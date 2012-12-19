@@ -1,0 +1,21 @@
+<project name="Core" basedir="." default="release">
+    <property environment="env"/>
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="build/classes"/>
+        <javac srcdir="src" destdir="build/classes"/>
+    </target>
+
+    <target name="compile_debug">
+        <mkdir dir="build/classes"/>
+        <javac srcdir="src" destdir="build/classes" debug="true" debuglevel="lines,vars,source"/>
+    </target>
+
+    <target name="release" depends="clean,compile"/>
+    <target name="debug" depends="clean,compile_debug"/>
+
+</project>

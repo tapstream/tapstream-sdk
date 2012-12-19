@@ -1,0 +1,53 @@
+package com.tapstream.sdk;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ThreadFactory;
+
+class PlatformImpl implements Platform {
+	public Response response = new Response(200, null);
+	public Set<String> savedFiredList = null;
+
+	public PlatformImpl() {
+	}
+
+	public ThreadFactory makeWorkerThreadFactory() {
+		return new WorkerThread.Factory();
+	}
+
+	public String loadUuid() {
+		return "00000000-0000-0000-0000-000000000000";
+	}
+
+	public Set<String> loadFiredEvents() {
+		return new HashSet<String>();
+	}
+
+	public void saveFiredEvents(Set<String> firedEvents) {
+		savedFiredList = new HashSet<String>(firedEvents);
+	}
+
+	public String getResolution() {
+		return "480x960";
+	}
+
+	public String getManufacturer() {
+		return "TestManfacturer";
+	}
+
+	public String getModel() {
+		return "TestModel";
+	}
+
+	public String getOs() {
+		return "AndroidTestOs";
+	}
+
+	public String getLocale() {
+		return "en_US";
+	}
+
+	public Response request(String url, String data) {
+		return response;
+	}
+}
