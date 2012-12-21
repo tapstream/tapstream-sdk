@@ -4,27 +4,27 @@ import com.tapstream.sdk.Hit.CompletionHandler;
 
 import android.content.Context;
 
-public class ConversionTracker implements Api {
-	private static ConversionTracker instance;
+public class Tapstream implements Api {
+	private static Tapstream instance;
 
 	public static void create(Context context, String accountName, String developerSecret) {
 		create(context, accountName, developerSecret, null);
 	}
 
 	public static void create(Context context, String accountName, String developerSecret, String hardware) {
-		synchronized (ConversionTracker.class) {
+		synchronized (Tapstream.class) {
 			if (instance == null) {
-				instance = new ConversionTracker(context, accountName, developerSecret, hardware);
+				instance = new Tapstream(context, accountName, developerSecret, hardware);
 			} else {
-				Logging.log(Logging.WARN, "ConversionTracker Warning: ConversionTracker already instantiated, it cannot be re-created.");
+				Logging.log(Logging.WARN, "Tapstream Warning: Tapstream already instantiated, it cannot be re-created.");
 			}
 		}
 	}
 
-	public static ConversionTracker getInstance() {
-		synchronized (ConversionTracker.class) {
+	public static Tapstream getInstance() {
+		synchronized (Tapstream.class) {
 			if (instance == null) {
-				throw new RuntimeException("You must first call ConversionTracker.create");
+				throw new RuntimeException("You must first call Tapstream.create");
 			}
 			return instance;
 		}
@@ -45,7 +45,7 @@ public class ConversionTracker implements Api {
 	private CoreListener listener;
 	private Core core;
 
-	private ConversionTracker(Context context, String accountName, String developerSecret, String hardware) {
+	private Tapstream(Context context, String accountName, String developerSecret, String hardware) {
 		delegate = new DelegateImpl();
 		platform = new PlatformImpl(context);
 		listener = new CoreListenerImpl();

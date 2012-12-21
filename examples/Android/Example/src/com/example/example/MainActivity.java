@@ -14,9 +14,9 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		ConversionTracker.create(getApplicationContext(), "sdktest", "YGP2pezGTI6ec48uti4o1w");
+		Tapstream.create(getApplicationContext(), "sdktest", "YGP2pezGTI6ec48uti4o1w");
 		
-		ConversionTracker tracker = ConversionTracker.getInstance();
+		Tapstream tracker = Tapstream.getInstance();
 
 		Event e = new Event("test-event", false);
         e.addPair("player", "John Doe");

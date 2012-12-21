@@ -2,7 +2,7 @@ package com.tapstream.sdk;
 
 import com.tapstream.sdk.Hit.CompletionHandler;
 
-class ConversionTracker implements Api {
+class Tapstream implements Api {
 
 	private class DelegateImpl implements Delegate {
 		public int getDelay() {
@@ -19,14 +19,14 @@ class ConversionTracker implements Api {
 	private CoreListener listener;
 	public Core core;
 
-	public ConversionTracker(OperationQueue queue, String accountName, String developerSecret) {
+	public Tapstream(OperationQueue queue, String accountName, String developerSecret) {
 		delegate = new DelegateImpl();
 		platform = new PlatformImpl();
 		listener = new CoreListenerImpl(queue);
 		core = new Core(delegate, platform, listener, accountName, developerSecret, null);
 	}
 
-	public ConversionTracker(OperationQueue queue, String accountName, String developerSecret, String hardware) {
+	public Tapstream(OperationQueue queue, String accountName, String developerSecret, String hardware) {
 		delegate = new DelegateImpl();
 		platform = new PlatformImpl();
 		listener = new CoreListenerImpl(queue);

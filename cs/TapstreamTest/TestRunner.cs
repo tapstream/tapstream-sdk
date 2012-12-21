@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Jint;
 using Jint.Native;
 
-namespace Tapstream.Sdk
+namespace TapstreamMetrics.Sdk
 {
     public class Util
     {
@@ -38,22 +38,22 @@ namespace Tapstream.Sdk
             Console.Out.WriteLine(message);
         }
 
-        public void setResponseStatus(ConversionTracker ts, int status)
+        public void setResponseStatus(Tapstream ts, int status)
         {
             ts.SetResponseStatus(status);
         }
 
-        public string getPostData(ConversionTracker ts)
+        public string getPostData(Tapstream ts)
         {
             return ts.GetPostData();
         }
 
-        public double getDelay(ConversionTracker ts)
+        public double getDelay(Tapstream ts)
         {
             return ts.GetDelay();
         }
 
-        public JsArray getSavedFiredList(ConversionTracker ts)
+        public JsArray getSavedFiredList(Tapstream ts)
         {
             string[] strings = ts.GetSavedFiredList();
             JsArray array = engine.Global.ArrayClass.New();
@@ -70,9 +70,9 @@ namespace Tapstream.Sdk
             return new OperationQueue();
         }
 
-        public ConversionTracker newConversionTracker(OperationQueue queue, string accountName, string secret, string hardware)
+        public Tapstream newTapstream(OperationQueue queue, string accountName, string secret, string hardware)
         {
-            return new ConversionTracker(queue, accountName, secret, hardware);
+            return new Tapstream(queue, accountName, secret, hardware);
         }
 
         public Event newEvent(string name, bool oneTimeOnly)

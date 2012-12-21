@@ -9,7 +9,7 @@
 #import "Response.h"
 #import "Logging.h"
 
-@interface ConversionTracker : NSObject<Api> {
+@interface Tapstream : NSObject<Api> {
 @private
 	id<Delegate> del;
 	id<Platform> platform;

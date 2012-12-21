@@ -13,7 +13,7 @@
 		120430F9167D4A7B00F509B7 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 120430F7167D4A7B00F509B7 /* Credits.rtf */; };
 		120430FC167D4A7B00F509B7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 120430FB167D4A7B00F509B7 /* AppDelegate.m */; };
 		120430FF167D4A7B00F509B7 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 120430FD167D4A7B00F509B7 /* MainMenu.xib */; };
-		1258BAB51681701F00DA7D11 /* ConversionTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 1258BAA11681701F00DA7D11 /* ConversionTracker.m */; };
+		1258BAB51681701F00DA7D11 /* Tapstream.m in Sources */ = {isa = PBXBuildFile; fileRef = 1258BAA11681701F00DA7D11 /* Tapstream.m */; };
 		1258BAB61681701F00DA7D11 /* Core.m in Sources */ = {isa = PBXBuildFile; fileRef = 1258BAA31681701F00DA7D11 /* Core.m */; };
 		1258BAB71681701F00DA7D11 /* CoreListenerImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 1258BAA61681701F00DA7D11 /* CoreListenerImpl.m */; };
 		1258BAB81681701F00DA7D11 /* Event.m in Sources */ = {isa = PBXBuildFile; fileRef = 1258BAA91681701F00DA7D11 /* Event.m */; };
@@ -38,8 +38,8 @@
 		120430FB167D4A7B00F509B7 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		120430FE167D4A7B00F509B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		1258BA9F1681701F00DA7D11 /* Api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Api.h; sourceTree = "<group>"; };
-		1258BAA01681701F00DA7D11 /* ConversionTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConversionTracker.h; sourceTree = "<group>"; };
-		1258BAA11681701F00DA7D11 /* ConversionTracker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConversionTracker.m; sourceTree = "<group>"; };
+		1258BAA01681701F00DA7D11 /* Tapstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tapstream.h; sourceTree = "<group>"; };
+		1258BAA11681701F00DA7D11 /* Tapstream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tapstream.m; sourceTree = "<group>"; };
 		1258BAA21681701F00DA7D11 /* Core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Core.h; sourceTree = "<group>"; };
 		1258BAA31681701F00DA7D11 /* Core.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Core.m; sourceTree = "<group>"; };
 		1258BAA41681701F00DA7D11 /* CoreListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreListener.h; sourceTree = "<group>"; };
@@ -137,8 +137,8 @@
 			isa = PBXGroup;
 			children = (
 				1258BA9F1681701F00DA7D11 /* Api.h */,
-				1258BAA01681701F00DA7D11 /* ConversionTracker.h */,
-				1258BAA11681701F00DA7D11 /* ConversionTracker.m */,
+				1258BAA01681701F00DA7D11 /* Tapstream.h */,
+				1258BAA11681701F00DA7D11 /* Tapstream.m */,
 				1258BAA21681701F00DA7D11 /* Core.h */,
 				1258BAA31681701F00DA7D11 /* Core.m */,
 				1258BAA41681701F00DA7D11 /* CoreListener.h */,
@@ -229,7 +229,7 @@
 			files = (
 				120430F5167D4A7B00F509B7 /* main.m in Sources */,
 				120430FC167D4A7B00F509B7 /* AppDelegate.m in Sources */,
-				1258BAB51681701F00DA7D11 /* ConversionTracker.m in Sources */,
+				1258BAB51681701F00DA7D11 /* Tapstream.m in Sources */,
 				1258BAB61681701F00DA7D11 /* Core.m in Sources */,
 				1258BAB71681701F00DA7D11 /* CoreListenerImpl.m in Sources */,
 				1258BAB81681701F00DA7D11 /* Event.m in Sources */,

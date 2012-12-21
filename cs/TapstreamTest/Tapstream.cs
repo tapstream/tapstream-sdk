@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using System.Runtime.InteropServices.WindowsRuntime;
 
-namespace Tapstream.Sdk
+namespace TapstreamMetrics.Sdk
 {
-    public sealed class ConversionTracker : Api
+    public sealed class Tapstream : Api
     {
         private class DelegateImpl : Delegate
         {
@@ -28,7 +28,7 @@ namespace Tapstream.Sdk
         private CoreListener listener;
         private Core core;
 
-        public ConversionTracker(OperationQueue queue, string accountName, string developerSecret, string hardware)
+        public Tapstream(OperationQueue queue, string accountName, string developerSecret, string hardware)
         {
             del = new DelegateImpl();
             platform = new PlatformImpl();

@@ -1,5 +1,6 @@
 from paver.easy import *
 from paver.easy import path
+import re
 
 """
 Notes:
@@ -56,10 +57,15 @@ def _gen_java_whitelabel():
 	path.copytree(path('java'), path('java-whitelabel'))
 	for d in ('Core', 'Tapstream', 'TapstreamTest'):
 		path.move(path('java-whitelabel/%s/src/com/tapstream' % d), path('java-whitelabel/%s/src/com/conversiontracker' % d))
+	path.move(path('java-whitelabel/Tapstream/src/com/conversiontracker/sdk/Tapstream.java'), path('java-whitelabel/Tapstream/src/com/conversiontracker/sdk/ConversionTracker.java'))
+
+	package_name = re.compile(r'com\.tapstream\.sdk')
+	class_name = re.compile(r'([\s("])Tapstream([\s(.])')
 	for file_path in path('java-whitelabel').walkfiles('*.java'):
 		with open(file_path, 'rb+') as f:
 			data = f.read()
-			data = data.replace('com.tapstream.sdk', 'com.conversiontracker.sdk')
+			data = package_name.sub('com.conversiontracker.sdk', data)
+			data = class_name.sub(r'\1ConversionTracker\2', data)
 			f.seek(0)
 			f.write(data)
 			f.truncate()
@@ -117,19 +123,19 @@ def package_cs():
 	make_cs()
 	path('builds/win8').rmtree()
 	path('builds/win8').makedirs()
-	path.copy(path('./cs/Tapstream/bin/%s/Tapstream.winmd' % CONFIGURATION), path('./builds/win8/'))
+	path.copy(path('./cs/Tapstream/bin/%s/TapstreamMetrics.winmd' % CONFIGURATION), path('./builds/win8/'))
 	
 	path('builds/winphone').rmtree()
 	path('builds/winphone').makedirs()
-	path.copy(path('./cs/TapstreamWinPhone/Bin/%s/Tapstream.dll' % CONFIGURATION), path('./builds/winphone/'))
+	path.copy(path('./cs/TapstreamWinPhone/Bin/%s/TapstreamMetrics.dll' % CONFIGURATION), path('./builds/winphone/'))
 
 	path('builds/TapstreamSDK-win8.zip').remove()
 	with pushd('builds/win8'):
-		sh('7z a -tzip ../TapstreamSDK-win8.zip Tapstream.winmd')
+		sh('7z a -tzip ../TapstreamSDK-win8.zip TapstreamMetrics.winmd')
 
 	path('builds/TapstreamSDK-winphone.zip').remove()
 	with pushd('builds/winphone'):
-		sh('7z a -tzip ../TapstreamSDK-winphone.zip Tapstream.dll')
+		sh('7z a -tzip ../TapstreamSDK-winphone.zip TapstreamMetrics.dll')
 
 
 

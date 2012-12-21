@@ -17,13 +17,13 @@ public class Hit {
 		try {
 			encodedTrackerName = URLEncoder.encode(hitTrackerName, "UTF-8").replace("+", "%20");
 		} catch (UnsupportedEncodingException e) {
-			Logging.log(Logging.INFO, "ConversionTracker Error: Could not encode hit tracker name, exception=%s", e.getMessage());
+			Logging.log(Logging.INFO, "Tapstream Error: Could not encode hit tracker name, exception=%s", e.getMessage());
 		}
 	}
 
 	public void addTag(String tag) {
 		if (tag.length() > 255) {
-			Logging.log(Logging.WARN, "ConversionTracker Warning: Hit tag exceeds 255 characters, it will not be included in the post (tag=%s)", tag);
+			Logging.log(Logging.WARN, "Tapstream Warning: Hit tag exceeds 255 characters, it will not be included in the post (tag=%s)", tag);
 			return;
 		}
 
@@ -31,7 +31,7 @@ public class Hit {
 		try {
 			encodedTag = URLEncoder.encode(tag, "UTF-8").replace("+", "%20");
 		} catch (UnsupportedEncodingException e) {
-			Logging.log(Logging.INFO, "ConversionTracker Error: Could not encode hit tracker tag %s, exception=%s", tag, e.getMessage());
+			Logging.log(Logging.INFO, "Tapstream Error: Could not encode hit tracker tag %s, exception=%s", tag, e.getMessage());
 			return;
 		}
 

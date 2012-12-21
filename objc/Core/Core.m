@@ -83,14 +83,14 @@
 		{
 			if([firedEvents containsObject:e.name])
 			{
-				[Logging logAtLevel:kLoggingInfo format:@"ConversionTracker ignoring event named \"%@\" because it is a one-time-only event that has already been fired", e.name];
+				[Logging logAtLevel:kLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that has already been fired", e.name];
                 [listener reportOperation:@"event-ignored-already-fired"];
                 [listener reportOperation:@"job-ended"];
                 return;
 			}
 			else if([firedEvents containsObject:e.name])
 			{
-				[Logging logAtLevel:kLoggingInfo format:@"ConversionTracker ignoring event named \"%@\" because it is a one-time-only event that is already in progress", e.name];
+				[Logging logAtLevel:kLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that is already in progress", e.name];
                 [listener reportOperation:@"event-ignored-already-in-progress"];
                 [listener reportOperation:@"job-ended"];
                 return;
@@ -156,15 +156,15 @@
             {
 			    if(response.status < 0)
                 {
-				    [Logging logAtLevel:kLoggingError format:@"ConversionTracker Error: Failed to fire event, error=%@", response.message];
+				    [Logging logAtLevel:kLoggingError format:@"Tapstream Error: Failed to fire event, error=%@", response.message];
 			    }
                 else if(response.status == 404)
                 {
-				    [Logging logAtLevel:kLoggingError format:@"ConversionTracker Error: Failed to fire event, http code %d\nDoes your event name contain characters that are not url safe? This event will not be retried.", response.status];
+				    [Logging logAtLevel:kLoggingError format:@"Tapstream Error: Failed to fire event, http code %d\nDoes your event name contain characters that are not url safe? This event will not be retried.", response.status];
 			    }
                 else if(response.status == 403)
                 {
-				   [Logging logAtLevel:kLoggingError format:@"ConversionTracker Error: Failed to fire event, http code %d\nAre your account name and application secret correct?  This event will not be retried.", response.status];
+				   [Logging logAtLevel:kLoggingError format:@"Tapstream Error: Failed to fire event, http code %d\nAre your account name and application secret correct?  This event will not be retried.", response.status];
 			    }
                 else
                 {
@@ -173,7 +173,7 @@
                     {
 					    retryMsg = @"  This event will not be retried.";
 				    }
-				    [Logging logAtLevel:kLoggingError format:@"ConversionTracker Error: Failed to fire event, http code %d.%@", response.status, retryMsg];
+				    [Logging logAtLevel:kLoggingError format:@"Tapstream Error: Failed to fire event, http code %d.%@", response.status, retryMsg];
 			    }
 
 			    [listener reportOperation:@"event-failed" arg:e.uid];
@@ -190,7 +190,7 @@
 		    }
             else
             {
-            	[Logging logAtLevel:kLoggingInfo format:@"ConversionTracker fired event named \"%@\"", e.name];
+            	[Logging logAtLevel:kLoggingInfo format:@"Tapstream fired event named \"%@\"", e.name];
 			    [listener reportOperation:@"event-succeeded"];
 		    }
 		
@@ -208,12 +208,12 @@
 		Response *response = [platform request:url data:data];
 		if(response.status < 200 || response.status >= 300)
 		{
-			[Logging logAtLevel:kLoggingError format:@"ConversionTracker Error: Failed to fire hit, http code: %d", response.status];
+			[Logging logAtLevel:kLoggingError format:@"Tapstream Error: Failed to fire hit, http code: %d", response.status];
             [listener reportOperation:@"hit-failed"];
         }
         else
         {
-            [Logging logAtLevel:kLoggingInfo format:@"ConversionTracker fired hit to tracker: %@", hit.trackerName];
+            [Logging logAtLevel:kLoggingInfo format:@"Tapstream fired hit to tracker: %@", hit.trackerName];
             [listener reportOperation:@"hit-succeeded"];
         }
 
@@ -282,7 +282,7 @@
 	{
 		if([hardware length] > 255)
 		{
-			[Logging logAtLevel:kLoggingWarn format:@"ConversionTracker Warning: Hardware argument exceeds 255 characters, it will not be included with fired events"];
+			[Logging logAtLevel:kLoggingWarn format:@"Tapstream Warning: Hardware argument exceeds 255 characters, it will not be included with fired events"];
 		}
 		else
 		{

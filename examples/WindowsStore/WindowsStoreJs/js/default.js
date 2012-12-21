@@ -8,7 +8,7 @@
     var app = WinJS.Application;
     var activation = Windows.ApplicationModel.Activation;
     
-    var tapstream = Tapstream.Sdk;
+    var tapstream = TapstreamMetrics.Sdk;
 
     app.onactivated = function (args) {
         if (args.detail.kind === activation.ActivationKind.launch) {
@@ -21,9 +21,9 @@
             }
             args.setPromise(WinJS.UI.processAll());
 
-            tapstream.ConversionTracker.create("sdktest", "YGP2pezGTI6ec48uti4o1w");
+            tapstream.Tapstream.create("sdktest", "YGP2pezGTI6ec48uti4o1w");
 
-            var tracker = tapstream.ConversionTracker.instance;
+            var tracker = tapstream.Tapstream.instance;
 
             var e = new tapstream.Event("test-event", false);
             e.addPair("player", "John Doe");

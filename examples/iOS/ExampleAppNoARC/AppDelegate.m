@@ -7,7 +7,7 @@
 //
 
 #import "AppDelegate.h"
-#import "ConversionTracker.h"
+#import "Tapstream.h"
 
 @implementation AppDelegate
 
@@ -26,9 +26,9 @@
         splitViewController.delegate = (id)navigationController.topViewController;
     }
     
-    [ConversionTracker createWithAccountName:@"sdktest" developerSecret:@"YGP2pezGTI6ec48uti4o1w"];
+    [Tapstream createWithAccountName:@"sdktest" developerSecret:@"YGP2pezGTI6ec48uti4o1w"];
     
-    ConversionTracker *tracker = [ConversionTracker instance];
+    Tapstream *tracker = [Tapstream instance];
 
     Event *e = [Event eventWithName:@"test-event" oneTimeOnly:NO];
     [e addValue:@"John Doe" forKey:@"player"];

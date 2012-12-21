@@ -185,8 +185,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Tapstream">
-      <HintPath>..\..\..\builds\win8\Tapstream.winmd</HintPath>
+    <Reference Include="TapstreamMetrics">
+      <HintPath>..\..\..\builds\win8\TapstreamMetrics.winmd</HintPath>
       <IsWinMDFile>true</IsWinMDFile>
     </Reference>
   </ItemGroup>

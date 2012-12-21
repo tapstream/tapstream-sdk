@@ -1,4 +1,4 @@
-#import "ConversionTracker.h"
+#import "Tapstream.h"
 #import "helpers.h"
 #import "PlatformImpl.h"
 #import "CoreListenerImpl.h"
@@ -23,7 +23,7 @@
 
 
 
-@interface ConversionTracker()
+@interface Tapstream()
 
 @property(nonatomic, STRONG_OR_RETAIN) id<Delegate> del;
 @property(nonatomic, STRONG_OR_RETAIN) id<Platform> platform;
@@ -33,7 +33,7 @@
 @end
 
 
-@implementation ConversionTracker
+@implementation Tapstream
 
 @synthesize del, platform, listener, core;
 

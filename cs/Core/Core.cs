@@ -14,7 +14,7 @@ using Windows.Foundation;
 using Windows.System.Threading;
 #endif
 
-namespace Tapstream.Sdk
+namespace TapstreamMetrics.Sdk
 {
     class Core
     {
@@ -60,14 +60,14 @@ namespace Tapstream.Sdk
                 {
                     if (firedEvents.Contains(e.Name))
                     {
-                        Logging.Log(LogLevel.INFO, "ConversionTracker ignoring event named \"{0}\" because it is a one-time-only event that has already been fired", e.Name);
+                        Logging.Log(LogLevel.INFO, "Tapstream ignoring event named \"{0}\" because it is a one-time-only event that has already been fired", e.Name);
                         listener.ReportOperation("event-ignored-already-fired");
                         listener.ReportOperation("job-ended");
                         return;
                     }
                     else if (firingEvents.Contains(e.Name))
                     {
-                        Logging.Log(LogLevel.INFO, "ConversionTracker ignoring event named \"{0}\" because it is a one-time-only event that is already in progress", e.Name);
+                        Logging.Log(LogLevel.INFO, "Tapstream ignoring event named \"{0}\" because it is a one-time-only event that is already in progress", e.Name);
                         listener.ReportOperation("event-ignored-already-in-progress");
                         listener.ReportOperation("job-ended");
                         return;
@@ -141,15 +141,15 @@ namespace Tapstream.Sdk
                     {
 					    if(response.Status < 0)
                         {
-                            Logging.Log(LogLevel.ERROR, "ConversionTracker Error: Failed to fire event, error={0}", response.Message);
+                            Logging.Log(LogLevel.ERROR, "Tapstream Error: Failed to fire event, error={0}", response.Message);
 					    }
                         else if(response.Status == 404)
                         {
-                            Logging.Log(LogLevel.ERROR, "ConversionTracker Error: Failed to fire event, http code {0}\nDoes your event name contain characters that are not url safe? This event will not be retried.", response.Status);
+                            Logging.Log(LogLevel.ERROR, "Tapstream Error: Failed to fire event, http code {0}\nDoes your event name contain characters that are not url safe? This event will not be retried.", response.Status);
 					    }
                         else if(response.Status == 403)
                         {
-                            Logging.Log(LogLevel.ERROR, "ConversionTracker Error: Failed to fire event, http code {0}\nAre your account name and application secret correct?  This event will not be retried.", response.Status);
+                            Logging.Log(LogLevel.ERROR, "Tapstream Error: Failed to fire event, http code {0}\nAre your account name and application secret correct?  This event will not be retried.", response.Status);
 					    }
                         else
                         {
@@ -158,7 +158,7 @@ namespace Tapstream.Sdk
                             {
 							    retryMsg = "  This event will not be retried.";
 						    }
-                            Logging.Log(LogLevel.ERROR, "ConversionTracker Error: Failed to fire event, http code {0}.{1}", response.Status, retryMsg);
+                            Logging.Log(LogLevel.ERROR, "Tapstream Error: Failed to fire event, http code {0}.{1}", response.Status, retryMsg);
 					    }
 
 					    listener.ReportOperation("event-failed", e.Uid);
@@ -175,7 +175,7 @@ namespace Tapstream.Sdk
 				    }
                     else
                     {
-                        Logging.Log(LogLevel.INFO, "ConversionTracker fired event named \"{0}\"", e.Name);
+                        Logging.Log(LogLevel.INFO, "Tapstream fired event named \"{0}\"", e.Name);
 					    listener.ReportOperation("event-succeeded");
 				    }
 				
@@ -207,7 +207,7 @@ namespace Tapstream.Sdk
                     Response response = platform.Request(url, data);
                     if(response.Status < 200 || response.Status >= 300)
                     {
-                        Logging.Log(LogLevel.ERROR, "ConversionTracker Error: Failed to fire hit, http code: {0}", response.Status);
+                        Logging.Log(LogLevel.ERROR, "Tapstream Error: Failed to fire hit, http code: {0}", response.Status);
                         listener.ReportOperation("hit-failed");
                     }
                     else
@@ -282,7 +282,7 @@ namespace Tapstream.Sdk
             {
                 if(hardware.Length > 255)
                 {
-                    Logging.Log(LogLevel.WARN, "ConversionTracker Warning: Hardware argument exceeds 255 characters, it will not be included with fired events");
+                    Logging.Log(LogLevel.WARN, "Tapstream Warning: Hardware argument exceeds 255 characters, it will not be included with fired events");
                 }
                 else
                 {

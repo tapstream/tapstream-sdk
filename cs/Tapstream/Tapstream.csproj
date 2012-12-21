@@ -9,8 +9,8 @@
     <ProjectGuid>{6406D8DD-1867-4C94-BF75-2C9AAE4850E8}</ProjectGuid>
     <OutputType>winmdobj</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tapstream</RootNamespace>
-    <AssemblyName>Tapstream</AssemblyName>
+    <RootNamespace>TapstreamMetrics</RootNamespace>
+    <AssemblyName>TapstreamMetrics</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -132,7 +132,7 @@
     <Compile Include="CoreListenerImpl.cs" />
     <Compile Include="PlatformImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ConversionTracker.cs" />
+    <Compile Include="Tapstream.cs" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>

@@ -27,17 +27,17 @@
 
 {% elif platform == 'win8' %}
 
-* Extract Tapstream.winmd from the SDK zip file.
+* Extract TapstreamMetrics.winmd from the SDK zip file.
 * Open your project in Visual Studio.
 * Right click on your project in the Solution Explorer, and select "Add Reference...".
-* Click the "Browse" button and select Tapstream.winmd from the location you extracted it to.
+* Click the "Browse" button and select TapstreamMetrics.winmd from the location you extracted it to.
 
 {% elif platform == 'winphone' %}
 
-* Extract Tapstream.dll from the SDK zip file.
+* Extract TapstreamMetrics.dll from the SDK zip file.
 * Open your project in Visual Studio.
 * Right click on your project in the Solution Explorer, and select "Add Reference...".
-* Click the "Browse" button and select Tapstream.dll from the location you extracted it to.
+* Click the "Browse" button and select TapstreamMetrics.dll from the location you extracted it to.
 
 {% endif %}
 
@@ -57,18 +57,18 @@ In your project's main activity file, import the TapStream SDK:
 import com.tapstream.sdk.*;
 ```
 
-Then, in the `onCreate` method of your main activity, create the `ConversionTracker` singleton with the account name and
+Then, in the `onCreate` method of your main activity, create the `Tapstream` singleton with the account name and
 developer secret that you've setup on the Tapstream website:
 
 ```java
-ConversionTracker.create(getApplicationContext(), "TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY");
+Tapstream.create(getApplicationContext(), "TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY");
 ```
 
 If you have access to some kind of unique hardware identifier, you may provide this upon creation.
 The hardware identifier must be no more than 255 characters in length.  In this case, instantiation would look like this: 
 
 ```java
-ConversionTracker.create(getApplicationContext(), "TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", "SOME_UNIQUE_HARDWARE_ID");
+Tapstream.create(getApplicationContext(), "TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", "SOME_UNIQUE_HARDWARE_ID");
 ```
 
 {% elif platform == 'ios' or platform == 'mac' %}
@@ -76,20 +76,20 @@ ConversionTracker.create(getApplicationContext(), "TAPSTREAM_ACCOUNT_NAME", "DEV
 In your project's AppDelegate.m file, import the Tapstream SDK:
 
 ```objective-c
-#import "ConversionTracker.h"
+#import "Tapstream.h"
 ```
 
 Then, in the {% if platform == 'ios' %}`-application:didFinishLaunchingWithOptions:`{% else %}`-applicationDidFinishLaunching:`{% endif %} method of the AppDelegate,
-create the `ConversionTracker` singleton with the account name and developer secret that you've setup on the Tapstream website:
+create the `Tapstream` singleton with the account name and developer secret that you've setup on the Tapstream website:
 ```objective-c
-[ConversionTracker createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY"];
+[Tapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY"];
 ```
 
 If you have access to some kind of unique hardware identifier, you may provide this upon creation.
 The hardware identifier must be no more than 255 characters in length.  In this case, instantiation would look like this: 
 
 ```objective-c
-[ConversionTracker createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY" hardware:@"SOME_UNIQUE_HARDWARE_ID"];
+[Tapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY" hardware:@"SOME_UNIQUE_HARDWARE_ID"];
 ```
 
 {% elif platform == 'win8' or platform == 'winphone' %}
@@ -97,21 +97,21 @@ The hardware identifier must be no more than 255 characters in length.  In this 
 In your project's main activity file, import the TapStream SDK:
 
 ```csharp
-using Tapstream.Sdk;
+using TapstreamMetrics.Sdk;
 ```
 
-Then, in the constructor of your main application class, create the `ConversionTracker` singleton with the account name and
+Then, in the constructor of your main application class, create the `Tapstream` singleton with the account name and
 developer secret that you've setup on the Tapstream website:
 
 ```csharp
-ConversionTracker.Create("TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY");
+Tapstream.Create("TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY");
 ```
 
 If you have access to some kind of unique hardware identifier, you may provide this upon creation.
 The hardware identifier must be no more than 255 characters in length.  In this case, instantiation would look like this: 
 
 ```csharp
-ConversionTracker.Create("TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", "SOME_UNIQUE_HARDWARE_ID");
+Tapstream.Create("TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", "SOME_UNIQUE_HARDWARE_ID");
 ```
 
 {% endif %}
@@ -129,17 +129,17 @@ Now that the sdk is initialized, you may fire events from anywhere in your code.
 {% if platform == 'android' %}
 ```java
 Event *e = new Event("install", false);
-ConversionTracker.getInstance().fireEvent(e);
+Tapstream.getInstance().fireEvent(e);
 ```
 {% elif platform == 'ios' or platform == 'mac' %}
 ```objective-c
 Event *e = [Event eventWithName:@"install" oneTimeOnly:NO];
-[[ConversionTracker instance] fireEvent:e];
+[[Tapstream instance] fireEvent:e];
 ```
 {% elif platform == 'win8' or platform == 'winphone' %}
 ```csharp
 Event *e = new Event("install", false);
-ConversionTracker.Instance.FireEvent(e);
+Tapstream.Instance.FireEvent(e);
 ```
 {% endif %}
 
@@ -152,17 +152,17 @@ If you want to fire an event that will only happen once in the lifetime of the a
 {% if platform == 'android' %}
 ```java
 Event *e = new Event("install", true);
-ConversionTracker.getInstance().fireEvent(e);
+Tapstream.getInstance().fireEvent(e);
 ```
 {% elif platform == 'ios' or platform == 'mac' %}
 ```objective-c
 Event *e = [Event eventWithName:@"install" oneTimeOnly:YES];
-[[ConversionTracker instance] fireEvent:e];
+[[Tapstream instance] fireEvent:e];
 ```
 {% elif platform == 'win8' or platform == 'winphone' %}
 ```csharp
 Event *e = new Event("install", true);
-ConversionTracker.Instance.FireEvent(e);
+Tapstream.Instance.FireEvent(e);
 ```
 {% endif %}
 
@@ -182,7 +182,7 @@ In the following example, two events are fired.  Both contain key/value pairs, a
 
 {% if platform == 'android' %}
 ```java
-ConversionTracker tracker = ConversionTracker.getInstance();
+Tapstream tracker = Tapstream.getInstance();
 
 Event *e = new Event("installed", true);
 e.addPair("username", "test-user");
@@ -195,7 +195,7 @@ tracker.fireEvent(e);
 ```
 {% elif platform == 'ios' or platform == 'mac' %}
 ```objective-c
-ConversionTracker *tracker = [ConversionTracker instance];
+Tapstream *tracker = [Tapstream instance];
 
 Event *e = [Event eventWithName:@"installed" oneTimeOnly:YES];
 [e addValue:@"test-user" forKey:@"username"];
@@ -208,7 +208,7 @@ e = [Event eventWithName:@"level-complete" oneTimeOnly:NO];
 ```
 {% elif platform == 'win8' or platform == 'winphone' %}
 ```csharp
-ConversionTracker tracker = ConversionTracker.Instance;
+Tapstream tracker = Tapstream.Instance;
 
 Event *e = new Event("installed", true);
 e.AddPair("username", "test-user");
@@ -281,7 +281,7 @@ Although hits are usually created in a browser, it is possible to fire hits from
 Hit h = new Hit("my-hit-tracker-name");
 h.addTag("tag-1");
 h.addTag("tag-2");
-ConversionTracker.getInstance().fireHit(h, new Hit.CompletionHandler() {
+Tapstream.getInstance().fireHit(h, new Hit.CompletionHandler() {
 	@Override
 	public void complete(Response response) {
 		if(response.status >= 200 && response.status < 300) {
@@ -297,7 +297,7 @@ ConversionTracker.getInstance().fireHit(h, new Hit.CompletionHandler() {
 Hit *h = [Hit hitWithTrackerName:@"my-hit-tracker-name"];
 [h addTag:@"tag-1"];
 [h addTag:@"tag-2"];
-[[ConversionTracker instance] fireHit:h completion:^(Response *response) {
+[[Tapstream instance] fireHit:h completion:^(Response *response) {
     if (response.status >= 200 && response.status < 300)
     {
         // Success
@@ -315,7 +315,7 @@ h.AddTag("tag-1");
 h.AddTag("tag-2");
 Task.Run(async () =>
 {
-    Response response = await ConversionTracker.Instance.FireHitAsync(h);
+    Response response = await Tapstream.Instance.FireHitAsync(h);
     if (response.Status >= 200 && response.Status < 300)
     {
         // Success

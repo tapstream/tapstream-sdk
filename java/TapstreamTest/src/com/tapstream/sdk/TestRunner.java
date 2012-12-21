@@ -41,15 +41,15 @@ public class TestRunner {
 			System.out.println(message);
 		}
 
-		public String getPostData(ConversionTracker ts) {
+		public String getPostData(Tapstream ts) {
 			return ts.core.getPostData();
 		}
 
-		public double getDelay(ConversionTracker ts) {
+		public double getDelay(Tapstream ts) {
 			return ts.core.getDelay();
 		}
 
-		public Scriptable getSavedFiredList(ConversionTracker ts) {
+		public Scriptable getSavedFiredList(Tapstream ts) {
 			Set<String> set = ((PlatformImpl) ts.platform).savedFiredList;
 			if (set == null) {
 				set = new HashSet<String>();
@@ -57,7 +57,7 @@ public class TestRunner {
 			return context.newArray(scope, set.toArray());
 		}
 
-		public void setResponseStatus(ConversionTracker ts, int status) {
+		public void setResponseStatus(Tapstream ts, int status) {
 			((PlatformImpl) ts.platform).response = new Response(status, String.format("Http %d", status));
 		}
 
@@ -65,8 +65,8 @@ public class TestRunner {
 			return new OperationQueue();
 		}
 
-		public ConversionTracker newConversionTracker(OperationQueue queue, String accountName, String secret, String hardware) {
-			return new ConversionTracker(queue, accountName, secret, hardware);
+		public Tapstream newTapstream(OperationQueue queue, String accountName, String secret, String hardware) {
+			return new Tapstream(queue, accountName, secret, hardware);
 		}
 
 		public Event newEvent(String name, boolean oneTimeOnly) {

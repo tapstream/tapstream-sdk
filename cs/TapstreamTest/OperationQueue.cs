@@ -7,7 +7,7 @@ using System.Collections.Concurrent;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Tapstream.Sdk
+namespace TapstreamMetrics.Sdk
 {
     public sealed class Operation
     {

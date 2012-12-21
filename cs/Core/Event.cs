@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Tapstream.Sdk
+namespace TapstreamMetrics.Sdk
 {
     public sealed class Event
     {
@@ -28,7 +28,7 @@ namespace Tapstream.Sdk
         {
             if(key.Length > 255)
             {
-                Logging.Log(LogLevel.WARN, "ConversionTracker Warning: Custom key exceeds 255 characters, this field will not be included in the post (key={0})", key);
+                Logging.Log(LogLevel.WARN, "Tapstream Warning: Custom key exceeds 255 characters, this field will not be included in the post (key={0})", key);
                 return;
             }
             string encodedName = Uri.EscapeDataString("custom-" + key);
@@ -36,7 +36,7 @@ namespace Tapstream.Sdk
             string stringifiedValue = value.ToString();
             if(stringifiedValue.Length > 255)
             {
-                Logging.Log(LogLevel.WARN, "ConversionTracker Warning: Custom value exceeds 255 characters, this field will not be included in the post (value={0})", value);
+                Logging.Log(LogLevel.WARN, "Tapstream Warning: Custom value exceeds 255 characters, this field will not be included in the post (value={0})", value);
                 return;
             }
             string encodedValue = Uri.EscapeDataString(stringifiedValue);

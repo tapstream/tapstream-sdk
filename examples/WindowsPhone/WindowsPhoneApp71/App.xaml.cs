@@ -13,7 +13,7 @@ using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 
-using Tapstream.Sdk;
+using TapstreamMetrics.Sdk;
 
 namespace WindowsPhoneApp71
 {
@@ -35,9 +35,9 @@ namespace WindowsPhoneApp71
             UnhandledException += Application_UnhandledException;
 
 
-            ConversionTracker.Create("sdktest", "YGP2pezGTI6ec48uti4o1w");
+            Tapstream.Create("sdktest", "YGP2pezGTI6ec48uti4o1w");
 
-            ConversionTracker tracker = ConversionTracker.Instance;
+            Tapstream tracker = Tapstream.Instance;
 
             Event e = new Event("test-event", false);
             e.AddPair("player", "John Doe");

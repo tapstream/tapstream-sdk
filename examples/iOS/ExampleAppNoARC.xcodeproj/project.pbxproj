@@ -20,7 +20,7 @@
 		12043085167D475800F509B7 /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 12043083167D475800F509B7 /* MainStoryboard_iPad.storyboard */; };
 		12043088167D475800F509B7 /* MasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 12043087167D475800F509B7 /* MasterViewController.m */; };
 		1204308B167D475800F509B7 /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1204308A167D475800F509B7 /* DetailViewController.m */; };
-		1258BA4A16816FBF00DA7D11 /* ConversionTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 1258BA3616816FBF00DA7D11 /* ConversionTracker.m */; };
+		1258BA4A16816FBF00DA7D11 /* Tapstream.m in Sources */ = {isa = PBXBuildFile; fileRef = 1258BA3616816FBF00DA7D11 /* Tapstream.m */; };
 		1258BA4B16816FBF00DA7D11 /* Core.m in Sources */ = {isa = PBXBuildFile; fileRef = 1258BA3816816FBF00DA7D11 /* Core.m */; };
 		1258BA4C16816FBF00DA7D11 /* CoreListenerImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 1258BA3B16816FBF00DA7D11 /* CoreListenerImpl.m */; };
 		1258BA4D16816FBF00DA7D11 /* Event.m in Sources */ = {isa = PBXBuildFile; fileRef = 1258BA3E16816FBF00DA7D11 /* Event.m */; };
@@ -51,8 +51,8 @@
 		12043089167D475800F509B7 /* DetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DetailViewController.h; sourceTree = "<group>"; };
 		1204308A167D475800F509B7 /* DetailViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DetailViewController.m; sourceTree = "<group>"; };
 		1258BA3416816FBF00DA7D11 /* Api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Api.h; sourceTree = "<group>"; };
-		1258BA3516816FBF00DA7D11 /* ConversionTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConversionTracker.h; sourceTree = "<group>"; };
-		1258BA3616816FBF00DA7D11 /* ConversionTracker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConversionTracker.m; sourceTree = "<group>"; };
+		1258BA3516816FBF00DA7D11 /* Tapstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tapstream.h; sourceTree = "<group>"; };
+		1258BA3616816FBF00DA7D11 /* Tapstream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tapstream.m; sourceTree = "<group>"; };
 		1258BA3716816FBF00DA7D11 /* Core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Core.h; sourceTree = "<group>"; };
 		1258BA3816816FBF00DA7D11 /* Core.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Core.m; sourceTree = "<group>"; };
 		1258BA3916816FBF00DA7D11 /* CoreListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreListener.h; sourceTree = "<group>"; };
@@ -150,8 +150,8 @@
 			isa = PBXGroup;
 			children = (
 				1258BA3416816FBF00DA7D11 /* Api.h */,
-				1258BA3516816FBF00DA7D11 /* ConversionTracker.h */,
-				1258BA3616816FBF00DA7D11 /* ConversionTracker.m */,
+				1258BA3516816FBF00DA7D11 /* Tapstream.h */,
+				1258BA3616816FBF00DA7D11 /* Tapstream.m */,
 				1258BA3716816FBF00DA7D11 /* Core.h */,
 				1258BA3816816FBF00DA7D11 /* Core.m */,
 				1258BA3916816FBF00DA7D11 /* CoreListener.h */,
@@ -247,7 +247,7 @@
 				12043079167D475800F509B7 /* AppDelegate.m in Sources */,
 				12043088167D475800F509B7 /* MasterViewController.m in Sources */,
 				1204308B167D475800F509B7 /* DetailViewController.m in Sources */,
-				1258BA4A16816FBF00DA7D11 /* ConversionTracker.m in Sources */,
+				1258BA4A16816FBF00DA7D11 /* Tapstream.m in Sources */,
 				1258BA4B16816FBF00DA7D11 /* Core.m in Sources */,
 				1258BA4C16816FBF00DA7D11 /* CoreListenerImpl.m in Sources */,
 				1258BA4D16816FBF00DA7D11 /* Event.m in Sources */,

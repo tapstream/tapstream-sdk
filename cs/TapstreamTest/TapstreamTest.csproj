@@ -88,7 +88,7 @@
     <Compile Include="PlatformImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestRunner.cs" />
-    <Compile Include="ConversionTracker.cs" />
+    <Compile Include="Tapstream.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -142,7 +142,7 @@ test('hit-tag-long', function() {
 // Tapstream tests
 test('post-data', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware');
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware');
     var pd = util.getPostData(ts);
     util.log(pd);
     util.assertTrue(pd.search("secret=") != -1);
@@ -158,20 +158,20 @@ test('post-data', function() {
 });
 test('long-hardware-id', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', string256);
+        ts = util.newTapstream(q, 'test-account', 'test-secret', string256);
     var pd = util.getPostData(ts);
     util.assertTrue(pd.search("hardware=") == -1);
 });
 test('succeeded', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         e = util.newEvent('test', false);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'event-succeeded', 'job-ended');
 });
 test('succeeded-event-has-created-time', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         e = util.newEvent('test', false);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'event-succeeded', 'job-ended');
@@ -182,7 +182,7 @@ test('succeeded-event-has-created-time', function() {
 });
 test('failed', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         e = util.newEvent('test', false);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
@@ -190,7 +190,7 @@ test('failed', function() {
 });
 test('failed-event-has-created-time', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         e = util.newEvent('test', false);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
@@ -202,7 +202,7 @@ test('failed-event-has-created-time', function() {
 });
 test('failed-non-500-range-doesnt-retry', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         e = util.newEvent('test', false);
     util.setResponseStatus(ts, 404);
     callMethod(ts, 'fireEvent', e);
@@ -210,7 +210,7 @@ test('failed-non-500-range-doesnt-retry', function() {
 });
 test('oto-enters-fired-list', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         e = util.newEvent('test', true);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'fired-list-saved');
@@ -220,7 +220,7 @@ test('oto-enters-fired-list', function() {
 });
 test('non-oto-does-not-enter-fired-list', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         e = util.newEvent('test', false);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'event-succeeded', 'job-ended');
@@ -229,7 +229,7 @@ test('non-oto-does-not-enter-fired-list', function() {
 });
 test('respects-fired-list-for-oto-events', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         e = util.newEvent('test', true);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'fired-list-saved', 'event-succeeded', 'job-ended');
@@ -239,7 +239,7 @@ test('respects-fired-list-for-oto-events', function() {
 });
 test('doesnt-respect-fired-list-for-non-oto-events', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         e = util.newEvent('test', true);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'fired-list-saved', 'event-succeeded', 'job-ended');
@@ -249,7 +249,7 @@ test('doesnt-respect-fired-list-for-non-oto-events', function() {
 });
 test('failed-oto-events-dont-enter-fired-list', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         e = util.newEvent('test', true);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
@@ -259,7 +259,7 @@ test('failed-oto-events-dont-enter-fired-list', function() {
 });
 test('increasing-delay', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         e = util.newEvent('test', false);
     util.setResponseStatus(ts, 500);
     var expected = [2, 4, 8, 16, 32, 60, 60, 60];
@@ -271,7 +271,7 @@ test('increasing-delay', function() {
 });
 test('success-doesnt-increase-delay', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         e = util.newEvent('test', false);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'event-succeeded', 'job-ended');
@@ -279,7 +279,7 @@ test('success-doesnt-increase-delay', function() {
 });
 test('first-failure-increases-delay', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         e = util.newEvent('test', false);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
@@ -288,7 +288,7 @@ test('first-failure-increases-delay', function() {
 });
 test('success-of-first-failed-event-resets-delay', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         e = util.newEvent('test', false);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
@@ -302,7 +302,7 @@ test('success-of-first-failed-event-resets-delay', function() {
 });
 test('success-of-any-event-resets-delay', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         e = util.newEvent('test', false);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
@@ -317,7 +317,7 @@ test('success-of-any-event-resets-delay', function() {
 });
 test('subsequent-failure-of-same-event-increases-delay', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         e = util.newEvent('test', false);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
@@ -330,7 +330,7 @@ test('subsequent-failure-of-same-event-increases-delay', function() {
 });
 test('only-first-event-to-fail-can-increase-delay', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         e1 = util.newEvent('test1', false),
         e2 = util.newEvent('test2', false);
     util.setResponseStatus(ts, 500);
@@ -353,14 +353,14 @@ test('only-first-event-to-fail-can-increase-delay', function() {
 });
 test('hit-success', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         h = util.newHit('test');
     callMethod(ts, 'fireHit', h);
     expect(q, 'hit-succeeded');
 });
 test('hit-failed', function() {
     var q = util.newOperationQueue(),
-        ts = util.newConversionTracker(q, 'test-account', 'test-secret', 'hardware'),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
         h = util.newHit('test');
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireHit', h);

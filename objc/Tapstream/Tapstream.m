@@ -1,24 +1,24 @@
-#import "ConversionTracker.h"
+#import "Tapstream.h"
 #import "helpers.h"
 #import "PlatformImpl.h"
 #import "CoreListenerImpl.h"
 
 @interface DelegateImpl : NSObject<Delegate> {
-	ConversionTracker *ts;
+	Tapstream *ts;
 }
-@property(nonatomic, STRONG_OR_RETAIN) ConversionTracker *ts;
-- (id)initWithConversionTracker:(ConversionTracker *)ts;
+@property(nonatomic, STRONG_OR_RETAIN) Tapstream *ts;
+- (id)initWithTapstream:(Tapstream *)ts;
 - (int)getDelay;
 - (bool)isRetryAllowed;
 @end
-// DelegateImpl comes at the end of the file so it can access a private property of the ConversionTracker interface
+// DelegateImpl comes at the end of the file so it can access a private property of the Tapstream interface
 
 
 
-static ConversionTracker *instance = nil;
+static Tapstream *instance = nil;
 
 
-@interface ConversionTracker()
+@interface Tapstream()
 
 @property(nonatomic, STRONG_OR_RETAIN) id<Delegate> del;
 @property(nonatomic, STRONG_OR_RETAIN) id<Platform> platform;
@@ -30,13 +30,13 @@ static ConversionTracker *instance = nil;
 @end
 
 
-@implementation ConversionTracker
+@implementation Tapstream
 
 @synthesize del, platform, listener, core;
 
 + (void)createWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret
 {
-	[ConversionTracker createWithAccountName:accountName developerSecret:developerSecret hardware:nil];
+	[Tapstream createWithAccountName:accountName developerSecret:developerSecret hardware:nil];
 }
 
 + (void)createWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret hardware:(NSString *)hardware
@@ -45,11 +45,11 @@ static ConversionTracker *instance = nil;
 	{
 		if(instance == nil)
 		{
-			instance = [[ConversionTracker alloc] initWithAccountName:accountName developerSecret:developerSecret hardware:hardware];
+			instance = [[Tapstream alloc] initWithAccountName:accountName developerSecret:developerSecret hardware:hardware];
 		}
 		else
 		{
-			[Logging logAtLevel:kLoggingWarn format:@"ConversionTracker Warning: ConversionTracker already instantiated, it cannot be re-created."];
+			[Logging logAtLevel:kLoggingWarn format:@"Tapstream Warning: Tapstream already instantiated, it cannot be re-created."];
 		}
 	}
 }
@@ -109,7 +109,7 @@ static ConversionTracker *instance = nil;
 @implementation DelegateImpl
 @synthesize ts;
 
-- (id)initWithConversionTracker:(ConversionTracker *)tsVal
+- (id)initWithTapstream:(Tapstream *)tsVal
 {
 	if((self = [super init]) != nil)
 	{

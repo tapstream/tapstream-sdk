@@ -6,11 +6,11 @@ using Windows.Foundation;
 using System.Threading.Tasks;
 #endif
 
-namespace Tapstream.Sdk
+namespace TapstreamMetrics.Sdk
 {
-    public sealed class ConversionTracker : Api
+    public sealed class Tapstream : Api
     {
-        private static ConversionTracker instance;
+        private static Tapstream instance;
         private static object instanceLock = new Object();
         
         public static void Create(string accountName, string developerSecret)
@@ -24,16 +24,16 @@ namespace Tapstream.Sdk
             {
                 if (instance == null)
                 {
-                    instance = new ConversionTracker(accountName, developerSecret, hardware);
+                    instance = new Tapstream(accountName, developerSecret, hardware);
                 }
                 else
                 {
-                    Logging.Log(LogLevel.WARN, "ConversionTracker Warning: ConversionTracker already instantiated, it cannot be re-created.");
+                    Logging.Log(LogLevel.WARN, "Tapstream Warning: Tapstream already instantiated, it cannot be re-created.");
                 }
             }
         }
 
-        public static ConversionTracker Instance
+        public static Tapstream Instance
         {
             get
             {
@@ -41,7 +41,7 @@ namespace Tapstream.Sdk
                 {
                     if (instance == null)
                     {
-                        throw new Exception("You must first call ConversionTracker.Create");
+                        throw new Exception("You must first call Tapstream.Create");
                     }
                     return instance;
                 }
@@ -51,9 +51,9 @@ namespace Tapstream.Sdk
 
         private class DelegateImpl : Delegate
         {
-            private ConversionTracker ts;
+            private Tapstream ts;
             
-            public DelegateImpl(ConversionTracker ts)
+            public DelegateImpl(Tapstream ts)
             {
                 this.ts = ts;
             }
@@ -75,7 +75,7 @@ namespace Tapstream.Sdk
         private CoreListener listener;
         private Core core;
 
-        private ConversionTracker(string accountName, string developerSecret, string hardware)
+        private Tapstream(string accountName, string developerSecret, string hardware)
         {
             del = new DelegateImpl(this);
             platform = new PlatformImpl();

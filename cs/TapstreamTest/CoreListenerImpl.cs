@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tapstream.Sdk
+namespace TapstreamMetrics.Sdk
 {
     class CoreListenerImpl : CoreListener
     {

@@ -47,12 +47,12 @@ class Core {
 
 		if (e.isOneTimeOnly()) {
 			if (firedEvents.contains(e.getName())) {
-				Logging.log(Logging.INFO, "ConversionTracker ignoring event named \"%s\" because it is a one-time-only event that has already been fired", e.getName());
+				Logging.log(Logging.INFO, "Tapstream ignoring event named \"%s\" because it is a one-time-only event that has already been fired", e.getName());
 				listener.reportOperation("event-ignored-already-fired");
 				listener.reportOperation("job-ended");
 				return;
 			} else if (firingEvents.contains(e.getName())) {
-				Logging.log(Logging.INFO, "ConversionTracker ignoring event named \"%s\" because it is a one-time-only event that is already in progress", e.getName());
+				Logging.log(Logging.INFO, "Tapstream ignoring event named \"%s\" because it is a one-time-only event that is already in progress", e.getName());
 				listener.reportOperation("event-ignored-already-in-progress");
 				listener.reportOperation("job-ended");
 				return;
@@ -109,17 +109,17 @@ class Core {
 
 				if (failed) {
 					if (response.status < 0) {
-						Logging.log(Logging.ERROR, "ConversionTracker Error: Failed to fire event, error=%s", response.message);
+						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, error=%s", response.message);
 					} else if (response.status == 404) {
-						Logging.log(Logging.ERROR, "ConversionTracker Error: Failed to fire event, http code %d\nDoes your event name contain characters that are not url safe? This event will not be retried.", response.status);
+						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d\nDoes your event name contain characters that are not url safe? This event will not be retried.", response.status);
 					} else if (response.status == 403) {
-						Logging.log(Logging.ERROR, "ConversionTracker Error: Failed to fire event, http code %d\nAre your account name and application secret correct?  This event will not be retried.", response.status);
+						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d\nAre your account name and application secret correct?  This event will not be retried.", response.status);
 					} else {
 						String retryMsg = "";
 						if (!shouldRetry) {
 							retryMsg = "  This event will not be retried.";
 						}
-						Logging.log(Logging.ERROR, "ConversionTracker Error: Failed to fire event, http code %d.%s", response.status, retryMsg);
+						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d.%s", response.status, retryMsg);
 					}
 
 					self.listener.reportOperation("event-failed", e.getUid());
@@ -132,7 +132,7 @@ class Core {
 						return;
 					}
 				} else {
-					Logging.log(Logging.INFO, "ConversionTracker fired event named \"%s\"", e.getName());
+					Logging.log(Logging.INFO, "Tapstream fired event named \"%s\"", e.getName());
 					self.listener.reportOperation("event-succeeded");
 				}
 
@@ -161,10 +161,10 @@ class Core {
 			public void run() {
 				Response response = platform.request(url, data);
 				if (response.status < 200 || response.status >= 300) {
-					Logging.log(Logging.ERROR, "ConversionTracker Error: Failed to fire hit, http code: %d", response.status);
+					Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire hit, http code: %d", response.status);
 					listener.reportOperation("hit-failed");
 				} else {
-					Logging.log(Logging.INFO, "ConversionTracker fired hit to tracker: %s", h.getTrackerName());
+					Logging.log(Logging.INFO, "Tapstream fired hit to tracker: %s", h.getTrackerName());
 					listener.reportOperation("hit-succeeded");
 				}
 				if (completion != null) {
@@ -236,7 +236,7 @@ class Core {
 		appendPostPair("sdkversion", VERSION);
 		if (hardware != null) {
 			if (hardware.length() > 255) {
-				Logging.log(Logging.WARN, "ConversionTracker Warning: Hardware argument exceeds 255 characters, it will not be included with fired events");
+				Logging.log(Logging.WARN, "Tapstream Warning: Hardware argument exceeds 255 characters, it will not be included with fired events");
 			} else {
 				appendPostPair("hardware", hardware);
 			}

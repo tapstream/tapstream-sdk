@@ -24,7 +24,7 @@ public class Event {
 
 	public void addPair(String key, Object value) {
 		if (key.length() > 255) {
-			Logging.log(Logging.WARN, "ConversionTracker Warning: Custom key exceeds 255 characters, this field will not be included in the post (key=%s)", key);
+			Logging.log(Logging.WARN, "Tapstream Warning: Custom key exceeds 255 characters, this field will not be included in the post (key=%s)", key);
 			return;
 		}
 
@@ -50,7 +50,7 @@ public class Event {
 		}
 
 		if (stringifiedValue.length() > 255) {
-			Logging.log(Logging.WARN, "ConversionTracker Warning: Custom value exceeds 255 characters, this field will not be included in the post (value=%s)", value);
+			Logging.log(Logging.WARN, "Tapstream Warning: Custom value exceeds 255 characters, this field will not be included in the post (value=%s)", value);
 			return;
 		}
 

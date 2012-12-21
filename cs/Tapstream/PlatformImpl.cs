@@ -16,7 +16,7 @@ using System.Net.Http;
 using Windows.Globalization;
 #endif
 
-namespace Tapstream.Sdk
+namespace TapstreamMetrics.Sdk
 {
     class PlatformImpl : Platform
     {

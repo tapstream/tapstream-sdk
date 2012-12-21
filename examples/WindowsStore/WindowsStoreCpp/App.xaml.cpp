@@ -23,7 +23,7 @@ using namespace Windows::UI::Xaml::Interop;
 using namespace Windows::UI::Xaml::Media;
 using namespace Windows::UI::Xaml::Navigation;
 
-using namespace Tapstream::Sdk;
+using namespace TapstreamMetrics::Sdk;
 using namespace concurrency;
 
 // The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
@@ -39,9 +39,9 @@ App::App()
 
 
 
-	ConversionTracker::Create("sdktest", "YGP2pezGTI6ec48uti4o1w");
+	Tapstream::Create("sdktest", "YGP2pezGTI6ec48uti4o1w");
 
-	ConversionTracker ^tracker = ConversionTracker::Instance;
+	Tapstream ^tracker = Tapstream::Instance;
 
     Event ^e = ref new Event("test-event", false);
     e->AddPair("player", "John Doe");

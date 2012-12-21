@@ -14,7 +14,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-using Tapstream.Sdk;
+using TapstreamMetrics.Sdk;
 using System.Threading.Tasks;
 
 
@@ -37,9 +37,9 @@ namespace WindowsStoreCSharp
             this.InitializeComponent();
             this.Suspending += OnSuspending;
 
-            ConversionTracker.Create("sdktest", "YGP2pezGTI6ec48uti4o1w");
+            Tapstream.Create("sdktest", "YGP2pezGTI6ec48uti4o1w");
 
-            ConversionTracker tracker = ConversionTracker.Instance;
+            Tapstream tracker = Tapstream.Instance;
 
             Event e = new Event("test-event", false);
             e.AddPair("player", "John Doe");

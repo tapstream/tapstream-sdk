@@ -56,8 +56,8 @@
     <Reference Include="System.Net" />
     <Reference Include="System.Xml" />
     <Reference Include="mscorlib.extensions" />
-    <Reference Include="Tapstream">
-      <HintPath>..\..\..\builds\winphone\Tapstream.dll</HintPath>
+    <Reference Include="TapstreamMetrics">
+      <HintPath>..\..\..\builds\winphone\TapstreamMetrics.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -135,8 +135,8 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Tapstream">
-      <HintPath>..\..\..\builds\win8\Tapstream.winmd</HintPath>
+    <Reference Include="TapstreamMetrics">
+      <HintPath>..\..\..\builds\win8\TapstreamMetrics.winmd</HintPath>
     </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">

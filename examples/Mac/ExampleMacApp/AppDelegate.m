@@ -7,7 +7,7 @@
 //
 
 #import "AppDelegate.h"
-#import "ConversionTracker.h"
+#import "Tapstream.h"
 
 @implementation AppDelegate
 
@@ -15,9 +15,9 @@
 {
     // Insert code here to initialize your application
     
-    [ConversionTracker createWithAccountName:@"sdktest" developerSecret:@"YGP2pezGTI6ec48uti4o1w"];
+    [Tapstream createWithAccountName:@"sdktest" developerSecret:@"YGP2pezGTI6ec48uti4o1w"];
     
-    ConversionTracker *tracker = [ConversionTracker instance];
+    Tapstream *tracker = [Tapstream instance];
     
     
     Event *e = [Event eventWithName:@"test-event" oneTimeOnly:NO];

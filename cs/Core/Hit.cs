@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Tapstream.Sdk
+namespace TapstreamMetrics.Sdk
 {
     public sealed class Hit
     {
@@ -25,7 +25,7 @@ namespace Tapstream.Sdk
         {
             if (tag.Length > 255)
             {
-                Logging.Log(LogLevel.WARN, "ConversionTracker Warning: Hit tag exceeds 255 characters, it will not be included in the post (tag={0})", tag);
+                Logging.Log(LogLevel.WARN, "Tapstream Warning: Hit tag exceeds 255 characters, it will not be included in the post (tag={0})", tag);
                 return;
             }
 

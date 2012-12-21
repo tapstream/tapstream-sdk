@@ -38,7 +38,7 @@
 {
 	if(tag.length > 255)
 	{
-		[Logging logAtLevel:kLoggingWarn format:@"ConversionTracker Warning: Tag exceeds 255 characters, it will not be included in the post (tag=%@)", tag];
+		[Logging logAtLevel:kLoggingWarn format:@"Tapstream Warning: Tag exceeds 255 characters, it will not be included in the post (tag=%@)", tag];
         return;
 	}
 	NSString *encodedTag = [self encodeString:tag];

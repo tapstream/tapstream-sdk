@@ -148,8 +148,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Tapstream">
-      <HintPath>..\..\..\builds\winphone\Tapstream.dll</HintPath>
+    <Reference Include="TapstreamMetrics">
+      <HintPath>..\..\..\builds\winphone\TapstreamMetrics.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />

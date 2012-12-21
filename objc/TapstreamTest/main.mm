@@ -2,7 +2,7 @@
 #import <js/jsapi.h>
 #import "Event.h"
 #import "OperationQueue.h"
-#import "ConversionTracker.h"
+#import "Tapstream.h"
 #import "Event.h"
 
 #import <v8.h>
@@ -51,12 +51,12 @@ void OperationQueue_destructor(Persistent<Value> object, void *parameters)
 	EXTERNAL_ALLOC(-FAKE_OBJECT_SIZE);
 }
 
-Handle<Value> ConversionTracker_fireEvent(const Arguments &args)
+Handle<Value> Tapstream_fireEvent(const Arguments &args)
 {
 	Locker locker;
 	HandleScope scope;
 	Handle<Object> self = args.This();
-	ConversionTracker *ts = (BRIDGE ConversionTracker *)(Handle<External>::Cast(self->GetInternalField(0))->Value());
+	Tapstream *ts = (BRIDGE Tapstream *)(Handle<External>::Cast(self->GetInternalField(0))->Value());
 
 	if(args.Length() < 1) return ThrowException(String::New("Expected 1 argument"));
 
@@ -66,12 +66,12 @@ Handle<Value> ConversionTracker_fireEvent(const Arguments &args)
 	[ts fireEvent:e];
 	return Undefined();
 }
-Handle<Value> ConversionTracker_fireHit(const Arguments &args)
+Handle<Value> Tapstream_fireHit(const Arguments &args)
 {
 	Locker locker;
 	HandleScope scope;
 	Handle<Object> self = args.This();
-	ConversionTracker *ts = (BRIDGE ConversionTracker *)(Handle<External>::Cast(self->GetInternalField(0))->Value());
+	Tapstream *ts = (BRIDGE Tapstream *)(Handle<External>::Cast(self->GetInternalField(0))->Value());
 
 	if(args.Length() < 1) return ThrowException(String::New("Expected 1 argument"));
 
@@ -81,14 +81,14 @@ Handle<Value> ConversionTracker_fireHit(const Arguments &args)
 	[ts fireHit:h completion:nil];
 	return Undefined();
 }
-void ConversionTracker_destructor(Persistent<Value> object, void *parameters)
+void Tapstream_destructor(Persistent<Value> object, void *parameters)
 {
 	#if TEST_GC
-	printf("ConversionTracker destructor\n");
+	printf("Tapstream destructor\n");
 	#endif
 	Locker locker;
 
-	ConversionTracker *ts = (BRIDGE_TRANSFER ConversionTracker *)(Handle<External>::Cast(object->ToObject()->GetInternalField(0))->Value());
+	Tapstream *ts = (BRIDGE_TRANSFER Tapstream *)(Handle<External>::Cast(object->ToObject()->GetInternalField(0))->Value());
 	object->ToObject()->SetInternalField(0, Null());
 	object.Dispose();
 	object.Clear();
@@ -299,7 +299,7 @@ Handle<Value> Util_getPostData(const Arguments &args)
 	if(args.Length() < 1) return ThrowException(String::New("Expected 1 argument"));
 
 	if(!args[0]->IsObject()) return ThrowException(String::New("Arg 0 must be an object"));
-	ConversionTracker *ts = (BRIDGE ConversionTracker *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
+	Tapstream *ts = (BRIDGE Tapstream *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
 	
 	Handle<String> postData = String::New([[ts getPostData] UTF8String]);
 
@@ -314,7 +314,7 @@ Handle<Value> Util_getDelay(const Arguments &args)
 	if(args.Length() < 1) return ThrowException(String::New("Expected 1 argument"));
 
 	if(!args[0]->IsObject()) return ThrowException(String::New("Arg 0 must be an object"));
-	ConversionTracker *ts = (BRIDGE ConversionTracker *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
+	Tapstream *ts = (BRIDGE Tapstream *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
 	
 	Handle<Number> delay = Number::New((double)[ts getDelay]);
 
@@ -329,7 +329,7 @@ Handle<Value> Util_getSavedFiredList(const Arguments &args)
 	if(args.Length() < 1) return ThrowException(String::New("Expected 1 argument"));
 
 	if(!args[0]->IsObject()) return ThrowException(String::New("Arg 0 must be an object"));
-	ConversionTracker *ts = (BRIDGE ConversionTracker *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
+	Tapstream *ts = (BRIDGE Tapstream *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
 	
 	NSArray *strings = [ts getSavedFiredList];
 	Handle<Array> array = Array::New(strings.count);
@@ -348,7 +348,7 @@ Handle<Value> Util_setResponseStatus(const Arguments &args)
 	if(args.Length() < 2) return ThrowException(String::New("Expected 2 arguments"));
 
 	if(!args[0]->IsObject()) return ThrowException(String::New("Arg 0 must be an object"));
-	ConversionTracker *ts = (BRIDGE ConversionTracker *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
+	Tapstream *ts = (BRIDGE Tapstream *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
 
 	if(!args[1]->IsInt32()) return ThrowException(String::New("Arg 1 must be an integer"));
 	int status = args[1]->ToInt32()->Value();
@@ -378,7 +378,7 @@ Handle<Value> Util_newOperationQueue(const Arguments &args)
 	return scope.Close(obj);
 }
 
-Handle<Value> Util_newConversionTracker(const Arguments &args)
+Handle<Value> Util_newTapstream(const Arguments &args)
 {
 	Locker locker;
 	HandleScope scope;
@@ -397,7 +397,7 @@ Handle<Value> Util_newConversionTracker(const Arguments &args)
 	if(!args[3]->IsString()) return ThrowException(String::New("Arg 3 must be a string"));
 	String::Utf8Value hardware(args[3]);
 
-	ConversionTracker *ts = AUTORELEASE([[ConversionTracker alloc] initWithOperationQueue:queue
+	Tapstream *ts = AUTORELEASE([[Tapstream alloc] initWithOperationQueue:queue
 		accountName:[NSString stringWithUTF8String:*accountName]
 		developerSecret:[NSString stringWithUTF8String:*developerSecret]
 		hardware:[NSString stringWithUTF8String:*hardware]
@@ -406,11 +406,11 @@ Handle<Value> Util_newConversionTracker(const Arguments &args)
 
 	Handle<ObjectTemplate> templ = ObjectTemplate::New();
 	templ->SetInternalFieldCount(1);
-	templ->Set(String::New("fireEvent"), FunctionTemplate::New(InvocationCallback(ConversionTracker_fireEvent))->GetFunction(), ReadOnly);
-	templ->Set(String::New("fireHit"), FunctionTemplate::New(InvocationCallback(ConversionTracker_fireHit))->GetFunction(), ReadOnly);
+	templ->Set(String::New("fireEvent"), FunctionTemplate::New(InvocationCallback(Tapstream_fireEvent))->GetFunction(), ReadOnly);
+	templ->Set(String::New("fireHit"), FunctionTemplate::New(InvocationCallback(Tapstream_fireHit))->GetFunction(), ReadOnly);
 
 	Persistent<Object> obj = Persistent<Object>::New(templ->NewInstance());
-	obj.MakeWeak(NULL, ConversionTracker_destructor);
+	obj.MakeWeak(NULL, Tapstream_destructor);
 	obj->SetInternalField(0, External::New(ptr));
 
 	EXTERNAL_ALLOC(FAKE_OBJECT_SIZE);
@@ -533,7 +533,7 @@ int main(int argc, char *argv[])
 		templ->Set(String::New("getSavedFiredList"), FunctionTemplate::New(InvocationCallback(Util_getSavedFiredList))->GetFunction(), ReadOnly);
 		templ->Set(String::New("setResponseStatus"), FunctionTemplate::New(InvocationCallback(Util_setResponseStatus))->GetFunction(), ReadOnly);
 		templ->Set(String::New("newOperationQueue"), FunctionTemplate::New(InvocationCallback(Util_newOperationQueue))->GetFunction(), ReadOnly);
-		templ->Set(String::New("newConversionTracker"), FunctionTemplate::New(InvocationCallback(Util_newConversionTracker))->GetFunction(), ReadOnly);
+		templ->Set(String::New("newTapstream"), FunctionTemplate::New(InvocationCallback(Util_newTapstream))->GetFunction(), ReadOnly);
 		templ->Set(String::New("newEvent"), FunctionTemplate::New(InvocationCallback(Util_newEvent))->GetFunction(), ReadOnly);
 		templ->Set(String::New("newHit"), FunctionTemplate::New(InvocationCallback(Util_newHit))->GetFunction(), ReadOnly);
 		Handle<Object> util = templ->NewInstance();

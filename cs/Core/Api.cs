@@ -9,7 +9,7 @@ using Windows.Foundation;
 using System.Threading.Tasks;
 #endif
 
-namespace Tapstream.Sdk
+namespace TapstreamMetrics.Sdk
 {
     public interface Api
     {

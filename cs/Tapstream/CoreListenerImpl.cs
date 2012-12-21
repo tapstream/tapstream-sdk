@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 #endif
 
-namespace Tapstream.Sdk
+namespace TapstreamMetrics.Sdk
 {
     class CoreListenerImpl : CoreListener
     {
