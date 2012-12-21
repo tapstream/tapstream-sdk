@@ -1,6 +1,7 @@
 from paver.easy import *
 from paver.easy import path
 import re
+import itertools
 
 """
 Notes:
@@ -211,10 +212,24 @@ def package_objc():
 		path('builds/%s-whitelabel' % sdk).rmtree()
 		path('builds/%s-whitelabel' % sdk).mkdir()
 		sh('cp -r ./builds/%s/Tapstream ./builds/%s-whitelabel/' % (sdk, sdk))
+		with pushd('./builds/%s-whitelabel' % sdk):
+			sh('mv Tapstream ConversionTracker')
+			sh('mv ConversionTracker/Tapstream.h ConversionTracker/ConversionTracker.h')
+			sh('mv ConversionTracker/Tapstream.m ConversionTracker/ConversionTracker.m')
+
+			pattern = re.compile(r'(With|[\s\[("])Tapstream([\s(.*:])')
+			for file_path in itertools.chain(path('.').walkfiles('*.h'), path('.').walkfiles('*.m')):
+				with open(file_path, 'rb+') as f:
+					data = f.read()
+					data = pattern.sub(r'\1ConversionTracker\2', data)
+					f.seek(0)
+					f.write(data)
+					f.truncate()
+
 		path('builds/TapstreamSDK-%s-whitelabel.zip' % sdk).remove()
 		with pushd('builds/%s-whitelabel' % sdk):
-			sh('mv Tapstream ConversionTracker')
 			sh('zip -r ../TapstreamSDK-%s-whitelabel.zip ConversionTracker' % sdk)
+
 
 @task
 def docs():
