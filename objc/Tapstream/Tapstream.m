@@ -59,7 +59,7 @@ static Tapstream *instance = nil;
 	@synchronized(self)
 	{
 		NSAssert(instance != nil, @"You must first call +createWithAccountName:developerSecret:");
-		return AUTORELEASE(instance);
+		return instance;
 	}
 }
 
