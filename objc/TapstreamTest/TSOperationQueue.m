@@ -1,8 +1,8 @@
-#import "OperationQueue.h"
+#import "TSOperationQueue.h"
 #import <assert.h>
 
 
-@implementation Operation
+@implementation TSOperation
 
 @synthesize name;
 @synthesize arg;
@@ -27,14 +27,14 @@
 @end
 
 
-@interface OperationQueue()
+@interface TSOperationQueue()
 
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableArray *queue;
 @property(nonatomic, STRONG_OR_RETAIN) NSConditionLock *queueLock;
 
 @end
 
-@implementation OperationQueue : NSObject
+@implementation TSOperationQueue : NSObject
 
 @synthesize queue, queueLock;
 
@@ -48,17 +48,17 @@
 	return self;
 }
 
-- (void)put:(Operation *)op
+- (void)put:(TSOperation *)op
 {
 	[queueLock lock];
 	[queue addObject:op];
 	[queueLock unlockWithCondition:1];
 }
 
-- (Operation *)take
+- (TSOperation *)take
 {
 	[queueLock lockWhenCondition:1];
-	Operation *op = [queue objectAtIndex:0];
+	TSOperation *op = [queue objectAtIndex:0];
 	[queue removeObjectAtIndex:0];
 	int more = [queue count] > 0 ? 1 : 0;
 	[queueLock unlockWithCondition:more];
@@ -67,7 +67,7 @@
 
 - (void)expect:(NSString *)opName
 {
-	Operation *op = [self take];
+	TSOperation *op = [self take];
 	if(![op.name isEqualToString:opName])
 	{
 		NSAssert(false, @"Expected '%@' but got '%@'", opName, op.name);

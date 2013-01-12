@@ -20,14 +20,14 @@
 		12043085167D475800F509B7 /* MainStoryboard_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 12043083167D475800F509B7 /* MainStoryboard_iPad.storyboard */; };
 		12043088167D475800F509B7 /* MasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 12043087167D475800F509B7 /* MasterViewController.m */; };
 		1204308B167D475800F509B7 /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1204308A167D475800F509B7 /* DetailViewController.m */; };
-		12781C48169514F70046935B /* Core.m in Sources */ = {isa = PBXBuildFile; fileRef = 12781C34169514F70046935B /* Core.m */; };
-		12781C49169514F70046935B /* CoreListenerImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 12781C37169514F70046935B /* CoreListenerImpl.m */; };
-		12781C4A169514F70046935B /* Event.m in Sources */ = {isa = PBXBuildFile; fileRef = 12781C3A169514F70046935B /* Event.m */; };
-		12781C4B169514F70046935B /* Hit.m in Sources */ = {isa = PBXBuildFile; fileRef = 12781C3D169514F70046935B /* Hit.m */; };
-		12781C4C169514F70046935B /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = 12781C3F169514F70046935B /* Logging.m */; };
-		12781C4D169514F70046935B /* PlatformImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 12781C43169514F70046935B /* PlatformImpl.m */; };
-		12781C4E169514F70046935B /* Response.m in Sources */ = {isa = PBXBuildFile; fileRef = 12781C45169514F70046935B /* Response.m */; };
-		12781C4F169514F70046935B /* Tapstream.m in Sources */ = {isa = PBXBuildFile; fileRef = 12781C47169514F70046935B /* Tapstream.m */; };
+		125A2E2B169CB30A00F1FBEB /* TSCore.m in Sources */ = {isa = PBXBuildFile; fileRef = 125A2E17169CB30A00F1FBEB /* TSCore.m */; };
+		125A2E2C169CB30A00F1FBEB /* TSCoreListenerImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 125A2E1A169CB30A00F1FBEB /* TSCoreListenerImpl.m */; };
+		125A2E2D169CB30A00F1FBEB /* TSEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 125A2E1D169CB30A00F1FBEB /* TSEvent.m */; };
+		125A2E2E169CB30A00F1FBEB /* TSHit.m in Sources */ = {isa = PBXBuildFile; fileRef = 125A2E20169CB30A00F1FBEB /* TSHit.m */; };
+		125A2E2F169CB30A00F1FBEB /* TSLogging.m in Sources */ = {isa = PBXBuildFile; fileRef = 125A2E22169CB30A00F1FBEB /* TSLogging.m */; };
+		125A2E30169CB30A00F1FBEB /* TSPlatformImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 125A2E26169CB30A00F1FBEB /* TSPlatformImpl.m */; };
+		125A2E31169CB30A00F1FBEB /* TSResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 125A2E28169CB30A00F1FBEB /* TSResponse.m */; };
+		125A2E32169CB30A00F1FBEB /* TSTapstream.m in Sources */ = {isa = PBXBuildFile; fileRef = 125A2E2A169CB30A00F1FBEB /* TSTapstream.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,28 +50,28 @@
 		12043087167D475800F509B7 /* MasterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MasterViewController.m; sourceTree = "<group>"; };
 		12043089167D475800F509B7 /* DetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DetailViewController.h; sourceTree = "<group>"; };
 		1204308A167D475800F509B7 /* DetailViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DetailViewController.m; sourceTree = "<group>"; };
-		12781C32169514F70046935B /* Api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Api.h; sourceTree = "<group>"; };
-		12781C33169514F70046935B /* Core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Core.h; sourceTree = "<group>"; };
-		12781C34169514F70046935B /* Core.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Core.m; sourceTree = "<group>"; };
-		12781C35169514F70046935B /* CoreListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreListener.h; sourceTree = "<group>"; };
-		12781C36169514F70046935B /* CoreListenerImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreListenerImpl.h; sourceTree = "<group>"; };
-		12781C37169514F70046935B /* CoreListenerImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreListenerImpl.m; sourceTree = "<group>"; };
-		12781C38169514F70046935B /* Delegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Delegate.h; sourceTree = "<group>"; };
-		12781C39169514F70046935B /* Event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Event.h; sourceTree = "<group>"; };
-		12781C3A169514F70046935B /* Event.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Event.m; sourceTree = "<group>"; };
-		12781C3B169514F70046935B /* helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = helpers.h; sourceTree = "<group>"; };
-		12781C3C169514F70046935B /* Hit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Hit.h; sourceTree = "<group>"; };
-		12781C3D169514F70046935B /* Hit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Hit.m; sourceTree = "<group>"; };
-		12781C3E169514F70046935B /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
-		12781C3F169514F70046935B /* Logging.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Logging.m; sourceTree = "<group>"; };
-		12781C40169514F70046935B /* LogLevel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogLevel.h; sourceTree = "<group>"; };
-		12781C41169514F70046935B /* Platform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Platform.h; sourceTree = "<group>"; };
-		12781C42169514F70046935B /* PlatformImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlatformImpl.h; sourceTree = "<group>"; };
-		12781C43169514F70046935B /* PlatformImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlatformImpl.m; sourceTree = "<group>"; };
-		12781C44169514F70046935B /* Response.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Response.h; sourceTree = "<group>"; };
-		12781C45169514F70046935B /* Response.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Response.m; sourceTree = "<group>"; };
-		12781C46169514F70046935B /* Tapstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tapstream.h; sourceTree = "<group>"; };
-		12781C47169514F70046935B /* Tapstream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tapstream.m; sourceTree = "<group>"; };
+		125A2E15169CB30A00F1FBEB /* TSApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSApi.h; sourceTree = "<group>"; };
+		125A2E16169CB30A00F1FBEB /* TSCore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSCore.h; sourceTree = "<group>"; };
+		125A2E17169CB30A00F1FBEB /* TSCore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSCore.m; sourceTree = "<group>"; };
+		125A2E18169CB30A00F1FBEB /* TSCoreListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSCoreListener.h; sourceTree = "<group>"; };
+		125A2E19169CB30A00F1FBEB /* TSCoreListenerImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSCoreListenerImpl.h; sourceTree = "<group>"; };
+		125A2E1A169CB30A00F1FBEB /* TSCoreListenerImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSCoreListenerImpl.m; sourceTree = "<group>"; };
+		125A2E1B169CB30A00F1FBEB /* TSDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSDelegate.h; sourceTree = "<group>"; };
+		125A2E1C169CB30A00F1FBEB /* TSEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSEvent.h; sourceTree = "<group>"; };
+		125A2E1D169CB30A00F1FBEB /* TSEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSEvent.m; sourceTree = "<group>"; };
+		125A2E1E169CB30A00F1FBEB /* TSHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSHelpers.h; sourceTree = "<group>"; };
+		125A2E1F169CB30A00F1FBEB /* TSHit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSHit.h; sourceTree = "<group>"; };
+		125A2E20169CB30A00F1FBEB /* TSHit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSHit.m; sourceTree = "<group>"; };
+		125A2E21169CB30A00F1FBEB /* TSLogging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSLogging.h; sourceTree = "<group>"; };
+		125A2E22169CB30A00F1FBEB /* TSLogging.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSLogging.m; sourceTree = "<group>"; };
+		125A2E23169CB30A00F1FBEB /* TSLogLevel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSLogLevel.h; sourceTree = "<group>"; };
+		125A2E24169CB30A00F1FBEB /* TSPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSPlatform.h; sourceTree = "<group>"; };
+		125A2E25169CB30A00F1FBEB /* TSPlatformImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSPlatformImpl.h; sourceTree = "<group>"; };
+		125A2E26169CB30A00F1FBEB /* TSPlatformImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSPlatformImpl.m; sourceTree = "<group>"; };
+		125A2E27169CB30A00F1FBEB /* TSResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSResponse.h; sourceTree = "<group>"; };
+		125A2E28169CB30A00F1FBEB /* TSResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSResponse.m; sourceTree = "<group>"; };
+		125A2E29169CB30A00F1FBEB /* TSTapstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSTapstream.h; sourceTree = "<group>"; };
+		125A2E2A169CB30A00F1FBEB /* TSTapstream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSTapstream.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,7 +91,7 @@
 		12043059167D475800F509B7 = {
 			isa = PBXGroup;
 			children = (
-				12781C31169514F70046935B /* Tapstream */,
+				125A2E14169CB30A00F1FBEB /* Tapstream */,
 				1204306E167D475800F509B7 /* ExampleAppNoARC */,
 				12043067167D475800F509B7 /* Frameworks */,
 				12043065167D475800F509B7 /* Products */,
@@ -146,31 +146,31 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		12781C31169514F70046935B /* Tapstream */ = {
+		125A2E14169CB30A00F1FBEB /* Tapstream */ = {
 			isa = PBXGroup;
 			children = (
-				12781C32169514F70046935B /* Api.h */,
-				12781C33169514F70046935B /* Core.h */,
-				12781C34169514F70046935B /* Core.m */,
-				12781C35169514F70046935B /* CoreListener.h */,
-				12781C36169514F70046935B /* CoreListenerImpl.h */,
-				12781C37169514F70046935B /* CoreListenerImpl.m */,
-				12781C38169514F70046935B /* Delegate.h */,
-				12781C39169514F70046935B /* Event.h */,
-				12781C3A169514F70046935B /* Event.m */,
-				12781C3B169514F70046935B /* helpers.h */,
-				12781C3C169514F70046935B /* Hit.h */,
-				12781C3D169514F70046935B /* Hit.m */,
-				12781C3E169514F70046935B /* Logging.h */,
-				12781C3F169514F70046935B /* Logging.m */,
-				12781C40169514F70046935B /* LogLevel.h */,
-				12781C41169514F70046935B /* Platform.h */,
-				12781C42169514F70046935B /* PlatformImpl.h */,
-				12781C43169514F70046935B /* PlatformImpl.m */,
-				12781C44169514F70046935B /* Response.h */,
-				12781C45169514F70046935B /* Response.m */,
-				12781C46169514F70046935B /* Tapstream.h */,
-				12781C47169514F70046935B /* Tapstream.m */,
+				125A2E15169CB30A00F1FBEB /* TSApi.h */,
+				125A2E16169CB30A00F1FBEB /* TSCore.h */,
+				125A2E17169CB30A00F1FBEB /* TSCore.m */,
+				125A2E18169CB30A00F1FBEB /* TSCoreListener.h */,
+				125A2E19169CB30A00F1FBEB /* TSCoreListenerImpl.h */,
+				125A2E1A169CB30A00F1FBEB /* TSCoreListenerImpl.m */,
+				125A2E1B169CB30A00F1FBEB /* TSDelegate.h */,
+				125A2E1C169CB30A00F1FBEB /* TSEvent.h */,
+				125A2E1D169CB30A00F1FBEB /* TSEvent.m */,
+				125A2E1E169CB30A00F1FBEB /* TSHelpers.h */,
+				125A2E1F169CB30A00F1FBEB /* TSHit.h */,
+				125A2E20169CB30A00F1FBEB /* TSHit.m */,
+				125A2E21169CB30A00F1FBEB /* TSLogging.h */,
+				125A2E22169CB30A00F1FBEB /* TSLogging.m */,
+				125A2E23169CB30A00F1FBEB /* TSLogLevel.h */,
+				125A2E24169CB30A00F1FBEB /* TSPlatform.h */,
+				125A2E25169CB30A00F1FBEB /* TSPlatformImpl.h */,
+				125A2E26169CB30A00F1FBEB /* TSPlatformImpl.m */,
+				125A2E27169CB30A00F1FBEB /* TSResponse.h */,
+				125A2E28169CB30A00F1FBEB /* TSResponse.m */,
+				125A2E29169CB30A00F1FBEB /* TSTapstream.h */,
+				125A2E2A169CB30A00F1FBEB /* TSTapstream.m */,
 			);
 			name = Tapstream;
 			path = ../../builds/ios/Tapstream;
@@ -247,14 +247,14 @@
 				12043079167D475800F509B7 /* AppDelegate.m in Sources */,
 				12043088167D475800F509B7 /* MasterViewController.m in Sources */,
 				1204308B167D475800F509B7 /* DetailViewController.m in Sources */,
-				12781C48169514F70046935B /* Core.m in Sources */,
-				12781C49169514F70046935B /* CoreListenerImpl.m in Sources */,
-				12781C4A169514F70046935B /* Event.m in Sources */,
-				12781C4B169514F70046935B /* Hit.m in Sources */,
-				12781C4C169514F70046935B /* Logging.m in Sources */,
-				12781C4D169514F70046935B /* PlatformImpl.m in Sources */,
-				12781C4E169514F70046935B /* Response.m in Sources */,
-				12781C4F169514F70046935B /* Tapstream.m in Sources */,
+				125A2E2B169CB30A00F1FBEB /* TSCore.m in Sources */,
+				125A2E2C169CB30A00F1FBEB /* TSCoreListenerImpl.m in Sources */,
+				125A2E2D169CB30A00F1FBEB /* TSEvent.m in Sources */,
+				125A2E2E169CB30A00F1FBEB /* TSHit.m in Sources */,
+				125A2E2F169CB30A00F1FBEB /* TSLogging.m in Sources */,
+				125A2E30169CB30A00F1FBEB /* TSPlatformImpl.m in Sources */,
+				125A2E31169CB30A00F1FBEB /* TSResponse.m in Sources */,
+				125A2E32169CB30A00F1FBEB /* TSTapstream.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

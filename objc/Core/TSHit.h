@@ -1,8 +1,8 @@
 #pragma once
 #import <Foundation/Foundation.h>
-#import "helpers.h"
+#import "TSHelpers.h"
 
-@interface Hit : NSObject {
+@interface TSHit : NSObject {
 @private
 	NSString *trackerName;
 	NSString *encodedTrackerName;

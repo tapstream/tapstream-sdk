@@ -1,9 +1,9 @@
 #import <stdio.h>
 #import <js/jsapi.h>
-#import "Event.h"
-#import "OperationQueue.h"
-#import "Tapstream.h"
-#import "Event.h"
+#import "TSEvent.h"
+#import "TSOperationQueue.h"
+#import "TSTapstream.h"
+#import "TSEvent.h"
 
 #import <v8.h>
 using namespace v8;
@@ -26,7 +26,7 @@ Handle<Value> OperationQueue_expect(const Arguments &args)
 	Locker locker;
 	HandleScope scope;
 	Handle<Object> self = args.This();
-	OperationQueue *q = (BRIDGE OperationQueue *)(Handle<External>::Cast(self->GetInternalField(0))->Value());
+	TSOperationQueue *q = (BRIDGE TSOperationQueue *)(Handle<External>::Cast(self->GetInternalField(0))->Value());
 
 	if(args.Length() < 1) return ThrowException(String::New("Expected 1 argument"));
 
@@ -43,7 +43,7 @@ void OperationQueue_destructor(Persistent<Value> object, void *parameters)
 	#endif
 	Locker locker;
 
-	OperationQueue *q = (BRIDGE_TRANSFER OperationQueue *)(Handle<External>::Cast(object->ToObject()->GetInternalField(0))->Value());
+	TSOperationQueue *q = (BRIDGE_TRANSFER TSOperationQueue *)(Handle<External>::Cast(object->ToObject()->GetInternalField(0))->Value());
 	object->ToObject()->SetInternalField(0, Null());
 	object.Dispose();
 	object.Clear();
@@ -56,12 +56,12 @@ Handle<Value> Tapstream_fireEvent(const Arguments &args)
 	Locker locker;
 	HandleScope scope;
 	Handle<Object> self = args.This();
-	Tapstream *ts = (BRIDGE Tapstream *)(Handle<External>::Cast(self->GetInternalField(0))->Value());
+	TSTapstream *ts = (BRIDGE TSTapstream *)(Handle<External>::Cast(self->GetInternalField(0))->Value());
 
 	if(args.Length() < 1) return ThrowException(String::New("Expected 1 argument"));
 
 	if(!args[0]->IsObject()) return ThrowException(String::New("Arg 0 must be an object"));
-	Event *e = (BRIDGE Event *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
+	TSEvent *e = (BRIDGE TSEvent *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
 
 	[ts fireEvent:e];
 	return Undefined();
@@ -71,12 +71,12 @@ Handle<Value> Tapstream_fireHit(const Arguments &args)
 	Locker locker;
 	HandleScope scope;
 	Handle<Object> self = args.This();
-	Tapstream *ts = (BRIDGE Tapstream *)(Handle<External>::Cast(self->GetInternalField(0))->Value());
+	TSTapstream *ts = (BRIDGE TSTapstream *)(Handle<External>::Cast(self->GetInternalField(0))->Value());
 
 	if(args.Length() < 1) return ThrowException(String::New("Expected 1 argument"));
 
 	if(!args[0]->IsObject()) return ThrowException(String::New("Arg 0 must be an object"));
-	Hit *h = (BRIDGE Hit *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
+	TSHit *h = (BRIDGE TSHit *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
 
 	[ts fireHit:h completion:nil];
 	return Undefined();
@@ -88,7 +88,7 @@ void Tapstream_destructor(Persistent<Value> object, void *parameters)
 	#endif
 	Locker locker;
 
-	Tapstream *ts = (BRIDGE_TRANSFER Tapstream *)(Handle<External>::Cast(object->ToObject()->GetInternalField(0))->Value());
+	TSTapstream *ts = (BRIDGE_TRANSFER TSTapstream *)(Handle<External>::Cast(object->ToObject()->GetInternalField(0))->Value());
 	object->ToObject()->SetInternalField(0, Null());
 	object.Dispose();
 	object.Clear();
@@ -103,7 +103,7 @@ Handle<Value> Event_addPair(const Arguments &args)
 	Locker locker;
 	HandleScope scope;
 	Handle<Object> self = args.This();
-	Event *event = (BRIDGE Event *)(Handle<External>::Cast(self->GetInternalField(0))->Value());
+	TSEvent *event = (BRIDGE TSEvent *)(Handle<External>::Cast(self->GetInternalField(0))->Value());
 
 	if(args.Length() < 2) return ThrowException(String::New("Expected 2 arguments"));
 
@@ -146,7 +146,7 @@ void Event_destructor(Persistent<Value> object, void *parameters)
 	#endif
 	Locker locker;
 
-	Event *event = (BRIDGE_TRANSFER Event *)(Handle<External>::Cast(object->ToObject()->GetInternalField(0))->Value());
+	TSEvent *event = (BRIDGE_TRANSFER TSEvent *)(Handle<External>::Cast(object->ToObject()->GetInternalField(0))->Value());
 	object->ToObject()->SetInternalField(0, Null());
 	object.Dispose();
 	object.Clear();
@@ -156,7 +156,7 @@ void Event_destructor(Persistent<Value> object, void *parameters)
 static Handle<Value> Event_accessor(Local<String> name, const AccessorInfo &info)
 {
 	String::Utf8Value s(name);
-	Event *event = (BRIDGE Event *)(Handle<External>::Cast(info.This()->GetInternalField(0))->Value());
+	TSEvent *event = (BRIDGE TSEvent *)(Handle<External>::Cast(info.This()->GetInternalField(0))->Value());
 
 	if(strcmp(*s, "postData") == 0)
 	{
@@ -181,7 +181,7 @@ Handle<Value> Hit_addTag(const Arguments &args)
 	Locker locker;
 	HandleScope scope;
 	Handle<Object> self = args.This();
-	Hit *hit = (BRIDGE Hit *)(Handle<External>::Cast(self->GetInternalField(0))->Value());
+	TSHit *hit = (BRIDGE TSHit *)(Handle<External>::Cast(self->GetInternalField(0))->Value());
 
 	if(args.Length() < 1) return ThrowException(String::New("Expected 1 argument"));
 
@@ -198,7 +198,7 @@ void Hit_destructor(Persistent<Value> object, void *parameters)
 	#endif
 	Locker locker;
 
-	Hit *hit = (BRIDGE_TRANSFER Hit *)(Handle<External>::Cast(object->ToObject()->GetInternalField(0))->Value());
+	TSHit *hit = (BRIDGE_TRANSFER TSHit *)(Handle<External>::Cast(object->ToObject()->GetInternalField(0))->Value());
 	object->ToObject()->SetInternalField(0, Null());
 	object.Dispose();
 	object.Clear();
@@ -208,7 +208,7 @@ void Hit_destructor(Persistent<Value> object, void *parameters)
 static Handle<Value> Hit_accessor(Local<String> name, const AccessorInfo &info)
 {
 	String::Utf8Value s(name);
-	Hit *hit = (BRIDGE Hit *)(Handle<External>::Cast(info.This()->GetInternalField(0))->Value());
+	TSHit *hit = (BRIDGE TSHit *)(Handle<External>::Cast(info.This()->GetInternalField(0))->Value());
 
 	if(strcmp(*s, "postData") == 0)
 	{
@@ -299,7 +299,7 @@ Handle<Value> Util_getPostData(const Arguments &args)
 	if(args.Length() < 1) return ThrowException(String::New("Expected 1 argument"));
 
 	if(!args[0]->IsObject()) return ThrowException(String::New("Arg 0 must be an object"));
-	Tapstream *ts = (BRIDGE Tapstream *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
+	TSTapstream *ts = (BRIDGE TSTapstream *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
 	
 	Handle<String> postData = String::New([[ts getPostData] UTF8String]);
 
@@ -314,7 +314,7 @@ Handle<Value> Util_getDelay(const Arguments &args)
 	if(args.Length() < 1) return ThrowException(String::New("Expected 1 argument"));
 
 	if(!args[0]->IsObject()) return ThrowException(String::New("Arg 0 must be an object"));
-	Tapstream *ts = (BRIDGE Tapstream *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
+	TSTapstream *ts = (BRIDGE TSTapstream *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
 	
 	Handle<Number> delay = Number::New((double)[ts getDelay]);
 
@@ -329,7 +329,7 @@ Handle<Value> Util_getSavedFiredList(const Arguments &args)
 	if(args.Length() < 1) return ThrowException(String::New("Expected 1 argument"));
 
 	if(!args[0]->IsObject()) return ThrowException(String::New("Arg 0 must be an object"));
-	Tapstream *ts = (BRIDGE Tapstream *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
+	TSTapstream *ts = (BRIDGE TSTapstream *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
 	
 	NSArray *strings = [ts getSavedFiredList];
 	Handle<Array> array = Array::New(strings.count);
@@ -348,7 +348,7 @@ Handle<Value> Util_setResponseStatus(const Arguments &args)
 	if(args.Length() < 2) return ThrowException(String::New("Expected 2 arguments"));
 
 	if(!args[0]->IsObject()) return ThrowException(String::New("Arg 0 must be an object"));
-	Tapstream *ts = (BRIDGE Tapstream *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
+	TSTapstream *ts = (BRIDGE TSTapstream *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
 
 	if(!args[1]->IsInt32()) return ThrowException(String::New("Arg 1 must be an integer"));
 	int status = args[1]->ToInt32()->Value();
@@ -362,7 +362,7 @@ Handle<Value> Util_newOperationQueue(const Arguments &args)
 	Locker locker;
 	HandleScope scope;
 
-	OperationQueue *q = AUTORELEASE([[OperationQueue alloc] init]);
+	TSOperationQueue *q = AUTORELEASE([[TSOperationQueue alloc] init]);
 	void *ptr = (BRIDGE_RETAINED void *)RETAIN(q);
 
 	Handle<ObjectTemplate> templ = ObjectTemplate::New();
@@ -386,7 +386,7 @@ Handle<Value> Util_newTapstream(const Arguments &args)
 	if(args.Length() < 4) return ThrowException(String::New("Expected 4 arguments"));
 
 	if(!args[0]->IsObject()) return ThrowException(String::New("Arg 0 must be an object"));
-	OperationQueue *queue = (BRIDGE OperationQueue *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
+	TSOperationQueue *queue = (BRIDGE TSOperationQueue *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
 
 	if(!args[1]->IsString()) return ThrowException(String::New("Arg 1 must be a string"));
 	String::Utf8Value accountName(args[1]);
@@ -397,7 +397,7 @@ Handle<Value> Util_newTapstream(const Arguments &args)
 	if(!args[3]->IsString()) return ThrowException(String::New("Arg 3 must be a string"));
 	String::Utf8Value hardware(args[3]);
 
-	Tapstream *ts = AUTORELEASE([[Tapstream alloc] initWithOperationQueue:queue
+	TSTapstream *ts = AUTORELEASE([[TSTapstream alloc] initWithOperationQueue:queue
 		accountName:[NSString stringWithUTF8String:*accountName]
 		developerSecret:[NSString stringWithUTF8String:*developerSecret]
 		hardware:[NSString stringWithUTF8String:*hardware]
@@ -431,7 +431,7 @@ Handle<Value> Util_newEvent(const Arguments &args)
 	if(!args[1]->IsBoolean()) return ThrowException(String::New("Arg 1 must be a boolean"));
 	bool oneTimeOnly = args[1]->BooleanValue();
 
-	Event *event = [Event eventWithName:[NSString stringWithUTF8String:*name] oneTimeOnly:oneTimeOnly];
+	TSEvent *event = [TSEvent eventWithName:[NSString stringWithUTF8String:*name] oneTimeOnly:oneTimeOnly];
 	void *ptr = (BRIDGE_RETAINED void *)RETAIN(event);
 
 	Handle<ObjectTemplate> templ = ObjectTemplate::New();
@@ -460,7 +460,7 @@ Handle<Value> Util_newHit(const Arguments &args)
 	if(!args[0]->IsString()) return ThrowException(String::New("Arg 0 must be a string"));
 	String::Utf8Value name(args[0]);
 
-	Hit *hit = [Hit hitWithTrackerName:[NSString stringWithUTF8String:*name]];
+	TSHit *hit = [TSHit hitWithTrackerName:[NSString stringWithUTF8String:*name]];
 	void *ptr = (BRIDGE_RETAINED void *)RETAIN(hit);
 
 	Handle<ObjectTemplate> templ = ObjectTemplate::New();

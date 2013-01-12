@@ -72,20 +72,20 @@ The hardware identifier must be no more than 255 characters in length.  In this 
 In your project's AppDelegate.m file, import the Tapstream SDK:
 
     :::objective-c
-    #import "Tapstream.h"
+    #import "TSTapstream.h"
 
 Then, in the {% if platform == 'ios' %}`-application:didFinishLaunchingWithOptions:`{% else %}`-applicationDidFinishLaunching:`{% endif %} method of the AppDelegate,
-create the `Tapstream` singleton with the account name and developer secret that you've setup on the Tapstream website:
+create the `TSTapstream` singleton with the account name and developer secret that you've setup on the Tapstream website:
 
     :::objective-c
-    [Tapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY"];
+    [TSTapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY"];
 
 
 If you have access to some kind of unique hardware identifier, you may provide this upon creation.
 The hardware identifier must be no more than 255 characters in length.  In this case, instantiation would look like this:
 
     :::objective-c
-    [Tapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY" hardware:@"SOME_UNIQUE_HARDWARE_ID"];
+    [TSTapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY" hardware:@"SOME_UNIQUE_HARDWARE_ID"];
 
 {% elif platform == 'win8' or platform == 'winphone' %}
 
@@ -125,8 +125,8 @@ Now that the sdk is initialized, you may fire events from anywhere in your code.
 
 {% elif platform == 'ios' or platform == 'mac' %}
     :::objective-c
-    Event *e = [Event eventWithName:@"install" oneTimeOnly:NO];
-    [[Tapstream instance] fireEvent:e];
+    TSEvent *e = [TSEvent eventWithName:@"install" oneTimeOnly:NO];
+    [[TSTapstream instance] fireEvent:e];
 
 {% elif platform == 'win8' or platform == 'winphone' %}
     :::csharp
@@ -148,8 +148,8 @@ If you want to fire an event that will only happen once in the lifetime of the a
 
 {% elif platform == 'ios' or platform == 'mac' %}
     :::objective-c
-    Event *e = [Event eventWithName:@"install" oneTimeOnly:YES];
-    [[Tapstream instance] fireEvent:e];
+    TSEvent *e = [TSEvent eventWithName:@"install" oneTimeOnly:YES];
+    [[TSTapstream instance] fireEvent:e];
 
 {% elif platform == 'win8' or platform == 'winphone' %}
     :::csharp
@@ -187,13 +187,13 @@ In the following example, two events are fired.  Both contain key/value pairs, a
 
 {% elif platform == 'ios' or platform == 'mac' %}
     :::objective-c
-    Tapstream *tracker = [Tapstream instance];
+    TSTapstream *tracker = [TSTapstream instance];
 
-    Event *e = [Event eventWithName:@"installed" oneTimeOnly:YES];
+    TSEvent *e = [TSEvent eventWithName:@"installed" oneTimeOnly:YES];
     [e addValue:@"test-user" forKey:@"username"];
     [tracker fireEvent:e];
 
-    e = [Event eventWithName:@"level-complete" oneTimeOnly:NO];
+    e = [TSEvent eventWithName:@"level-complete" oneTimeOnly:NO];
     [e addIntegerValue:15000 forKey:@"score"];
     [e addValue:@"easy" forKey:@"skill"];
     [tracker fireEvent:e];
@@ -236,8 +236,8 @@ Here's how you might redirect Tapstream messages to a custom logging system:
 
 {% elif platform == 'ios' or platform == 'mac' %}
     :::objective-c
-    // You'll need:  #import "Logging.h"
-    [Logging setLogger:^(int logLevel, NSString *message) {
+    // You'll need:  #import "TSLogging.h"
+    [TSLogging setLogger:^(int logLevel, NSString *message) {
     	MyCustomLoggingSystem(message);
     }];
 
@@ -286,10 +286,10 @@ Although hits are usually created in a browser, it is possible to fire hits from
 
 {% elif platform == 'ios' or platform == 'mac' %}
     :::objective-c
-    Hit *h = [Hit hitWithTrackerName:@"my-hit-tracker-name"];
+    TSHit *h = [TSHit hitWithTrackerName:@"my-hit-tracker-name"];
     [h addTag:@"tag-1"];
     [h addTag:@"tag-2"];
-    [[Tapstream instance] fireHit:h completion:^(Response *response) {
+    [[TSTapstream instance] fireHit:h completion:^(TSResponse *response) {
         if (response.status >= 200 && response.status < 300)
         {
             // Success

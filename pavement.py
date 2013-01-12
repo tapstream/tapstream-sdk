@@ -214,10 +214,10 @@ def package_objc():
 		sh('cp -r ./builds/%s/Tapstream ./builds/%s-whitelabel/' % (sdk, sdk))
 		with pushd('./builds/%s-whitelabel' % sdk):
 			sh('mv Tapstream ConversionTracker')
-			sh('mv ConversionTracker/Tapstream.h ConversionTracker/ConversionTracker.h')
-			sh('mv ConversionTracker/Tapstream.m ConversionTracker/ConversionTracker.m')
+			sh('mv ConversionTracker/TSTapstream.h ConversionTracker/ConversionTracker.h')
+			sh('mv ConversionTracker/TSTapstream.m ConversionTracker/ConversionTracker.m')
 
-			pattern = re.compile(r'(With|[\s\[("])Tapstream([\s(.*:])')
+			pattern = re.compile(r'(With|[\s\[("])(?:TS)?Tapstream([\s(.*:])')
 			for file_path in itertools.chain(path('.').walkfiles('*.h'), path('.').walkfiles('*.m')):
 				with open(file_path, 'rb+') as f:
 					data = f.read()

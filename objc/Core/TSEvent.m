@@ -1,10 +1,10 @@
-#import "Event.h"
+#import "TSEvent.h"
 #import <sys/time.h>
 #import <stdio.h>
 #import <stdlib.h>
-#import "Logging.h"
+#import "TSLogging.h"
 
-@interface Event()
+@interface TSEvent()
 
 - (id)initWithName:(NSString *)name oneTimeOnly:(BOOL)oneTimeOnly;
 - (void)firing;
@@ -14,7 +14,7 @@
 
 
 
-@implementation Event
+@implementation TSEvent
 
 @synthesize uid, name, encodedName, oneTimeOnly, postData;
 
@@ -46,14 +46,14 @@
 {
 	if(key.length > 255)
 	{
-		[Logging logAtLevel:kLoggingWarn format:@"Tapstream Warning: Custom key exceeds 255 characters, this field will not be included in the post (key=%@)", key];
+		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Custom key exceeds 255 characters, this field will not be included in the post (key=%@)", key];
         return;
 	}
 	NSString *encodedKey = [self encodeString:[@"custom-" stringByAppendingString:key]];
 
 	if(value.length > 255)
 	{
-		[Logging logAtLevel:kLoggingWarn format:@"Tapstream Warning: Custom value exceeds 255 characters, this field will not be included in the post (value=%@)", value];
+		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Custom value exceeds 255 characters, this field will not be included in the post (value=%@)", value];
         return;
 	}
 	NSString *encodedValue = [self encodeString:value];

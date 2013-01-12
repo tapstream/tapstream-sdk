@@ -1,8 +1,8 @@
 #pragma once
 #import <Foundation/Foundation.h>
-#import "helpers.h"
+#import "TSHelpers.h"
 
-@interface Operation : NSObject {
+@interface TSOperation : NSObject {
 @private
 	NSString *name;
 	NSString *arg;
@@ -16,14 +16,14 @@
 @end
 
 
-@interface OperationQueue : NSObject {
+@interface TSOperationQueue : NSObject {
 @private
 	NSMutableArray *queue;
     NSConditionLock *queueLock;
 }
 
-- (void)put:(Operation *)op;
-- (Operation *)take;
+- (void)put:(TSOperation *)op;
+- (TSOperation *)take;
 - (void)expect:(NSString *)opName;
 
 @end

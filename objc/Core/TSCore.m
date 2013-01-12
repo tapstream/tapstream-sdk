@@ -1,23 +1,23 @@
-#import "Core.h"
-#import "helpers.h"
-#import "Logging.h"
+#import "TSCore.h"
+#import "TSHelpers.h"
+#import "TSLogging.h"
 
-#define kVersion @"2.0"
-#define kEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
-#define kHitUrlTemplate @"http://api.tapstream.com/%@/hit/%@.gif"
+#define kTSVersion @"2.0"
+#define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
+#define kTSHitUrlTemplate @"http://api.tapstream.com/%@/hit/%@.gif"
 
-@interface Event(hidden)
+@interface TSEvent(hidden)
 - (void)firing;
 @end
 
 
 
 
-@interface Core()
+@interface TSCore()
 
-@property(nonatomic, STRONG_OR_RETAIN) id<Delegate> del;
-@property(nonatomic, STRONG_OR_RETAIN) id<Platform> platform;
-@property(nonatomic, STRONG_OR_RETAIN) id<CoreListener> listener;
+@property(nonatomic, STRONG_OR_RETAIN) id<TSDelegate> del;
+@property(nonatomic, STRONG_OR_RETAIN) id<TSPlatform> platform;
+@property(nonatomic, STRONG_OR_RETAIN) id<TSCoreListener> listener;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *accountName;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableString *postData;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableSet *firingEvents;
@@ -31,13 +31,13 @@
 @end
 
 
-@implementation Core
+@implementation TSCore
 
 @synthesize del, platform, listener, accountName, postData, firingEvents, firedEvents, failingEventId;
 
-- initWithDelegate:(id<Delegate>)delegateVal
-	platform:(id<Platform>)platformVal
-	listener:(id<CoreListener>)listenerVal
+- initWithDelegate:(id<TSDelegate>)delegateVal
+	platform:(id<TSPlatform>)platformVal
+	listener:(id<TSCoreListener>)listenerVal
 	accountName:(NSString *)accountNameVal
 	developerSecret:(NSString *)developerSecretVal
 	hardware:(NSString *)hardwareVal
@@ -72,7 +72,7 @@
 	SUPER_DEALLOC;
 }
 
-- (void)fireEvent:(Event *)e
+- (void)fireEvent:(TSEvent *)e
 {
 	@synchronized(self)
 	{
@@ -83,14 +83,14 @@
 		{
 			if([firedEvents containsObject:e.name])
 			{
-				[Logging logAtLevel:kLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that has already been fired", e.name];
+				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that has already been fired", e.name];
                 [listener reportOperation:@"event-ignored-already-fired"];
                 [listener reportOperation:@"job-ended"];
                 return;
 			}
 			else if([firedEvents containsObject:e.name])
 			{
-				[Logging logAtLevel:kLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that is already in progress", e.name];
+				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that is already in progress", e.name];
                 [listener reportOperation:@"event-ignored-already-in-progress"];
                 [listener reportOperation:@"job-ended"];
                 return;
@@ -99,7 +99,7 @@
 			[firingEvents addObject:e.name];
 		}
 
-		NSString *url = [NSString stringWithFormat:kEventUrlTemplate, accountName, e.encodedName];
+		NSString *url = [NSString stringWithFormat:kTSEventUrlTemplate, accountName, e.encodedName];
 		NSString *data = [postData stringByAppendingString:e.postData];
 
 
@@ -107,7 +107,7 @@
 		dispatch_time_t dispatchTime = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * actualDelay);
 		dispatch_after(dispatchTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 
-			Response *response = [platform request:url data:data];
+			TSResponse *response = [platform request:url data:data];
 			bool failed = response.status < 200 || response.status >= 300;
 			bool shouldRetry = response.status < 0 || (response.status >= 500 && response.status < 600);
 
@@ -156,15 +156,15 @@
             {
 			    if(response.status < 0)
                 {
-				    [Logging logAtLevel:kLoggingError format:@"Tapstream Error: Failed to fire event, error=%@", response.message];
+				    [TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, error=%@", response.message];
 			    }
                 else if(response.status == 404)
                 {
-				    [Logging logAtLevel:kLoggingError format:@"Tapstream Error: Failed to fire event, http code %d\nDoes your event name contain characters that are not url safe? This event will not be retried.", response.status];
+				    [TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, http code %d\nDoes your event name contain characters that are not url safe? This event will not be retried.", response.status];
 			    }
                 else if(response.status == 403)
                 {
-				   [Logging logAtLevel:kLoggingError format:@"Tapstream Error: Failed to fire event, http code %d\nAre your account name and application secret correct?  This event will not be retried.", response.status];
+				   [TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, http code %d\nAre your account name and application secret correct?  This event will not be retried.", response.status];
 			    }
                 else
                 {
@@ -173,7 +173,7 @@
                     {
 					    retryMsg = @"  This event will not be retried.";
 				    }
-				    [Logging logAtLevel:kLoggingError format:@"Tapstream Error: Failed to fire event, http code %d.%@", response.status, retryMsg];
+				    [TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, http code %d.%@", response.status, retryMsg];
 			    }
 
 			    [listener reportOperation:@"event-failed" arg:e.uid];
@@ -190,7 +190,7 @@
 		    }
             else
             {
-            	[Logging logAtLevel:kLoggingInfo format:@"Tapstream fired event named \"%@\"", e.name];
+            	[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream fired event named \"%@\"", e.name];
 			    [listener reportOperation:@"event-succeeded"];
 		    }
 		
@@ -199,21 +199,21 @@
 	}
 }
 
-- (void)fireHit:(Hit *)hit completion:(void(^)(Response *))completion
+- (void)fireHit:(TSHit *)hit completion:(void(^)(TSResponse *))completion
 {
-	NSString *url = [NSString stringWithFormat:kHitUrlTemplate, accountName, hit.encodedTrackerName];
+	NSString *url = [NSString stringWithFormat:kTSHitUrlTemplate, accountName, hit.encodedTrackerName];
 	NSString *data = hit.postData;
 
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		Response *response = [platform request:url data:data];
+		TSResponse *response = [platform request:url data:data];
 		if(response.status < 200 || response.status >= 300)
 		{
-			[Logging logAtLevel:kLoggingError format:@"Tapstream Error: Failed to fire hit, http code: %d", response.status];
+			[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire hit, http code: %d", response.status];
             [listener reportOperation:@"hit-failed"];
         }
         else
         {
-            [Logging logAtLevel:kLoggingInfo format:@"Tapstream fired hit to tracker: %@", hit.trackerName];
+            [TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream fired hit to tracker: %@", hit.trackerName];
             [listener reportOperation:@"hit-succeeded"];
         }
 
@@ -276,13 +276,13 @@
 - (void)makePostArgsWithSecret:(NSString *)secret hardware:(NSString *)hardware
 {
 	[self appendPostPairWithKey:@"secret" value:secret];
-	[self appendPostPairWithKey:@"sdkversion" value:kVersion];
+	[self appendPostPairWithKey:@"sdkversion" value:kTSVersion];
 
 	if(hardware != nil)
 	{
 		if([hardware length] > 255)
 		{
-			[Logging logAtLevel:kLoggingWarn format:@"Tapstream Warning: Hardware argument exceeds 255 characters, it will not be included with fired events"];
+			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Hardware argument exceeds 255 characters, it will not be included with fired events"];
 		}
 		else
 		{

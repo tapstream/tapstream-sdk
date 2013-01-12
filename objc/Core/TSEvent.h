@@ -1,8 +1,8 @@
 #pragma once
 #import <Foundation/Foundation.h>
-#import "helpers.h"
+#import "TSHelpers.h"
 
-@interface Event : NSObject {
+@interface TSEvent : NSObject {
 @private
 	NSTimeInterval firstFiredTime;
 	NSString *uid;

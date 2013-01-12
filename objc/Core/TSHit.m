@@ -1,12 +1,12 @@
-#import "Hit.h"
-#import "Logging.h"
+#import "TSHit.h"
+#import "TSLogging.h"
 
-@implementation Hit
+@implementation TSHit
 @synthesize trackerName, encodedTrackerName, postData = tags;
 
 + (id)hitWithTrackerName:(NSString *)trackerName
 {
-	return AUTORELEASE([[Hit alloc] initWithTrackerName:trackerName]);
+	return AUTORELEASE([[TSHit alloc] initWithTrackerName:trackerName]);
 }
 
 - (id)initWithTrackerName:(NSString *)trackerNameVal
@@ -38,7 +38,7 @@
 {
 	if(tag.length > 255)
 	{
-		[Logging logAtLevel:kLoggingWarn format:@"Tapstream Warning: Tag exceeds 255 characters, it will not be included in the post (tag=%@)", tag];
+		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Tag exceeds 255 characters, it will not be included in the post (tag=%@)", tag];
         return;
 	}
 	NSString *encodedTag = [self encodeString:tag];

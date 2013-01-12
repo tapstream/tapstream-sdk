@@ -1,11 +1,11 @@
-#import "Logging.h"
-#import "helpers.h"
+#import "TSLogging.h"
+#import "TSHelpers.h"
 
 static void(^currentLogger)(int, NSString *) = nil;
 static bool overridden = false;
 
 
-@implementation Logging
+@implementation TSLogging
 
 + (void)setLogger:(void(^)(int, NSString *))logger
 {
@@ -16,7 +16,7 @@ static bool overridden = false;
 	}
 }
 
-+ (void)logAtLevel:(LoggingLevel)level format:(NSString *)format, ...
++ (void)logAtLevel:(TSLoggingLevel)level format:(NSString *)format, ...
 {
 	@synchronized(self)
 	{

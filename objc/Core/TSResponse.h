@@ -1,7 +1,7 @@
 #pragma once
 #import <Foundation/Foundation.h>
 
-@interface Response : NSObject {
+@interface TSResponse : NSObject {
 @private
 	int status;
 	NSString *message;

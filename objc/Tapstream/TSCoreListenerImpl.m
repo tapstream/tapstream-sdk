@@ -1,6 +1,6 @@
-#import "CoreListenerImpl.h"
+#import "TSCoreListenerImpl.h"
 
-@implementation CoreListenerImpl
+@implementation TSCoreListenerImpl
 
 - (void)reportOperation:(NSString *)op
 {

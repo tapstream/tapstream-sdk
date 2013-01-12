@@ -1,10 +1,8 @@
 #pragma once
 #import <Foundation/Foundation.h>
-#import "Platform.h"
-#import "Response.h"
+#import "TSResponse.h"
 
-@interface PlatformImpl : NSObject<Platform> {}
-
+@protocol TSPlatform<NSObject>
 - (NSString *)loadUuid;
 - (NSMutableSet *)loadFiredEvents;
 - (void)saveFiredEvents:(NSMutableSet *)firedEvents;
@@ -13,6 +11,5 @@
 - (NSString *)getModel;
 - (NSString *)getOs;
 - (NSString *)getLocale;
-- (Response *)request:(NSString *)url data:(NSString *)data;
-
+- (TSResponse *)request:(NSString *)url data:(NSString *)data;
 @end

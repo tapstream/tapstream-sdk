@@ -7,7 +7,7 @@
 //
 
 #import "AppDelegate.h"
-#import "Tapstream.h"
+#import "TSTapstream.h"
 
 @implementation AppDelegate
 
@@ -26,22 +26,22 @@
         splitViewController.delegate = (id)navigationController.topViewController;
     }
     
-    [Tapstream createWithAccountName:@"sdktest" developerSecret:@"YGP2pezGTI6ec48uti4o1w"];
+    [TSTapstream createWithAccountName:@"sdktest" developerSecret:@"YGP2pezGTI6ec48uti4o1w"];
     
-    Tapstream *tracker = [Tapstream instance];
+    TSTapstream *tracker = [TSTapstream instance];
 
-    Event *e = [Event eventWithName:@"test-event" oneTimeOnly:NO];
+    TSEvent *e = [TSEvent eventWithName:@"test-event" oneTimeOnly:NO];
     [e addValue:@"John Doe" forKey:@"player"];
     [e addIntegerValue:5 forKey:@"score"];
     [tracker fireEvent:e];
     
-    e = [Event eventWithName:@"test-event-oto" oneTimeOnly:YES];
+    e = [TSEvent eventWithName:@"test-event-oto" oneTimeOnly:YES];
     [tracker fireEvent:e];
     
-    Hit *h = [Hit hitWithTrackerName:@"test-tracker"];
+    TSHit *h = [TSHit hitWithTrackerName:@"test-tracker"];
     [h addTag:@"tag1"];
     [h addTag:@"tag2"];
-    [tracker fireHit:h completion:^(Response *response) {
+    [tracker fireHit:h completion:^(TSResponse *response) {
         if (response.status >= 200 && response.status < 300)
         {
             // Success

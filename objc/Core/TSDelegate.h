@@ -1,7 +1,7 @@
 #pragma once
 #import <Foundation/Foundation.h>
 
-@protocol Delegate<NSObject>
+@protocol TSDelegate<NSObject>
 - (int)getDelay;
 - (BOOL)isRetryAllowed;
 @end

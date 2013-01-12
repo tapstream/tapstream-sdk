@@ -1,7 +1,7 @@
-#import "Response.h"
-#import "helpers.h"
+#import "TSResponse.h"
+#import "TSHelpers.h"
 
-@implementation Response
+@implementation TSResponse
 
 @synthesize status = status;
 @synthesize message = message;

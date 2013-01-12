@@ -1,7 +1,10 @@
 #pragma once
 #import <Foundation/Foundation.h>
+#import "TSCoreListener.h"
 
-@protocol CoreListener<NSObject>
+@interface TSCoreListenerImpl : NSObject<TSCoreListener> {}
+
 - (void)reportOperation:(NSString *)op;
 - (void)reportOperation:(NSString *)op arg:(NSString *)arg;
+
 @end

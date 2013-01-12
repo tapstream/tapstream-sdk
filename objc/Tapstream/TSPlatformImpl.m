@@ -1,7 +1,7 @@
-#import "PlatformImpl.h"
+#import "TSPlatformImpl.h"
 #import <sys/types.h>
 #import <sys/sysctl.h>
-#import "helpers.h"
+#import "TSHelpers.h"
 
 #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 #import <UIKit/UIKit.h>
@@ -9,20 +9,20 @@
 #import <AppKit/AppKit.h>
 #endif
 
-#define kFiredEventsKey @"__tapstream_fired_events"
-#define kUUIDKey @"__tapstream_uuid"
+#define kTSFiredEventsKey @"__tapstream_fired_events"
+#define kTSUUIDKey @"__tapstream_uuid"
 
-@implementation PlatformImpl
+@implementation TSPlatformImpl
 
 - (NSString *)loadUuid
 {
-	NSString *uuid = [[NSUserDefaults standardUserDefaults] objectForKey:kUUIDKey];
+	NSString *uuid = [[NSUserDefaults standardUserDefaults] objectForKey:kTSUUIDKey];
 	if(!uuid)
 	{
 		CFUUIDRef uuidObject = CFUUIDCreate(kCFAllocatorDefault); 
   		uuid = AUTORELEASE((BRIDGE_TRANSFER NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuidObject));
  		CFRelease(uuidObject);
- 		[[NSUserDefaults standardUserDefaults] setObject:uuid forKey:kUUIDKey];
+ 		[[NSUserDefaults standardUserDefaults] setObject:uuid forKey:kTSUUIDKey];
  		[[NSUserDefaults standardUserDefaults] synchronize];
 	}
 	return uuid;
@@ -30,7 +30,7 @@
 
 - (NSMutableSet *)loadFiredEvents
 {
-	NSArray *fireList = [[NSUserDefaults standardUserDefaults] objectForKey:kFiredEventsKey];
+	NSArray *fireList = [[NSUserDefaults standardUserDefaults] objectForKey:kTSFiredEventsKey];
 	if(fireList)
 	{
 		return [NSMutableSet setWithArray:fireList];
@@ -40,7 +40,7 @@
 
 - (void)saveFiredEvents:(NSMutableSet *)firedEvents
 {
-	[[NSUserDefaults standardUserDefaults] setObject:[firedEvents allObjects] forKey:kFiredEventsKey];
+	[[NSUserDefaults standardUserDefaults] setObject:[firedEvents allObjects] forKey:kTSFiredEventsKey];
 	[[NSUserDefaults standardUserDefaults] synchronize];
 }
 
@@ -98,7 +98,7 @@
 	return [[NSLocale currentLocale] localeIdentifier];
 }
 
-- (Response *)request:(NSString *)url data:(NSString *)data
+- (TSResponse *)request:(NSString *)url data:(NSString *)data
 {
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
 	[request setHTTPMethod:@"POST"];
@@ -111,11 +111,11 @@
 		if(error)
 		{
 			NSString *msg = [NSString stringWithFormat:@"%@", error];
-			return AUTORELEASE([[Response alloc] initWithStatus:-1 message:msg]);
+			return AUTORELEASE([[TSResponse alloc] initWithStatus:-1 message:msg]);
 		}
-		return AUTORELEASE([[Response alloc] initWithStatus:-1 message:@"Unknown"]);
+		return AUTORELEASE([[TSResponse alloc] initWithStatus:-1 message:@"Unknown"]);
 	}
-	return AUTORELEASE([[Response alloc] initWithStatus:response.statusCode message:[NSHTTPURLResponse localizedStringForStatusCode:response.statusCode]]);
+	return AUTORELEASE([[TSResponse alloc] initWithStatus:response.statusCode message:[NSHTTPURLResponse localizedStringForStatusCode:response.statusCode]]);
 }
 
 - (NSString *)systemInfoByName:(NSString *)name

@@ -1,15 +1,15 @@
 #pragma once
 #import <Foundation/Foundation.h>
-#import "Platform.h"
-#import "Response.h"
-#import "helpers.h"
+#import "TSPlatform.h"
+#import "TSResponse.h"
+#import "TSHelpers.h"
 
-@interface PlatformImpl : NSObject<Platform> {
-	Response *response;
+@interface TSPlatformImpl : NSObject<TSPlatform> {
+	TSResponse *response;
 	NSArray *savedFiredList;
 }
 
-@property(nonatomic, STRONG_OR_RETAIN) Response *response;
+@property(nonatomic, STRONG_OR_RETAIN) TSResponse *response;
 @property(nonatomic, STRONG_OR_RETAIN) NSArray *savedFiredList;
 
 - (NSString *)loadUuid;
@@ -20,6 +20,6 @@
 - (NSString *)getModel;
 - (NSString *)getOs;
 - (NSString *)getLocale;
-- (Response *)request:(NSString *)url data:(NSString *)data;
+- (TSResponse *)request:(NSString *)url data:(NSString *)data;
 
 @end

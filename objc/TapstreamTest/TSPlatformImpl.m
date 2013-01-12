@@ -1,7 +1,7 @@
-#import "PlatformImpl.h"
-#import "helpers.h"
+#import "TSPlatformImpl.h"
+#import "TSHelpers.h"
 
-@implementation PlatformImpl
+@implementation TSPlatformImpl
 
 @synthesize response, savedFiredList;
 
@@ -9,7 +9,7 @@
 {
 	if((self = [super init]) != nil)
 	{
-		response = [[Response alloc] initWithStatus:200 message:nil];
+		response = [[TSResponse alloc] initWithStatus:200 message:nil];
 		savedFiredList = nil;
 	}
 	return self;
@@ -62,7 +62,7 @@
 	return @"en_US";
 }
 
-- (Response *)request:(NSString *)url data:(NSString *)data
+- (TSResponse *)request:(NSString *)url data:(NSString *)data
 {
 	return response;
 }

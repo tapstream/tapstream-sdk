@@ -1,10 +1,10 @@
-#import "CoreListenerImpl.h"
+#import "TSCoreListenerImpl.h"
 
-@implementation CoreListenerImpl
+@implementation TSCoreListenerImpl
 
 @synthesize queue;
 
-- (id)initWithQueue:(OperationQueue *)queueVal
+- (id)initWithQueue:(TSOperationQueue *)queueVal
 {
 	if((self = [super init]) != nil)
 	{
@@ -15,12 +15,12 @@
 
 - (void)reportOperation:(NSString *)op
 {
-	[queue put:AUTORELEASE([[Operation alloc] initWithName:op arg:nil])];
+	[queue put:AUTORELEASE([[TSOperation alloc] initWithName:op arg:nil])];
 }
 
 - (void)reportOperation:(NSString *)op arg:(NSString *)arg
 {
-	[queue put:AUTORELEASE([[Operation alloc] initWithName:op arg:arg])];
+	[queue put:AUTORELEASE([[TSOperation alloc] initWithName:op arg:arg])];
 }
 
 - (void)dealloc
