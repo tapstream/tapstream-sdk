@@ -2,7 +2,7 @@
 #import "TSHelpers.h"
 #import "TSLogging.h"
 
-#define kTSVersion @"2.0"
+#define kTSVersion @"2.1"
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
 #define kTSHitUrlTemplate @"http://api.tapstream.com/%@/hit/%@.gif"
 
