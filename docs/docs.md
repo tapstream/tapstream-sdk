@@ -116,49 +116,49 @@ The hardware identifier must be no more than 255 characters in length.  In this 
 
 ## Firing events
 
-Now that the sdk is initialized, you may fire events from anywhere in your code.  Firing an event is simple and can be done like this:
+Now that the SDK is initialized, you may fire events from anywhere in your code.  Firing an event is simple and can be done like this:
 
 {% if platform == 'android' %}
     :::java
-    Event *e = new Event("install", false);
+    Event *e = new Event("activation", false);
     Tapstream.getInstance().fireEvent(e);
 
 {% elif platform == 'ios' or platform == 'mac' %}
     :::objective-c
-    TSEvent *e = [TSEvent eventWithName:@"install" oneTimeOnly:NO];
+    TSEvent *e = [TSEvent eventWithName:@"activation" oneTimeOnly:NO];
     [[TSTapstream instance] fireEvent:e];
 
 {% elif platform == 'win8' or platform == 'winphone' %}
     :::csharp
-    Event *e = new Event("install", false);
+    Event *e = new Event("activation", false);
     Tapstream.Instance.FireEvent(e);
 
 {% endif %}
 
-This example fires an event called "install" which might be an appropriate name for a first activation event, but you may call your events anything you like. Event names are case insensitive.
+This example fires an event called "activation" which might be an appropriate name for a first activation event, but you may call your events anything you like. Event names are case insensitive.
 
 The ***Tapstream SDK is threadsafe***, so you may fire events from any thread you wish.
 
-If you want to fire an event that will only happen once in the lifetime of the application (an install event is a good example of this), you may create a "one time only" event as follows:
+If you want to fire an event that will only happen once in the lifetime of the application, you may create a "one time only" event as follows:
 
 {% if platform == 'android' %}
     :::java
-    Event *e = new Event("install", true);
+    Event *e = new Event("activation", true);
     Tapstream.getInstance().fireEvent(e);
 
 {% elif platform == 'ios' or platform == 'mac' %}
     :::objective-c
-    TSEvent *e = [TSEvent eventWithName:@"install" oneTimeOnly:YES];
+    TSEvent *e = [TSEvent eventWithName:@"activation" oneTimeOnly:YES];
     [[TSTapstream instance] fireEvent:e];
 
 {% elif platform == 'win8' or platform == 'winphone' %}
     :::csharp
-    Event *e = new Event("install", true);
+    Event *e = new Event("activation", true);
     Tapstream.Instance.FireEvent(e);
 
 {% endif %}
 
-One time only events will reach the Tapstream server ***exactly once***, even if you fire them multiple times in your code.
+One-time only events will reach the Tapstream server ***exactly once***, even if you fire them multiple times in your code.
 
 
 
@@ -228,27 +228,27 @@ Here's how you might redirect Tapstream messages to a custom logging system:
 {% if platform == 'android' %}
     :::java
     Logging.setLogger(new Logger() {
-    	@Override
-    	public void log(int logLevel, String message) {
-    		MyCustomLoggingSystem(message);
-    	}
+        @Override
+        public void log(int logLevel, String message) {
+            MyCustomLoggingSystem(message);
+        }
     });
 
 {% elif platform == 'ios' or platform == 'mac' %}
     :::objective-c
     // You'll need:  #import "TSLogging.h"
     [TSLogging setLogger:^(int logLevel, NSString *message) {
-    	MyCustomLoggingSystem(message);
+        MyCustomLoggingSystem(message);
     }];
 
 {% elif platform == 'win8' or platform == 'winphone' %}
     :::csharp
     class ConsoleLogger : Logger
     {
-    	public void Log(LogLevel level, string msg)
-    	{
-    		MyCustomLoggingSystem(msg);
-    	}
+        public void Log(LogLevel level, string msg)
+        {
+            MyCustomLoggingSystem(msg);
+        }
     }
 
     ...
@@ -274,14 +274,14 @@ Although hits are usually created in a browser, it is possible to fire hits from
     h.addTag("tag-1");
     h.addTag("tag-2");
     Tapstream.getInstance().fireHit(h, new Hit.CompletionHandler() {
-    	@Override
-    	public void complete(Response response) {
-    		if(response.status >= 200 && response.status < 300) {
-    			// Success
-    		} else {
-    			// Error
-    		}
-    	}
+        @Override
+        public void complete(Response response) {
+            if(response.status >= 200 && response.status < 300) {
+                // Success
+            } else {
+                // Error
+            }
+        }
     });
 
 {% elif platform == 'ios' or platform == 'mac' %}
