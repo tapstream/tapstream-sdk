@@ -33,7 +33,16 @@ namespace TapstreamMetrics.Sdk
             }
             string encodedName = Uri.EscapeDataString("custom-" + key);
             
-            string stringifiedValue = value.ToString();
+            string stringifiedValue = null;
+            if(value == null)
+            {
+                stringifiedValue = "null";
+            }
+            else
+            {
+                stringifiedValue = value.ToString();
+            }
+
             if(stringifiedValue.Length > 255)
             {
                 Logging.Log(LogLevel.WARN, "Tapstream Warning: Custom value exceeds 255 characters, this field will not be included in the post (value={0})", value);

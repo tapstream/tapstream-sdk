@@ -38,16 +38,20 @@ public class Event {
 		}
 
 		String stringifiedValue = null;
-		try {
-			double d = (Double) value;
-			double truncated = Math.floor(d);
-			if (truncated == d) {
-				stringifiedValue = String.format(Locale.US, "%.0f", d);
-			} else {
+		if(value == null) {
+			stringifiedValue = "null";
+		} else {
+			try {
+				double d = (Double) value;
+				double truncated = Math.floor(d);
+				if (truncated == d) {
+					stringifiedValue = String.format(Locale.US, "%.0f", d);
+				} else {
+					stringifiedValue = value.toString();
+				}
+			} catch (ClassCastException ex) {
 				stringifiedValue = value.toString();
 			}
-		} catch (ClassCastException ex) {
-			stringifiedValue = value.toString();
 		}
 
 		if (stringifiedValue.length() > 255) {

@@ -76,6 +76,11 @@ test('event-params', function() {
         callGetter(e, 'postData')
     );
 });
+test('event-null-param', function() {
+    var e = util.newEvent('test', false);
+    callMethod(e, 'addPair', 'key', null);
+    util.assertEqual('&created=0&custom-key=null', callGetter(e, 'postData'));
+});
 test('event-param-int', function() {
     var e = util.newEvent('test', false);
     callMethod(e, 'addPair', 'key', -13);
