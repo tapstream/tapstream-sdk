@@ -51,12 +51,12 @@
 	}
 	NSString *encodedKey = [self encodeString:[@"custom-" stringByAppendingString:key]];
 
-	if(value.length > 255)
+	NSString *encodedValue = value == nil ? @"null" : [self encodeString:value];
+	if(encodedValue.length > 255)
 	{
 		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Custom value exceeds 255 characters, this field will not be included in the post (value=%@)", value];
         return;
 	}
-	NSString *encodedValue = [self encodeString:value];
 
 	if(postData == nil)
 	{

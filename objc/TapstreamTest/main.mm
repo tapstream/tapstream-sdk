@@ -136,6 +136,11 @@ Handle<Value> Event_addPair(const Arguments &args)
 		[event addBooleanValue:args[1]->BooleanValue() forKey:[NSString stringWithUTF8String:*key]];
 		return Undefined();
 	}
+	else if(args[1]->IsNull())
+	{
+		[event addValue:nil forKey:[NSString stringWithUTF8String:*key]];
+		return Undefined();
+	}
 	
 	return ThrowException(String::New("Arg 1 has invalid type"));
 }
