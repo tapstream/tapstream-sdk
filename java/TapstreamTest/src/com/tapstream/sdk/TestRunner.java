@@ -7,6 +7,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -58,7 +59,7 @@ public class TestRunner {
 		}
 
 		public void setResponseStatus(Tapstream ts, int status) {
-			((PlatformImpl) ts.platform).response = new Response(status, String.format("Http %d", status));
+			((PlatformImpl) ts.platform).response = new Response(status, String.format(Locale.US, "Http %d", status));
 		}
 
 		public OperationQueue newOperationQueue() {

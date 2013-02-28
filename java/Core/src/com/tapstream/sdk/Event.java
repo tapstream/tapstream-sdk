@@ -2,6 +2,7 @@ package com.tapstream.sdk;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Locale;
 
 public class Event {
 	private double firstFiredTime = 0;
@@ -41,7 +42,7 @@ public class Event {
 			double d = (Double) value;
 			double truncated = Math.floor(d);
 			if (truncated == d) {
-				stringifiedValue = String.format("%.0f", d);
+				stringifiedValue = String.format(Locale.US, "%.0f", d);
 			} else {
 				stringifiedValue = value.toString();
 			}
@@ -89,7 +90,7 @@ public class Event {
 
 	public String getPostData() {
 		String data = postData != null ? postData.toString() : "";
-		return String.format("&created=%.0f", firstFiredTime) + data;
+		return String.format(Locale.US, "&created=%.0f", firstFiredTime) + data;
 	}
 
 	void firing() {
@@ -100,6 +101,6 @@ public class Event {
 	}
 
 	private String makeUid() {
-		return String.format("%d:%f", System.currentTimeMillis(), Math.random());
+		return String.format(Locale.US, "%d:%f", System.currentTimeMillis(), Math.random());
 	}
 };

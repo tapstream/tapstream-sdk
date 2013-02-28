@@ -68,7 +68,7 @@ class PlatformImpl implements Platform {
 		Display display = wm.getDefaultDisplay();
 		DisplayMetrics metrics = new DisplayMetrics();
 		display.getMetrics(metrics);
-		return String.format("%dx%d", metrics.widthPixels, metrics.heightPixels);
+		return String.format(Locale.US, "%dx%d", metrics.widthPixels, metrics.heightPixels);
 	}
 
 	public String getManufacturer() {
@@ -84,7 +84,7 @@ class PlatformImpl implements Platform {
 	}
 
 	public String getOs() {
-		return String.format("Android %s", Build.VERSION.RELEASE);
+		return String.format(Locale.US, "Android %s", Build.VERSION.RELEASE);
 	}
 
 	public String getLocale() {

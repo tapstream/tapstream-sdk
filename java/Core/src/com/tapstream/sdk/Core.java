@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -62,7 +63,7 @@ class Core {
 		}
 
 		final Core self = this;
-		final String url = String.format(EVENT_URL_TEMPLATE, accountName, e.getEncodedName());
+		final String url = String.format(Locale.US, EVENT_URL_TEMPLATE, accountName, e.getEncodedName());
 		final String data = postData.toString() + e.getPostData();
 
 		Runnable task = new Runnable() {
@@ -155,7 +156,7 @@ class Core {
 	}
 
 	public void fireHit(final Hit h, final Hit.CompletionHandler completion) {
-		final String url = String.format(HIT_URL_TEMPLATE, accountName, h.getEncodedTrackerName());
+		final String url = String.format(Locale.US, HIT_URL_TEMPLATE, accountName, h.getEncodedTrackerName());
 		final String data = h.getPostData();
 		Runnable task = new Runnable() {
 			public void run() {
