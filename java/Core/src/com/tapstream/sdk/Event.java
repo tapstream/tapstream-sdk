@@ -24,6 +24,10 @@ public class Event {
 	}
 
 	public void addPair(String key, Object value) {
+		if(value == null) {
+			return;
+		}
+
 		if (key.length() > 255) {
 			Logging.log(Logging.WARN, "Tapstream Warning: Custom key exceeds 255 characters, this field will not be included in the post (key=%s)", key);
 			return;
@@ -38,22 +42,18 @@ public class Event {
 		}
 
 		String stringifiedValue = null;
-		if(value == null) {
-			stringifiedValue = "null";
-		} else {
-			try {
-				double d = (Double) value;
-				double truncated = Math.floor(d);
-				if (truncated == d) {
-					stringifiedValue = String.format(Locale.US, "%.0f", d);
-				} else {
-					stringifiedValue = value.toString();
-				}
-			} catch (ClassCastException ex) {
+		try {
+			double d = (Double) value;
+			double truncated = Math.floor(d);
+			if (truncated == d) {
+				stringifiedValue = String.format(Locale.US, "%.0f", d);
+			} else {
 				stringifiedValue = value.toString();
 			}
+		} catch (ClassCastException ex) {
+			stringifiedValue = value.toString();
 		}
-
+	
 		if (stringifiedValue.length() > 255) {
 			Logging.log(Logging.WARN, "Tapstream Warning: Custom value exceeds 255 characters, this field will not be included in the post (value=%s)", value);
 			return;

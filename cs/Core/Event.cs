@@ -26,6 +26,11 @@ namespace TapstreamMetrics.Sdk
 
         public void AddPair(string key, Object value)
         {
+            if(value == null)
+            {
+                return;
+            }
+
             if(key.Length > 255)
             {
                 Logging.Log(LogLevel.WARN, "Tapstream Warning: Custom key exceeds 255 characters, this field will not be included in the post (key={0})", key);
@@ -33,16 +38,7 @@ namespace TapstreamMetrics.Sdk
             }
             string encodedName = Uri.EscapeDataString("custom-" + key);
             
-            string stringifiedValue = null;
-            if(value == null)
-            {
-                stringifiedValue = "null";
-            }
-            else
-            {
-                stringifiedValue = value.ToString();
-            }
-
+            string stringifiedValue = value.ToString();
             if(stringifiedValue.Length > 255)
             {
                 Logging.Log(LogLevel.WARN, "Tapstream Warning: Custom value exceeds 255 characters, this field will not be included in the post (value={0})", value);
