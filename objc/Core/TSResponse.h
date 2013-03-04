@@ -10,6 +10,6 @@
 @property(nonatomic, assign, readonly) int status;
 @property(nonatomic, retain, readonly) NSString *message;
 
-- initWithStatus:(int)status message:(NSString *)message;
+- (id)initWithStatus:(int)status message:(NSString *)message;
 
 @end

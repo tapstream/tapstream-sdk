@@ -35,7 +35,7 @@
 
 @synthesize del, platform, listener, accountName, postData, firingEvents, firedEvents, failingEventId;
 
-- initWithDelegate:(id<TSDelegate>)delegateVal
+- (id)initWithDelegate:(id<TSDelegate>)delegateVal
 	platform:(id<TSPlatform>)platformVal
 	listener:(id<TSCoreListener>)listenerVal
 	accountName:(NSString *)accountNameVal

@@ -6,7 +6,7 @@
 @synthesize status = status;
 @synthesize message = message;
 
-- initWithStatus:(int)statusVal message:(NSString *)messageVal
+- (id)initWithStatus:(int)statusVal message:(NSString *)messageVal
 {
 	if((self = [super init]) != nil)
 	{
