@@ -209,7 +209,7 @@ namespace TapstreamMetrics.Sdk
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    HttpResponseMessage response = client.PostAsync(url, new StringContent(data)).Result;
+                    HttpResponseMessage response = client.PostAsync(url, new StringContent(data, Encoding.UTF8, "application/x-www-form-urlencoded")).Result;
                     status = (int)response.StatusCode;
                     if(!response.IsSuccessStatusCode)
                     {
