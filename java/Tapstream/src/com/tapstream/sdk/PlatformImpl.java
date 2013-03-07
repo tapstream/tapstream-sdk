@@ -95,11 +95,14 @@ class PlatformImpl implements Platform {
 		WorkerThread th = (WorkerThread) Thread.currentThread();
 
 		HttpPost post = new HttpPost(url);
+		StringEntity se = null;
 		try {
-			post.setEntity(new StringEntity(data));
+			se = new StringEntity(data);	
 		} catch (UnsupportedEncodingException e) {
 			return new Response(-1, e.toString());
 		}
+		se.setContentType("application/x-www-form-urlencoded");
+		post.setEntity(se);
 
 		HttpResponse response = null;
 		try {
