@@ -66,8 +66,12 @@ public class TestRunner {
 			return new OperationQueue();
 		}
 
-		public Tapstream newTapstream(OperationQueue queue, String accountName, String secret, String hardware) {
-			return new Tapstream(queue, accountName, secret, hardware);
+		public Config newConfig() {
+			return new Config();
+		}
+
+		public Tapstream newTapstream(OperationQueue queue, String accountName, String secret, Config config) {
+			return new Tapstream(queue, accountName, secret, config);
 		}
 
 		public Event newEvent(String name, boolean oneTimeOnly) {

@@ -47,6 +47,18 @@ class PlatformImpl implements Platform {
 		return "en_US";
 	}
 
+	public String getWifiMac() {
+		return "00:00:00:00:00:00";
+	}
+
+	public String getDeviceId() {
+		return "000000000000000";
+	}
+
+	public String getAndroidId() {
+		return "1111111111111111";
+	}
+
 	public Response request(String url, String data) {
 		return response;
 	}

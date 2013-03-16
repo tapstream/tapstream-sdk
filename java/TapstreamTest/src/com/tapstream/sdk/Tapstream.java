@@ -19,18 +19,11 @@ class Tapstream implements Api {
 	private CoreListener listener;
 	public Core core;
 
-	public Tapstream(OperationQueue queue, String accountName, String developerSecret) {
+	public Tapstream(OperationQueue queue, String accountName, String developerSecret, Config config) {
 		delegate = new DelegateImpl();
 		platform = new PlatformImpl();
 		listener = new CoreListenerImpl(queue);
-		core = new Core(delegate, platform, listener, accountName, developerSecret, null);
-	}
-
-	public Tapstream(OperationQueue queue, String accountName, String developerSecret, String hardware) {
-		delegate = new DelegateImpl();
-		platform = new PlatformImpl();
-		listener = new CoreListenerImpl(queue);
-		core = new Core(delegate, platform, listener, accountName, developerSecret, hardware);
+		core = new Core(delegate, platform, listener, accountName, developerSecret, config);
 	}
 
 	public void fireEvent(Event e) {

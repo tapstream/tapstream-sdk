@@ -27,13 +27,13 @@ class Core {
 	private String failingEventId = null;
 	private int delay = 0;
 
-	Core(Delegate delegate, Platform platform, CoreListener listener, String accountName, String developerSecret, String hardware) {
+	Core(Delegate delegate, Platform platform, CoreListener listener, String accountName, String developerSecret, Config config) {
 		this.delegate = delegate;
 		this.platform = platform;
 		this.listener = listener;
 
 		this.accountName = clean(accountName);
-		makePostArgs(developerSecret, hardware);
+		makePostArgs(developerSecret, config);
 
 		firedEvents = platform.loadFiredEvents();
 
@@ -232,14 +232,35 @@ class Core {
 		postData.append(encodedValue);
 	}
 
-	private void makePostArgs(String secret, String hardware) {
+	private void makePostArgs(String secret, Config config) {
 		appendPostPair("secret", secret);
 		appendPostPair("sdkversion", VERSION);
+		
+		String hardware = config.getHardware();
 		if (hardware != null) {
 			if (hardware.length() > 255) {
 				Logging.log(Logging.WARN, "Tapstream Warning: Hardware argument exceeds 255 characters, it will not be included with fired events");
 			} else {
 				appendPostPair("hardware", hardware);
+			}
+		}
+
+		if (config.getCollectWifiMac()) {
+			String value = platform.getWifiMac();
+			if (value != null) {
+				appendPostPair("hardware-wifi-mac", value);
+			}
+		}
+		if (config.getCollectDeviceId()) {
+			String value = platform.getDeviceId();
+			if (value != null) {
+				appendPostPair("hardware-device-id", value);
+			}
+		}
+		if (config.getCollectAndroidId()) {
+			String value = platform.getAndroidId();
+			if (value != null) {
+				appendPostPair("hardware-android-id", value);
 			}
 		}
 

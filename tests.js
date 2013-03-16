@@ -34,6 +34,23 @@ function callGetter(obj, propertyName) {
     return obj[methodName].apply(obj, args);
 }
 
+// Accesses the appropriate property or calls its setter, depending on language
+function callSetter(obj, propertyName) {
+    if(language == 'objc') {
+        obj[propertyName] = value;
+        return;
+    } else if(language == 'cs') {
+        propertyName = propertyName.charAt(0).toUpperCase() + propertyName.slice(1);
+        obj[propertyName] = value;
+        return;
+    }
+    // Else, call a getter function
+    var args = Array.prototype.slice.call(arguments, 2),
+        methodName = propertyName.charAt(0).toUpperCase() + propertyName.slice(1);
+    methodName = 'set'+methodName;
+    obj[methodName].apply(obj, args);
+}
+
 // Assert that a certain series of operations come out of the queue
 function expect(q) {
     for(var i = 1; i < arguments.length; i++) {
@@ -145,9 +162,10 @@ test('hit-tag-long', function() {
 
 
 // Tapstream tests
-test('post-data', function() {
+test('required-post-data', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware');
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
     var pd = util.getPostData(ts);
     util.log(pd);
     util.assertTrue(pd.search("secret=") != -1);
@@ -161,22 +179,64 @@ test('post-data', function() {
     util.assertTrue(pd.search("locale=") != -1);
     util.assertTrue(pd.search("gmtoffset=") != -1);
 });
-test('long-hardware-id', function() {
+test('collect-device-info-defaults-to-true', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', string256);
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
+    var pd = util.getPostData(ts);
+    util.log(pd);
+    util.assertTrue(pd.search("hardware-wifi-mac=") != -1);
+    if(language == 'java') {
+        util.assertTrue(pd.search("hardware-device-id=") != -1);
+        util.assertTrue(pd.search("hardware-android-id=") != -1);
+    }
+});
+test('collect-device-info-opt-out', function() {
+    var q = util.newOperationQueue(),
+        conf = util.newConfig();
+    callSetter(conf, 'collectWifiMac', false);
+    if(language == 'java') {
+        callSetter(conf, 'collectDeviceId', false);
+        callSetter(conf, 'collectAndroidId', false);
+    }
+    var ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
+    var pd = util.getPostData(ts);
+    util.log(pd);
+    util.assertTrue(pd.search("hardware-wifi-mac=") == -1);
+    if(language == 'java') {
+        util.assertTrue(pd.search("hardware-device-id=") == -1);
+        util.assertTrue(pd.search("hardware-android-id=") == -1);
+    }
+});
+test('hardware-id-included', function() {
+    var q = util.newOperationQueue(),
+        conf = util.newConfig();
+    callSetter(conf, 'hardware', '12345');
+    var ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
+    var pd = util.getPostData(ts);
+    util.log(pd);
+    util.assertTrue(pd.search("hardware=12345") != -1);
+});
+test('long-hardware-id-rejected', function() {
+    var q = util.newOperationQueue(),
+        conf = util.newConfig();
+    callSetter(conf, 'hardware', string256);
+    var ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
     var pd = util.getPostData(ts);
     util.assertTrue(pd.search("hardware=") == -1);
 });
 test('succeeded', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'event-succeeded', 'job-ended');
 });
 test('succeeded-event-has-created-time', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'event-succeeded', 'job-ended');
@@ -187,7 +247,8 @@ test('succeeded-event-has-created-time', function() {
 });
 test('failed', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
@@ -195,7 +256,8 @@ test('failed', function() {
 });
 test('failed-event-has-created-time', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
@@ -207,7 +269,8 @@ test('failed-event-has-created-time', function() {
 });
 test('failed-non-500-range-doesnt-retry', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
     util.setResponseStatus(ts, 404);
     callMethod(ts, 'fireEvent', e);
@@ -215,7 +278,8 @@ test('failed-non-500-range-doesnt-retry', function() {
 });
 test('oto-enters-fired-list', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', true);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'fired-list-saved');
@@ -225,7 +289,8 @@ test('oto-enters-fired-list', function() {
 });
 test('non-oto-does-not-enter-fired-list', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'event-succeeded', 'job-ended');
@@ -234,7 +299,8 @@ test('non-oto-does-not-enter-fired-list', function() {
 });
 test('respects-fired-list-for-oto-events', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', true);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'fired-list-saved', 'event-succeeded', 'job-ended');
@@ -244,7 +310,8 @@ test('respects-fired-list-for-oto-events', function() {
 });
 test('doesnt-respect-fired-list-for-non-oto-events', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', true);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'fired-list-saved', 'event-succeeded', 'job-ended');
@@ -254,7 +321,8 @@ test('doesnt-respect-fired-list-for-non-oto-events', function() {
 });
 test('failed-oto-events-dont-enter-fired-list', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', true);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
@@ -264,7 +332,8 @@ test('failed-oto-events-dont-enter-fired-list', function() {
 });
 test('increasing-delay', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
     util.setResponseStatus(ts, 500);
     var expected = [2, 4, 8, 16, 32, 60, 60, 60];
@@ -276,7 +345,8 @@ test('increasing-delay', function() {
 });
 test('success-doesnt-increase-delay', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'event-succeeded', 'job-ended');
@@ -284,7 +354,8 @@ test('success-doesnt-increase-delay', function() {
 });
 test('first-failure-increases-delay', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
@@ -293,7 +364,8 @@ test('first-failure-increases-delay', function() {
 });
 test('success-of-first-failed-event-resets-delay', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
@@ -307,7 +379,8 @@ test('success-of-first-failed-event-resets-delay', function() {
 });
 test('success-of-any-event-resets-delay', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
@@ -322,7 +395,8 @@ test('success-of-any-event-resets-delay', function() {
 });
 test('subsequent-failure-of-same-event-increases-delay', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
@@ -335,7 +409,8 @@ test('subsequent-failure-of-same-event-increases-delay', function() {
 });
 test('only-first-event-to-fail-can-increase-delay', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e1 = util.newEvent('test1', false),
         e2 = util.newEvent('test2', false);
     util.setResponseStatus(ts, 500);
@@ -358,14 +433,16 @@ test('only-first-event-to-fail-can-increase-delay', function() {
 });
 test('hit-success', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         h = util.newHit('test');
     callMethod(ts, 'fireHit', h);
     expect(q, 'hit-succeeded');
 });
 test('hit-failed', function() {
     var q = util.newOperationQueue(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', 'hardware'),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         h = util.newHit('test');
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireHit', h);

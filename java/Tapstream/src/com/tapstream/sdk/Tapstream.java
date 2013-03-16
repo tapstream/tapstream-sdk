@@ -7,14 +7,10 @@ import android.content.Context;
 public class Tapstream implements Api {
 	private static Tapstream instance;
 
-	public static void create(Context context, String accountName, String developerSecret) {
-		create(context, accountName, developerSecret, null);
-	}
-
-	public static void create(Context context, String accountName, String developerSecret, String hardware) {
+	public static void create(Context context, String accountName, String developerSecret, Config config) {
 		synchronized (Tapstream.class) {
 			if (instance == null) {
-				instance = new Tapstream(context, accountName, developerSecret, hardware);
+				instance = new Tapstream(context, accountName, developerSecret, config);
 			} else {
 				Logging.log(Logging.WARN, "Tapstream Warning: Tapstream already instantiated, it cannot be re-created.");
 			}
@@ -45,11 +41,11 @@ public class Tapstream implements Api {
 	private CoreListener listener;
 	private Core core;
 
-	private Tapstream(Context context, String accountName, String developerSecret, String hardware) {
+	private Tapstream(Context context, String accountName, String developerSecret, Config config) {
 		delegate = new DelegateImpl();
 		platform = new PlatformImpl(context);
 		listener = new CoreListenerImpl();
-		core = new Core(delegate, platform, listener, accountName, developerSecret, hardware);
+		core = new Core(delegate, platform, listener, accountName, developerSecret, config);
 	}
 
 	public void fireEvent(Event e) {

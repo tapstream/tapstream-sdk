@@ -17,9 +17,13 @@ import org.apache.http.entity.StringEntity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.provider.Settings.Secure;
+import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiInfo;
 
 class PlatformImpl implements Platform {
 	private static final String FIRED_EVENTS_KEY = "TapstreamSDKFiredEvents";
@@ -89,6 +93,31 @@ class PlatformImpl implements Platform {
 
 	public String getLocale() {
 		return Locale.getDefault().toString();
+	}
+
+	public String getWifiMac() {
+		try {
+			WifiManager manager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
+			WifiInfo info = manager.getConnectionInfo();
+			return info.getMacAddress();
+		} catch (SecurityException e) {
+			Logging.log(Logging.ERROR, "Tapstream Error: Failed to get wifi mac address - you need to add the ACCESS_WIFI_STATE permission to your manifest.");
+			return null;
+		}
+	}
+
+	public String getDeviceId() {
+		try {
+			TelephonyManager manager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+			return manager.getDeviceId();
+		} catch (SecurityException e) {
+			Logging.log(Logging.ERROR, "Tapstream Error: Failed to get device id - you need to add the READ_PHONE_STATE permission to your manifest.");
+			return null;
+		}
+	}
+
+	public String getAndroidId() {
+		return Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
 	}
 
 	public Response request(String url, String data) {
