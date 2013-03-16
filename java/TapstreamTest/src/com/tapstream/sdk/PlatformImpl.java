@@ -59,6 +59,14 @@ class PlatformImpl implements Platform {
 		return "1111111111111111";
 	}
 
+	public String getAppName() {
+		return "TestApp";
+	}
+
+	public String getPackageName() {
+		return "com.test.TestApp";
+	}
+
 	public Response request(String url, String data) {
 		return response;
 	}

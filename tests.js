@@ -177,6 +177,8 @@ test('required-post-data', function() {
     util.assertTrue(pd.search("os=") != -1);
     util.assertTrue(pd.search("resolution=") != -1);
     util.assertTrue(pd.search("locale=") != -1);
+    util.assertTrue(pd.search("app-name=") != -1);
+    util.assertTrue(pd.search("package-name=") != -1);
     util.assertTrue(pd.search("gmtoffset=") != -1);
 });
 test('collect-device-info-defaults-to-true', function() {
@@ -225,11 +227,18 @@ test('long-hardware-id-rejected', function() {
     var pd = util.getPostData(ts);
     util.assertTrue(pd.search("hardware=") == -1);
 });
+test('automatic-run-event', function() {
+    var q = util.newOperationQueue(),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
+});
 test('succeeded', function() {
     var q = util.newOperationQueue(),
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
     callMethod(ts, 'fireEvent', e);
     expect(q, 'event-succeeded', 'job-ended');
 });
@@ -238,6 +247,7 @@ test('succeeded-event-has-created-time', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
     callMethod(ts, 'fireEvent', e);
     expect(q, 'event-succeeded', 'job-ended');
     var pd = callGetter(e, 'postData');
@@ -250,6 +260,7 @@ test('failed', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'increased-delay', 'event-failed', 'retry', 'job-ended');
@@ -259,6 +270,7 @@ test('failed-event-has-created-time', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'increased-delay', 'event-failed', 'retry', 'job-ended');
@@ -272,6 +284,7 @@ test('failed-non-500-range-doesnt-retry', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
     util.setResponseStatus(ts, 404);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'event-failed', 'job-ended');
@@ -281,6 +294,7 @@ test('oto-enters-fired-list', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', true);
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
     callMethod(ts, 'fireEvent', e);
     expect(q, 'fired-list-saved');
     var fired_events = util.getSavedFiredList(ts);
@@ -292,6 +306,7 @@ test('non-oto-does-not-enter-fired-list', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
     callMethod(ts, 'fireEvent', e);
     expect(q, 'event-succeeded', 'job-ended');
     var fired_events = util.getSavedFiredList(ts);
@@ -302,6 +317,7 @@ test('respects-fired-list-for-oto-events', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', true);
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
     callMethod(ts, 'fireEvent', e);
     expect(q, 'fired-list-saved', 'event-succeeded', 'job-ended');
     e = util.newEvent('test', true);
@@ -313,6 +329,7 @@ test('doesnt-respect-fired-list-for-non-oto-events', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', true);
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
     callMethod(ts, 'fireEvent', e);
     expect(q, 'fired-list-saved', 'event-succeeded', 'job-ended');
     e = util.newEvent('test', false);
@@ -324,6 +341,7 @@ test('failed-oto-events-dont-enter-fired-list', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', true);
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'increased-delay', 'event-failed', 'retry', 'job-ended');
@@ -335,6 +353,7 @@ test('increasing-delay', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
     util.setResponseStatus(ts, 500);
     var expected = [2, 4, 8, 16, 32, 60, 60, 60];
     for(var i = 0; i < expected.length; i++) {
@@ -348,6 +367,7 @@ test('success-doesnt-increase-delay', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
     callMethod(ts, 'fireEvent', e);
     expect(q, 'event-succeeded', 'job-ended');
     util.assertEqual(0, util.getDelay(ts));
@@ -357,6 +377,7 @@ test('first-failure-increases-delay', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'increased-delay', 'event-failed', 'retry', 'job-ended');
@@ -367,6 +388,7 @@ test('success-of-first-failed-event-resets-delay', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'increased-delay', 'event-failed', 'retry', 'job-ended');
@@ -382,6 +404,7 @@ test('success-of-any-event-resets-delay', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'increased-delay', 'event-failed', 'retry', 'job-ended');
@@ -398,6 +421,7 @@ test('subsequent-failure-of-same-event-increases-delay', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'increased-delay', 'event-failed', 'retry', 'job-ended');
@@ -413,6 +437,8 @@ test('only-first-event-to-fail-can-increase-delay', function() {
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e1 = util.newEvent('test1', false),
         e2 = util.newEvent('test2', false);
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
+
     util.setResponseStatus(ts, 500);
     
     callMethod(ts, 'fireEvent', e1);
@@ -436,6 +462,7 @@ test('hit-success', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         h = util.newHit('test');
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
     callMethod(ts, 'fireHit', h);
     expect(q, 'hit-succeeded');
 });
@@ -444,6 +471,7 @@ test('hit-failed', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         h = util.newHit('test');
+    expect(q, 'event-succeeded', 'job-ended');  // Automatic run event
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireHit', h);
     expect(q, 'hit-failed');

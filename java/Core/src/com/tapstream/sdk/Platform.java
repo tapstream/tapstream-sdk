@@ -28,5 +28,9 @@ interface Platform {
 
 	public String getAndroidId();
 
+	public String getAppName();
+
+	public String getPackageName();
+
 	public Response request(String url, String data);
 }

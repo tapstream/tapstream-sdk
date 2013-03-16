@@ -39,6 +39,10 @@ class Core {
 
 		executor = new ScheduledThreadPoolExecutor(MAX_THREADS, platform.makeWorkerThreadFactory());
 		executor.prestartAllCoreThreads();
+
+		// Automatically fire run event
+		String eventName = String.format(Locale.US, "android-%s-run", platform.getAppName());
+		fireEvent(new Event(eventName, false));
 	}
 
 	public synchronized void fireEvent(final Event e) {
@@ -271,6 +275,8 @@ class Core {
 		appendPostPair("os", platform.getOs());
 		appendPostPair("resolution", platform.getResolution());
 		appendPostPair("locale", platform.getLocale());
+		appendPostPair("app-name", platform.getAppName());
+		appendPostPair("package-name", platform.getPackageName());
 
 		int offsetFromUtc = TimeZone.getDefault().getOffset((new Date()).getTime()) / 1000;
 		appendPostPair("gmtoffset", Integer.toString(offsetFromUtc));

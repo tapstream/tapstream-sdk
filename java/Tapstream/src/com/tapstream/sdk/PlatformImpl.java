@@ -16,14 +16,16 @@ import org.apache.http.entity.StringEntity;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiInfo;
 import android.os.Build;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiInfo;
+
 
 class PlatformImpl implements Platform {
 	private static final String FIRED_EVENTS_KEY = "TapstreamSDKFiredEvents";
@@ -118,6 +120,19 @@ class PlatformImpl implements Platform {
 
 	public String getAndroidId() {
 		return Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
+	}
+
+	public String getAppName() {
+		Resources resources = context.getResources();
+		String appName = resources.getString(resources.getIdentifier("app_name", "string", context.getPackageName()));
+		if(appName != null) {
+			return appName;
+		}
+		return "";
+	}
+
+	public String getPackageName() {
+		return context.getPackageName();
 	}
 
 	public Response request(String url, String data) {
