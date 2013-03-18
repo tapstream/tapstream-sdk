@@ -90,19 +90,14 @@ namespace TapstreamMetrics.Sdk
             int h = (int)System.Windows.Application.Current.Host.Content.ActualHeight;
             return String.Format("{0}x{1}", w, h);
 #else
-            return "";
+            return null;
 #endif
         }
 
         public string GetManufacturer()
         {
 #if WINDOWS_PHONE
-            object manufacturerObject;
-            if(DeviceExtendedProperties.TryGetValue("DeviceManufacturer", out manufacturerObject))
-            {
-                return (string)manufacturerObject;
-            }
-            return "";
+            return (string)DeviceExtendedProperties.GetValue("DeviceManufacturer");
 #else
             return "Microsoft";
 #endif
@@ -111,14 +106,9 @@ namespace TapstreamMetrics.Sdk
         public string GetModel()
         {
 #if WINDOWS_PHONE
-            object modelObject;
-            if(DeviceExtendedProperties.TryGetValue("DeviceName", out modelObject))
-            {
-                return (string)modelObject;
-            }
-            return "";
+            return (string)DeviceExtendedProperties.GetValue("DeviceName");
 #else
-            return "";
+            return null;
 #endif
         }
 
@@ -136,14 +126,15 @@ namespace TapstreamMetrics.Sdk
 #if WINDOWS_PHONE
             return String.Format("{0}_{1}", System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName, System.Globalization.RegionInfo.CurrentRegion.TwoLetterISORegionName);
 #else
-            string locale = "unknown";
             try
             {
-                locale = ApplicationLanguages.Languages.ElementAt(0);
-                locale = locale.Replace("-", "_");
+                string locale = ApplicationLanguages.Languages.ElementAt(0);
+                return locale.Replace("-", "_");
             }
-            catch (Exception) { }
-            return locale;
+            catch (Exception)
+            {
+                return null;
+            }
 #endif
         }
 

@@ -41,7 +41,11 @@ class Core {
 		executor.prestartAllCoreThreads();
 
 		// Automatically fire run event
-		String eventName = String.format(Locale.US, "android-%s-run", platform.getAppName());
+		String appName = platform.getAppName();
+		if(appName == null) {
+			appName = "";
+		}
+		String eventName = String.format(Locale.US, "android-%s-run", appName);
 		fireEvent(new Event(eventName, false));
 	}
 

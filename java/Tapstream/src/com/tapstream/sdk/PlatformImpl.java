@@ -81,8 +81,8 @@ class PlatformImpl implements Platform {
 		try {
 			return Build.MANUFACTURER;
 		} catch (Exception e) {
+			return null;
 		}
-		return "unknown";
 	}
 
 	public String getModel() {
@@ -124,11 +124,7 @@ class PlatformImpl implements Platform {
 
 	public String getAppName() {
 		Resources resources = context.getResources();
-		String appName = resources.getString(resources.getIdentifier("app_name", "string", context.getPackageName()));
-		if(appName != null) {
-			return appName;
-		}
-		return "";
+		return resources.getString(resources.getIdentifier("app_name", "string", context.getPackageName()));
 	}
 
 	public String getPackageName() {
