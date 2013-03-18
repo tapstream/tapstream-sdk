@@ -210,6 +210,10 @@ class Core {
 	}
 
 	private void appendPostPair(String key, String value) {
+		if(value == null) {
+			return;
+		}
+
 		String encodedName = null;
 		try {
 			encodedName = URLEncoder.encode(key, "UTF-8").replace("+", "%20");
@@ -250,22 +254,13 @@ class Core {
 		}
 
 		if (config.getCollectWifiMac()) {
-			String value = platform.getWifiMac();
-			if (value != null) {
-				appendPostPair("hardware-wifi-mac", value);
-			}
+			appendPostPair("hardware-wifi-mac", platform.getWifiMac());
 		}
 		if (config.getCollectDeviceId()) {
-			String value = platform.getDeviceId();
-			if (value != null) {
-				appendPostPair("hardware-device-id", value);
-			}
+			appendPostPair("hardware-device-id", platform.getDeviceId());
 		}
 		if (config.getCollectAndroidId()) {
-			String value = platform.getAndroidId();
-			if (value != null) {
-				appendPostPair("hardware-android-id", value);
-			}
+			appendPostPair("hardware-android-id", platform.getAndroidId());
 		}
 
 		appendPostPair("uuid", platform.loadUuid());

@@ -10,10 +10,14 @@ using System.Threading;
 using System.Net;
 using System.IO;
 using System.IO.IsolatedStorage;
+using System.Reflection;
 #else
 using System.Threading.Tasks;
 using System.Net.Http;
 using Windows.Globalization;
+using Windows.Storage.Streams;
+using Windows.System.Profile;
+using Windows.ApplicationModel;
 #endif
 
 namespace TapstreamMetrics.Sdk
@@ -140,6 +144,57 @@ namespace TapstreamMetrics.Sdk
             }
             catch (Exception) { }
             return locale;
+#endif
+        }
+
+#if WINDOWS_PHONE
+        public string GetDeviceUniqueId()
+        {
+            return (string)DeviceExtendedProperties.GetValue("DeviceUniqueId");
+        }
+#else
+        public string GetAppSpecificHardwareId()
+        {
+            // http://msdn.microsoft.com/en-us/library/windows/apps/jj553431
+            string deviceId = "";
+            HardwareToken hardwareToken = HardwareIdentification.GetPackageSpecificToken(null);
+            using (DataReader dataReader = DataReader.FromBuffer(hardwareToken.Id))
+            {
+                int offset = 0;
+                while (offset < hardwareToken.Id.Length)
+                {
+                    byte[] hardwareEntry = new byte[4];
+                    dataReader.ReadBytes(hardwareEntry);
+
+                    // CPU ID of the processor || Size of the memory || Serial number of the disk device || BIOS
+                    if ((hardwareEntry[0] == 1 || hardwareEntry[0] == 2 || hardwareEntry[0] == 3 || hardwareEntry[0] == 9) && hardwareEntry[1] == 0)
+                    {
+                        deviceId += string.Format("{0}.{1}", hardwareEntry[2], hardwareEntry[3]);
+                    }
+                    offset += 4;
+                }
+            }
+            return deviceId;
+        }
+#endif
+
+        public string GetAppName()
+        {
+#if WINDOWS_PHONE
+            AssemblyName nameHelper = new AssemblyName(Assembly.GetExecutingAssembly().FullName);
+            return nameHelper.Name;
+#else
+            return Package.Current.Id.Name;
+#endif
+        }
+
+        public string GetPackageName()
+        {
+#if WINDOWS_PHONE
+            AssemblyName nameHelper = new AssemblyName(Assembly.GetExecutingAssembly().FullName);
+            return nameHelper.FullName;
+#else
+            return Package.Current.Id.FullName;
 #endif
         }
 

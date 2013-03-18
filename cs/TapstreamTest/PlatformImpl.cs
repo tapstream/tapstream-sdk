@@ -51,6 +51,28 @@ namespace TapstreamMetrics.Sdk
             return "en_US";
         }
 
+#if WINDOWS_PHONE
+        public string GetDeviceUniqueId()
+        {
+            return "000000000000000";
+        }
+#else
+        public string GetAppSpecificHardwareId()
+        {
+            return "000000000000000";
+        }
+#endif
+
+        public string GetAppName()
+        {
+            return "TestApp";
+        }
+
+        public string GetPackageName()
+        {
+            return "com.test.TestApp";
+        }
+
         public Response Request(string url, string data)
         {
             return response;

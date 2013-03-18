@@ -18,13 +18,13 @@ namespace TapstreamMetrics.Sdk
             Create(accountName, developerSecret, null);
         }
         
-        public static void Create(string accountName, string developerSecret, string hardware)
+        public static void Create(string accountName, string developerSecret, Config config)
         {
             lock (instanceLock)
             {
                 if (instance == null)
                 {
-                    instance = new Tapstream(accountName, developerSecret, hardware);
+                    instance = new Tapstream(accountName, developerSecret, config);
                 }
                 else
                 {
@@ -75,12 +75,12 @@ namespace TapstreamMetrics.Sdk
         private CoreListener listener;
         private Core core;
 
-        private Tapstream(string accountName, string developerSecret, string hardware)
+        private Tapstream(string accountName, string developerSecret, Config config)
         {
             del = new DelegateImpl(this);
             platform = new PlatformImpl();
             listener = new CoreListenerImpl();
-            core = new Core(del, platform, listener, accountName, developerSecret, hardware);
+            core = new Core(del, platform, listener, accountName, developerSecret, config);
         }
 
         public void FireEvent(Event e)

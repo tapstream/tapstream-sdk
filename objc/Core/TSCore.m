@@ -260,6 +260,11 @@
 
 - (void)appendPostPairWithKey:(NSString *)key value:(NSString *)value
 {
+	if(value == nil)
+	{
+		return;
+	}
+
 	if(postData == nil)
     {
     	self.postData = [[NSMutableString alloc] initWithCapacity:256];

@@ -28,12 +28,12 @@ namespace TapstreamMetrics.Sdk
         private CoreListener listener;
         private Core core;
 
-        public Tapstream(OperationQueue queue, string accountName, string developerSecret, string hardware)
+        public Tapstream(OperationQueue queue, string accountName, string developerSecret, Config config)
         {
             del = new DelegateImpl();
             platform = new PlatformImpl();
             listener = new CoreListenerImpl(queue);
-            core = new Core(del, platform, listener, accountName, developerSecret, hardware);
+            core = new Core(del, platform, listener, accountName, developerSecret, config);
         }
 
         public void FireEvent(Event e)

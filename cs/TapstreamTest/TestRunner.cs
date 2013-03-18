@@ -70,9 +70,14 @@ namespace TapstreamMetrics.Sdk
             return new OperationQueue();
         }
 
-        public Tapstream newTapstream(OperationQueue queue, string accountName, string secret, string hardware)
+        public Config newConfig()
         {
-            return new Tapstream(queue, accountName, secret, hardware);
+            return new Config();
+        }
+
+        public Tapstream newTapstream(OperationQueue queue, string accountName, string secret, Config config)
+        {
+            return new Tapstream(queue, accountName, secret, config);
         }
 
         public Event newEvent(string name, bool oneTimeOnly)

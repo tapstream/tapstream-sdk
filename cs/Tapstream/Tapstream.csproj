@@ -102,6 +102,9 @@
     <Compile Include="..\Core\Api.cs">
       <Link>Api.cs</Link>
     </Compile>
+    <Compile Include="..\Core\Config.cs">
+      <Link>Config.cs</Link>
+    </Compile>
     <Compile Include="..\Core\Core.cs">
       <Link>Core.cs</Link>
     </Compile>

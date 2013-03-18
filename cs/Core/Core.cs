@@ -37,16 +37,23 @@ namespace TapstreamMetrics.Sdk
         private string failingEventId = null;
 	    private int delay = 0;
 
-        public Core(Delegate del, Platform platform, CoreListener listener, String accountName, String developerSecret, String hardware)
+        public Core(Delegate del, Platform platform, CoreListener listener, String accountName, String developerSecret, Config config)
         {
 		    this.del = del;
 		    this.platform = platform;
 		    this.listener = listener;
 		
 		    this.accountName = Clean(accountName);
-		    MakePostArgs(developerSecret, hardware);
+		    MakePostArgs(developerSecret, config);
 		
 		    firedEvents = platform.LoadFiredEvents();
+
+#if WINDOWS_PHONE
+            string platformName = "winphone";
+#else
+            string platformName = "windows";
+#endif
+            FireEvent(new Event(string.Format("{0}-{1}-run", platformName, platform.GetAppName()), false));
 	    }
 
         public void FireEvent(Event e)
@@ -261,6 +268,11 @@ namespace TapstreamMetrics.Sdk
 
         private void AppendPostPair(string key, string value)
         {
+            if (value == null)
+            {
+                return;
+            }
+
             if (postData == null)
             {
                 postData = new StringBuilder();
@@ -274,23 +286,37 @@ namespace TapstreamMetrics.Sdk
             postData.Append(Uri.EscapeDataString(value));
         }
 
-        private void MakePostArgs(string secret, string hardware)
+        private void MakePostArgs(string secret, Config config)
         {
             AppendPostPair("secret", secret);
             AppendPostPair("sdkversion", VERSION);
-            if (hardware != null)
+
+            if (config.Hardware != null)
             {
-                if(hardware.Length > 255)
+                if (config.Hardware.Length > 255)
                 {
                     Logging.Log(LogLevel.WARN, "Tapstream Warning: Hardware argument exceeds 255 characters, it will not be included with fired events");
                 }
                 else
                 {
-                    AppendPostPair("hardware", hardware);
+                    AppendPostPair("hardware", config.Hardware);
                 }
             }
 
+#if WINDOWS_PHONE
+            if (config.CollectDeviceUniqueId)
+            {
+                AppendPostPair("hardware-device-unique-id", platform.GetDeviceUniqueId());
+            }
+#else
+            if (config.CollectAppSpecificHardwareId)
+            {
+                AppendPostPair("hardware-app-specific-hardware-id", platform.GetAppSpecificHardwareId());
+            }
+#endif
+
             AppendPostPair("uuid", platform.LoadUuid());
+
 #if WINDOWS_PHONE
             AppendPostPair("platform", "Windows Phone");
 #else
@@ -301,6 +327,8 @@ namespace TapstreamMetrics.Sdk
             AppendPostPair("os", platform.GetOs());
             AppendPostPair("resolution", platform.GetResolution());
             AppendPostPair("locale", platform.GetLocale());
+            AppendPostPair("app-name", platform.GetAppName());
+            AppendPostPair("package-name", platform.GetPackageName());
             AppendPostPair("gmtoffset", DateTimeOffset.Now.Offset.TotalSeconds.ToString());
         }
 

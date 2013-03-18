@@ -36,18 +36,17 @@ function callGetter(obj, propertyName) {
 
 // Accesses the appropriate property or calls its setter, depending on language
 function callSetter(obj, propertyName) {
+    var args = Array.prototype.slice.call(arguments, 2);
     if(language == 'objc') {
-        obj[propertyName] = value;
+        obj[propertyName] = args[0];
         return;
     } else if(language == 'cs') {
         propertyName = propertyName.charAt(0).toUpperCase() + propertyName.slice(1);
-        obj[propertyName] = value;
+        obj[propertyName] = args[0];
         return;
     }
-    // Else, call a getter function
-    var args = Array.prototype.slice.call(arguments, 2),
-        methodName = propertyName.charAt(0).toUpperCase() + propertyName.slice(1);
-    methodName = 'set'+methodName;
+    // Else, call a setter function
+    var methodName = 'set'+propertyName.charAt(0).toUpperCase() + propertyName.slice(1);
     obj[methodName].apply(obj, args);
 }
 
@@ -168,18 +167,18 @@ test('required-post-data', function() {
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
     var pd = util.getPostData(ts);
     util.log(pd);
-    util.assertTrue(pd.search("secret=") != -1);
-    util.assertTrue(pd.search("sdkversion=") != -1);
-    util.assertTrue(pd.search("uuid=") != -1);
-    util.assertTrue(pd.search("platform=") != -1);
-    util.assertTrue(pd.search("vendor=") != -1);
-    util.assertTrue(pd.search("model=") != -1);
-    util.assertTrue(pd.search("os=") != -1);
-    util.assertTrue(pd.search("resolution=") != -1);
-    util.assertTrue(pd.search("locale=") != -1);
-    util.assertTrue(pd.search("app-name=") != -1);
-    util.assertTrue(pd.search("package-name=") != -1);
-    util.assertTrue(pd.search("gmtoffset=") != -1);
+    util.assertTrue(pd.search('secret=') != -1);
+    util.assertTrue(pd.search('sdkversion=') != -1);
+    util.assertTrue(pd.search('uuid=') != -1);
+    util.assertTrue(pd.search('platform=') != -1);
+    util.assertTrue(pd.search('vendor=') != -1);
+    util.assertTrue(pd.search('model=') != -1);
+    util.assertTrue(pd.search('os=') != -1);
+    util.assertTrue(pd.search('resolution=') != -1);
+    util.assertTrue(pd.search('locale=') != -1);
+    util.assertTrue(pd.search('app-name=') != -1);
+    util.assertTrue(pd.search('package-name=') != -1);
+    util.assertTrue(pd.search('gmtoffset=') != -1);
 });
 test('collect-device-info-defaults-to-true', function() {
     var q = util.newOperationQueue(),
@@ -187,27 +186,36 @@ test('collect-device-info-defaults-to-true', function() {
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
     var pd = util.getPostData(ts);
     util.log(pd);
-    util.assertTrue(pd.search("hardware-wifi-mac=") != -1);
     if(language == 'java') {
-        util.assertTrue(pd.search("hardware-device-id=") != -1);
-        util.assertTrue(pd.search("hardware-android-id=") != -1);
+        util.assertTrue(pd.search('hardware-wifi-mac=') != -1);
+        util.assertTrue(pd.search('hardware-device-id=') != -1);
+        util.assertTrue(pd.search('hardware-android-id=') != -1);
+    } else if(language == 'cs') {
+        util.assertTrue(
+            pd.search('hardware-app-specific-hardware-id=') != -1 || pd.search('hardware-device-unique-id=') != -1
+        );
     }
 });
 test('collect-device-info-opt-out', function() {
     var q = util.newOperationQueue(),
         conf = util.newConfig();
-    callSetter(conf, 'collectWifiMac', false);
     if(language == 'java') {
+        callSetter(conf, 'collectWifiMac', false);
         callSetter(conf, 'collectDeviceId', false);
         callSetter(conf, 'collectAndroidId', false);
+    } else if(language == 'cs') {
+        callSetter(conf, 'collectAppSpecificHardwareId', false);
     }
     var ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
     var pd = util.getPostData(ts);
     util.log(pd);
-    util.assertTrue(pd.search("hardware-wifi-mac=") == -1);
     if(language == 'java') {
-        util.assertTrue(pd.search("hardware-device-id=") == -1);
-        util.assertTrue(pd.search("hardware-android-id=") == -1);
+        util.assertTrue(pd.search('hardware-wifi-mac=') == -1);
+        util.assertTrue(pd.search('hardware-device-id=') == -1);
+        util.assertTrue(pd.search('hardware-android-id=') == -1);
+    } else if(language == 'cs') {
+        util.assertTrue(pd.search('hardware-app-specific-hardware-id=') == -1);
+        util.assertTrue(pd.search('hardware-device-unique-id=') == -1);
     }
 });
 test('hardware-id-included', function() {
