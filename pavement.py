@@ -176,7 +176,7 @@ def make_objc():
 		sh('%s -isysroot %s -miphoneos-version-min=4.3 -arch armv7 -fobjc-arc -shared %s %s -o ./TapstreamTest/bin/Tapstream.so -framework Foundation -framework UIKit' % (
 			clang, sdk_root, include_dirs, tapstream_sources
 		))
-
+		
 		# Mac With and without ARC
 		sh('clang -fno-objc-arc -shared %s %s -o ./TapstreamTest/bin/Tapstream.so -framework Foundation -framework AppKit' % (
 			include_dirs, tapstream_sources
@@ -185,14 +185,28 @@ def make_objc():
 			include_dirs, tapstream_sources
 		))
 
-		# Compile test application
-		sh('clang++ -fobjc-arc %s %s -o ./TapstreamTest/bin/TapstreamTest -lv8 -framework Foundation' % (
+		# Compile test application for ios
+		sh('clang++ -fobjc-arc %s %s -o ./TapstreamTest/bin/TapstreamTestIos -DTEST_IOS=1 -DTEST_PLATFORM=ios -lv8 -framework Foundation' % (
 			include_dirs, tapstream_test_sources
 		))
+		# Compile test application for mac
+		sh('clang++ -fobjc-arc %s %s -o ./TapstreamTest/bin/TapstreamTestMac -DTEST_PLATFORM=mac -lv8 -framework Foundation' % (
+			include_dirs, tapstream_test_sources
+		))
+		
+
+@task
+def test_objc_mac():
+	sh('./objc/TapstreamTest/bin/TapstreamTestMac tests.js')
+
+@task
+def test_objc_ios():
+	sh('./objc/TapstreamTest/bin/TapstreamTestIos tests.js')
 
 @task
 def test_objc():
-	sh('./objc/TapstreamTest/bin/TapstreamTest tests.js')
+	test_objc_mac()
+	test_objc_ios()
 
 @task
 def package_objc():

@@ -12,6 +12,10 @@ using namespace v8;
 // Used for testing purposes to convince the v8 garbage collector to run frequently
 #define TEST_GC 0
 
+#define STRINGIZER2(x) #x
+#define STRINGIZER(x) STRINGIZER2(x)
+#define TEST_PLATFORM_STRING STRINGIZER(TEST_PLATFORM)
+
 #if TEST_GC
 #define FAKE_OBJECT_SIZE 1024
 #define EXTERNAL_ALLOC(x) printf("Allocation adjust: %+d...", (x)); V8::AdjustAmountOfExternalAllocatedMemory(1024*1024*(x)); printf(" done\n");
@@ -91,7 +95,7 @@ static Handle<Value> Config_accessor(Local<String> name, const AccessorInfo &inf
 	{
 		return v8::Boolean::New(conf.collectWifiMac);
 	}
-#if !(TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
+#if !(TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
 	else if(strcmp(*s, "collectSerialNumber") == 0)
 	{
 		return v8::Boolean::New(conf.collectSerialNumber);
@@ -143,7 +147,7 @@ static void Config_mutator(Local<String> name, Local<Value> value, const Accesso
 			conf.collectWifiMac = value->BooleanValue();
 		}
 	}
-#if !(TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
+#if !(TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
 	else if(strcmp(*s, "collectSerialNumber") == 0)
 	{
 		if(value->IsBoolean())
@@ -620,6 +624,10 @@ Handle<Value> Util_newHit(const Arguments &args)
 int main(int argc, char *argv[])
 {
 	printf("objc_arc = %d\n", __has_feature(objc_arc));
+
+	#if TARGET_OS_IPHONE
+	printf("target_os_iphone = 1\n");
+	#endif
 	
 	if(argc != 2)
 	{
@@ -651,8 +659,10 @@ int main(int argc, char *argv[])
 
 		Handle<ObjectTemplate> globalTemplate = ObjectTemplate::New();
 
-		// Set the language
+		// Set the language and platform
 		globalTemplate->Set(String::New("language"), String::New("objc"), ReadOnly);
+
+		globalTemplate->Set(String::New("platform"), String::New(TEST_PLATFORM_STRING), ReadOnly);
 
 		Handle<Context> context = Context::New(NULL, globalTemplate);
 		Context::Scope scope(context);

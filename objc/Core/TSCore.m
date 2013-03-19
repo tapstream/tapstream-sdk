@@ -61,7 +61,7 @@
 		{
 			appName = @"";
 		}
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 		NSString *platformName = @"ios";
 #else
 		NSString *platformName = @"mac";
@@ -349,7 +349,7 @@
 		[self appendPostPairWithKey:@"hardware-wifi-mac" value:[platform getWifiMac]];
 	}
 
-#if !(TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
+#if !(TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
 	if(config.collectSerialNumber)
 	{
 		[self appendPostPairWithKey:@"hardware-serial-number" value:[platform getSerialNumber]];
@@ -358,7 +358,7 @@
 
 	[self appendPostPairWithKey:@"uuid" value:[platform loadUuid]];
 
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 	[self appendPostPairWithKey:@"platform" value:@"iOS"];
 #else
 	[self appendPostPairWithKey:@"platform" value:@"Mac"];

@@ -5,7 +5,7 @@
 #import <net/if.h>
 #import <net/if_dl.h>
 
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 #import <UIKit/UIKit.h>
 #else
 #import <AppKit/AppKit.h>
@@ -52,7 +52,7 @@
 
 - (NSString *)getResolution
 {
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 	CGRect frame = [UIScreen mainScreen].bounds;
 	float scale = [UIScreen mainScreen].scale;
 	return [NSString stringWithFormat:@"%dx%d", (int)(frame.size.width * scale), (int)(frame.size.height * scale)];
@@ -70,7 +70,7 @@
 - (NSString *)getModel
 {
 	NSString *machine = [self systemInfoByName:@"hw.machine"];
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 	return machine;
 #else
 	NSString *model = [self systemInfoByName:@"hw.model"];
@@ -88,7 +88,7 @@
 
 - (NSString *)getOs
 {
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 	return [NSString stringWithFormat:@"%@ %@", [[UIDevice currentDevice] systemName], [[UIDevice currentDevice] systemVersion]];
 #else
 
@@ -164,7 +164,7 @@
 	return macAddressString;
 }
 
-#if !(TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
+#if !(TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
 - (NSString *)getSerialNumber
 {
 	// NSString *ret = nil;

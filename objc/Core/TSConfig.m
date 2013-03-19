@@ -8,7 +8,7 @@
 @synthesize idfa = idfa;
 @synthesize secureUdid = secureUdid;
 @synthesize collectWifiMac = collectWifiMac;
-#if !(TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
+#if !(TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
 @synthesize collectSerialNumber = collectSerialNumber;
 #endif
 
@@ -22,7 +22,7 @@
 	if((self = [super init]) != nil)
 	{
 		collectWifiMac = YES;
-#if !(TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
+#if !(TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
 		collectSerialNumber = YES;
 #endif
 	}
