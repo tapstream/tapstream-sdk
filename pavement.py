@@ -113,11 +113,23 @@ def make_cs():
 	with pushd('cs'):
 		sh('msbuild /m Tapstream.sln /t:Build /p:Configuration=%s' % CONFIGURATION)
 		sh('msbuild /m TapstreamWinPhone.sln /t:Build /p:Configuration=%s' % CONFIGURATION)
-		sh('msbuild /m TapstreamTest.sln /t:Build /p:Configuration=Debug')
+		# Build win8 test code
+		sh('msbuild /m TapstreamTest.sln /t:Build /p:Configuration=Debug;OutDir=bin/Debug/win8')
+		# Build winphone test code
+		sh('msbuild /m TapstreamTest.sln /t:Build /p:Configuration=Debug;OutDir=bin/Debug/winphone;DefineConstants="DEBUG;TRACE;TEST_WINPHONE"')
+
+@task
+def test_cs_win8():
+	sh('"cs/TapstreamTest/bin/Debug/win8/TapstreamTest.exe" tests.js')
+
+@task
+def test_cs_winphone():
+	sh('"cs/TapstreamTest/bin/Debug/winphone/TapstreamTest.exe" tests.js')
 
 @task
 def test_cs():
-	sh('"cs/TapstreamTest/bin/Debug/TapstreamTest.exe" tests.js')
+	test_cs_win8()
+	test_cs_winphone()
 
 @task
 def package_cs():

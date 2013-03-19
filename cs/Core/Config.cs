@@ -11,7 +11,7 @@ namespace TapstreamMetrics.Sdk
         private string hardware = null;
 
         // Set these to false if you do NOT want to collect this data.
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
         private bool collectDeviceUniqueId = true;
 #else
         private bool collectAppSpecificHardwareId = true;
@@ -23,7 +23,7 @@ namespace TapstreamMetrics.Sdk
             set { hardware = value; }
         }
 
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
         public bool CollectDeviceUniqueId
         {
             get { return collectDeviceUniqueId; }

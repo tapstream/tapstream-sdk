@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
 #else
 using System.Threading.Tasks;
 #endif

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
 using Microsoft.Phone.Reactive;
 using Microsoft.Phone.Info;
 using System.Threading;
@@ -29,7 +29,7 @@ namespace TapstreamMetrics.Sdk
 
         public string LoadUuid()
         {
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
             string guid = null;
             if(IsolatedStorageSettings.ApplicationSettings.TryGetValue<string>(UUID_KEY, out guid))
             {
@@ -53,7 +53,7 @@ namespace TapstreamMetrics.Sdk
 
         public HashSet<string> LoadFiredEvents()
         {
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
             HashSet<string> firedEvents = new HashSet<string>();
             Dictionary<string, bool> contents;
             if(IsolatedStorageSettings.ApplicationSettings.TryGetValue<Dictionary<string, bool>>(FIRED_EVENTS_KEY, out contents))
@@ -73,7 +73,7 @@ namespace TapstreamMetrics.Sdk
 
         public void SaveFiredEvents(HashSet<string> firedEvents)
         {
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
             IsolatedStorageSettings.ApplicationSettings[FIRED_EVENTS_KEY] = firedEvents.dict;
             IsolatedStorageSettings.ApplicationSettings.Save();
 #else
@@ -85,7 +85,7 @@ namespace TapstreamMetrics.Sdk
 
         public string GetResolution()
         {
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
             int w = (int)System.Windows.Application.Current.Host.Content.ActualWidth;
             int h = (int)System.Windows.Application.Current.Host.Content.ActualHeight;
             return String.Format("{0}x{1}", w, h);
@@ -96,7 +96,7 @@ namespace TapstreamMetrics.Sdk
 
         public string GetManufacturer()
         {
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
             return (string)DeviceExtendedProperties.GetValue("DeviceManufacturer");
 #else
             return "Microsoft";
@@ -105,7 +105,7 @@ namespace TapstreamMetrics.Sdk
 
         public string GetModel()
         {
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
             return (string)DeviceExtendedProperties.GetValue("DeviceName");
 #else
             return null;
@@ -114,7 +114,7 @@ namespace TapstreamMetrics.Sdk
 
         public string GetOs()
         {
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
             return System.Environment.OSVersion.ToString();
 #else
             return "Windows 8";
@@ -123,7 +123,7 @@ namespace TapstreamMetrics.Sdk
 
         public string GetLocale()
         {
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
             return String.Format("{0}_{1}", System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName, System.Globalization.RegionInfo.CurrentRegion.TwoLetterISORegionName);
 #else
             try
@@ -138,7 +138,7 @@ namespace TapstreamMetrics.Sdk
 #endif
         }
 
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
         public string GetDeviceUniqueId()
         {
             return (string)DeviceExtendedProperties.GetValue("DeviceUniqueId");
@@ -171,7 +171,7 @@ namespace TapstreamMetrics.Sdk
 
         public string GetAppName()
         {
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
             AssemblyName nameHelper = new AssemblyName(Assembly.GetExecutingAssembly().FullName);
             return nameHelper.Name;
 #else
@@ -181,7 +181,7 @@ namespace TapstreamMetrics.Sdk
 
         public string GetPackageName()
         {
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
             AssemblyName nameHelper = new AssemblyName(Assembly.GetExecutingAssembly().FullName);
             return nameHelper.FullName;
 #else
@@ -191,7 +191,7 @@ namespace TapstreamMetrics.Sdk
 
         public Response Request(string url, string data)
         {
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
             int status = -1;
             string message = null;
             AutoResetEvent signal = new AutoResetEvent(false);

@@ -48,7 +48,7 @@ namespace TapstreamMetrics.Sdk
 		
 		    firedEvents = platform.LoadFiredEvents();
 
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
             string platformName = "winphone";
 #else
             string platformName = "windows";
@@ -308,7 +308,7 @@ namespace TapstreamMetrics.Sdk
                 }
             }
 
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
             if (config.CollectDeviceUniqueId)
             {
                 AppendPostPair("hardware-device-unique-id", platform.GetDeviceUniqueId());
@@ -322,7 +322,7 @@ namespace TapstreamMetrics.Sdk
 
             AppendPostPair("uuid", platform.LoadUuid());
 
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
             AppendPostPair("platform", "Windows Phone");
 #else
             AppendPostPair("platform", "Windows");

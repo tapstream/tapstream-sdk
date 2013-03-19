@@ -15,7 +15,7 @@ namespace TapstreamMetrics.Sdk
         string GetModel();
         string GetOs();
         string GetLocale();
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
         string GetDeviceUniqueId(); 
 #else
         string GetAppSpecificHardwareId();

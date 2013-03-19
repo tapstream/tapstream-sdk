@@ -51,7 +51,7 @@ namespace TapstreamMetrics.Sdk
             return "en_US";
         }
 
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
         public string GetDeviceUniqueId()
         {
             return "000000000000000";

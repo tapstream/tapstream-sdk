@@ -191,9 +191,13 @@ test('collect-device-info-defaults-to-true', function() {
         util.assertTrue(pd.search('hardware-device-id=') != -1);
         util.assertTrue(pd.search('hardware-android-id=') != -1);
     } else if(language == 'cs') {
-        util.assertTrue(
-            pd.search('hardware-app-specific-hardware-id=') != -1 || pd.search('hardware-device-unique-id=') != -1
-        );
+        if(platform == 'win8') {
+            util.assertTrue(pd.search('hardware-app-specific-hardware-id=') != -1);
+            util.assertTrue(pd.search('hardware-device-unique-id=') == -1);
+        } else {
+            util.assertTrue(pd.search('hardware-app-specific-hardware-id=') == -1);
+            util.assertTrue(pd.search('hardware-device-unique-id=') != -1);
+        }
     } else if(language == 'objc') {
         util.log(platform);
         if(platform == 'mac') {
@@ -213,7 +217,11 @@ test('collect-device-info-opt-out', function() {
         callSetter(conf, 'collectDeviceId', false);
         callSetter(conf, 'collectAndroidId', false);
     } else if(language == 'cs') {
-        callSetter(conf, 'collectAppSpecificHardwareId', false);
+        if(platform == 'win8') {
+            callSetter(conf, 'collectAppSpecificHardwareId', false);
+        } else {
+            callSetter(conf, 'collectDeviceUniqueId', false);
+        }
     } else if(language == 'objc') {
         callSetter(conf, 'collectWifiMac', false);
         if(platform == 'mac') {

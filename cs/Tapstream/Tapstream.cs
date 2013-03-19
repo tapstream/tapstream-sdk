@@ -1,6 +1,6 @@
 ﻿using System;
 
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
 #else
 using Windows.Foundation;
 using System.Threading.Tasks;
@@ -88,7 +88,7 @@ namespace TapstreamMetrics.Sdk
             core.FireEvent(e);
         }
 
-#if WINDOWS_PHONE
+#if TEST_WINPHONE || WINDOWS_PHONE
         public void FireHit(Hit h, Hit.Complete completion)
         {
             core.FireHit(h, completion);

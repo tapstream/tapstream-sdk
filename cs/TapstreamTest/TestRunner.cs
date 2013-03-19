@@ -109,6 +109,11 @@ namespace TapstreamMetrics.Sdk
             string script = System.IO.File.ReadAllText(args[0]);
             JintEngine engine = new JintEngine();
             engine.SetParameter("language", "cs");
+#if TEST_WINPHONE
+            engine.SetParameter("platform", "winphone");
+#else
+            engine.SetParameter("platform", "win8");
+#endif
             engine.SetParameter("util", new Util(engine));
             engine.Run(script);
         }
