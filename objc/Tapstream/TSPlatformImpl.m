@@ -167,19 +167,20 @@
 #if !(TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
 - (NSString *)getSerialNumber
 {
-	NSString *ret = nil;
-	io_service_t platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"));
-	if(platformExpert)
-	{
-		CFTypeRef serialNumber = IORegistryEntryCreateCFProperty(platformExpert, CFSTR(kIOPlatformSerialNumberKey), kCFAllocatorDefault, 0);
-		if(serialNumber)
-		{
-			ret = AUTORELEASE((BRIDGE_TRANSFER NSString *)serialNumber);
-			CFRelease(serialNumber);
-		}
-		IOObjectRelease(platformExpert);
-	}
-	return ret;
+	// NSString *ret = nil;
+	// io_service_t platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"));
+	// if(platformExpert)
+	// {
+	// 	CFTypeRef serialNumber = IORegistryEntryCreateCFProperty(platformExpert, CFSTR(kIOPlatformSerialNumberKey), kCFAllocatorDefault, 0);
+	// 	if(serialNumber)
+	// 	{
+	// 		ret = AUTORELEASE((BRIDGE_TRANSFER NSString *)serialNumber);
+	// 		CFRelease(serialNumber);
+	// 	}
+	// 	IOObjectRelease(platformExpert);
+	// }
+	// return ret;
+	return nil;
 }
 #endif
 

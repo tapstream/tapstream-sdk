@@ -89,58 +89,69 @@ static Handle<Value> Config_accessor(Local<String> name, const AccessorInfo &inf
 	}
 	else if(strcmp(*s, "collectWifiMac") == 0)
 	{
-		return Boolean::New(conf.collectWifiMac);
+		return v8::Boolean::New(conf.collectWifiMac);
 	}
 #if !(TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
 	else if(strcmp(*s, "collectSerialNumber") == 0)
 	{
-		return Boolean::New(conf.collectSerialNumber);
+		return v8::Boolean::New(conf.collectSerialNumber);
 	}
 #endif
 	return Null();
 }
-static Handle<Value> Config_mutator(Local<String> name, Local<Value> value, const AccessorInfo &info)
+static void Config_mutator(Local<String> name, Local<Value> value, const AccessorInfo &info)
 {
 	String::Utf8Value s(name);
 	TSConfig *conf = (BRIDGE TSConfig *)(Handle<External>::Cast(info.This()->GetInternalField(0))->Value());
 
 	if(strcmp(*s, "hardware") == 0)
 	{
-		if(!value->IsString()) return ThrowException(String::New("Value must be a string"));
-		String::Utf8Value v(value);
-		conf.hardware = [NSString stringWithUTF8String:v];
+		if(value->IsString())
+		{
+			String::Utf8Value v(value);
+			conf.hardware = [NSString stringWithUTF8String:*v];
+		}
 	}
 	else if(strcmp(*s, "udid") == 0)
 	{
-		if(!value->IsString()) return ThrowException(String::New("Value must be a string"));
-		String::Utf8Value v(value);
-		conf.udid = [NSString stringWithUTF8String:v];
+		if(value->IsString())
+		{
+			String::Utf8Value v(value);
+			conf.udid = [NSString stringWithUTF8String:*v];
+		}
 	}
 	else if(strcmp(*s, "idfa") == 0)
 	{
-		if(!value->IsString()) return ThrowException(String::New("Value must be a string"));
-		String::Utf8Value v(value);
-		conf.idfa = [NSString stringWithUTF8String:v];
+		if(value->IsString())
+		{
+			String::Utf8Value v(value);
+			conf.idfa = [NSString stringWithUTF8String:*v];
+		}
 	}
 	else if(strcmp(*s, "secureUdid") == 0)
 	{
-		if(!value->IsString()) return ThrowException(String::New("Value must be a string"));
-		String::Utf8Value v(value);
-		conf.secureUdid = [NSString stringWithUTF8String:v];
+		if(value->IsString())
+		{
+			String::Utf8Value v(value);
+			conf.secureUdid = [NSString stringWithUTF8String:*v];
+		}
 	}
 	else if(strcmp(*s, "collectWifiMac") == 0)
 	{
-		if(!value->IsBoolean()) return ThrowException(String::New("Value must be a boolean"));
-		conf.collectWifiMac = value->BooleanValue();
+		if(value->IsBoolean())
+		{
+			conf.collectWifiMac = value->BooleanValue();
+		}
 	}
 #if !(TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
 	else if(strcmp(*s, "collectSerialNumber") == 0)
 	{
-		if(!value->IsBoolean()) return ThrowException(String::New("Value must be a boolean"));
-		conf.collectSerialNumber = value->BooleanValue();
+		if(value->IsBoolean())
+		{
+			conf.collectSerialNumber = value->BooleanValue();
+		}
 	}
 #endif
-	return Null();
 }
 
 
@@ -481,8 +492,8 @@ Handle<Value> Util_newConfig(const Arguments &args)
 	Locker locker;
 	HandleScope scope;
 
-	TSConfig *conf = [TSConfig configWithDefaults]);
-	void *ptr = (BRIDGE_RETAINED void *)RETAIN(q);
+	TSConfig *conf = [TSConfig configWithDefaults];
+	void *ptr = (BRIDGE_RETAINED void *)RETAIN(conf);
 
 	Handle<ObjectTemplate> templ = ObjectTemplate::New();
 	templ->SetInternalFieldCount(1);
@@ -518,13 +529,13 @@ Handle<Value> Util_newTapstream(const Arguments &args)
 	if(!args[2]->IsString()) return ThrowException(String::New("Arg 2 must be a string"));
 	String::Utf8Value developerSecret(args[2]);
 
-	if(!args[3]->IsString()) return ThrowException(String::New("Arg 3 must be a string"));
-	String::Utf8Value hardware(args[3]);
+	if(!args[3]->IsObject()) return ThrowException(String::New("Arg 3 must be an object"));
+	TSConfig *config = (BRIDGE TSConfig *)(Handle<External>::Cast(args[3]->ToObject()->GetInternalField(0))->Value());
 
 	TSTapstream *ts = AUTORELEASE([[TSTapstream alloc] initWithOperationQueue:queue
 		accountName:[NSString stringWithUTF8String:*accountName]
 		developerSecret:[NSString stringWithUTF8String:*developerSecret]
-		hardware:[NSString stringWithUTF8String:*hardware]
+		config:config
 		]);
 	void *ptr = (BRIDGE_RETAINED void *)RETAIN(ts);
 
@@ -657,6 +668,7 @@ int main(int argc, char *argv[])
 		templ->Set(String::New("getSavedFiredList"), FunctionTemplate::New(InvocationCallback(Util_getSavedFiredList))->GetFunction(), ReadOnly);
 		templ->Set(String::New("setResponseStatus"), FunctionTemplate::New(InvocationCallback(Util_setResponseStatus))->GetFunction(), ReadOnly);
 		templ->Set(String::New("newOperationQueue"), FunctionTemplate::New(InvocationCallback(Util_newOperationQueue))->GetFunction(), ReadOnly);
+		templ->Set(String::New("newConfig"), FunctionTemplate::New(InvocationCallback(Util_newConfig))->GetFunction(), ReadOnly);
 		templ->Set(String::New("newTapstream"), FunctionTemplate::New(InvocationCallback(Util_newTapstream))->GetFunction(), ReadOnly);
 		templ->Set(String::New("newEvent"), FunctionTemplate::New(InvocationCallback(Util_newEvent))->GetFunction(), ReadOnly);
 		templ->Set(String::New("newHit"), FunctionTemplate::New(InvocationCallback(Util_newHit))->GetFunction(), ReadOnly);

@@ -194,6 +194,8 @@ test('collect-device-info-defaults-to-true', function() {
         util.assertTrue(
             pd.search('hardware-app-specific-hardware-id=') != -1 || pd.search('hardware-device-unique-id=') != -1
         );
+    } else if(language == 'objc') {
+        util.assertTrue(pd.search('hardware-wifi-mac=') != -1);
     }
 });
 test('collect-device-info-opt-out', function() {
@@ -205,6 +207,9 @@ test('collect-device-info-opt-out', function() {
         callSetter(conf, 'collectAndroidId', false);
     } else if(language == 'cs') {
         callSetter(conf, 'collectAppSpecificHardwareId', false);
+    } else if(language == 'objc') {
+        callSetter(conf, 'collectWifiMac', false);
+        callSetter(conf, 'collectSerialNumber', false);
     }
     var ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
     var pd = util.getPostData(ts);
@@ -216,6 +221,9 @@ test('collect-device-info-opt-out', function() {
     } else if(language == 'cs') {
         util.assertTrue(pd.search('hardware-app-specific-hardware-id=') == -1);
         util.assertTrue(pd.search('hardware-device-unique-id=') == -1);
+    } else if(language == 'objc') {
+        util.assertTrue(pd.search('hardware-wifi-mac=') == -1);
+        util.assertTrue(pd.search('hardware-serial-number=') == -1);
     }
 });
 test('hardware-id-included', function() {
