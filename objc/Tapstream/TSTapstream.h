@@ -17,8 +17,7 @@
 	TSCore *core;
 }
 
-+ (void)createWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret;
-+ (void)createWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret hardware:(NSString *)hardware;
++ (void)createWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)config;
 + (id)instance;
 
 - (void)fireEvent:(TSEvent *)event;

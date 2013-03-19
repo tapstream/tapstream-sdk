@@ -6,6 +6,7 @@
 #import "TSCoreListener.h"
 #import "TSHit.h"
 #import "TSResponse.h"
+#import "TSConfig.h"
 
 @interface TSCore : NSObject {
 @private
@@ -20,7 +21,7 @@
 	int delay;
 }
 
-- (id)initWithDelegate:(id<TSDelegate>)delegate platform:(id<TSPlatform>)platform listener:(id<TSCoreListener>)listener accountName:(NSString *)accountName developerSecret:(NSString *)developerSecret hardware:(NSString *)hardware;
+- (id)initWithDelegate:(id<TSDelegate>)delegate platform:(id<TSPlatform>)platform listener:(id<TSCoreListener>)listener accountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)config;
 - (void)fireEvent:(TSEvent *)event;
 - (void)fireHit:(TSHit *)hit completion:(void(^)(TSResponse *))completion;
 - (int)getDelay;

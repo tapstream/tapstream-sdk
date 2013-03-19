@@ -51,6 +51,99 @@ void OperationQueue_destructor(Persistent<Value> object, void *parameters)
 	EXTERNAL_ALLOC(-FAKE_OBJECT_SIZE);
 }
 
+
+void Config_destructor(Persistent<Value> object, void *parameters)
+{
+	#if TEST_GC
+	printf("Config destructor\n");
+	#endif
+	Locker locker;
+
+	TSConfig *hit = (BRIDGE_TRANSFER TSConfig *)(Handle<External>::Cast(object->ToObject()->GetInternalField(0))->Value());
+	object->ToObject()->SetInternalField(0, Null());
+	object.Dispose();
+	object.Clear();
+
+	EXTERNAL_ALLOC(-FAKE_OBJECT_SIZE);
+}
+static Handle<Value> Config_accessor(Local<String> name, const AccessorInfo &info)
+{
+	String::Utf8Value s(name);
+	TSConfig *conf = (BRIDGE TSConfig *)(Handle<External>::Cast(info.This()->GetInternalField(0))->Value());
+
+	if(strcmp(*s, "hardware") == 0)
+	{
+		return String::New([conf.hardware UTF8String]);
+	}
+	else if(strcmp(*s, "udid") == 0)
+	{
+		return String::New([conf.udid UTF8String]);
+	}
+	else if(strcmp(*s, "idfa") == 0)
+	{
+		return String::New([conf.idfa UTF8String]);
+	}
+	else if(strcmp(*s, "secureUdid") == 0)
+	{
+		return String::New([conf.secureUdid UTF8String]);
+	}
+	else if(strcmp(*s, "collectWifiMac") == 0)
+	{
+		return Boolean::New(conf.collectWifiMac);
+	}
+#if !(TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
+	else if(strcmp(*s, "collectSerialNumber") == 0)
+	{
+		return Boolean::New(conf.collectSerialNumber);
+	}
+#endif
+	return Null();
+}
+static Handle<Value> Config_mutator(Local<String> name, Local<Value> value, const AccessorInfo &info)
+{
+	String::Utf8Value s(name);
+	TSConfig *conf = (BRIDGE TSConfig *)(Handle<External>::Cast(info.This()->GetInternalField(0))->Value());
+
+	if(strcmp(*s, "hardware") == 0)
+	{
+		if(!value->IsString()) return ThrowException(String::New("Value must be a string"));
+		String::Utf8Value v(value);
+		conf.hardware = [NSString stringWithUTF8String:v];
+	}
+	else if(strcmp(*s, "udid") == 0)
+	{
+		if(!value->IsString()) return ThrowException(String::New("Value must be a string"));
+		String::Utf8Value v(value);
+		conf.udid = [NSString stringWithUTF8String:v];
+	}
+	else if(strcmp(*s, "idfa") == 0)
+	{
+		if(!value->IsString()) return ThrowException(String::New("Value must be a string"));
+		String::Utf8Value v(value);
+		conf.idfa = [NSString stringWithUTF8String:v];
+	}
+	else if(strcmp(*s, "secureUdid") == 0)
+	{
+		if(!value->IsString()) return ThrowException(String::New("Value must be a string"));
+		String::Utf8Value v(value);
+		conf.secureUdid = [NSString stringWithUTF8String:v];
+	}
+	else if(strcmp(*s, "collectWifiMac") == 0)
+	{
+		if(!value->IsBoolean()) return ThrowException(String::New("Value must be a boolean"));
+		conf.collectWifiMac = value->BooleanValue();
+	}
+#if !(TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
+	else if(strcmp(*s, "collectSerialNumber") == 0)
+	{
+		if(!value->IsBoolean()) return ThrowException(String::New("Value must be a boolean"));
+		conf.collectSerialNumber = value->BooleanValue();
+	}
+#endif
+	return Null();
+}
+
+
 Handle<Value> Tapstream_fireEvent(const Arguments &args)
 {
 	Locker locker;
@@ -376,6 +469,32 @@ Handle<Value> Util_newOperationQueue(const Arguments &args)
 	
 	Persistent<Object> obj = Persistent<Object>::New(templ->NewInstance());
 	obj.MakeWeak(NULL, OperationQueue_destructor);
+	obj->SetInternalField(0, External::New(ptr));
+
+	EXTERNAL_ALLOC(FAKE_OBJECT_SIZE);
+
+	return scope.Close(obj);
+}
+
+Handle<Value> Util_newConfig(const Arguments &args)
+{
+	Locker locker;
+	HandleScope scope;
+
+	TSConfig *conf = [TSConfig configWithDefaults]);
+	void *ptr = (BRIDGE_RETAINED void *)RETAIN(q);
+
+	Handle<ObjectTemplate> templ = ObjectTemplate::New();
+	templ->SetInternalFieldCount(1);
+	templ->SetAccessor(String::New("hardware"), Config_accessor, Config_mutator);
+	templ->SetAccessor(String::New("udid"), Config_accessor, Config_mutator);
+	templ->SetAccessor(String::New("idfa"), Config_accessor, Config_mutator);
+	templ->SetAccessor(String::New("secureUdid"), Config_accessor, Config_mutator);
+	templ->SetAccessor(String::New("collectWifiMac"), Config_accessor, Config_mutator);
+	templ->SetAccessor(String::New("collectSerialNumber"), Config_accessor, Config_mutator);
+	
+	Persistent<Object> obj = Persistent<Object>::New(templ->NewInstance());
+	obj.MakeWeak(NULL, Config_destructor);
 	obj->SetInternalField(0, External::New(ptr));
 
 	EXTERNAL_ALLOC(FAKE_OBJECT_SIZE);

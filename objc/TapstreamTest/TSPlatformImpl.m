@@ -62,6 +62,28 @@
 	return @"en_US";
 }
 
+- (NSString *)getWifiMac
+{
+	return @"00:00:00:00:00:00";
+}
+
+#if !(TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
+- (NSString *)getSerialNumber
+{
+	return @"1234567890";
+}
+#endif
+
+- (NSString *)getAppName
+{
+	return @"TestApp";
+}
+
+- (NSString *)getPackageName
+{
+	return @"com.test.TestApp";
+}
+
 - (TSResponse *)request:(NSString *)url data:(NSString *)data
 {
 	return response;

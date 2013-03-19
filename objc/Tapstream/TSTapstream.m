@@ -25,7 +25,7 @@ static TSTapstream *instance = nil;
 @property(nonatomic, STRONG_OR_RETAIN) id<TSCoreListener> listener;
 @property(nonatomic, STRONG_OR_RETAIN) TSCore *core;
 
-- (id)initWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret hardware:(NSString *)hardware;
+- (id)initWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)config;
 
 @end
 
@@ -34,18 +34,13 @@ static TSTapstream *instance = nil;
 
 @synthesize del, platform, listener, core;
 
-+ (void)createWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret
-{
-	[TSTapstream createWithAccountName:accountName developerSecret:developerSecret hardware:nil];
-}
-
-+ (void)createWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret hardware:(NSString *)hardware
++ (void)createWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)config
 {
 	@synchronized(self)
 	{
 		if(instance == nil)
 		{
-			instance = [[TSTapstream alloc] initWithAccountName:accountName developerSecret:developerSecret hardware:hardware];
+			instance = [[TSTapstream alloc] initWithAccountName:accountName developerSecret:developerSecret config:config];
 		}
 		else
 		{
@@ -64,7 +59,7 @@ static TSTapstream *instance = nil;
 }
 
 
-- (id)initWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret hardware:(NSString *)hardware
+- (id)initWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)config
 {
 	if((self = [super init]) != nil)
 	{
@@ -76,7 +71,7 @@ static TSTapstream *instance = nil;
 			listener:listener
 			accountName:accountName
 			developerSecret:developerSecret
-			hardware:hardware];
+			config:config];
 	}
 	return self;
 }

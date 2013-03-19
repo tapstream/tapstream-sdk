@@ -27,7 +27,7 @@
 - (NSString *)clean:(NSString *)s;
 - (void)increaseDelay;
 - (void)appendPostPairWithKey:(NSString *)key value:(NSString *)value;
-- (void)makePostArgsWithSecret:(NSString *)secret hardware:(NSString *)hardware;
+- (void)makePostArgsWithSecret:(NSString *)secret config:(TSConfig *)config;
 @end
 
 
@@ -40,7 +40,7 @@
 	listener:(id<TSCoreListener>)listenerVal
 	accountName:(NSString *)accountNameVal
 	developerSecret:(NSString *)developerSecretVal
-	hardware:(NSString *)hardwareVal
+	config:(TSConfig *)config
 {
 	if((self = [super init]) != nil)
 	{
@@ -51,10 +51,23 @@
 		self.postData = nil;
 		self.failingEventId = nil;
 
-		[self makePostArgsWithSecret:developerSecretVal hardware:hardwareVal];
+		[self makePostArgsWithSecret:developerSecretVal config:config];
 
 		self.firingEvents = [[NSMutableSet alloc] initWithCapacity:32];
 		self.firedEvents = [platform loadFiredEvents];
+
+		NSString *appName = [platform getAppName];
+		if(appName == nil)
+		{
+			appName = @"";
+		}
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+		NSString *platformName = @"ios";
+#else
+		NSString *platformName = @"mac";
+#endif
+		NSString *eventName = [NSString stringWithFormat:@"%@-%@-run", platformName, appName];
+		[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
 	}
 	return self;
 }
@@ -278,36 +291,86 @@
     [postData appendString:[self encodeString:value]];
 }
 
-- (void)makePostArgsWithSecret:(NSString *)secret hardware:(NSString *)hardware
+- (void)makePostArgsWithSecret:(NSString *)secret config:(TSConfig *)config
 {
 	[self appendPostPairWithKey:@"secret" value:secret];
 	[self appendPostPairWithKey:@"sdkversion" value:kTSVersion];
 
-	if(hardware != nil)
+	if(config.hardware != nil)
 	{
-		if([hardware length] > 255)
+		if([config.hardware length] > 255)
 		{
 			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Hardware argument exceeds 255 characters, it will not be included with fired events"];
 		}
 		else
 		{
-			[self appendPostPairWithKey:@"hardware" value:hardware];
+			[self appendPostPairWithKey:@"hardware" value:config.hardware];
 		}
 	}
 
+	if(config.udid != nil)
+	{
+		if([config.udid length] > 255)
+		{
+			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: UDID argument exceeds 255 characters, it will not be included with fired events"];
+		}
+		else
+		{
+			[self appendPostPairWithKey:@"hardware-udid" value:config.udid];
+		}
+	}
+
+	if(config.idfa != nil)
+	{
+		if([config.idfa length] > 255)
+		{
+			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: IDFA argument exceeds 255 characters, it will not be included with fired events"];
+		}
+		else
+		{
+			[self appendPostPairWithKey:@"hardware-idfa" value:config.idfa];
+		}
+	}
+
+	if(config.secureUdid != nil)
+	{
+		if([config.secureUdid length] > 255)
+		{
+			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: SecureUDID argument exceeds 255 characters, it will not be included with fired events"];
+		}
+		else
+		{
+			[self appendPostPairWithKey:@"hardware-secure-udid" value:config.secureUdid];
+		}
+	}
+
+	if(config.collectWifiMac)
+	{
+		[self appendPostPairWithKey:@"hardware-wifi-mac" value:[platform getWifiMac]];
+	}
+
+#if !(TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
+	if(config.collectSerialNumber)
+	{
+		[self appendPostPairWithKey:@"hardware-serial-number" value:[platform getSerialNumber]];
+	}
+#endif
+
 	[self appendPostPairWithKey:@"uuid" value:[platform loadUuid]];
 
-	#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 	[self appendPostPairWithKey:@"platform" value:@"iOS"];
-	#else
+#else
 	[self appendPostPairWithKey:@"platform" value:@"Mac"];
-	#endif
+#endif
 
 	[self appendPostPairWithKey:@"vendor" value:[platform getManufacturer]];
 	[self appendPostPairWithKey:@"model" value:[platform getModel]];
 	[self appendPostPairWithKey:@"os" value:[platform getOs]];
 	[self appendPostPairWithKey:@"resolution" value:[platform getResolution]];
 	[self appendPostPairWithKey:@"locale" value:[platform getLocale]];
+	[self appendPostPairWithKey:@"app-name" value:[platform getAppName]];
+	[self appendPostPairWithKey:@"package-name" value:[platform getPackageName]];
 
 	NSString *offset = [NSString stringWithFormat:@"%d", (int)[[NSTimeZone systemTimeZone] secondsFromGMT]];
 	[self appendPostPairWithKey:@"gmtoffset" value:offset];

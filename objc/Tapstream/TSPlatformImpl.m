@@ -1,13 +1,19 @@
 #import "TSPlatformImpl.h"
 #import <sys/types.h>
 #import <sys/sysctl.h>
-#import "TSHelpers.h"
+#import <sys/socket.h>
+#import <net/if.h>
+#import <net/if_dl.h>
 
 #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 #import <UIKit/UIKit.h>
 #else
 #import <AppKit/AppKit.h>
+#import <IOKit/IOKitLib.h>
 #endif
+
+#import "TSHelpers.h"
+
 
 #define kTSFiredEventsKey @"__tapstream_fired_events"
 #define kTSUUIDKey @"__tapstream_uuid"
@@ -20,10 +26,10 @@
 	if(!uuid)
 	{
 		CFUUIDRef uuidObject = CFUUIDCreate(kCFAllocatorDefault); 
-  		uuid = AUTORELEASE((BRIDGE_TRANSFER NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuidObject));
- 		CFRelease(uuidObject);
- 		[[NSUserDefaults standardUserDefaults] setObject:uuid forKey:kTSUUIDKey];
- 		[[NSUserDefaults standardUserDefaults] synchronize];
+		uuid = AUTORELEASE((BRIDGE_TRANSFER NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuidObject));
+		CFRelease(uuidObject);
+		[[NSUserDefaults standardUserDefaults] setObject:uuid forKey:kTSUUIDKey];
+		[[NSUserDefaults standardUserDefaults] synchronize];
 	}
 	return uuid;
 }
@@ -63,10 +69,20 @@
 
 - (NSString *)getModel
 {
+	NSString *machine = [self systemInfoByName:@"hw.machine"];
 #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-	return [self systemInfoByName:@"hw.machine"];
+	return machine;
 #else
-	return [NSString stringWithFormat:@"%@ %@", [self systemInfoByName:@"hw.model"], [self systemInfoByName:@"hw.machine"]];
+	NSString *model = [self systemInfoByName:@"hw.model"];
+	if(model != nil)
+	{
+		if(machine != nil)
+		{
+			model = [NSString stringWithFormat:@"%@ %@", model, machine];
+		}
+		return model;
+	}
+	return machine;
 #endif
 }
 
@@ -96,6 +112,85 @@
 - (NSString *)getLocale
 {
 	return [[NSLocale currentLocale] localeIdentifier];
+}
+
+- (NSString *)getWifiMac
+{
+	// Setup the management Information Base (mib)
+	int mgmtInfoBase[6];
+	mgmtInfoBase[0] = CTL_NET;        // Request network subsystem
+	mgmtInfoBase[1] = AF_ROUTE;       // Routing table info
+	mgmtInfoBase[2] = 0;              
+	mgmtInfoBase[3] = AF_LINK;        // Request link layer information
+	mgmtInfoBase[4] = NET_RT_IFLIST;  // Request all configured interfaces
+
+	// With all configured interfaces requested, get handle index
+	if((mgmtInfoBase[5] = if_nametoindex("en0")) == 0)
+	{
+		return nil;
+	}
+
+	// Get the size of the data available (store in len)
+	size_t length;
+	if(sysctl(mgmtInfoBase, 6, NULL, &length, NULL, 0) < 0)
+	{
+		return nil;
+	}
+		
+	// Alloc memory based on above call
+	char *msgBuffer = malloc(length);
+	if(msgBuffer == NULL)
+	{
+		return nil;
+	}
+
+	// Get system information, store in buffer
+	if(sysctl(mgmtInfoBase, 6, msgBuffer, &length, NULL, 0) < 0)
+	{
+		free(msgBuffer);
+		return nil;
+	}
+
+	struct if_msghdr *interfaceMsgStruct = (struct if_msghdr *)msgBuffer;
+	struct sockaddr_dl *socketStruct = (struct sockaddr_dl *) (interfaceMsgStruct + 1);
+
+	unsigned char macAddress[6];
+	memcpy(&macAddress, socketStruct->sdl_data + socketStruct->sdl_nlen, 6);
+	NSString *macAddressString = [NSString stringWithFormat:@"%02X:%02X:%02X:%02X:%02X:%02X", 
+		macAddress[0], macAddress[1], macAddress[2],
+		macAddress[3], macAddress[4], macAddress[5]];
+
+	free(msgBuffer);
+	return macAddressString;
+}
+
+#if !(TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
+- (NSString *)getSerialNumber
+{
+	NSString *ret = nil;
+	io_service_t platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"));
+	if(platformExpert)
+	{
+		CFTypeRef serialNumber = IORegistryEntryCreateCFProperty(platformExpert, CFSTR(kIOPlatformSerialNumberKey), kCFAllocatorDefault, 0);
+		if(serialNumber)
+		{
+			ret = AUTORELEASE((BRIDGE_TRANSFER NSString *)serialNumber);
+			CFRelease(serialNumber);
+		}
+		IOObjectRelease(platformExpert);
+	}
+	return ret;
+}
+#endif
+
+- (NSString *)getAppName
+{
+	return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
+}
+
+- (NSString *)getPackageName
+{
+	return [[NSBundle mainBundle] bundleIdentifier];
 }
 
 - (TSResponse *)request:(NSString *)url data:(NSString *)data
@@ -128,7 +223,7 @@
 	NSString *value = [NSString stringWithUTF8String:pBuffer];
 	free( pBuffer );
 
-	return value != nil ? value : @"";
+	return value;
 }
 
 @end

@@ -37,7 +37,7 @@
 
 @synthesize del, platform, listener, core;
 
-- (id)initWithOperationQueue:(TSOperationQueue *)q accountName:(NSString *)accountName developerSecret:(NSString *)developerSecret hardware:(NSString *)hardware
+- (id)initWithOperationQueue:(TSOperationQueue *)q accountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)config
 {
 	if((self = [super init]) != nil)
 	{
@@ -49,7 +49,7 @@
 			listener:listener
 			accountName:accountName
 			developerSecret:developerSecret
-			hardware:hardware];
+			config:config];
 	}
 	return self;
 }
