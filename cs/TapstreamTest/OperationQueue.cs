@@ -32,5 +32,17 @@ namespace TapstreamMetrics.Sdk
             Operation op = Take();
             Assert.AreEqual(opName, op.name);
 	    }
+
+        public void ConsumeUntil(string opName)
+        {
+            while(true)
+            {
+                Operation op = Take();
+                if (opName == op.name)
+                {
+                    break;
+                }
+            }
+        }
     }
 }

@@ -74,6 +74,18 @@
 	}
 }
 
+- (void)consumeUntil:(NSString *)opName
+{
+	while(true)
+	{
+		TSOperation *op = [self take];
+		if([op.name isEqualToString:opName])
+		{
+			break;
+		}
+	}
+}
+
 - (void)dealloc
 {
 	RELEASE(queue);

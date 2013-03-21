@@ -25,5 +25,6 @@
 - (void)put:(TSOperation *)op;
 - (TSOperation *)take;
 - (void)expect:(NSString *)opName;
+- (void)consumeUntil:(NSString *)opName;
 
 @end

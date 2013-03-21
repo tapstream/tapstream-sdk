@@ -25,4 +25,13 @@ public class OperationQueue extends ArrayBlockingQueue<Operation> {
 		Operation op = take();
 		TestCase.assertEquals(opName, op.name);
 	}
+
+	public void consumeUntil(String opName) throws InterruptedException {
+		while(true) {
+			Operation op = take();
+			if(opName.equals(op.name)) {
+				break;
+			}
+		}
+	}
 }

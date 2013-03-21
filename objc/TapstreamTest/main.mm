@@ -40,6 +40,21 @@ Handle<Value> OperationQueue_expect(const Arguments &args)
 	[q expect:[NSString stringWithUTF8String:*name]];
 	return Undefined();
 }
+Handle<Value> OperationQueue_consumeUntil(const Arguments &args)
+{
+	Locker locker;
+	HandleScope scope;
+	Handle<Object> self = args.This();
+	TSOperationQueue *q = (BRIDGE TSOperationQueue *)(Handle<External>::Cast(self->GetInternalField(0))->Value());
+
+	if(args.Length() < 1) return ThrowException(String::New("Expected 1 argument"));
+
+	if(!args[0]->IsString()) return ThrowException(String::New("Arg 0 must be a string"));
+	String::Utf8Value name(args[0]);
+
+	[q consumeUntil:[NSString stringWithUTF8String:*name]];
+	return Undefined();
+}
 void OperationQueue_destructor(Persistent<Value> object, void *parameters)
 {
 	#if TEST_GC
@@ -532,6 +547,7 @@ Handle<Value> Util_newOperationQueue(const Arguments &args)
 	Handle<ObjectTemplate> templ = ObjectTemplate::New();
 	templ->SetInternalFieldCount(1);
 	templ->Set(String::New("expect"), FunctionTemplate::New(InvocationCallback(OperationQueue_expect))->GetFunction(), ReadOnly);
+	templ->Set(String::New("consumeUntil"), FunctionTemplate::New(InvocationCallback(OperationQueue_consumeUntil))->GetFunction(), ReadOnly);
 	
 	Persistent<Object> obj = Persistent<Object>::New(templ->NewInstance());
 	obj.MakeWeak(NULL, OperationQueue_destructor);
