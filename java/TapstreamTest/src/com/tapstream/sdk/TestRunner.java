@@ -102,6 +102,7 @@ public class TestRunner {
 		try {
 			ScriptableObject scope = cx.initStandardObjects();
 			scope.putConst("language", scope, "java");
+			scope.putConst("platform", scope, "android");
 			scope.put("util", scope, new Util(cx, scope));
 			cx.evaluateString(scope, script, args[0], 1, null);
 		} catch (Error ex) {
