@@ -257,19 +257,21 @@ class Core {
 			}
 		}
 
-		if (config.odin1 != null) {
-			if (config.odin1.length() > 255) {
+		String odin1 = config.getOdin1();
+		if (odin1 != null) {
+			if (odin1.length() > 255) {
 				Logging.log(Logging.WARN, "Tapstream Warning: ODIN-1 argument exceeds 255 characters, it will not be included with fired events");
 			} else {
-				appendPostPair("hardware-odin1", config.odin1);
+				appendPostPair("hardware-odin1", odin1);
 			}
 		}
 
-		if (config.openUdid != null) {
-			if (config.openUdid.length() > 255) {
+		String openUdid = config.getOpenUdid();
+		if (openUdid != null) {
+			if (openUdid.length() > 255) {
 				Logging.log(Logging.WARN, "Tapstream Warning: OpenUDID argument exceeds 255 characters, it will not be included with fired events");
 			} else {
-				appendPostPair("hardware-openUdid", config.openUdid);
+				appendPostPair("hardware-open-udid", openUdid);
 			}
 		}
 
