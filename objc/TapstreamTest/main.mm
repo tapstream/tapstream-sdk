@@ -37,10 +37,10 @@ Handle<Value> OperationQueue_expect(const Arguments &args)
 	if(!args[0]->IsString()) return ThrowException(String::New("Arg 0 must be a string"));
 	String::Utf8Value name(args[0]);
 
-	[q expect:[NSString stringWithUTF8String:*name]];
-	return Undefined();
+	NSString *arg = [q expect:[NSString stringWithUTF8String:*name]];
+	return String::New([arg UTF8String]);
 }
-Handle<Value> OperationQueue_consumeUntil(const Arguments &args)
+Handle<Value> OperationQueue_expectEventually(const Arguments &args)
 {
 	Locker locker;
 	HandleScope scope;
@@ -52,8 +52,8 @@ Handle<Value> OperationQueue_consumeUntil(const Arguments &args)
 	if(!args[0]->IsString()) return ThrowException(String::New("Arg 0 must be a string"));
 	String::Utf8Value name(args[0]);
 
-	[q consumeUntil:[NSString stringWithUTF8String:*name]];
-	return Undefined();
+	NSString *arg = [q expectEventually:[NSString stringWithUTF8String:*name]];
+	return String::New([arg UTF8String]);
 }
 void OperationQueue_destructor(Persistent<Value> object, void *parameters)
 {
@@ -547,7 +547,7 @@ Handle<Value> Util_newOperationQueue(const Arguments &args)
 	Handle<ObjectTemplate> templ = ObjectTemplate::New();
 	templ->SetInternalFieldCount(1);
 	templ->Set(String::New("expect"), FunctionTemplate::New(InvocationCallback(OperationQueue_expect))->GetFunction(), ReadOnly);
-	templ->Set(String::New("consumeUntil"), FunctionTemplate::New(InvocationCallback(OperationQueue_consumeUntil))->GetFunction(), ReadOnly);
+	templ->Set(String::New("expectEventually"), FunctionTemplate::New(InvocationCallback(OperationQueue_expectEventually))->GetFunction(), ReadOnly);
 	
 	Persistent<Object> obj = Persistent<Object>::New(templ->NewInstance());
 	obj.MakeWeak(NULL, OperationQueue_destructor);

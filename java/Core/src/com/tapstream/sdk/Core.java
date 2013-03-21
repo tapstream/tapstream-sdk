@@ -69,13 +69,13 @@ class Core {
 		if (e.isOneTimeOnly()) {
 			if (firedEvents.contains(e.getName())) {
 				Logging.log(Logging.INFO, "Tapstream ignoring event named \"%s\" because it is a one-time-only event that has already been fired", e.getName());
-				listener.reportOperation("event-ignored-already-fired");
-				listener.reportOperation("job-ended");
+				listener.reportOperation("event-ignored-already-fired", e.getName());
+				listener.reportOperation("job-ended", e.getName());
 				return;
 			} else if (firingEvents.contains(e.getName())) {
 				Logging.log(Logging.INFO, "Tapstream ignoring event named \"%s\" because it is a one-time-only event that is already in progress", e.getName());
-				listener.reportOperation("event-ignored-already-in-progress");
-				listener.reportOperation("job-ended");
+				listener.reportOperation("event-ignored-already-in-progress", e.getName());
+				listener.reportOperation("job-ended", e.getName());
 				return;
 			}
 
@@ -120,7 +120,7 @@ class Core {
 							self.firedEvents.add(e.getName());
 
 							self.platform.saveFiredEvents(self.firedEvents);
-							self.listener.reportOperation("fired-list-saved", e.getUid());
+							self.listener.reportOperation("fired-list-saved", e.getName());
 						}
 
 						// Success of any event resets the delay
@@ -143,10 +143,10 @@ class Core {
 						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d.%s", response.status, retryMsg);
 					}
 
-					self.listener.reportOperation("event-failed", e.getUid());
+					self.listener.reportOperation("event-failed", e.getName());
 					if (shouldRetry) {
-						self.listener.reportOperation("retry", e.getUid());
-						self.listener.reportOperation("job-ended");
+						self.listener.reportOperation("retry", e.getName());
+						self.listener.reportOperation("job-ended", e.getName());
 						if (self.delegate.isRetryAllowed()) {
 							self.fireEvent(e);
 						}
@@ -154,10 +154,10 @@ class Core {
 					}
 				} else {
 					Logging.log(Logging.INFO, "Tapstream fired event named \"%s\"", e.getName());
-					self.listener.reportOperation("event-succeeded");
+					self.listener.reportOperation("event-succeeded", e.getName());
 				}
 
-				self.listener.reportOperation("job-ended");
+				self.listener.reportOperation("job-ended", e.getName());
 			}
 			public void run() {
 				try {

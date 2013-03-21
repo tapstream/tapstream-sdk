@@ -65,25 +65,27 @@
 	return op;
 }
 
-- (void)expect:(NSString *)opName
+- (NSString *)expect:(NSString *)opName
 {
 	TSOperation *op = [self take];
 	if(![op.name isEqualToString:opName])
 	{
 		NSAssert(false, @"Expected '%@' but got '%@'", opName, op.name);
 	}
+	return op.arg;
 }
 
-- (void)consumeUntil:(NSString *)opName
+- (NSString *)expectEventually:(NSString *)opName
 {
 	while(true)
 	{
 		TSOperation *op = [self take];
 		if([op.name isEqualToString:opName])
 		{
-			break;
+			return op.arg;
 		}
 	}
+	return nil;
 }
 
 - (void)dealloc

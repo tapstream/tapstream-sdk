@@ -21,16 +21,17 @@ public class OperationQueue extends ArrayBlockingQueue<Operation> {
 		super(32);
 	}
 
-	public void expect(String opName) throws InterruptedException {
+	public String expect(String opName) throws InterruptedException {
 		Operation op = take();
 		TestCase.assertEquals(opName, op.name);
+		return op.arg;
 	}
 
-	public void consumeUntil(String opName) throws InterruptedException {
+	public String expectEventually(String opName) throws InterruptedException {
 		while(true) {
 			Operation op = take();
 			if(opName.equals(op.name)) {
-				break;
+				return op.arg;
 			}
 		}
 	}

@@ -61,7 +61,7 @@
 		{
 			appName = @"";
 		}
-		
+
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 		NSString *platformName = @"ios";
 #else
@@ -116,15 +116,15 @@
 			if([firedEvents containsObject:e.name])
 			{
 				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that has already been fired", e.name];
-                [listener reportOperation:@"event-ignored-already-fired"];
-                [listener reportOperation:@"job-ended"];
+                [listener reportOperation:@"event-ignored-already-fired" arg:e.name];
+                [listener reportOperation:@"job-ended" arg:e.name];
                 return;
 			}
 			else if([firedEvents containsObject:e.name])
 			{
 				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that is already in progress", e.name];
-                [listener reportOperation:@"event-ignored-already-in-progress"];
-                [listener reportOperation:@"job-ended"];
+                [listener reportOperation:@"event-ignored-already-in-progress" arg:e.name];
+                [listener reportOperation:@"job-ended" arg:e.name];
                 return;
 			}
 
@@ -163,7 +163,7 @@
 							self.failingEventId = e.uid;
 							[self increaseDelay];
 						}
-						else if([failingEventId isEqualToString:e.uid])
+						else if([failingEventId isEqualToString:e.name])
 						{
 							[self increaseDelay];
 						}
@@ -176,7 +176,7 @@
 						[firedEvents addObject:e.name];
 
 						[platform saveFiredEvents:firedEvents];
-						[listener reportOperation:@"fired-list-saved" arg:e.uid];
+						[listener reportOperation:@"fired-list-saved" arg:e.name];
 					}
 
 					// Success of any event resets the delay
@@ -208,11 +208,11 @@
 				    [TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, http code %d.%@", response.status, retryMsg];
 			    }
 
-			    [listener reportOperation:@"event-failed" arg:e.uid];
+			    [listener reportOperation:@"event-failed" arg:e.name];
 			    if(shouldRetry)
                 {
-				    [listener reportOperation:@"retry" arg:e.uid];
-				    [listener reportOperation:@"job-ended"];
+				    [listener reportOperation:@"retry" arg:e.name];
+				    [listener reportOperation:@"job-ended" arg:e.name];
 				    if([del isRetryAllowed])
                     {
 					    [self fireEvent:e];
@@ -223,10 +223,10 @@
             else
             {
             	[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream fired event named \"%@\"", e.name];
-			    [listener reportOperation:@"event-succeeded"];
+			    [listener reportOperation:@"event-succeeded" arg:e.name];
 		    }
 		
-		    [listener reportOperation:@"job-ended"];
+		    [listener reportOperation:@"job-ended" arg:e.name];
 		});
 	}
 }

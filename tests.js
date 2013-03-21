@@ -64,9 +64,33 @@ function indexOf(list, item) {
 // Assert that a certain series of operations come out of the queue
 function expect(q) {
     for(var i = 1; i < arguments.length; i++) {
-        callMethod(q, 'expect', arguments[i]);
+        if(arguments[i] instanceof Array) {
+            var arg = callMethod(q, 'expect', arguments[i][0]);
+            util.assertEqual(arguments[i][1], arg);
+        } else {
+            callMethod(q, 'expect', arguments[i]);
+        }
     }
 }
+
+
+function consumeEvents(q, name1, name2) {
+    var arg = callMethod(q, 'expectEventually', 'job-ended');
+    if(arg == name1) {
+        arg = callMethod(q, 'expectEventually', 'job-ended');
+        util.assertEqual(arg, name2);
+    } else if(arg == name2) {
+        arg = callMethod(q, 'expectEventually', 'job-ended');
+        util.assertEqual(arg, name1);
+    } else {
+        util.assertTrue(false);
+    }
+}
+
+function consumeAutomaticEvents(q) {
+    consumeEvents(q, platform+'-testapp-install', platform+'-testapp-open');
+}
+
 
 // Runs a function as a test
 var tests_count = 0;
@@ -281,6 +305,24 @@ test('device-info-opt-in', function() {
         }
     }
 });
+test('automatic-install-and-open-events', function() {
+    var q = util.newOperationQueue(),
+        conf = util.newConfig(),
+        ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
+    consumeAutomaticEvents(q);
+    var fired_events = util.getSavedFiredList(ts);
+    util.assertTrue(indexOf(fired_events, platform+'-testapp-install') != -1);
+});
+test('automatic-install-and-open-events-with-custom-names', function() {
+    var q = util.newOperationQueue(),
+        conf = util.newConfig();
+    callSetter(conf, 'installEventName', 'my-install-event');
+    callSetter(conf, 'openEventName', 'my-open-event');
+    var ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
+    consumeEvents(q, 'my-install-event', 'my-open-event');
+    var fired_events = util.getSavedFiredList(ts);
+    util.assertTrue(indexOf(fired_events, 'my-install-event') != -1);
+});
 test('hardware-id-included', function() {
     var q = util.newOperationQueue(),
         conf = util.newConfig();
@@ -298,20 +340,12 @@ test('long-hardware-id-rejected', function() {
     var pd = util.getPostData(ts);
     util.assertTrue(pd.search("hardware=") == -1);
 });
-test('automatic-install-and-run-events', function() {
-    var q = util.newOperationQueue(),
-        conf = util.newConfig(),
-        ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
-    var fired_events = util.getSavedFiredList(ts);
-    util.assertTrue(indexOf(fired_events, platform+'-testapp-install') != -1);
-});
 test('succeeded', function() {
     var q = util.newOperationQueue(),
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'event-succeeded', 'job-ended');
 });
@@ -320,7 +354,7 @@ test('succeeded-event-has-created-time', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'event-succeeded', 'job-ended');
     var pd = callGetter(e, 'postData');
@@ -333,7 +367,7 @@ test('failed', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'increased-delay', 'event-failed', 'retry', 'job-ended');
@@ -343,7 +377,7 @@ test('failed-event-has-created-time', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'increased-delay', 'event-failed', 'retry', 'job-ended');
@@ -357,7 +391,7 @@ test('failed-non-500-range-doesnt-retry', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
     util.setResponseStatus(ts, 404);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'event-failed', 'job-ended');
@@ -367,7 +401,7 @@ test('oto-enters-fired-list', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', true);
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'fired-list-saved');
     var fired_events = util.getSavedFiredList(ts);
@@ -379,7 +413,7 @@ test('non-oto-does-not-enter-fired-list', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'event-succeeded', 'job-ended');
     var fired_events = util.getSavedFiredList(ts);
@@ -390,7 +424,7 @@ test('respects-fired-list-for-oto-events', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', true);
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'fired-list-saved', 'event-succeeded', 'job-ended');
     e = util.newEvent('test', true);
@@ -402,7 +436,7 @@ test('doesnt-respect-fired-list-for-non-oto-events', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', true);
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'fired-list-saved', 'event-succeeded', 'job-ended');
     e = util.newEvent('test', false);
@@ -414,7 +448,7 @@ test('failed-oto-events-dont-enter-fired-list', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', true);
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'increased-delay', 'event-failed', 'retry', 'job-ended');
@@ -426,7 +460,7 @@ test('increasing-delay', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
     util.setResponseStatus(ts, 500);
     var expected = [2, 4, 8, 16, 32, 60, 60, 60];
     for(var i = 0; i < expected.length; i++) {
@@ -440,7 +474,7 @@ test('success-doesnt-increase-delay', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'event-succeeded', 'job-ended');
     util.assertEqual(0, util.getDelay(ts));
@@ -450,7 +484,7 @@ test('first-failure-increases-delay', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'increased-delay', 'event-failed', 'retry', 'job-ended');
@@ -461,7 +495,7 @@ test('success-of-first-failed-event-resets-delay', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'increased-delay', 'event-failed', 'retry', 'job-ended');
@@ -477,7 +511,7 @@ test('success-of-any-event-resets-delay', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'increased-delay', 'event-failed', 'retry', 'job-ended');
@@ -494,7 +528,7 @@ test('subsequent-failure-of-same-event-increases-delay', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e = util.newEvent('test', false);
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireEvent', e);
     expect(q, 'increased-delay', 'event-failed', 'retry', 'job-ended');
@@ -510,7 +544,7 @@ test('only-first-event-to-fail-can-increase-delay', function() {
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         e1 = util.newEvent('test1', false),
         e2 = util.newEvent('test2', false);
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
 
     util.setResponseStatus(ts, 500);
     
@@ -535,7 +569,7 @@ test('hit-success', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         h = util.newHit('test');
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
     callMethod(ts, 'fireHit', h);
     expect(q, 'hit-succeeded');
 });
@@ -544,7 +578,7 @@ test('hit-failed', function() {
         conf = util.newConfig(),
         ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
         h = util.newHit('test');
-    callMethod(q, 'consumeUntil', 'job-ended'); callMethod(q, 'consumeUntil', 'job-ended');  // Automatic install and open events
+    consumeAutomaticEvents(q);
     util.setResponseStatus(ts, 500);
     callMethod(ts, 'fireHit', h);
     expect(q, 'hit-failed');
