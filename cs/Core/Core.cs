@@ -308,15 +308,27 @@ namespace TapstreamMetrics.Sdk
                 }
             }
 
+            if (config.Odin1 != null)
+            {
+                if (config.Odin1.Length > 255)
+                {
+                    Logging.Log(LogLevel.WARN, "Tapstream Warning: ODIN-1 argument exceeds 255 characters, it will not be included with fired events");
+                }
+                else
+                {
+                    AppendPostPair("hardware-odin1", config.Odin1);
+                }
+            }
+
 #if TEST_WINPHONE || WINDOWS_PHONE
             if (config.CollectDeviceUniqueId)
             {
-                AppendPostPair("hardware-device-unique-id", platform.GetDeviceUniqueId());
+                AppendPostPair("hardware-winphone-device-unique-id", platform.GetDeviceUniqueId());
             }
 #else
             if (config.CollectAppSpecificHardwareId)
             {
-                AppendPostPair("hardware-app-specific-hardware-id", platform.GetAppSpecificHardwareId());
+                AppendPostPair("hardware-windows-ashwid", platform.GetAppSpecificHardwareId());
             }
 #endif
 

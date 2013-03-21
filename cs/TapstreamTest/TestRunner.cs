@@ -112,7 +112,7 @@ namespace TapstreamMetrics.Sdk
 #if TEST_WINPHONE
             engine.SetParameter("platform", "winphone");
 #else
-            engine.SetParameter("platform", "win8");
+            engine.SetParameter("platform", "windows");
 #endif
             engine.SetParameter("util", new Util(engine));
             engine.Run(script);

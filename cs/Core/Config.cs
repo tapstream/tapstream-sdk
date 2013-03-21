@@ -10,6 +10,9 @@ namespace TapstreamMetrics.Sdk
         // Deprecated, hardware-id field
         private string hardware = null;
 
+        // Optional hardware identifiers that can be provided by the caller
+        private string odin1 = null;
+
         // Set these to false if you do NOT want to collect this data.
 #if TEST_WINPHONE || WINDOWS_PHONE
         private bool collectDeviceUniqueId = true;
@@ -21,6 +24,12 @@ namespace TapstreamMetrics.Sdk
         {
             get { return hardware; }
             set { hardware = value; }
+        }
+
+        public string Odin1
+        {
+            get { return odin1; }
+            set { odin1 = value; }
         }
 
 #if TEST_WINPHONE || WINDOWS_PHONE

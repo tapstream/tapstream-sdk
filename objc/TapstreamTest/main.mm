@@ -79,6 +79,15 @@ static Handle<Value> Config_accessor(Local<String> name, const AccessorInfo &inf
 	{
 		return String::New([conf.hardware UTF8String]);
 	}
+	else if(strcmp(*s, "odin1") == 0)
+	{
+		return String::New([conf.odin1 UTF8String]);
+	}
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+	else if(strcmp(*s, "openUdid") == 0)
+	{
+		return String::New([conf.openUdid UTF8String]);
+	}
 	else if(strcmp(*s, "udid") == 0)
 	{
 		return String::New([conf.udid UTF8String]);
@@ -91,16 +100,16 @@ static Handle<Value> Config_accessor(Local<String> name, const AccessorInfo &inf
 	{
 		return String::New([conf.secureUdid UTF8String]);
 	}
+#else
+	else if(strcmp(*s, "serialNumber") == 0)
+	{
+		return String::New([conf.serialNumber UTF8String]);
+	}
+#endif
 	else if(strcmp(*s, "collectWifiMac") == 0)
 	{
 		return v8::Boolean::New(conf.collectWifiMac);
 	}
-#if !(TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
-	else if(strcmp(*s, "collectSerialNumber") == 0)
-	{
-		return v8::Boolean::New(conf.collectSerialNumber);
-	}
-#endif
 	return Null();
 }
 static void Config_mutator(Local<String> name, Local<Value> value, const AccessorInfo &info)
@@ -114,6 +123,23 @@ static void Config_mutator(Local<String> name, Local<Value> value, const Accesso
 		{
 			String::Utf8Value v(value);
 			conf.hardware = [NSString stringWithUTF8String:*v];
+		}
+	}
+	else if(strcmp(*s, "odin1") == 0)
+	{
+		if(value->IsString())
+		{
+			String::Utf8Value v(value);
+			conf.odin1 = [NSString stringWithUTF8String:*v];
+		}
+	}
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+	else if(strcmp(*s, "openUdid") == 0)
+	{
+		if(value->IsString())
+		{
+			String::Utf8Value v(value);
+			conf.openUdid = [NSString stringWithUTF8String:*v];
 		}
 	}
 	else if(strcmp(*s, "udid") == 0)
@@ -140,6 +166,16 @@ static void Config_mutator(Local<String> name, Local<Value> value, const Accesso
 			conf.secureUdid = [NSString stringWithUTF8String:*v];
 		}
 	}
+#else
+	else if(strcmp(*s, "serialNumber") == 0)
+	{
+		if(value->IsString())
+		{
+			String::Utf8Value v(value);
+			conf.serialNumber = [NSString stringWithUTF8String:*v];
+		}
+	}
+#endif
 	else if(strcmp(*s, "collectWifiMac") == 0)
 	{
 		if(value->IsBoolean())
@@ -147,15 +183,6 @@ static void Config_mutator(Local<String> name, Local<Value> value, const Accesso
 			conf.collectWifiMac = value->BooleanValue();
 		}
 	}
-#if !(TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
-	else if(strcmp(*s, "collectSerialNumber") == 0)
-	{
-		if(value->IsBoolean())
-		{
-			conf.collectSerialNumber = value->BooleanValue();
-		}
-	}
-#endif
 }
 
 
@@ -502,11 +529,18 @@ Handle<Value> Util_newConfig(const Arguments &args)
 	Handle<ObjectTemplate> templ = ObjectTemplate::New();
 	templ->SetInternalFieldCount(1);
 	templ->SetAccessor(String::New("hardware"), Config_accessor, Config_mutator);
+	templ->SetAccessor(String::New("odin1"), Config_accessor, Config_mutator);
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+	templ->SetAccessor(String::New("openUdid"), Config_accessor, Config_mutator);
 	templ->SetAccessor(String::New("udid"), Config_accessor, Config_mutator);
 	templ->SetAccessor(String::New("idfa"), Config_accessor, Config_mutator);
 	templ->SetAccessor(String::New("secureUdid"), Config_accessor, Config_mutator);
+#else
+	templ->SetAccessor(String::New("serialNumber"), Config_accessor, Config_mutator);
+#endif
+	
 	templ->SetAccessor(String::New("collectWifiMac"), Config_accessor, Config_mutator);
-	templ->SetAccessor(String::New("collectSerialNumber"), Config_accessor, Config_mutator);
+	
 	
 	Persistent<Object> obj = Persistent<Object>::New(templ->NewInstance());
 	obj.MakeWeak(NULL, Config_destructor);

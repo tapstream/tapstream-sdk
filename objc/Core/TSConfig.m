@@ -4,13 +4,19 @@
 @implementation TSConfig
 
 @synthesize hardware = hardware;
+@synthesize odin1 = odin1;
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+@synthesize openUdid = openUdid;
 @synthesize udid = udid;
 @synthesize idfa = idfa;
 @synthesize secureUdid = secureUdid;
-@synthesize collectWifiMac = collectWifiMac;
-#if !(TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
-@synthesize collectSerialNumber = collectSerialNumber;
+#else
+@synthesize serialNumber = serialNumber;
 #endif
+
+@synthesize collectWifiMac = collectWifiMac;
+
+
 
 + (id)configWithDefaults
 {
@@ -22,9 +28,6 @@
 	if((self = [super init]) != nil)
 	{
 		collectWifiMac = YES;
-#if !(TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
-		collectSerialNumber = YES;
-#endif
 	}
 	return self;
 }
@@ -32,9 +35,16 @@
 - (void)dealloc
 {
 	RELEASE(hardware);
+	RELEASE(odin1);
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+	RELEASE(openUdid);
 	RELEASE(udid);
 	RELEASE(idfa);
 	RELEASE(secureUdid);
+#else
+	RELEASE(serialNumber);
+#endif
+	
 	SUPER_DEALLOC;
 }
 

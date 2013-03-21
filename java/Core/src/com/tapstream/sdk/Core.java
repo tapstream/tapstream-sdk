@@ -257,14 +257,30 @@ class Core {
 			}
 		}
 
+		if (config.odin1 != null) {
+			if (config.odin1.length() > 255) {
+				Logging.log(Logging.WARN, "Tapstream Warning: ODIN-1 argument exceeds 255 characters, it will not be included with fired events");
+			} else {
+				appendPostPair("hardware-odin1", config.odin1);
+			}
+		}
+
+		if (config.openUdid != null) {
+			if (config.openUdid.length() > 255) {
+				Logging.log(Logging.WARN, "Tapstream Warning: OpenUDID argument exceeds 255 characters, it will not be included with fired events");
+			} else {
+				appendPostPair("hardware-openUdid", config.openUdid);
+			}
+		}
+
 		if (config.getCollectWifiMac()) {
 			appendPostPair("hardware-wifi-mac", platform.getWifiMac());
 		}
 		if (config.getCollectDeviceId()) {
-			appendPostPair("hardware-device-id", platform.getDeviceId());
+			appendPostPair("hardware-android-device-id", platform.getDeviceId());
 		}
 		if (config.getCollectAndroidId()) {
-			appendPostPair("hardware-android-id", platform.getAndroidId());
+			appendPostPair("hardware-android-android-id", platform.getAndroidId());
 		}
 
 		appendPostPair("uuid", platform.loadUuid());

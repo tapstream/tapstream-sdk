@@ -308,6 +308,32 @@
 		}
 	}
 
+	if(config.odin1 != nil)
+	{
+		if([config.odin1 length] > 255)
+		{
+			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: ODIN-1 argument exceeds 255 characters, it will not be included with fired events"];
+		}
+		else
+		{
+			[self appendPostPairWithKey:@"hardware-odin1" value:config.odin1];
+		}
+	}
+
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+
+	if(config.openUdid != nil)
+	{
+		if([config.openUdid length] > 255)
+		{
+			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: OpenUDID argument exceeds 255 characters, it will not be included with fired events"];
+		}
+		else
+		{
+			[self appendPostPairWithKey:@"hardware-open-udid" value:config.openUdid];
+		}
+	}
+
 	if(config.udid != nil)
 	{
 		if([config.udid length] > 255)
@@ -316,7 +342,7 @@
 		}
 		else
 		{
-			[self appendPostPairWithKey:@"hardware-udid" value:config.udid];
+			[self appendPostPairWithKey:@"hardware-ios-udid" value:config.udid];
 		}
 	}
 
@@ -328,7 +354,7 @@
 		}
 		else
 		{
-			[self appendPostPairWithKey:@"hardware-idfa" value:config.idfa];
+			[self appendPostPairWithKey:@"hardware-ios-idfa" value:config.idfa];
 		}
 	}
 
@@ -340,21 +366,29 @@
 		}
 		else
 		{
-			[self appendPostPairWithKey:@"hardware-secure-udid" value:config.secureUdid];
+			[self appendPostPairWithKey:@"hardware-ios-secure-udid" value:config.secureUdid];
 		}
 	}
+
+#else
+
+	if([config.serialNumber length] > 255)
+	{
+		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Serial number argument exceeds 255 characters, it will not be included with fired events"];
+	}
+	else
+	{
+		[self appendPostPairWithKey:@"hardware-mac-serial-number" value:config.serialNumber];
+	}
+
+#endif
+
+
 
 	if(config.collectWifiMac)
 	{
 		[self appendPostPairWithKey:@"hardware-wifi-mac" value:[platform getWifiMac]];
 	}
-
-#if !(TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
-	if(config.collectSerialNumber)
-	{
-		[self appendPostPairWithKey:@"hardware-serial-number" value:[platform getSerialNumber]];
-	}
-#endif
 
 	[self appendPostPairWithKey:@"uuid" value:[platform loadUuid]];
 
