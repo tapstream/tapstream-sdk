@@ -61,13 +61,32 @@
 		{
 			appName = @"";
 		}
+		
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 		NSString *platformName = @"ios";
 #else
 		NSString *platformName = @"mac";
 #endif
-		NSString *eventName = [NSString stringWithFormat:@"%@-%@-run", platformName, appName];
-		[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
+
+		if(config.installEventName != nil)
+		{
+			[self fireEvent:[TSEvent eventWithName:config.installEventName oneTimeOnly:YES]];
+		}
+		else
+		{
+			NSString *eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, appName];
+			[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:YES]];
+		}
+
+		if(config.openEventName != nil)
+		{
+			[self fireEvent:[TSEvent eventWithName:config.openEventName oneTimeOnly:NO]];
+		}
+		else
+		{
+			NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, appName];
+			[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
+		}
 	}
 	return self;
 }

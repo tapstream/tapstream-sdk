@@ -53,12 +53,30 @@ namespace TapstreamMetrics.Sdk
 #else
             string platformName = "windows";
 #endif
+            
             string appName = platform.GetAppName();
             if (appName == null)
             {
                 appName = "";
             }
-            FireEvent(new Event(string.Format("{0}-{1}-run", platformName, appName), false));
+
+            if (config.InstallEventName != null)
+            {
+                FireEvent(new Event(config.InstallEventName, true));
+            }
+            else
+            {
+                FireEvent(new Event(string.Format("{0}-{1}-install", platformName, appName), true));
+            }
+
+            if (config.OpenEventName != null)
+            {
+                FireEvent(new Event(config.OpenEventName, false));
+            }
+            else
+            {
+                FireEvent(new Event(string.Format("{0}-{1}-open", platformName, appName), false));
+            }            
 	    }
 
         public void FireEvent(Event e)

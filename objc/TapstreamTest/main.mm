@@ -110,6 +110,14 @@ static Handle<Value> Config_accessor(Local<String> name, const AccessorInfo &inf
 	{
 		return v8::Boolean::New(conf.collectWifiMac);
 	}
+	else if(strcmp(*s, "installEventName") == 0)
+	{
+		return String::New([conf.installEventName UTF8String]);
+	}
+	else if(strcmp(*s, "openEventName") == 0)
+	{
+		return String::New([conf.openEventName UTF8String]);
+	}
 	return Null();
 }
 static void Config_mutator(Local<String> name, Local<Value> value, const AccessorInfo &info)
@@ -181,6 +189,22 @@ static void Config_mutator(Local<String> name, Local<Value> value, const Accesso
 		if(value->IsBoolean())
 		{
 			conf.collectWifiMac = value->BooleanValue();
+		}
+	}
+	else if(strcmp(*s, "installEventName") == 0)
+	{
+		if(value->IsString())
+		{
+			String::Utf8Value v(value);
+			conf.installEventName = [NSString stringWithUTF8String:*v];
+		}
+	}
+	else if(strcmp(*s, "openEventName") == 0)
+	{
+		if(value->IsString())
+		{
+			String::Utf8Value v(value);
+			conf.openEventName = [NSString stringWithUTF8String:*v];
 		}
 	}
 }
@@ -538,8 +562,9 @@ Handle<Value> Util_newConfig(const Arguments &args)
 #else
 	templ->SetAccessor(String::New("serialNumber"), Config_accessor, Config_mutator);
 #endif
-	
 	templ->SetAccessor(String::New("collectWifiMac"), Config_accessor, Config_mutator);
+	templ->SetAccessor(String::New("installEventName"), Config_accessor, Config_mutator);
+	templ->SetAccessor(String::New("openEventName"), Config_accessor, Config_mutator);
 	
 	
 	Persistent<Object> obj = Persistent<Object>::New(templ->NewInstance());

@@ -16,6 +16,8 @@
 
 @synthesize collectWifiMac = collectWifiMac;
 
+@synthesize installEventName = installEventName;
+@synthesize openEventName = openEventName;
 
 
 + (id)configWithDefaults
@@ -44,7 +46,9 @@
 #else
 	RELEASE(serialNumber);
 #endif
-	
+	RELEASE(installEventName);
+	RELEASE(openEventName);
+
 	SUPER_DEALLOC;
 }
 

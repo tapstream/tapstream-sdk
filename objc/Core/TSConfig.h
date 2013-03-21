@@ -19,6 +19,10 @@
 	
 	// Set these to false if you do NOT want to collect this data
 	BOOL collectWifiMac;
+
+	// Set these if you want to override the names of the automatic events sent by the sdk
+    NSString *installEventName;
+    NSString *openEventName;
 }
 
 @property(nonatomic, retain) NSString *hardware;
@@ -33,6 +37,9 @@
 #endif
 
 @property(nonatomic, assign) BOOL collectWifiMac;
+
+@property(nonatomic, retain) NSString *installEventName;
+@property(nonatomic, retain) NSString *openEventName;
 
 - (id)init;
 + (id)configWithDefaults;

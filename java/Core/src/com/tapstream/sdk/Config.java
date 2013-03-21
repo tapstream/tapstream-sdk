@@ -13,8 +13,12 @@ public class Config {
 	private boolean collectDeviceId = true;
 	private boolean collectAndroidId = true;
 
+	// Set these if you want to override the names of the automatic events sent by the sdk
+    private String installEventName = null;
+    private String openEventName = null;
 
 
+	// Accessors for the private members above:
 	public String getHardware() { return hardware; }
 	public void setHardware(String hardware) { this.hardware = hardware; }
 
@@ -32,4 +36,10 @@ public class Config {
 
 	public boolean getCollectAndroidId() { return collectAndroidId; }
 	public void setCollectAndroidId(boolean collect) { this.collectAndroidId = collect; }
+
+	public String getInstallEventName() { return installEventName; }
+	public void setInstallEventName(String name) { this.installEventName = name; }
+
+	public String getOpenEventName() { return openEventName; }
+	public void setOpenEventName(String name) { this.openEventName = name; }
 }

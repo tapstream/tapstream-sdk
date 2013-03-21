@@ -20,6 +20,13 @@ namespace TapstreamMetrics.Sdk
         private bool collectAppSpecificHardwareId = true;
 #endif
 
+        // Set these if you want to override the names of the automatic events sent by the sdk
+        private string installEventName = null;
+        private string openEventName = null;
+
+
+
+        // Properties for the private members above:
         public string Hardware
         {
             get { return hardware; }
@@ -45,5 +52,17 @@ namespace TapstreamMetrics.Sdk
             set { collectAppSpecificHardwareId = value; }
         }
 #endif
+        
+        public string InstallEventName
+        {
+            get { return installEventName; }
+            set { installEventName = value; }
+        }
+
+        public string OpenEventName
+        {
+            get { return openEventName; }
+            set { openEventName = value; }
+        }
     }
 }
