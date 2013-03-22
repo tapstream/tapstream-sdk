@@ -109,23 +109,23 @@
 	@synchronized(self)
 	{
 		// Notify the event that we are going to fire it so it can record the time
-        [e firing];
+		[e firing];
 
 		if(e.oneTimeOnly)
 		{
 			if([firedEvents containsObject:e.name])
 			{
 				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that has already been fired", e.name];
-                [listener reportOperation:@"event-ignored-already-fired" arg:e.name];
-                [listener reportOperation:@"job-ended" arg:e.name];
-                return;
+				[listener reportOperation:@"event-ignored-already-fired" arg:e.name];
+				[listener reportOperation:@"job-ended" arg:e.name];
+				return;
 			}
 			else if([firedEvents containsObject:e.name])
 			{
 				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that is already in progress", e.name];
-                [listener reportOperation:@"event-ignored-already-in-progress" arg:e.name];
-                [listener reportOperation:@"job-ended" arg:e.name];
-                return;
+				[listener reportOperation:@"event-ignored-already-in-progress" arg:e.name];
+				[listener reportOperation:@"job-ended" arg:e.name];
+				return;
 			}
 
 			[firingEvents addObject:e.name];
@@ -153,8 +153,8 @@
 				if(failed)
 				{
 					// Only increase delays if we actually intend to retry the event
-                    if(shouldRetry)
-                    {
+					if(shouldRetry)
+					{
 						// Not every job that fails will increase the retry delay.  It will be the responsibility of
 						// the first failed job to increase the delay after every failure.
 						if(delay == 0)
@@ -163,7 +163,7 @@
 							self.failingEventId = e.uid;
 							[self increaseDelay];
 						}
-						else if([failingEventId isEqualToString:e.name])
+						else if([failingEventId isEqualToString:e.uid])
 						{
 							[self increaseDelay];
 						}
@@ -185,48 +185,48 @@
 			}
 
 			if(failed)
-            {
-			    if(response.status < 0)
-                {
-				    [TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, error=%@", response.message];
-			    }
-                else if(response.status == 404)
-                {
-				    [TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, http code %d\nDoes your event name contain characters that are not url safe? This event will not be retried.", response.status];
-			    }
-                else if(response.status == 403)
-                {
+			{
+				if(response.status < 0)
+				{
+					[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, error=%@", response.message];
+				}
+				else if(response.status == 404)
+				{
+					[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, http code %d\nDoes your event name contain characters that are not url safe? This event will not be retried.", response.status];
+				}
+				else if(response.status == 403)
+				{
 				   [TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, http code %d\nAre your account name and application secret correct?  This event will not be retried.", response.status];
-			    }
-                else
-                {
-				    NSString *retryMsg = @"";
-				    if(!shouldRetry)
-                    {
-					    retryMsg = @"  This event will not be retried.";
-				    }
-				    [TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, http code %d.%@", response.status, retryMsg];
-			    }
+				}
+				else
+				{
+					NSString *retryMsg = @"";
+					if(!shouldRetry)
+					{
+						retryMsg = @"  This event will not be retried.";
+					}
+					[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, http code %d.%@", response.status, retryMsg];
+				}
 
-			    [listener reportOperation:@"event-failed" arg:e.name];
-			    if(shouldRetry)
-                {
-				    [listener reportOperation:@"retry" arg:e.name];
-				    [listener reportOperation:@"job-ended" arg:e.name];
-				    if([del isRetryAllowed])
-                    {
-					    [self fireEvent:e];
-				    }
-				    return;
-			    }
-		    }
-            else
-            {
-            	[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream fired event named \"%@\"", e.name];
-			    [listener reportOperation:@"event-succeeded" arg:e.name];
-		    }
+				[listener reportOperation:@"event-failed" arg:e.name];
+				if(shouldRetry)
+				{
+					[listener reportOperation:@"retry" arg:e.name];
+					[listener reportOperation:@"job-ended" arg:e.name];
+					if([del isRetryAllowed])
+					{
+						[self fireEvent:e];
+					}
+					return;
+				}
+			}
+			else
+			{
+				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream fired event named \"%@\"", e.name];
+				[listener reportOperation:@"event-succeeded" arg:e.name];
+			}
 		
-		    [listener reportOperation:@"job-ended" arg:e.name];
+			[listener reportOperation:@"job-ended" arg:e.name];
 		});
 	}
 }
@@ -241,18 +241,18 @@
 		if(response.status < 200 || response.status >= 300)
 		{
 			[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire hit, http code: %d", response.status];
-            [listener reportOperation:@"hit-failed"];
-        }
-        else
-        {
-            [TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream fired hit to tracker: %@", hit.trackerName];
-            [listener reportOperation:@"hit-succeeded"];
-        }
+			[listener reportOperation:@"hit-failed"];
+		}
+		else
+		{
+			[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream fired hit to tracker: %@", hit.trackerName];
+			[listener reportOperation:@"hit-succeeded"];
+		}
 
-        if(completion != nil)
-        {
-        	completion(response);
-        }
+		if(completion != nil)
+		{
+			completion(response);
+		}
 	});
 }
 
@@ -277,17 +277,17 @@
 - (void)increaseDelay
 {
 	if(delay == 0)
-    {
-        // First failure
-        delay = 2;
-    }
-    else
-    {
-        // 2, 4, 8, 16, 32, 60, 60, 60...
-        int newDelay = (int)pow( 2, log2( delay ) + 1 );
-        delay = newDelay > 60 ? 60 : newDelay;
-    }
-    [listener reportOperation:@"increased-delay"];
+	{
+		// First failure
+		delay = 2;
+	}
+	else
+	{
+		// 2, 4, 8, 16, 32, 60, 60, 60...
+		int newDelay = (int)pow( 2, log2( delay ) + 1 );
+		delay = newDelay > 60 ? 60 : newDelay;
+	}
+	[listener reportOperation:@"increased-delay"];
 }
 
 - (void)appendPostPairWithKey:(NSString *)key value:(NSString *)value
@@ -298,16 +298,16 @@
 	}
 
 	if(postData == nil)
-    {
-    	self.postData = [[NSMutableString alloc] initWithCapacity:256];
-    }
-    else
-    {
-        [postData appendString:@"&"];
-    }
-    [postData appendString:[self encodeString:key]];
-    [postData appendString:@"="];
-    [postData appendString:[self encodeString:value]];
+	{
+		self.postData = [[NSMutableString alloc] initWithCapacity:256];
+	}
+	else
+	{
+		[postData appendString:@"&"];
+	}
+	[postData appendString:[self encodeString:key]];
+	[postData appendString:@"="];
+	[postData appendString:[self encodeString:value]];
 }
 
 - (void)makePostArgsWithSecret:(NSString *)secret config:(TSConfig *)config

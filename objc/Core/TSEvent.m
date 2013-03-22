@@ -52,7 +52,7 @@
 	if(key.length > 255)
 	{
 		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Custom key exceeds 255 characters, this field will not be included in the post (key=%@)", key];
-        return;
+		return;
 	}
 	NSString *encodedKey = [self encodeString:[@"custom-" stringByAppendingString:key]];
 
@@ -60,7 +60,7 @@
 	if(encodedValue.length > 255)
 	{
 		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Custom value exceeds 255 characters, this field will not be included in the post (value=%@)", value];
-        return;
+		return;
 	}
 
 	if(postData == nil)
@@ -102,10 +102,10 @@
 - (void)firing
 {
 	// Only record the time of the first fire attempt
-    if(firstFiredTime == 0)
-    {
-        firstFiredTime = [[NSDate date] timeIntervalSince1970];
-    }
+	if(firstFiredTime == 0)
+	{
+		firstFiredTime = [[NSDate date] timeIntervalSince1970];
+	}
 }
 
 - (NSString *)makeUid

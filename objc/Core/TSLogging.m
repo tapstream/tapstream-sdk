@@ -23,7 +23,7 @@ static bool overridden = false;
 		if(currentLogger != nil || !overridden)
 		{
 			va_list ap;
-    		va_start(ap, format);
+			va_start(ap, format);
 
 			NSString *message = AUTORELEASE([[NSString alloc] initWithFormat:format arguments:ap]);
 

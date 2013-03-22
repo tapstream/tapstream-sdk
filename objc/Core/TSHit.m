@@ -39,7 +39,7 @@
 	if(tag.length > 255)
 	{
 		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Tag exceeds 255 characters, it will not be included in the post (tag=%@)", tag];
-        return;
+		return;
 	}
 	NSString *encodedTag = [self encodeString:tag];
 

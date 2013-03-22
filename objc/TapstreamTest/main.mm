@@ -38,7 +38,16 @@ Handle<Value> OperationQueue_expect(const Arguments &args)
 	String::Utf8Value name(args[0]);
 
 	NSString *arg = [q expect:[NSString stringWithUTF8String:*name]];
-	return String::New([arg UTF8String]);
+	//return String::New([arg UTF8String]);
+	if(arg != nil)
+	{
+		Handle<String> ret = String::New([arg UTF8String]);
+		return scope.Close(ret);
+	}
+	else
+	{
+		return scope.Close(Null());
+	}
 }
 Handle<Value> OperationQueue_expectEventually(const Arguments &args)
 {
@@ -53,7 +62,9 @@ Handle<Value> OperationQueue_expectEventually(const Arguments &args)
 	String::Utf8Value name(args[0]);
 
 	NSString *arg = [q expectEventually:[NSString stringWithUTF8String:*name]];
-	return String::New([arg UTF8String]);
+	//return String::New([arg UTF8String]);
+	Handle<String> ret = String::New([arg UTF8String]);
+	return scope.Close(ret);
 }
 void OperationQueue_destructor(Persistent<Value> object, void *parameters)
 {
