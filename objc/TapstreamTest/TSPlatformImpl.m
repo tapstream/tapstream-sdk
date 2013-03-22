@@ -67,13 +67,6 @@
 	return @"00:00:00:00:00:00";
 }
 
-#if !(TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
-- (NSString *)getSerialNumber
-{
-	return @"1234567890";
-}
-#endif
-
 - (NSString *)getAppName
 {
 	return @"TestApp";

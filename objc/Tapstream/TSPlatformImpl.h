@@ -14,9 +14,6 @@
 - (NSString *)getOs;
 - (NSString *)getLocale;
 - (NSString *)getWifiMac;
-#if !(TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
-- (NSString *)getSerialNumber;
-#endif
 - (NSString *)getAppName;
 - (NSString *)getPackageName;
 - (TSResponse *)request:(NSString *)url data:(NSString *)data;
