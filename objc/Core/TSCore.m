@@ -27,7 +27,7 @@
 - (NSString *)clean:(NSString *)s;
 - (void)increaseDelay;
 - (void)appendPostPairWithKey:(NSString *)key value:(NSString *)value;
-- (void)makePostArgsWithSecret:(NSString *)secret config:(TSConfig *)config;
+- (void)makePostArgsWithSecret:(NSString *)secret;
 @end
 
 
@@ -51,42 +51,10 @@
 		self.postData = nil;
 		self.failingEventId = nil;
 
-		[self makePostArgsWithSecret:developerSecretVal config:config];
+		[self makePostArgsWithSecret:developerSecretVal];
 
 		self.firingEvents = [[NSMutableSet alloc] initWithCapacity:32];
 		self.firedEvents = [platform loadFiredEvents];
-
-		NSString *appName = [platform getAppName];
-		if(appName == nil)
-		{
-			appName = @"";
-		}
-
-#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-		NSString *platformName = @"ios";
-#else
-		NSString *platformName = @"mac";
-#endif
-
-		if(config.installEventName != nil)
-		{
-			[self fireEvent:[TSEvent eventWithName:config.installEventName oneTimeOnly:YES]];
-		}
-		else
-		{
-			NSString *eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, appName];
-			[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:YES]];
-		}
-
-		if(config.openEventName != nil)
-		{
-			[self fireEvent:[TSEvent eventWithName:config.openEventName oneTimeOnly:NO]];
-		}
-		else
-		{
-			NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, appName];
-			[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
-		}
 	}
 	return self;
 }
@@ -102,6 +70,41 @@
 	RELEASE(firedEvents);
 	RELEASE(failingEventId);
 	SUPER_DEALLOC;
+}
+
+- (void)start
+{
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+	NSString *platformName = @"ios";
+#else
+	NSString *platformName = @"mac";
+#endif
+
+	NSString *appName = [platform getAppName];
+	if(appName == nil)
+	{
+		appName = @"";
+	}
+
+	if(config.installEventName != nil)
+	{
+		[self fireEvent:[TSEvent eventWithName:config.installEventName oneTimeOnly:YES]];
+	}
+	else
+	{
+		NSString *eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, appName];
+		[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:YES]];
+	}
+
+	if(config.openEventName != nil)
+	{
+		[self fireEvent:[TSEvent eventWithName:config.openEventName oneTimeOnly:NO]];
+	}
+	else
+	{
+		NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, appName];
+		[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
+	}
 }
 
 - (void)fireEvent:(TSEvent *)e
@@ -310,7 +313,7 @@
 	[postData appendString:[self encodeString:value]];
 }
 
-- (void)makePostArgsWithSecret:(NSString *)secret config:(TSConfig *)config
+- (void)makePostArgsWithSecret:(NSString *)secret
 {
 	[self appendPostPairWithKey:@"secret" value:secret];
 	[self appendPostPairWithKey:@"sdkversion" value:kTSVersion];

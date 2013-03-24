@@ -11,6 +11,7 @@ using System.Net;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Reflection;
+using System.Windows;
 #else
 using System.Threading.Tasks;
 using System.Net.Http;
@@ -141,7 +142,9 @@ namespace TapstreamMetrics.Sdk
 #if TEST_WINPHONE || WINDOWS_PHONE
         public string GetDeviceUniqueId()
         {
-            return (string)DeviceExtendedProperties.GetValue("DeviceUniqueId");
+            byte[] bytes = (byte[])DeviceExtendedProperties.GetValue("DeviceUniqueId");
+            string hex = BitConverter.ToString(bytes);
+            return hex.Replace("-", "").ToLower();
         }
 #else
         public string GetAppSpecificHardwareId()
@@ -172,7 +175,7 @@ namespace TapstreamMetrics.Sdk
         public string GetAppName()
         {
 #if TEST_WINPHONE || WINDOWS_PHONE
-            AssemblyName nameHelper = new AssemblyName(Assembly.GetExecutingAssembly().FullName);
+            AssemblyName nameHelper = new AssemblyName(Application.Current.GetType().Assembly.FullName);
             return nameHelper.Name;
 #else
             return Package.Current.Id.Name;
@@ -182,7 +185,7 @@ namespace TapstreamMetrics.Sdk
         public string GetPackageName()
         {
 #if TEST_WINPHONE || WINDOWS_PHONE
-            AssemblyName nameHelper = new AssemblyName(Assembly.GetExecutingAssembly().FullName);
+            AssemblyName nameHelper = new AssemblyName(Application.Current.GetType().Assembly.FullName);
             return nameHelper.FullName;
 #else
             return Package.Current.Id.FullName;

@@ -19,6 +19,7 @@ class Core {
 	private Delegate delegate;
 	private Platform platform;
 	private CoreListener listener;
+	private Config config;
 	private String accountName;
 	private ScheduledThreadPoolExecutor executor;
 	private StringBuilder postData = null;
@@ -31,15 +32,18 @@ class Core {
 		this.delegate = delegate;
 		this.platform = platform;
 		this.listener = listener;
+		this.config = config;
 
 		this.accountName = clean(accountName);
-		makePostArgs(developerSecret, config);
+		makePostArgs(developerSecret);
 
 		firedEvents = platform.loadFiredEvents();
 
 		executor = new ScheduledThreadPoolExecutor(MAX_THREADS, platform.makeWorkerThreadFactory());
-		executor.prestartAllCoreThreads();
+		executor.prestartAllCoreThreads();		
+	}
 
+	public void start() {
 		// Automatically fire run event
 		String appName = platform.getAppName();
 		if(appName == null) {
@@ -58,7 +62,7 @@ class Core {
 			fireEvent(new Event(openEventName, false));
 		} else {
 			fireEvent(new Event(String.format(Locale.US, "android-%s-open", appName), false));	
-		}		
+		}
 	}
 
 	public synchronized void fireEvent(final Event e) {
@@ -256,7 +260,7 @@ class Core {
 		postData.append(encodedValue);
 	}
 
-	private void makePostArgs(String secret, Config config) {
+	private void makePostArgs(String secret) {
 		appendPostPair("secret", secret);
 		appendPostPair("sdkversion", VERSION);
 		

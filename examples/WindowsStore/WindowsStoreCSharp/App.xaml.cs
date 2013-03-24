@@ -37,7 +37,8 @@ namespace WindowsStoreCSharp
             this.InitializeComponent();
             this.Suspending += OnSuspending;
 
-            Tapstream.Create("sdktest", "YGP2pezGTI6ec48uti4o1w");
+            Config config = new Config();
+            Tapstream.Create("sdktest", "YGP2pezGTI6ec48uti4o1w", config);
 
             Tapstream tracker = Tapstream.Instance;
 
@@ -48,22 +49,6 @@ namespace WindowsStoreCSharp
 
             e = new Event("test-event-oto", true);
             tracker.FireEvent(e);
-
-            Hit h = new Hit("test-tracker");
-            h.AddTag("tag1");
-            h.AddTag("tag2");
-            Task.Run(async () =>
-            {
-                Response response = await tracker.FireHitAsync(h);
-                if (response.Status >= 200 && response.Status < 300)
-                {
-                    // Success
-                }
-                else
-                {
-                    // Error
-                }
-            });
         }
 
         /// <summary>

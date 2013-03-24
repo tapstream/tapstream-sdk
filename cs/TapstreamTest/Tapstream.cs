@@ -34,6 +34,7 @@ namespace TapstreamMetrics.Sdk
             platform = new PlatformImpl();
             listener = new CoreListenerImpl(queue);
             core = new Core(del, platform, listener, accountName, developerSecret, config);
+            core.Start();
         }
 
         public void FireEvent(Event e)

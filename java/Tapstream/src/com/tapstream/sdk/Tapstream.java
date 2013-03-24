@@ -46,6 +46,7 @@ public class Tapstream implements Api {
 		platform = new PlatformImpl(context);
 		listener = new CoreListenerImpl();
 		core = new Core(delegate, platform, listener, accountName, developerSecret, config);
+		core.start();
 	}
 
 	public void fireEvent(Event e) {

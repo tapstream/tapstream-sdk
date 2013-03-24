@@ -14,7 +14,9 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		Tapstream.create(getApplicationContext(), "sdktest", "YGP2pezGTI6ec48uti4o1w");
+		Config config = new Config();
+		config.setOdin1("TestODINValue");
+		Tapstream.create(getApplicationContext(), "sdktest", "YGP2pezGTI6ec48uti4o1w", config);
 		
 		Tapstream tracker = Tapstream.getInstance();
 
@@ -25,23 +27,6 @@ public class MainActivity extends Activity {
 
         e = new Event("test-event-oto", true);
         tracker.fireEvent(e);
-		
-        Hit h = new Hit("test-java");
-        h.addTag("tag1");
-        h.addTag("tag2");
-        tracker.fireHit(h, new Hit.CompletionHandler() {
-			@Override
-			public void complete(Response response) {
-				if(response.status >= 200 && response.status < 300) {
-                    // Success
-					Log.i("tag", "success");
-                } else {
-                    // Error
-                	Log.e("tag", response.message);
-                }
-			}
-		});
-        
 	}
 
 	@Override

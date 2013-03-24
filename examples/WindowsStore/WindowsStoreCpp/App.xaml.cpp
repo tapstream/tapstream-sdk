@@ -37,9 +37,8 @@ App::App()
 	InitializeComponent();
 	Suspending += ref new SuspendingEventHandler(this, &App::OnSuspending);
 
-
-
-	Tapstream::Create("sdktest", "YGP2pezGTI6ec48uti4o1w");
+	Config ^config = ref new Config();
+	Tapstream::Create("sdktest", "YGP2pezGTI6ec48uti4o1w", config);
 
 	Tapstream ^tracker = Tapstream::Instance;
 
@@ -50,22 +49,6 @@ App::App()
 
     e = ref new Event("test-event-oto", true);
     tracker->FireEvent(e);
-
-	Hit ^h = ref new Hit("test-tracker");
-    h->AddTag("tag1");
-    h->AddTag("tag2");
-    create_task(tracker->FireHitAsync(h)).then([](task<Response ^> previous) {
-			Response ^response = previous.get();
-			if (response->Status >= 200 && response->Status < 300)
-			{
-				// Success
-			}
-			else
-			{
-				// Error
-			}
-		}
-	);
 }
 
 /// <summary>

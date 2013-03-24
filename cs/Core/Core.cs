@@ -29,6 +29,7 @@ namespace TapstreamMetrics.Sdk
         private Delegate del;
 	    private Platform platform;
 	    private CoreListener listener;
+        private Config config;
         private string accountName;
         private StringBuilder postData = null;
         private HashSet<string> firingEvents = new HashSet<string>();
@@ -42,12 +43,15 @@ namespace TapstreamMetrics.Sdk
 		    this.del = del;
 		    this.platform = platform;
 		    this.listener = listener;
+            this.config = config;
 		
 		    this.accountName = Clean(accountName);
-		    MakePostArgs(developerSecret, config);
+		    MakePostArgs(developerSecret);
 		
 		    firedEvents = platform.LoadFiredEvents();
+	    }
 
+        public void Start() {
 #if TEST_WINPHONE || WINDOWS_PHONE
             string platformName = "winphone";
 #else
@@ -76,8 +80,8 @@ namespace TapstreamMetrics.Sdk
             else
             {
                 FireEvent(new Event(string.Format("{0}-{1}-open", platformName, appName), false));
-            }            
-	    }
+            }
+        }
 
         public void FireEvent(Event e)
         {
@@ -309,7 +313,7 @@ namespace TapstreamMetrics.Sdk
             postData.Append(Uri.EscapeDataString(value));
         }
 
-        private void MakePostArgs(string secret, Config config)
+        private void MakePostArgs(string secret)
         {
             AppendPostPair("secret", secret);
             AppendPostPair("sdkversion", VERSION);

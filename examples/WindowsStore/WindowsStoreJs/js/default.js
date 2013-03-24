@@ -21,7 +21,8 @@
             }
             args.setPromise(WinJS.UI.processAll());
 
-            tapstream.Tapstream.create("sdktest", "YGP2pezGTI6ec48uti4o1w");
+            var config = new tapstream.Config();
+            tapstream.Tapstream.create("sdktest", "YGP2pezGTI6ec48uti4o1w", config);
 
             var tracker = tapstream.Tapstream.instance;
 
@@ -32,18 +33,6 @@
 
             e = new tapstream.Event("test-event-oto", true);
             tracker.fireEvent(e);
-
-            var h = new tapstream.Hit("test-tracker");
-            h.addTag("tag1");
-            h.addTag("tag2");
-            tracker.fireHitAsync(h).then(function (response) {
-                if (response.status >= 200 && response.status < 300) {
-                    // Success
-                }
-                else {
-                    // Error
-                }
-            });
         }
     };
 

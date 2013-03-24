@@ -44,7 +44,6 @@ namespace TapstreamMetrics.Sdk
                     return op.arg;
                 }
             }
-            return null;
         }
     }
 }

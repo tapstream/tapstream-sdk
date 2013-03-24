@@ -12,6 +12,14 @@ using TapstreamMetrics.Sdk;
 
 namespace WindowsPhoneApp80
 {
+    class MyLogger : Logger
+    {
+        public void Log(LogLevel level, string msg)
+        {
+            int temp = 1;
+        }
+    }
+
     public partial class App : Application
     {
         /// <summary>
@@ -28,8 +36,10 @@ namespace WindowsPhoneApp80
             // Global handler for uncaught exceptions.
             UnhandledException += Application_UnhandledException;
 
+            Logging.SetLogger(new MyLogger());
 
-            Tapstream.Create("sdktest", "YGP2pezGTI6ec48uti4o1w");
+            Config config = new Config();
+            Tapstream.Create("sdktest", "YGP2pezGTI6ec48uti4o1w", config);
 
             Tapstream tracker = Tapstream.Instance;
 

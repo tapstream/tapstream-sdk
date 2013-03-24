@@ -72,6 +72,7 @@ static TSTapstream *instance = nil;
 			accountName:accountName
 			developerSecret:developerSecret
 			config:config];
+		[core start];
 	}
 	return self;
 }

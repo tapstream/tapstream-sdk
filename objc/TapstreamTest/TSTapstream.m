@@ -50,6 +50,7 @@
 			accountName:accountName
 			developerSecret:developerSecret
 			config:config];
+		[core start];
 	}
 	return self;
 }

@@ -59,13 +59,8 @@ Then, in the `onCreate` method of your main activity, create the `Tapstream` sin
 developer secret that you've setup on the Tapstream website:
 
     :::java
-    Tapstream.create(getApplicationContext(), "TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY");
-
-If you have access to some kind of unique hardware identifier, you may provide this upon creation.
-The hardware identifier must be no more than 255 characters in length.  In this case, instantiation would look like this:
-
-    :::java
-    Tapstream.create(getApplicationContext(), "TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", "SOME_UNIQUE_HARDWARE_ID");
+    Config config = new Config();
+    Tapstream.create(getApplicationContext(), "TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", config);
 
 {% elif platform == 'ios' or platform == 'mac' %}
 
@@ -78,14 +73,8 @@ Then, in the {% if platform == 'ios' %}`-application:didFinishLaunchingWithOptio
 create the `TSTapstream` singleton with the account name and developer secret that you've setup on the Tapstream website:
 
     :::objective-c
-    [TSTapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY"];
-
-
-If you have access to some kind of unique hardware identifier, you may provide this upon creation.
-The hardware identifier must be no more than 255 characters in length.  In this case, instantiation would look like this:
-
-    :::objective-c
-    [TSTapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY" hardware:@"SOME_UNIQUE_HARDWARE_ID"];
+    Config *config = [Config configWithDefaults];
+    [TSTapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY" config:config];
 
 {% elif platform == 'win8' or platform == 'winphone' %}
 
@@ -98,18 +87,106 @@ Then, in the constructor of your main application class, create the `Tapstream` 
 developer secret that you've setup on the Tapstream website:
 
     :::csharp
-    Tapstream.Create("TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY");
-
-If you have access to some kind of unique hardware identifier, you may provide this upon creation.
-The hardware identifier must be no more than 255 characters in length.  In this case, instantiation would look like this:
-
-    :::csharp
-    Tapstream.Create("TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", "SOME_UNIQUE_HARDWARE_ID");
+    Config = new Config();
+    Tapstream.Create("TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", config);
 
 {% endif %}
 
 
 
+
+## Collecting hardware identifiers
+
+{% if platform != 'winphone' %}
+The Tapstream SDK can send various hardware identifiers to the Tapstream server with each event.  Some of these hardware identifiers are
+collected automatically and you must opt-out if you do not wish to collect them.  Others are opt-in, and must be collected by you and
+provided explicitly to the SDK.  To control which hardware identifiers are attached to events, you may modify the config object
+that you instantiated the SDK with.  Here's an example:
+{% endif %}
+
+{% if platform == 'android' %}
+
+    :::java
+    Config config = new Config();
+
+    // These hardware identifiers will be automatically collected and sent
+    // unless you opt-out by setting them to false, as shown here:
+    config.collectWifiMac = false;
+    config.collectDeviceId = false;
+    config.collectAndroidId = false;
+
+    // These hardware identifiers are not collected automatically.
+    // If you wish to send them, you must opt-in by providing values, as shown here:
+    config.odin1 = "<ODIN-1 value goes here>";
+    config.openUdid = "<OpenUDID value goes here>";
+
+    Tapstream.create(getApplicationContext(), "TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", config);
+
+{% elif platform == 'ios' %}
+
+    :::objective-c
+    Config *config = [Config configWithDefaults];
+
+    // This hardware identifier will be automatically collected and sent
+    // unless you opt-out by setting it to NO, as shown here:
+    config.collectWifiMac = NO;
+
+    // These hardware identifiers are not collected automatically.
+    // If you wish to send them, you must opt-in by providing values, as shown here:
+    config.odin1 = @"<ODIN-1 value goes here>";
+    config.udid = @"<UDID value goes here>";
+    config.idfa = @"<IDFA value goes here>";
+    config.openUdid = @"<OpenUDID value goes here>";
+    config.secureUdid = @"<SecureUDID value goes here>";
+
+    [TSTapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY" config:config];
+
+{% elif platform == 'mac' %}
+
+    :::objective-c
+    Config *config = [Config configWithDefaults];
+
+    // This hardware identifier will be automatically collected and sent
+    // unless you opt-out by setting it to NO, as shown here:
+    config.collectWifiMac = NO;
+
+    // These hardware identifiers are not collected automatically.
+    // If you wish to send them, you must opt-in by providing values, as shown here:
+    config.odin1 = @"<ODIN-1 value goes here>";
+    config.serialNumber = @"<Serial number value goes here>";
+
+    [TSTapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY" config:config];
+
+{% elif platform == 'win8' %}
+
+    :::csharp
+    Config config = new Config();
+
+    // This hardware identifier will be automatically collected and sent
+    // unless you opt-out by setting it to false, as shown here:
+    config.CollectAppSpecificHardwareId = false;
+
+    // This hardware identifier will not be collected automatically.
+    // If you wish to send it, you must opt-in by providing a value, as shown here:
+    config.odin1 = "<ODIN-1 value goes here>";
+
+    Tapstream.Create("TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", config);
+
+{% elif platform == 'winphone' %}
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Review this once winphone decisions are made !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+The Tapstream SDK can send various hardware identifiers to the Tapstream server with each event.  To control which
+hardware identifiers are attached to events, you may modify the config object that you instantiated the SDK with.
+Here's an example:
+
+    :::csharp
+    Config config = new Config();
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!! FILL THIS IN !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    Tapstream.Create("TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", config);
+
+{% endif %}
 
 
 
@@ -139,31 +216,6 @@ This example fires an event called "activation" which might be an appropriate na
 
 The ***Tapstream SDK is threadsafe***, so you may fire events from any thread you wish.
 
-If you want to fire an event that will only happen once in the lifetime of the application, you may create a "one time only" event as follows:
-
-{% if platform == 'android' %}
-    :::java
-    Event *e = new Event("activation", true);
-    Tapstream.getInstance().fireEvent(e);
-
-{% elif platform == 'ios' or platform == 'mac' %}
-    :::objective-c
-    TSEvent *e = [TSEvent eventWithName:@"activation" oneTimeOnly:YES];
-    [[TSTapstream instance] fireEvent:e];
-
-{% elif platform == 'win8' or platform == 'winphone' %}
-    :::csharp
-    Event *e = new Event("activation", true);
-    Tapstream.Instance.FireEvent(e);
-
-{% endif %}
-
-One-time only events will reach the Tapstream server ***exactly once***, even if you fire them multiple times in your code.
-
-
-
-
-
 
 
 
@@ -176,11 +228,7 @@ In the following example, two events are fired.  Both contain key/value pairs, a
     :::java
     Tapstream tracker = Tapstream.getInstance();
 
-    Event *e = new Event("installed", true);
-    e.addPair("username", "test-user");
-    tracker.fireEvent(e);
-
-    e = new Event("level-complete", false);
+    Event *e = new Event("level-complete", false);
     e.addPair("score", 15000);
     e.addPair("skill", "easy");
     tracker.fireEvent(e);
@@ -189,11 +237,7 @@ In the following example, two events are fired.  Both contain key/value pairs, a
     :::objective-c
     TSTapstream *tracker = [TSTapstream instance];
 
-    TSEvent *e = [TSEvent eventWithName:@"installed" oneTimeOnly:YES];
-    [e addValue:@"test-user" forKey:@"username"];
-    [tracker fireEvent:e];
-
-    e = [TSEvent eventWithName:@"level-complete" oneTimeOnly:NO];
+    TSEvent *e = [TSEvent eventWithName:@"level-complete" oneTimeOnly:NO];
     [e addIntegerValue:15000 forKey:@"score"];
     [e addValue:@"easy" forKey:@"skill"];
     [tracker fireEvent:e];
@@ -202,11 +246,7 @@ In the following example, two events are fired.  Both contain key/value pairs, a
     :::csharp
     Tapstream tracker = Tapstream.Instance;
 
-    Event *e = new Event("installed", true);
-    e.AddPair("username", "test-user");
-    tracker.FireEvent(e);
-
-    e = new Event("level-complete", false);
+    Event *e = new Event("level-complete", false);
     e.AddPair("score", 15000);
     e.AddPair("skill", "easy")
     tracker.FireEvent(e);
@@ -260,65 +300,3 @@ Here's how you might redirect Tapstream messages to a custom logging system:
 
 
 
-
-
-
-
-## Firing hits
-
-Although hits are usually created in a browser, it is possible to fire hits from the Tapstream SDK.  Here's an example:
-
-{% if platform == 'android' %}
-    :::java
-    Hit h = new Hit("my-hit-tracker-name");
-    h.addTag("tag-1");
-    h.addTag("tag-2");
-    Tapstream.getInstance().fireHit(h, new Hit.CompletionHandler() {
-        @Override
-        public void complete(Response response) {
-            if(response.status >= 200 && response.status < 300) {
-                // Success
-            } else {
-                // Error
-            }
-        }
-    });
-
-{% elif platform == 'ios' or platform == 'mac' %}
-    :::objective-c
-    TSHit *h = [TSHit hitWithTrackerName:@"my-hit-tracker-name"];
-    [h addTag:@"tag-1"];
-    [h addTag:@"tag-2"];
-    [[TSTapstream instance] fireHit:h completion:^(TSResponse *response) {
-        if (response.status >= 200 && response.status < 300)
-        {
-            // Success
-        }
-        else
-        {
-            // Error
-        }
-    }];
-
-{% elif platform == 'win8' or platform == 'winphone' %}
-    :::csharp
-    Hit h = new Hit("my-hit-tracker-name");
-    h.AddTag("tag-1");
-    h.AddTag("tag-2");
-    Task.Run(async () =>
-    {
-        Response response = await Tapstream.Instance.FireHitAsync(h);
-        if (response.Status >= 200 && response.Status < 300)
-        {
-            // Success
-        }
-        else
-        {
-            // Error
-        }
-    });
-
-{% endif %}
-
-
-The hit completion handler is optional, and you may pass {% if platform == 'ios' or platform == 'mac' %}`nil`{% else %}`null`{% endif %} if you prefer.
