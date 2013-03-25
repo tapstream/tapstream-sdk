@@ -37,6 +37,7 @@
 * Open your project in Visual Studio.
 * Right click on your project in the Solution Explorer, and select "Add Reference...".
 * Click the "Browse" button and select TapstreamMetrics.dll from the location you extracted it to.
+* In your WMAppManifest.xml file, make sure that you have requested the ID_CAP_NETWORKING and ID_CAP_IDENTIFY_DEVICE capabilities.
 
 {% endif %}
 
@@ -111,14 +112,14 @@ that you instantiated the SDK with.  Here's an example:
 
     // These hardware identifiers will be automatically collected and sent
     // unless you opt-out by setting them to false, as shown here:
-    config.collectWifiMac = false;
-    config.collectDeviceId = false;
-    config.collectAndroidId = false;
+    config.setCollectWifiMac(false);
+    config.setCollectDeviceId(false);
+    config.setCollectAndroidId(false);
 
     // These hardware identifiers are not collected automatically.
     // If you wish to send them, you must opt-in by providing values, as shown here:
-    config.odin1 = "<ODIN-1 value goes here>";
-    config.openUdid = "<OpenUDID value goes here>";
+    config.setOdin1("<ODIN-1 value goes here>");
+    config.setOpenUdid("<OpenUDID value goes here>");
 
     Tapstream.create(getApplicationContext(), "TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", config);
 
@@ -168,13 +169,12 @@ that you instantiated the SDK with.  Here's an example:
 
     // This hardware identifier will not be collected automatically.
     // If you wish to send it, you must opt-in by providing a value, as shown here:
-    config.odin1 = "<ODIN-1 value goes here>";
+    config.Odin1 = "<ODIN-1 value goes here>";
 
     Tapstream.Create("TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", config);
 
 {% elif platform == 'winphone' %}
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Review this once winphone decisions are made !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 The Tapstream SDK can send various hardware identifiers to the Tapstream server with each event.  To control which
 hardware identifiers are attached to events, you may modify the config object that you instantiated the SDK with.
 Here's an example:
@@ -182,7 +182,13 @@ Here's an example:
     :::csharp
     Config config = new Config();
 
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!! FILL THIS IN !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // This hardware identifier will be automatically collected and sent
+    // unless you opt-out by setting it to false, as shown here:
+    config.CollectDeviceUniqueId = false;
+
+    // This hardware identifier will not be collected automatically.
+    // If you wish to send it, you must opt-in by providing a value, as shown here:
+    config.Odin1 = "<ODIN-1 value goes here>";
 
     Tapstream.Create("TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", config);
 
