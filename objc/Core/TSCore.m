@@ -18,6 +18,7 @@
 @property(nonatomic, STRONG_OR_RETAIN) id<TSDelegate> del;
 @property(nonatomic, STRONG_OR_RETAIN) id<TSPlatform> platform;
 @property(nonatomic, STRONG_OR_RETAIN) id<TSCoreListener> listener;
+@property(nonatomic, STRONG_OR_RETAIN) TSConfig *config;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *accountName;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableString *postData;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableSet *firingEvents;
@@ -33,20 +34,21 @@
 
 @implementation TSCore
 
-@synthesize del, platform, listener, accountName, postData, firingEvents, firedEvents, failingEventId;
+@synthesize del, platform, listener, config, accountName, postData, firingEvents, firedEvents, failingEventId;
 
 - (id)initWithDelegate:(id<TSDelegate>)delegateVal
 	platform:(id<TSPlatform>)platformVal
 	listener:(id<TSCoreListener>)listenerVal
 	accountName:(NSString *)accountNameVal
 	developerSecret:(NSString *)developerSecretVal
-	config:(TSConfig *)config
+	config:(TSConfig *)configVal
 {
 	if((self = [super init]) != nil)
 	{
 		self.del = delegateVal;
 		self.platform = platformVal;
 		self.listener = listenerVal;
+		self.config = configVal;
 		self.accountName = [self clean:accountNameVal];
 		self.postData = nil;
 		self.failingEventId = nil;

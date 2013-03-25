@@ -13,6 +13,7 @@
 	id<TSDelegate> del;
 	id<TSPlatform> platform;
 	id<TSCoreListener> listener;
+	TSConfig *config;
 	NSString *accountName;
 	NSMutableString *postData;
 	NSMutableSet *firingEvents;
