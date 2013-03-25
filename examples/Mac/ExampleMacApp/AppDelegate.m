@@ -14,33 +14,15 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     // Insert code here to initialize your application
-    
-    [TSTapstream createWithAccountName:@"sdktest" developerSecret:@"YGP2pezGTI6ec48uti4o1w"];
+    TSConfig *config = [TSConfig configWithDefaults];
+    [TSTapstream createWithAccountName:@"sdktest" developerSecret:@"YGP2pezGTI6ec48uti4o1w" config:config];
     
     TSTapstream *tracker = [TSTapstream instance];
-    
     
     TSEvent *e = [TSEvent eventWithName:@"test-event" oneTimeOnly:NO];
     [e addValue:@"John Doe" forKey:@"player"];
     [e addIntegerValue:5 forKey:@"score"];
     [tracker fireEvent:e];
-    
-    e = [TSEvent eventWithName:@"test-event-oto" oneTimeOnly:YES];
-    [tracker fireEvent:e];
-    
-    TSHit *h = [TSHit hitWithTrackerName:@"test-tracker"];
-    [h addTag:@"tag1"];
-    [h addTag:@"tag2"];
-    [tracker fireHit:h completion:^(TSResponse *response) {
-        if (response.status >= 200 && response.status < 300)
-        {
-            // Success
-        }
-        else
-        {
-            // Error
-        }
-    }];
 
 }
 
