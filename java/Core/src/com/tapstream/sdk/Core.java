@@ -11,7 +11,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 class Core {
-	public static final String VERSION = "2.1";
+	public static final String VERSION = "2.2";
 	private static final String EVENT_URL_TEMPLATE = "https://api.tapstream.com/%s/event/%s/";
 	private static final String HIT_URL_TEMPLATE = "http://api.tapstream.com/%s/hit/%s.gif";
 	private static final int MAX_THREADS = 1;
