@@ -13,6 +13,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.params.CoreProtocolPNames;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -135,6 +136,8 @@ class PlatformImpl implements Platform {
 		WorkerThread th = (WorkerThread) Thread.currentThread();
 
 		HttpPost post = new HttpPost(url);
+		post.getParams().setBooleanParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, false);
+
 		StringEntity se = null;
 		try {
 			se = new StringEntity(data);	
