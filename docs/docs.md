@@ -14,6 +14,8 @@
 * To verify that Eclipse has discovered the Tapstream SDK, expand your project's "Android Dependencies" category.  It should now contain a reference to Tapstream.jar.
 * Tapstream requires that your project request the "INTERNET" permission.  If your AndroidManifest.xml does not already contain it, add the following line as a child of the `<manifest>` element:
 
+&nbsp;
+
     :::java
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -56,8 +58,7 @@ In your project's main activity file, import the Tapstream SDK:
     :::java
     import com.tapstream.sdk.*;
 
-Then, in the `onCreate` method of your main activity, create the `Tapstream` singleton with the account name and
-developer secret that you've setup on the Tapstream website:
+Then, in the `onCreate` method of your main activity, create the `Tapstream` singleton with the account name and developer secret that you've setup on the Tapstream website:
 
     :::java
     Config config = new Config();
@@ -70,8 +71,7 @@ In your project's AppDelegate.m file, import the Tapstream SDK:
     :::objective-c
     #import "TSTapstream.h"
 
-Then, in the {% if platform == 'ios' %}`-application:didFinishLaunchingWithOptions:`{% else %}`-applicationDidFinishLaunching:`{% endif %} method of the AppDelegate,
-create the `TSTapstream` singleton with the account name and developer secret that you've setup on the Tapstream website:
+Then, in the {% if platform == 'ios' %}`-application:didFinishLaunchingWithOptions:`{% else %}`-applicationDidFinishLaunching:`{% endif %} method of the AppDelegate, create the `TSTapstream` singleton with the account name and developer secret that you've setup on the Tapstream website:
 
     :::objective-c
     Config *config = [Config configWithDefaults];
@@ -100,9 +100,13 @@ developer secret that you've setup on the Tapstream website:
 
 {% if platform != 'winphone' %}
 The Tapstream SDK can send various hardware identifiers to the Tapstream server with each event.  Some of these hardware identifiers are
-collected automatically and you must opt-out if you do not wish to collect them.  Others are opt-in, and must be collected by you and
-provided explicitly to the SDK.  To control which hardware identifiers are attached to events, you may modify the config object
-that you instantiated the SDK with.  Here's an example:
+collected automatically, and you must opt-out if you do not wish to collect them.  Others are opt-in, and must be collected by you and
+provided explicitly to the SDK.
+
+To control which hardware identifiers are attached to events, you may modify the config object
+that you instantiated the SDK with.
+
+Here's an example:
 {% endif %}
 
 {% if platform == 'android' %}
@@ -111,7 +115,8 @@ that you instantiated the SDK with.  Here's an example:
     Config config = new Config();
 
     // These hardware identifiers will be automatically collected and sent
-    // unless you opt-out by setting them to false, as shown here:
+    // unless you opt-out by setting them to false, as shown below.
+
     config.setCollectWifiMac(false);
     config.setCollectDeviceId(false);
     config.setCollectAndroidId(false);
@@ -122,6 +127,10 @@ that you instantiated the SDK with.  Here's an example:
     config.setOpenUdid("<OpenUDID value goes here>");
 
     Tapstream.create(getApplicationContext(), "TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", config);
+
+To generate the device's ODIN-1 identifier, please see the [ODIN-1 documentation](https://code.google.com/p/odinmobile/wiki/ODIN1).
+
+To get the device's OpenUDID identifier, please see the [OpenUDID source code](https://github.com/ylechelle/OpenUDID).
 
 {% elif platform == 'ios' %}
 
@@ -142,6 +151,14 @@ that you instantiated the SDK with.  Here's an example:
 
     [TSTapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY" config:config];
 
+**We strongly recommend that you collect and provide the IDFA value to the Tapstream SDK.** Please see [Apple's documentation on collecting the IDFA](http://developer.apple.com/library/ios/#documentation/AdSupport/Reference/ASIdentifierManager_Ref/ASIdentifierManager.html).
+
+To generate the device's ODIN-1 identifier, please see the [ODIN-1 documentation](https://code.google.com/p/odinmobile/wiki/ODIN1).
+
+To get the device's OpenUDID identifier, please see the [OpenUDID source code](https://github.com/ylechelle/OpenUDID).
+
+To get the device's SecureUDID identifier, please see the [Official SecureUDID page](http://www.secureudid.org/).
+
 {% elif platform == 'mac' %}
 
     :::objective-c
@@ -158,6 +175,8 @@ that you instantiated the SDK with.  Here's an example:
 
     [TSTapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY" config:config];
 
+To generate the device's ODIN-1 identifier, please see the [ODIN-1 documentation](https://code.google.com/p/odinmobile/wiki/ODIN1).
+
 {% elif platform == 'win8' %}
 
     :::csharp
@@ -173,10 +192,15 @@ that you instantiated the SDK with.  Here's an example:
 
     Tapstream.Create("TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", config);
 
+To generate the device's ODIN-1 identifier, please see the [ODIN-1 documentation](https://code.google.com/p/odinmobile/wiki/ODIN1).
+
 {% elif platform == 'winphone' %}
 
-The Tapstream SDK can send various hardware identifiers to the Tapstream server with each event.  To control which
-hardware identifiers are attached to events, you may modify the config object that you instantiated the SDK with.
+The Tapstream SDK can send various hardware identifiers to the Tapstream server with each event.
+
+To control which hardware identifiers are attached to events, you may modify the config object that you instantiated
+the SDK with.
+
 Here's an example:
 
     :::csharp
@@ -192,33 +216,46 @@ Here's an example:
 
     Tapstream.Create("TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", config);
 
+To generate the device's ODIN-1 identifier, please see the [ODIN-1 documentation](https://code.google.com/p/odinmobile/wiki/ODIN1).
+
 {% endif %}
 
 
 
 
-## Firing events
+## Firing SDK events
 
-Now that the SDK is initialized, you may fire events from anywhere in your code.  Firing an event is simple and can be done like this:
+The SDK will fire two types of events automatically:
+
+* An install event, the first time the app runs
+* An open event, every time the app runs.
+
+The install event is called `[platform]-[appname]-install`, and the open event is called `[platform]-[appname]-open`, where `[platform]` is the device's platform (iOS, Android, etc.) and `[appname]` is your app's shortname.
+
+### Additional SDK events
+
+Now that the SDK is initialized, you may fire events from anywhere in your code.  This is useful for tracking engagement events, in-app purchases, and other LTV metrics.
+
+Firing an event is simple and can be done like this:
 
 {% if platform == 'android' %}
     :::java
-    Event *e = new Event("activation", false);
+    Event *e = new Event("purchase", false);
     Tapstream.getInstance().fireEvent(e);
 
 {% elif platform == 'ios' or platform == 'mac' %}
     :::objective-c
-    TSEvent *e = [TSEvent eventWithName:@"activation" oneTimeOnly:NO];
+    TSEvent *e = [TSEvent eventWithName:@"purchase" oneTimeOnly:NO];
     [[TSTapstream instance] fireEvent:e];
 
 {% elif platform == 'win8' or platform == 'winphone' %}
     :::csharp
-    Event *e = new Event("activation", false);
+    Event *e = new Event("purchase", false);
     Tapstream.Instance.FireEvent(e);
 
 {% endif %}
 
-This example fires an event called "activation" which might be an appropriate name for a first activation event, but you may call your events anything you like. Event names are case insensitive.
+This example fires an event called `purchase`, which might be an appropriate name for an in-app purchase event, but you may call your events anything you like. Event names are case insensitive.
 
 The ***Tapstream SDK is threadsafe***, so you may fire events from any thread you wish.
 
@@ -228,7 +265,8 @@ The ***Tapstream SDK is threadsafe***, so you may fire events from any thread yo
 ## Firing events with custom parameters
 
 Tapstream also allows you to attach key/value pairs to your events.  The keys and values must be no more than 255 characters each (once in string form).
-In the following example, two events are fired.  Both contain key/value pairs, and one is "one time only" while the other is not:
+
+In the following example, an event called `level-complete` with custom parameters for `score` and `skill` is fired.
 
 {% if platform == 'android' %}
     :::java
@@ -269,6 +307,7 @@ In the following example, two events are fired.  Both contain key/value pairs, a
 ## Controlling logging
 
 The log output of Tapstream can be redirected (or quelled) by providing a handler to receive the messages.
+
 Here's how you might redirect Tapstream messages to a custom logging system:
 
 {% if platform == 'android' %}
