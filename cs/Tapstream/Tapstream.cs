@@ -12,12 +12,7 @@ namespace TapstreamMetrics.Sdk
     {
         private static Tapstream instance;
         private static object instanceLock = new Object();
-        
-        public static void Create(string accountName, string developerSecret)
-        {
-            Create(accountName, developerSecret, null);
-        }
-        
+
         public static void Create(string accountName, string developerSecret, Config config)
         {
             lock (instanceLock)
