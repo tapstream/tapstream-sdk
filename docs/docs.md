@@ -74,7 +74,7 @@ In your project's AppDelegate.m file, import the Tapstream SDK:
 Then, in the {% if platform == 'ios' %}`-application:didFinishLaunchingWithOptions:`{% else %}`-applicationDidFinishLaunching:`{% endif %} method of the AppDelegate, create the `TSTapstream` singleton with the account name and developer secret that you've setup on the Tapstream website:
 
     :::objective-c
-    Config *config = [Config configWithDefaults];
+    TSConfig *config = [TSConfig configWithDefaults];
     [TSTapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY" config:config];
 
 {% elif platform == 'win8' or platform == 'winphone' %}
