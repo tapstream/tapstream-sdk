@@ -88,24 +88,30 @@
 		appName = @"";
 	}
 
-	if(config.installEventName != nil)
+	if(config.fireAutomaticInstallEvent)
 	{
-		[self fireEvent:[TSEvent eventWithName:config.installEventName oneTimeOnly:YES]];
-	}
-	else
-	{
-		NSString *eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, appName];
-		[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:YES]];
+		if(config.installEventName != nil)
+		{
+			[self fireEvent:[TSEvent eventWithName:config.installEventName oneTimeOnly:YES]];
+		}
+		else
+		{
+			NSString *eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, appName];
+			[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:YES]];
+		}
 	}
 
-	if(config.openEventName != nil)
+	if(config.fireAutomaticOpenEvent)
 	{
-		[self fireEvent:[TSEvent eventWithName:config.openEventName oneTimeOnly:NO]];
-	}
-	else
-	{
-		NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, appName];
-		[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
+		if(config.openEventName != nil)
+		{
+			[self fireEvent:[TSEvent eventWithName:config.openEventName oneTimeOnly:NO]];
+		}
+		else
+		{
+			NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, appName];
+			[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
+		}
 	}
 }
 

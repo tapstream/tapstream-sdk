@@ -19,6 +19,9 @@
 @synthesize installEventName = installEventName;
 @synthesize openEventName = openEventName;
 
+@synthesize fireAutomaticInstallEvent = fireAutomaticInstallEvent;
+@synthesize fireAutomaticOpenEvent = fireAutomaticOpenEvent;
+
 
 + (id)configWithDefaults
 {
@@ -30,6 +33,8 @@
 	if((self = [super init]) != nil)
 	{
 		collectWifiMac = YES;
+		fireAutomaticInstallEvent = YES;
+		fireAutomaticOpenEvent = YES;
 	}
 	return self;
 }

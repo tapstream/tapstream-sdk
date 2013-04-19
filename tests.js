@@ -68,8 +68,12 @@ function expect(q) {
 	}
 }
 
+function consumeEvent(q, event_name) {
+	var arg = callMethod(q, 'expectEventually', 'job-ended');
+	util.assertEqual(arg, event_name);
+}
 
-function consumeEvents(q, name1, name2) {
+function consumeEventsUnordered(q, name1, name2) {
 	var arg = callMethod(q, 'expectEventually', 'job-ended');
 	if(arg == name1) {
 		arg = callMethod(q, 'expectEventually', 'job-ended');
@@ -83,7 +87,7 @@ function consumeEvents(q, name1, name2) {
 }
 
 function consumeAutomaticEvents(q) {
-	consumeEvents(q, platform+'-testapp-install', platform+'-testapp-open');
+	consumeEventsUnordered(q, platform+'-testapp-install', platform+'-testapp-open');
 }
 
 
@@ -336,13 +340,29 @@ test('automatic-events', function() {
 	var fired_events = util.getSavedFiredList(ts);
 	util.assertTrue(indexOf(fired_events, platform+'-testapp-install') != -1);
 });
+test('automatic-events-suppress-install', function() {
+	var q = util.newOperationQueue(),
+		conf = util.newConfig();
+	callSetter(conf, 'fireAutomaticInstallEvent', false);
+	var ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
+	consumeEvent(q, platform+'-testapp-open');
+});
+test('automatic-events-suppress-open', function() {
+	var q = util.newOperationQueue(),
+		conf = util.newConfig();
+	callSetter(conf, 'fireAutomaticOpenEvent', false);
+	var ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
+	consumeEvent(q, platform+'-testapp-install');
+	var fired_events = util.getSavedFiredList(ts);
+	util.assertTrue(indexOf(fired_events, platform+'-testapp-install') != -1);
+});
 test('automatic-events-custom-names', function() {
 	var q = util.newOperationQueue(),
 		conf = util.newConfig();
 	callSetter(conf, 'installEventName', 'my-install-event');
 	callSetter(conf, 'openEventName', 'my-open-event');
 	var ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
-	consumeEvents(q, 'my-install-event', 'my-open-event');
+	consumeEventsUnordered(q, 'my-install-event', 'my-open-event');
 	var fired_events = util.getSavedFiredList(ts);
 	util.assertTrue(indexOf(fired_events, 'my-install-event') != -1);
 });

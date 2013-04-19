@@ -50,18 +50,22 @@ class Core {
 			appName = "";
 		}
 
-		String installEventName = config.getInstallEventName();
-		if(installEventName != null) {
-			fireEvent(new Event(installEventName, true));
-		} else {
-			fireEvent(new Event(String.format(Locale.US, "android-%s-install", appName), true));	
+		if(config.getFireAutomaticInstallEvent()) {
+			String installEventName = config.getInstallEventName();
+			if(installEventName != null) {
+				fireEvent(new Event(installEventName, true));
+			} else {
+				fireEvent(new Event(String.format(Locale.US, "android-%s-install", appName), true));	
+			}
 		}
 
-		String openEventName = config.getOpenEventName();
-		if(openEventName != null) {
-			fireEvent(new Event(openEventName, false));
-		} else {
-			fireEvent(new Event(String.format(Locale.US, "android-%s-open", appName), false));	
+		if(config.getFireAutomaticOpenEvent()) {
+			String openEventName = config.getOpenEventName();
+			if(openEventName != null) {
+				fireEvent(new Event(openEventName, false));
+			} else {
+				fireEvent(new Event(String.format(Locale.US, "android-%s-open", appName), false));	
+			}
 		}
 	}
 
