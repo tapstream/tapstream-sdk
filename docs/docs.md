@@ -259,7 +259,7 @@ This example fires an event called `purchase`, which might be an appropriate nam
 
 The ***Tapstream SDK is threadsafe***, so you may fire events from any thread you wish.
 
-## Firing events with custom parameters
+### Firing events with custom parameters
 
 Tapstream also allows you to attach key/value pairs to your events.  The keys and values must be no more than 255 characters each (once in string form).
 
@@ -296,21 +296,40 @@ In the following example, an event called `level-complete` with custom parameter
 
 ### Changing the default events
 
-These automatic events can be renamed or suppressed entirely by modifying the config object that you instantiated the SDK with.  For example, if you wanted to rename the install event and suppress the open event, you would set the config object like this:
+These automatic events can be renamed or suppressed entirely by modifying the config object that you instantiated the SDK with.  For example, if you wanted to rename the install and open events, you would set the config object like this:
 
 {% if platform == 'android' %}
     :::java
     config.setInstallEventName("my-install-event");
-    config.setFireAutomaticOpenEvent(false);
+    config.setOpenEventName("my-open-event");
 
 {% elif platform == 'ios' or platform == 'mac' %}
     :::objective-c
     config.installEventName = @"my-install-event";
-    config.fireAutomaticOpenEvent = NO;
+    config.openEventName = @"my-open-event";
 
 {% elif platform == 'win8' or platform == 'winphone' %}
     :::csharp
     config.InstallEventName = "my-install-event";
+    config.OpenEventName = "my-open-event";
+
+{% endif %}
+
+If you wanted to suppress the automatic install and open events, you would set the config object like this:
+
+{% if platform == 'android' %}
+    :::java
+    config.setFireAutomaticInstallEvent(false);
+    config.setFireAutomaticOpenEvent(false);
+
+{% elif platform == 'ios' or platform == 'mac' %}
+    :::objective-c
+    config.fireAutomaticInstallEvent = NO;
+    config.fireAutomaticOpenEvent = NO;
+
+{% elif platform == 'win8' or platform == 'winphone' %}
+    :::csharp
+    config.FireAutomaticInstallEvent = false;
     config.FireAutomaticOpenEvent = false;
 
 {% endif %}
