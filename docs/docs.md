@@ -232,26 +232,6 @@ The SDK will fire two types of events automatically:
 
 The install event is called `[platform]-[appname]-install`, and the open event is called `[platform]-[appname]-open`, where `[platform]` is the device's platform (iOS, Android, etc.) and `[appname]` is your app's shortname.
 
-These automatic events can be renamed or suppressed entirely by modifying the config object that you instantiated the sdk with.  For example, if you wanted to rename the install event and suppress the open event you would set the config object like this:
-
-{% if platform == 'android' %}
-    :::java
-    config.setInstallEventName("my-install-event");
-    config.setFireAutomaticOpenEvent(false);
-
-{% elif platform == 'ios' or platform == 'mac' %}
-    :::objective-c
-    config.installEventName = @"my-install-event";
-    config.fireAutomaticOpenEvent = NO;
-
-{% elif platform == 'win8' or platform == 'winphone' %}
-    :::csharp
-    config.InstallEventName = "my-install-event";
-    config.FireAutomaticOpenEvent = false;
-
-{% endif %}
-
-
 ### Additional SDK events
 
 Now that the SDK is initialized, you may fire events from anywhere in your code.  This is useful for tracking engagement events, in-app purchases, and other LTV metrics.
@@ -278,9 +258,6 @@ Firing an event is simple and can be done like this:
 This example fires an event called `purchase`, which might be an appropriate name for an in-app purchase event, but you may call your events anything you like. Event names are case insensitive.
 
 The ***Tapstream SDK is threadsafe***, so you may fire events from any thread you wish.
-
-
-
 
 ## Firing events with custom parameters
 
@@ -317,12 +294,26 @@ In the following example, an event called `level-complete` with custom parameter
 
 {% endif %}
 
+### Changing the default events
 
+These automatic events can be renamed or suppressed entirely by modifying the config object that you instantiated the SDK with.  For example, if you wanted to rename the install event and suppress the open event, you would set the config object like this:
 
+{% if platform == 'android' %}
+    :::java
+    config.setInstallEventName("my-install-event");
+    config.setFireAutomaticOpenEvent(false);
 
+{% elif platform == 'ios' or platform == 'mac' %}
+    :::objective-c
+    config.installEventName = @"my-install-event";
+    config.fireAutomaticOpenEvent = NO;
 
+{% elif platform == 'win8' or platform == 'winphone' %}
+    :::csharp
+    config.InstallEventName = "my-install-event";
+    config.FireAutomaticOpenEvent = false;
 
-
+{% endif %}
 
 ## Controlling logging
 
