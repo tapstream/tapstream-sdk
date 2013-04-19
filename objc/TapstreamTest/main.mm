@@ -144,6 +144,14 @@ static Handle<Value> Config_accessor(Local<String> name, const AccessorInfo &inf
 	{
 		return String::New([conf.openEventName UTF8String]);
 	}
+	else if(strcmp(*s, "fireAutomaticInstallEvent") == 0)
+	{
+		return v8::Boolean::New(conf.fireAutomaticInstallEvent);
+	}
+	else if(strcmp(*s, "fireAutomaticOpenEvent") == 0)
+	{
+		return v8::Boolean::New(conf.fireAutomaticOpenEvent);
+	}
 	return Null();
 }
 static void Config_mutator(Local<String> name, Local<Value> value, const AccessorInfo &info)
@@ -231,6 +239,20 @@ static void Config_mutator(Local<String> name, Local<Value> value, const Accesso
 		{
 			String::Utf8Value v(value);
 			conf.openEventName = [NSString stringWithUTF8String:*v];
+		}
+	}
+	else if(strcmp(*s, "fireAutomaticInstallEvent") == 0)
+	{
+		if(value->IsBoolean())
+		{
+			conf.fireAutomaticInstallEvent = value->BooleanValue();
+		}
+	}
+	else if(strcmp(*s, "fireAutomaticOpenEvent") == 0)
+	{
+		if(value->IsBoolean())
+		{
+			conf.fireAutomaticOpenEvent = value->BooleanValue();
 		}
 	}
 }
@@ -592,6 +614,8 @@ Handle<Value> Util_newConfig(const Arguments &args)
 	templ->SetAccessor(String::New("collectWifiMac"), Config_accessor, Config_mutator);
 	templ->SetAccessor(String::New("installEventName"), Config_accessor, Config_mutator);
 	templ->SetAccessor(String::New("openEventName"), Config_accessor, Config_mutator);
+	templ->SetAccessor(String::New("fireAutomaticInstallEvent"), Config_accessor, Config_mutator);
+	templ->SetAccessor(String::New("fireAutomaticOpenEvent"), Config_accessor, Config_mutator);
 	
 	
 	Persistent<Object> obj = Persistent<Object>::New(templ->NewInstance());

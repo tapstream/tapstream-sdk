@@ -46,7 +46,7 @@
 @property(nonatomic, retain) NSString *openEventName;
 
 @property(nonatomic, assign) BOOL fireAutomaticInstallEvent;
-@property(nonatomic, assign) BOOL fireAutomaticOpenEven;
+@property(nonatomic, assign) BOOL fireAutomaticOpenEvent;
 
 - (id)init;
 + (id)configWithDefaults;
