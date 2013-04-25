@@ -240,7 +240,7 @@ Firing an event is simple and can be done like this:
 
 {% if platform == 'android' %}
     :::java
-    Event *e = new Event("purchase", false);
+    Event e = new Event("purchase", false);
     Tapstream.getInstance().fireEvent(e);
 
 {% elif platform == 'ios' or platform == 'mac' %}
@@ -250,7 +250,7 @@ Firing an event is simple and can be done like this:
 
 {% elif platform == 'win8' or platform == 'winphone' %}
     :::csharp
-    Event *e = new Event("purchase", false);
+    Event e = new Event("purchase", false);
     Tapstream.Instance.FireEvent(e);
 
 {% endif %}
@@ -269,7 +269,7 @@ In the following example, an event called `level-complete` with custom parameter
     :::java
     Tapstream tracker = Tapstream.getInstance();
 
-    Event *e = new Event("level-complete", false);
+    Event e = new Event("level-complete", false);
     e.addPair("score", 15000);
     e.addPair("skill", "easy");
     tracker.fireEvent(e);
@@ -287,7 +287,7 @@ In the following example, an event called `level-complete` with custom parameter
     :::csharp
     Tapstream tracker = Tapstream.Instance;
 
-    Event *e = new Event("level-complete", false);
+    Event e = new Event("level-complete", false);
     e.AddPair("score", 15000);
     e.AddPair("skill", "easy")
     tracker.FireEvent(e);
