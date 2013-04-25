@@ -17,7 +17,9 @@ import org.apache.http.params.CoreProtocolPNames;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiInfo;
 import android.os.Build;
@@ -124,8 +126,15 @@ class PlatformImpl implements Platform {
 	}
 
 	public String getAppName() {
-		Resources resources = context.getResources();
-		return resources.getString(resources.getIdentifier("app_name", "string", context.getPackageName()));
+		PackageManager pm = context.getPackageManager();
+		String appName;
+		try {
+			ApplicationInfo ai = pm.getApplicationInfo(context.getPackageName(), 0);
+			appName = pm.getApplicationLabel(ai).toString();
+		} catch (NameNotFoundException e) {
+			appName = context.getPackageName();
+		}
+		return appName;
 	}
 
 	public String getPackageName() {
