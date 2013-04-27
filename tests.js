@@ -474,6 +474,20 @@ test('respects-fired-list-for-oto-events', function() {
 	callMethod(ts, 'fireEvent', e);
 	expect(q, 'event-ignored-already-fired', 'job-ended');
 });
+test('respects-firing-list-for-oto-events', function() {
+	var q = util.newOperationQueue(),
+		conf = util.newConfig(),
+		ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
+		e = util.newEvent('test', true);
+	consumeAutomaticEvents(q);
+	util.setResponseStatus(ts, 500);
+	util.setDelay(ts, 1);
+	callMethod(ts, 'fireEvent', e);
+	e = util.newEvent('test', true);
+	callMethod(ts, 'fireEvent', e);
+	expect(q, 'event-ignored-already-in-progress', 'job-ended');
+	expect(q, 'increased-delay', 'event-failed', 'retry', 'job-ended');
+});
 test('doesnt-respect-fired-list-for-non-oto-events', function() {
 	var q = util.newOperationQueue(),
 		conf = util.newConfig(),

@@ -58,6 +58,10 @@ namespace TapstreamMetrics.Sdk
                 return ts.core.GetDelay();
             }
 
+            public void SetDelay(int delay)
+            {
+            }
+
             public bool IsRetryAllowed()
             {
                 return true;

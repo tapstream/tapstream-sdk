@@ -31,6 +31,9 @@ public class Tapstream implements Api {
 			return core.getDelay();
 		}
 
+		public void setDelay(int delay) {
+		}
+
 		public boolean isRetryAllowed() {
 			return true;
 		}

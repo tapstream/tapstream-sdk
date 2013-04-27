@@ -8,6 +8,7 @@ namespace TapstreamMetrics.Sdk
     interface Delegate
     {
         int GetDelay();
+        void SetDelay(int delay);
         bool IsRetryAllowed();
     }
 }

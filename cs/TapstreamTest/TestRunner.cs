@@ -48,6 +48,11 @@ namespace TapstreamMetrics.Sdk
             return ts.GetPostData();
         }
 
+        public void setDelay(Tapstream ts, double delay)
+        {
+            ts.SetDelay((int)delay);
+        }
+
         public double getDelay(Tapstream ts)
         {
             return ts.GetDelay();

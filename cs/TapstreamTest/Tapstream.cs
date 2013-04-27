@@ -12,9 +12,16 @@ namespace TapstreamMetrics.Sdk
     {
         private class DelegateImpl : Delegate
         {
+            private int delay = 0;
+
             public int GetDelay()
             {
-                return 0;
+                return delay;
+            }
+
+            public void SetDelay(int delay)
+            {
+                this.delay = delay;
             }
 
             public bool IsRetryAllowed()
@@ -45,6 +52,11 @@ namespace TapstreamMetrics.Sdk
         public IAsyncOperation<Response> FireHitAsync(Hit h)
         {
             return core.FireHitAsync(h);
+        }
+
+        public void SetDelay(int delay)
+        {
+            del.SetDelay(delay);
         }
 
         public void SetResponseStatus(int status)

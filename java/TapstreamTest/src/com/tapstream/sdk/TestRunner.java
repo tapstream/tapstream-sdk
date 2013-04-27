@@ -50,6 +50,10 @@ public class TestRunner {
 			return ts.core.getDelay();
 		}
 
+		public void setDelay(Tapstream ts, int delay) {
+			ts.setDelay(delay);
+		}
+
 		public Scriptable getSavedFiredList(Tapstream ts) {
 			Set<String> set = ((PlatformImpl) ts.platform).savedFiredList;
 			if (set == null) {
