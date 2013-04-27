@@ -24,6 +24,7 @@
 - (void)setResponseStatus:(int)status;
 - (NSArray *)getSavedFiredList;
 - (int)getDelay;
+- (void)setDelay:(int)delay;
 - (NSString *)getPostData;
 
 @end

@@ -9,6 +9,7 @@
 @property(nonatomic, STRONG_OR_RETAIN) TSTapstream *ts;
 - (id)initWithTapstream:(TSTapstream *)ts;
 - (int)getDelay;
+- (void)setDelay:(int)delay;
 - (bool)isRetryAllowed;
 @end
 // DelegateImpl comes at the end of the file so it can access a private property of the Tapstream interface
@@ -123,6 +124,10 @@ static TSTapstream *instance = nil;
 - (int)getDelay
 {
 	return [ts.core getDelay];
+}
+
+- (void)setDelay:(int)delay
+{
 }
 
 - (bool)isRetryAllowed

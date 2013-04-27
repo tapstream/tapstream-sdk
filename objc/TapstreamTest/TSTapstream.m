@@ -3,7 +3,11 @@
 #import "TSPlatformImpl.h"
 #import "TSCoreListenerImpl.h"
 
-@interface TSDelegateImpl : NSObject<TSDelegate> {}
+@interface TSDelegateImpl : NSObject<TSDelegate>
+{
+@private
+	int delay;
+}
 - (int)getDelay;
 - (bool)isRetryAllowed;
 @end
@@ -11,7 +15,12 @@
 @implementation TSDelegateImpl
 - (int)getDelay
 {
-	return 0;
+	return delay;
+}
+
+- (void)setDelay:(int)delayVal
+{
+	delay = delayVal;
 }
 
 - (bool)isRetryAllowed
@@ -88,6 +97,11 @@
 - (int)getDelay
 {
 	return [core getDelay];
+}
+
+- (void)setDelay:(int)delay
+{
+	[del setDelay:delay];
 }
 
 - (NSString *)getPostData

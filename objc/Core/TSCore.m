@@ -131,7 +131,7 @@
 				[listener reportOperation:@"job-ended" arg:e.name];
 				return;
 			}
-			else if([firedEvents containsObject:e.name])
+			else if([firingEvents containsObject:e.name])
 			{
 				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that is already in progress", e.name];
 				[listener reportOperation:@"event-ignored-already-in-progress" arg:e.name];
