@@ -64,7 +64,7 @@ static TSTapstream *instance = nil;
 {
 	if((self = [super init]) != nil)
 	{
-		del = [[TSDelegateImpl alloc] init];
+		del = [[TSDelegateImpl alloc] initWithTapstream:self];
 		platform = [[TSPlatformImpl alloc] init];
 		listener = [[TSCoreListenerImpl alloc] init];
 		core = [[TSCore alloc] initWithDelegate:del
