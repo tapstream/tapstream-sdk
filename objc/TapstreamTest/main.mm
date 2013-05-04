@@ -533,6 +533,23 @@ Handle<Value> Util_getDelay(const Arguments &args)
 	return scope.Close(delay);
 }
 
+Handle<Value> Util_setDelay(const Arguments &args)
+{
+	Locker locker;
+	HandleScope scope;
+
+	if(args.Length() < 2) return ThrowException(String::New("Expected 2 arguments"));
+
+	if(!args[0]->IsObject()) return ThrowException(String::New("Arg 0 must be an object"));
+	TSTapstream *ts = (BRIDGE TSTapstream *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
+	
+	if(!args[1]->IsInt32()) return ThrowException(String::New("Arg 1 must be an integer"));
+	int delay = args[1]->ToInt32()->Value();
+	[ts setDelay:delay];
+
+	return Undefined();
+}
+
 Handle<Value> Util_getSavedFiredList(const Arguments &args)
 {
 	Locker locker;
@@ -785,6 +802,7 @@ int main(int argc, char *argv[])
 		templ->Set(String::New("log"), FunctionTemplate::New(InvocationCallback(Util_log))->GetFunction(), ReadOnly);
 		templ->Set(String::New("getPostData"), FunctionTemplate::New(InvocationCallback(Util_getPostData))->GetFunction(), ReadOnly);
 		templ->Set(String::New("getDelay"), FunctionTemplate::New(InvocationCallback(Util_getDelay))->GetFunction(), ReadOnly);
+		templ->Set(String::New("setDelay"), FunctionTemplate::New(InvocationCallback(Util_setDelay))->GetFunction(), ReadOnly);
 		templ->Set(String::New("getSavedFiredList"), FunctionTemplate::New(InvocationCallback(Util_getSavedFiredList))->GetFunction(), ReadOnly);
 		templ->Set(String::New("setResponseStatus"), FunctionTemplate::New(InvocationCallback(Util_setResponseStatus))->GetFunction(), ReadOnly);
 		templ->Set(String::New("newOperationQueue"), FunctionTemplate::New(InvocationCallback(Util_newOperationQueue))->GetFunction(), ReadOnly);
