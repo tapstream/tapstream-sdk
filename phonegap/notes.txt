@@ -1,0 +1,19 @@
+Android:
+
+- Add the following to your config.xml:
+<plugin name="Tapstream" value="com.tapstream.phonegap.TapstreamPlugin"/>
+
+- In your html file, before importing the javascript for your various pages, import the tapstream javascript file. Eg:
+<script type="text/javascript" src="js/tapstream.js"></script>
+This will attach a tapstream object to the window object.
+
+- Initialize the Tapstream sdk from your code like this:
+window.tapstream.create('sdktest', 'YGP2pezGTI6ec48uti4o1w', {});
+
+- To fire an event, do something like this:
+window.tapstream.fireEvent('test-event', false, {
+    'testval': 3,
+});
+
+- To fire a one-time-only event:
+window.tapstream.fireEvent('install', true, {});
