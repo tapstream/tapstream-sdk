@@ -1,7 +1,26 @@
-Android:
+For Android:
 
-- Add the following to your config.xml:
+- Add the following to your plugin list in config.xml:
 <plugin name="Tapstream" value="com.tapstream.phonegap.TapstreamPlugin"/>
+
+- Add Tapstream.jar to your libs folder (Tapstream.jar is the full Tapstream android sdk)
+
+
+
+For iOS:
+
+- Add the following to your plugin list in config.xml:
+<plugin name="Tapstream" value="TSTapstreamPlugin" />
+
+- Drag and drop TSTapstreamPlugin.h and TSTapstreamPlugin.m into your project's Plugins folder
+- Drag and drop the Tapstream folder (containing all source for the Tapstream SDK) into your project.
+
+
+
+For all:
+
+- Add a domain whitelist entry to your config.xml:
+<access origin="https://api.tapstream.com" />
 
 - In your html file, before importing the javascript for your various pages, import the tapstream javascript file. Eg:
 <script type="text/javascript" src="js/tapstream.js"></script>
