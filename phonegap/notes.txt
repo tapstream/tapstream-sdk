@@ -5,6 +5,10 @@ For Android:
 
 - Add Tapstream.jar to your libs folder (Tapstream.jar is the full Tapstream android sdk)
 
+- In your AndroidManifest.xml, add the internet permission:
+<uses-permission android:name="android.permission.INTERNET" />
+
+
 
 
 For iOS:

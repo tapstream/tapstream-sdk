@@ -27,24 +27,28 @@ public class TapstreamPlugin extends CordovaPlugin {
         return false;
     }
 
+    private Method lookupMethod(String propertyName, Class argType) {
+        String methodName = propertyName;
+        if(methodName.length() > 0) {
+            methodName = Character.toUpperCase(methodName.charAt(0)) + methodName.substring(1);
+        }
+        methodName = "set" + methodName;
+        
+        Method method = null;
+        try {
+            method = Config.class.getMethod(methodName, argType);
+        } catch (NoSuchMethodException e) {
+            Log.e(getClass().getSimpleName(), "Config object has no field named: " + propertyName);
+        } catch(Exception e) {
+            Log.e(getClass().getSimpleName(), "Error getting Config setter method: " + e.getMessage());
+        }
+        return method;
+    }
+
     private void create(String accountName, String developerSecret, JSONObject configVals) throws JSONException {
         Config config = new Config();
 
         if(configVals != null) {
-
-            Method[] methods = null;
-            try {
-                methods = Config.class.getDeclaredMethods();
-            } catch(Exception e) {
-                Log.e(getClass().getSimpleName(), "Error getting declared methods of Config class. " + e.getMessage());
-                return;
-            }
-
-            if(methods == null) {
-                Log.e(getClass().getSimpleName(), "Failed to get declared methods of Config class.");
-                return;
-            }
-            
             Iterator<?> iter = configVals.keys();
             while(iter.hasNext()) {
                 String key = (String)iter.next();
@@ -55,24 +59,27 @@ public class TapstreamPlugin extends CordovaPlugin {
                     continue;
                 }
 
-                String methodName = ("set"+key).toLowerCase(Locale.US);
-                Method method = null;
-                for(Method m : methods) {
-                    if(m.getName().toLowerCase(Locale.US).equals(methodName)) {
-                        method = m;
-                        break;
-                    }
-                }
-                if(method == null) {
-                    Log.e(getClass().getSimpleName(), "Config object has no field named: " + (String)value);
-                    continue;
-                }
-
                 try {
                     if(value instanceof String) {
-                        method.invoke(config, (String)value);
+                        Method method = lookupMethod(key, String.class);
+                        if(method != null) {
+                            method.invoke(config, (String)value);
+                        }
                     } else if(value instanceof Boolean) {
-                        method.invoke(config, (Boolean)value);
+                        Method method = lookupMethod(key, boolean.class);
+                        if(method != null) {
+                            method.invoke(config, (Boolean)value);
+                        }
+                    } else if(value instanceof Integer) {
+                        Method method = lookupMethod(key, int.class);
+                        if(method != null) {
+                            method.invoke(config, (Integer)value);
+                        }
+                    } else if(value instanceof Float) {
+                        Method method = lookupMethod(key, float.class);
+                        if(method != null) {
+                            method.invoke(config, (Float)value);
+                        }
                     } else {
                         Log.e(getClass().getSimpleName(), "Config object will not accept type: " + value.getClass().toString());
                     }
