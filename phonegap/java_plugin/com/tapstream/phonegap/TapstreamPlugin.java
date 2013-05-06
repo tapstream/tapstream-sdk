@@ -38,7 +38,7 @@ public class TapstreamPlugin extends CordovaPlugin {
         try {
             method = Config.class.getMethod(methodName, argType);
         } catch (NoSuchMethodException e) {
-            Log.e(getClass().getSimpleName(), "Config object has no field named: " + propertyName);
+            Log.i(getClass().getSimpleName(), "Ignoring config field named '" + propertyName + "', probably not meant for this platform.");
         } catch(Exception e) {
             Log.e(getClass().getSimpleName(), "Error getting Config setter method: " + e.getMessage());
         }

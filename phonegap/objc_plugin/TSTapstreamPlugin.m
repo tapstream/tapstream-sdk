@@ -30,7 +30,7 @@
                 }
                 else
                 {
-                    NSLog(@"Tapstream Config object has no property named: %@", key);
+                    NSLog(@"Ignoring config field named '%@', probably not meant for this platform.", key);
                 }
             }
         }

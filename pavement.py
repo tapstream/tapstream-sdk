@@ -257,6 +257,21 @@ def package_objc():
 			sh('zip -r ../TapstreamSDK-%s-whitelabel.zip ConversionTracker' % sdk)
 
 
+
+@task
+def package_phonegap():
+	path('builds/phonegap').rmtree()
+	path('builds/phonegap').makedirs()
+	sh('cp ./phonegap/tapstream.js ./builds/phonegap/')
+	sh('cp -r ./phonegap/objc_plugin ./builds/phonegap/')
+	sh('cp -r ./phonegap/java_plugin ./builds/phonegap/')
+
+	path('builds/Tapstream-phonegap.zip').remove()
+	with pushd('builds'):
+		sh('7z a -tzip Tapstream-phonegap.zip ./phonegap')
+
+
+
 @task
 def docs():
 	import markdown
@@ -281,4 +296,12 @@ def docs():
 			md = markdown.markdown(md, ['fenced_code', 'codehilite'])
 			page = base_template.render(Context({'md': md}))
 			with open('docs_%s.html' % platform, 'w') as f:
+				f.write(page)
+
+	path.copy(path('phonegap/PhoneGap.md'), path('./builds/docs/docs_phonegap.md'))
+	with open('phonegap/PhoneGap.md') as f:
+		md = markdown.markdown(f.read(), ['fenced_code', 'codehilite'])
+		page = base_template.render(Context({'md': md}))
+		with pushd('builds/docs'):
+			with open('docs_phonegap.html', 'w') as f:
 				f.write(page)
