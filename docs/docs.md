@@ -12,12 +12,17 @@
 * Copy Tapstream.jar into the "libs" subdirectory of your project (just create "libs" if it does not exist).
 * In Eclipse's package explorer pane, right click on your project and choose "Refresh".
 * To verify that Eclipse has discovered the Tapstream SDK, expand your project's "Android Dependencies" category.  It should now contain a reference to Tapstream.jar.
-* Tapstream requires that your project request the "INTERNET" permission.  If your AndroidManifest.xml does not already contain it, add the following line as a child of the `<manifest>` element:
+* Add the following permissions to your AndroidManifest.xml, as children of the `<manifest>` element:
 
 &nbsp;
 
     :::java
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+If you wish to avoid requesting the ACCESS_WIFI_STATE and READ_PHONE_STATE permissions, you will need to opt out of collecting the wifi mac address and device id.
+More information on this can be found in the [Collecting hardware identifiers](#collecting-hardware-identifiers) section.
 
 {% elif platform == 'ios' or platform == 'mac' %}
 
@@ -95,6 +100,8 @@ developer secret that you've setup on the Tapstream website:
 
 
 
+
+<a id="collecting-hardware-identifiers"></a>
 
 ## Collecting hardware identifiers
 

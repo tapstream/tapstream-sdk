@@ -7,10 +7,8 @@ For Android:
 
 - In your AndroidManifest.xml, add the internet permission:
 <uses-permission android:name="android.permission.INTERNET" />
-
-TODO:
-Figure out why i'm seeing permission errors (ACCESS_WIFI_STATE, READ_PHONE_STATE) in cordova apps but not in regular apps
-
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+<uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
 For iOS:
 
