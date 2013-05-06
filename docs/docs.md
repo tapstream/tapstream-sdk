@@ -21,9 +21,6 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
-If you wish to avoid requesting the ACCESS_WIFI_STATE and READ_PHONE_STATE permissions, you will need to opt out of collecting the wifi mac address and device id.
-More information on this can be found in the [Collecting hardware identifiers](#collecting-hardware-identifiers) section.
-
 {% elif platform == 'ios' or platform == 'mac' %}
 
 * Extract the SDK zip file.
@@ -138,6 +135,8 @@ Here's an example:
 To generate the device's ODIN-1 identifier, please see the [ODIN-1 documentation](https://code.google.com/p/odinmobile/wiki/ODIN1).
 
 To get the device's OpenUDID identifier, please see the [OpenUDID source code](https://github.com/ylechelle/OpenUDID).
+
+If you wish to avoid requesting the ACCESS_WIFI_STATE and READ_PHONE_STATE permissions, you will need to opt out of collecting the WiFi MAC address and Device ID.
 
 {% elif platform == 'ios' %}
 
