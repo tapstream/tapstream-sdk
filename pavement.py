@@ -1,6 +1,7 @@
 from paver.easy import *
 from paver.easy import path
 import re
+import json
 import itertools
 
 """
@@ -35,12 +36,13 @@ PRETTY_PLATFORMS = {
 DEBUG = False
 CONFIGURATION = 'Release'
 
+VERSION = json.load(open('current_version.json'))['version']
+
 @task
 def debug():
 	global DEBUG, CONFIGURATION
 	DEBUG = True
 	CONFIGURATION = 'Debug'
-
 
 # Java sdk for Android
 def _make_java(path):
@@ -76,17 +78,17 @@ def _package_java():
 	path('builds/android').makedirs()
 	path.copy(path('./java/Tapstream/build/jar/Tapstream.jar'), path('./builds/android/'))
 	path.copy(path('./java/Tapstream/build/jar/Tapstream.jar'), path('./examples/Android/Example/libs/'))
-	path('builds/TapstreamSDK-android.zip').remove()
+	path('builds/TapstreamSDK-%s-android.zip' % VERSION).remove()
 	with pushd('builds/android'):
-		sh('7z a -tzip ../TapstreamSDK-android.zip Tapstream.jar')
+		sh('7z a -tzip ../TapstreamSDK-%s-android.zip Tapstream.jar' % VERSION)
 
 def _package_java_whitelabel():
 	path('builds/android-whitelabel').rmtree()
 	path('builds/android-whitelabel').makedirs()
 	path.copy(path('./java-whitelabel/Tapstream/build/jar/Tapstream.jar'), path('./builds/android-whitelabel/ConversionTracker.jar'))
-	path('builds/TapstreamSDK-android-whitelabel.zip').remove()
+	path('builds/TapstreamSDK-%s-android-whitelabel.zip' % VERSION).remove()
 	with pushd('builds/android-whitelabel'):
-		sh('7z a -tzip ../TapstreamSDK-android-whitelabel.zip ConversionTracker.jar')
+		sh('7z a -tzip ../TapstreamSDK-%s-android-whitelabel.zip ConversionTracker.jar' % VERSION)
 	path('java-whitelabel').rmtree()
 
 @task
@@ -142,13 +144,13 @@ def package_cs():
 	path('builds/winphone').makedirs()
 	path.copy(path('./cs/TapstreamWinPhone/Bin/%s/TapstreamMetrics.dll' % CONFIGURATION), path('./builds/winphone/'))
 
-	path('builds/TapstreamSDK-win8.zip').remove()
+	path('builds/TapstreamSDK-%s-win8.zip' % VERSION).remove()
 	with pushd('builds/win8'):
-		sh('7z a -tzip ../TapstreamSDK-win8.zip TapstreamMetrics.winmd')
+		sh('7z a -tzip ../TapstreamSDK-%s-win8.zip TapstreamMetrics.winmd' % VERSION)
 
 	path('builds/TapstreamSDK-winphone.zip').remove()
 	with pushd('builds/winphone'):
-		sh('7z a -tzip ../TapstreamSDK-winphone.zip TapstreamMetrics.dll')
+		sh('7z a -tzip ../TapstreamSDK-%s-winphone.zip TapstreamMetrics.dll' % VERSION)
 
 
 
@@ -230,9 +232,9 @@ def package_objc():
 		for file_type in ('.h', '.m'):
 			sh('cp ./objc/Tapstream/*%s ./builds/%s/Tapstream/' % (file_type, sdk))
 			sh('cp ./objc/Core/*%s ./builds/%s/Tapstream/' % (file_type, sdk))
-		path('builds/TapstreamSDK-%s.zip' % sdk).remove()
+		path('builds/TapstreamSDK-%s-%s.zip' % (VERSION, sdk)).remove()
 		with pushd('builds/%s' % sdk):
-			sh('zip -r ../TapstreamSDK-%s.zip Tapstream' % sdk)
+			sh('zip -r ../TapstreamSDK-%s-%s.zip Tapstream' % (VERSION, sdk))
 
 		# Generate whitelabel
 		path('builds/%s-whitelabel' % sdk).rmtree()
@@ -252,23 +254,36 @@ def package_objc():
 					f.write(data)
 					f.truncate()
 
-		path('builds/TapstreamSDK-%s-whitelabel.zip' % sdk).remove()
+		path('builds/TapstreamSDK-%s-%s-whitelabel.zip' % (VERSION, sdk)).remove()
 		with pushd('builds/%s-whitelabel' % sdk):
-			sh('zip -r ../TapstreamSDK-%s-whitelabel.zip ConversionTracker' % sdk)
+			sh('zip -r ../TapstreamSDK-%s-%s-whitelabel.zip ConversionTracker' % (VERSION, sdk))
 
 
 
 @task
-def package_phonegap():
+def make_phonegap():
 	path('builds/phonegap').rmtree()
 	path('builds/phonegap').makedirs()
 	sh('cp ./phonegap/tapstream.js ./builds/phonegap/')
 	sh('cp -r ./phonegap/objc_plugin ./builds/phonegap/')
 	sh('cp -r ./phonegap/java_plugin ./builds/phonegap/')
+	if path('builds/android').exists():
+		sh('cp builds/android/Tapstream.jar ./builds/phonegap')
+	else:
+		print('WARNING: No builds/android directory found.')
+	if path('builds/ios').exists():
+		sh('cp -r builds/ios/Tapstream ./builds/phonegap')
+	else:
+		print('WARNING: No builds/ios directory found.')
 
-	path('builds/Tapstream-phonegap.zip').remove()
+@task
+def package_phonegap():
+	assert(path('builds/phonegap/Tapstream.jar').exists())
+	assert(path('builds/phonegap/Tapstream').exists())
+
+	path('builds/TapstreamSDK-%s-phonegap.zip' % VERSION).remove()
 	with pushd('builds'):
-		sh('7z a -tzip Tapstream-phonegap.zip ./phonegap')
+		sh('7z a -tzip TapstreamSDK-%s-phonegap.zip ./phonegap' % VERSION)
 
 
 
