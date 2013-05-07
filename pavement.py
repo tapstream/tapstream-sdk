@@ -267,14 +267,9 @@ def make_phonegap():
 	sh('cp ./phonegap/tapstream.js ./builds/phonegap/')
 	sh('cp -r ./phonegap/objc_plugin ./builds/phonegap/')
 	sh('cp -r ./phonegap/java_plugin ./builds/phonegap/')
-	if path('builds/android').exists():
-		sh('cp builds/android/Tapstream.jar ./builds/phonegap')
-	else:
-		print('WARNING: No builds/android directory found.')
-	if path('builds/ios').exists():
-		sh('cp -r builds/ios/Tapstream ./builds/phonegap')
-	else:
-		print('WARNING: No builds/ios directory found.')
+	sh('cp builds/android/Tapstream.jar ./builds/phonegap')
+	sh('cp -r builds/ios/Tapstream ./builds/phonegap')
+
 
 @task
 def package_phonegap():
@@ -283,7 +278,9 @@ def package_phonegap():
 
 	path('builds/TapstreamSDK-%s-phonegap.zip' % VERSION).remove()
 	with pushd('builds'):
-		sh('7z a -tzip TapstreamSDK-%s-phonegap.zip ./phonegap' % VERSION)
+		sh('cp -r phonegap TapstreamSDK-%s-phonegap' % VERSION)
+		sh('7z a -tzip TapstreamSDK-%s-phonegap.zip TapstreamSDK-%s-phonegap' % (VERSION, VERSION))
+		sh('rm -rf TapstreamSDK-%s-phonegap' % VERSION)
 
 
 
