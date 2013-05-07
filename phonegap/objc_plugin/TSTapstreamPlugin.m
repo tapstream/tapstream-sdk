@@ -50,7 +50,7 @@
     NSNumber *oneTimeOnly = [command.arguments objectAtIndex:1];
     NSDictionary *params = [command.arguments objectAtIndex:2];
 
-    if(eventName == nil || oneTimeOnly == nil)
+    if((id)eventName == [NSNull null] || (id)oneTimeOnly == [NSNull null])
     {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
     }
@@ -58,7 +58,7 @@
     {
         TSEvent *event = [TSEvent eventWithName:eventName oneTimeOnly:[oneTimeOnly boolValue]];
         
-        if(params != nil)
+        if((id)params != [NSNull null])
         {
             for(NSString *key in params)
             {
