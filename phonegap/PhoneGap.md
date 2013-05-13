@@ -10,8 +10,8 @@ If you're using your website inside of PhoneGap, and your website loads Tapstrea
 
 First, add the following JavaScript snippet in PhoneGap so that it fires before `onload`:
 
-        :::javascript
-        window.__ts_suppress = true;
+    :::javascript
+    window.__ts_suppress = true;
 
 Then, modify your site's Tapstream JavaScript from this:
 
@@ -39,6 +39,7 @@ to this:
 
     (function() {
         function z(){
+            // Return if the PhoneGap-only window variable is set
             if(window.__ts_suppress) return;
             var s = document.createElement("script");
             s.type = "text/javascript";
@@ -142,3 +143,4 @@ To change the default Tapstream config, provide config overrides like this:
     });
 
 Consult the platform-specific SDK documentation to see what config variables are available.  Don't use accessor methods, just set the variables directly, using camel-case capitalization
+
