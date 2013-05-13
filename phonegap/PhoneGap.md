@@ -4,6 +4,47 @@ This document assumes you are using PhoneGap to target both Android and iOS.  "A
 to the native projects that you generated with the PhoneGap tools. "Tapstream PhoneGap SDK" will refer to the archive containing
 the Tapstream SDK and PhoneGap plugin files that you are integrating into your projects.
 
+## Preventing conflicts with Tapstream's JavaScript
+
+If you're using your website inside of PhoneGap, and your website loads Tapstream's JavaScript, you need to modify your Tapstream JavaScrip before proceeding. (Otherwise, proceed to the next section.)
+
+First, add the following JavaScript snippet in PhoneGap so that it fires before `onload`:
+
+        :::javascript
+        window.__ts_suppress = true;
+
+Then, modify your site's Tapstream JavaScript from this:
+
+    :::javascript
+    <script type="text/javascript">
+
+    var _tsq = _tsq || [];
+    _tsq.push(["setAccountName", "ergerg"]);
+    _tsq.push(["fireHit", "javascript_tracker", []]);
+
+    (function() {
+        function z(){
+            var s = document.createElement("script");
+            s.type = "text/javascript";
+    ...
+
+to this:
+
+    :::javascript
+    <script type="text/javascript">
+
+    var _tsq = _tsq || [];
+    _tsq.push(["setAccountName", "ergerg"]);
+    _tsq.push(["fireHit", "javascript_tracker", []]);
+
+    (function() {
+        function z(){
+            if(window.__ts_suppress) return;
+            var s = document.createElement("script");
+            s.type = "text/javascript";
+    ...
+
+This will prevent Tapstream's JavaScript from firing hits from within your app.
 
 ## For the Android project
 
