@@ -104,7 +104,7 @@ This will cause an object called `tapstream` to be attached to the global window
 * Initialize Tapstream from your `onDeviceReady:` function like this:
 
         :::javascript
-        window.tapstream.create('TAPSTREAM_ACCOUNT_NAME', 'DEV_SECRET_KEY', {});
+        window.tapstream.create('TAPSTREAM_ACCOUNT_NAME', 'TAPSTREAM_SDK_SECRET', {});
 
 ### Firing extra events
 
@@ -134,7 +134,7 @@ By default, Tapstream fires an event whenever a user runs the app. You can defin
 To change the default Tapstream config, provide config overrides like this:
 
     :::javascript
-    window.tapstream.create('TAPSTREAM_ACCOUNT_NAME', 'DEV_SECRET_KEY', {
+    window.tapstream.create('TAPSTREAM_ACCOUNT_NAME', 'TAPSTREAM_SDK_SECRET', {
         collectWifiMac: false,
         secureUdid: '<SecureUDID goes here>',
         idfa: '<IDFA goes here>',
