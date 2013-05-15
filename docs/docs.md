@@ -60,7 +60,7 @@ In your project's main activity file, import the Tapstream SDK:
     :::java
     import com.tapstream.sdk.*;
 
-Then, in the `onCreate` method of your main activity, create the `Tapstream` singleton with the [account name and SDK secret]({% url 'application' %}) that you've setup on the Tapstream website:
+Then, in the `onCreate` method of your main activity, create the `Tapstream` singleton with the [account name and SDK secret](https://tapstream.com/account/application/) that you've setup on the Tapstream website:
 
     :::java
     Config config = new Config();
@@ -73,7 +73,7 @@ In your project's AppDelegate.m file, import the Tapstream SDK:
     :::objective-c
     #import "TSTapstream.h"
 
-Then, in the {% if platform == 'ios' %}`-application:didFinishLaunchingWithOptions:`{% else %}`-applicationDidFinishLaunching:`{% endif %} method of the AppDelegate, create the `TSTapstream` singleton with the [account name and SDK secret]({% url 'application' %}) that you've setup on the Tapstream website:
+Then, in the {% if platform == 'ios' %}`-application:didFinishLaunchingWithOptions:`{% else %}`-applicationDidFinishLaunching:`{% endif %} method of the AppDelegate, create the `TSTapstream` singleton with the [account name and SDK secret](https://tapstream.com/account/application/) that you've setup on the Tapstream website:
 
     :::objective-c
     TSConfig *config = [TSConfig configWithDefaults];
@@ -86,7 +86,7 @@ In your project's main activity file, import the TapStream SDK:
     :::csharp
     using Tapstream.Sdk;
 
-Then, in the constructor of your main application class, create the `Tapstream` singleton with the [account name and SDK secret]({% url 'application' %}) that you've setup on the Tapstream website:
+Then, in the constructor of your main application class, create the `Tapstream` singleton with the [account name and SDK secret](https://tapstream.com/account/application/) that you've setup on the Tapstream website:
 
     :::csharp
     Config = new Config();
