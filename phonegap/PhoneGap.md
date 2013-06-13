@@ -6,7 +6,7 @@ the Tapstream SDK and PhoneGap plugin files that you are integrating into your p
 
 ## Preventing conflicts with Tapstream's JavaScript
 
-If you're using your website inside of PhoneGap, and your website loads Tapstream's JavaScript, you need to modify your Tapstream JavaScrip before proceeding. (Otherwise, proceed to the next section.)
+If you're using your website inside of PhoneGap, and your website loads Tapstream's JavaScript, you need to modify your Tapstream JavaScript before proceeding. (Otherwise, proceed to the next section.)
 
 First, add the following JavaScript snippet in PhoneGap so that it fires before `onload`:
 
