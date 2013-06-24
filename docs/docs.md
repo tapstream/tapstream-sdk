@@ -60,11 +60,11 @@ In your project's main activity file, import the Tapstream SDK:
     :::java
     import com.tapstream.sdk.*;
 
-Then, in the `onCreate` method of your main activity, create the `Tapstream` singleton with the account name and developer secret that you've setup on the Tapstream website:
+Then, in the `onCreate` method of your main activity, create the `Tapstream` singleton with the [account name and SDK secret](https://tapstream.com/account/application/) that you've setup on the Tapstream website:
 
     :::java
     Config config = new Config();
-    Tapstream.create(getApplicationContext(), "TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", config);
+    Tapstream.create(getApplicationContext(), "TAPSTREAM_ACCOUNT_NAME", "TAPSTREAM_SDK_SECRET", config);
 
 {% elif platform == 'ios' or platform == 'mac' %}
 
@@ -73,11 +73,11 @@ In your project's AppDelegate.m file, import the Tapstream SDK:
     :::objective-c
     #import "TSTapstream.h"
 
-Then, in the {% if platform == 'ios' %}`-application:didFinishLaunchingWithOptions:`{% else %}`-applicationDidFinishLaunching:`{% endif %} method of the AppDelegate, create the `TSTapstream` singleton with the account name and developer secret that you've setup on the Tapstream website:
+Then, in the {% if platform == 'ios' %}`-application:didFinishLaunchingWithOptions:`{% else %}`-applicationDidFinishLaunching:`{% endif %} method of the AppDelegate, create the `TSTapstream` singleton with the [account name and SDK secret](https://tapstream.com/account/application/) that you've setup on the Tapstream website:
 
     :::objective-c
     TSConfig *config = [TSConfig configWithDefaults];
-    [TSTapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY" config:config];
+    [TSTapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"TAPSTREAM_SDK_SECRET" config:config];
 
 {% elif platform == 'win8' or platform == 'winphone' %}
 
@@ -86,12 +86,11 @@ In your project's main activity file, import the TapStream SDK:
     :::csharp
     using Tapstream.Sdk;
 
-Then, in the constructor of your main application class, create the `Tapstream` singleton with the account name and
-developer secret that you've setup on the Tapstream website:
+Then, in the constructor of your main application class, create the `Tapstream` singleton with the [account name and SDK secret](https://tapstream.com/account/application/) that you've setup on the Tapstream website:
 
     :::csharp
     Config = new Config();
-    Tapstream.Create("TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", config);
+    Tapstream.Create("TAPSTREAM_ACCOUNT_NAME", "TAPSTREAM_SDK_SECRET", config);
 
 {% endif %}
 
@@ -130,7 +129,7 @@ Here's an example:
     config.setOdin1("<ODIN-1 value goes here>");
     config.setOpenUdid("<OpenUDID value goes here>");
 
-    Tapstream.create(getApplicationContext(), "TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", config);
+    Tapstream.create(getApplicationContext(), "TAPSTREAM_ACCOUNT_NAME", "TAPSTREAM_SDK_SECRET", config);
 
 To generate the device's ODIN-1 identifier, please see the [ODIN-1 documentation](https://code.google.com/p/odinmobile/wiki/ODIN1).
 
@@ -155,7 +154,7 @@ If you wish to avoid requesting the ACCESS_WIFI_STATE and READ_PHONE_STATE permi
     config.openUdid = @"<OpenUDID value goes here>";
     config.secureUdid = @"<SecureUDID value goes here>";
 
-    [TSTapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY" config:config];
+    [TSTapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"TAPSTREAM_SDK_SECRET" config:config];
 
 **We strongly recommend that you collect and provide the IDFA value to the Tapstream SDK.** Please see [Apple's documentation on collecting the IDFA](http://developer.apple.com/library/ios/#documentation/AdSupport/Reference/ASIdentifierManager_Ref/ASIdentifierManager.html).
 
@@ -179,7 +178,7 @@ To get the device's SecureUDID identifier, please see the [Official SecureUDID p
     config.odin1 = @"<ODIN-1 value goes here>";
     config.serialNumber = @"<Serial number value goes here>";
 
-    [TSTapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"DEV_SECRET_KEY" config:config];
+    [TSTapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"TAPSTREAM_SDK_SECRET" config:config];
 
 To generate the device's ODIN-1 identifier, please see the [ODIN-1 documentation](https://code.google.com/p/odinmobile/wiki/ODIN1).
 
@@ -196,7 +195,7 @@ To generate the device's ODIN-1 identifier, please see the [ODIN-1 documentation
     // If you wish to send it, you must opt-in by providing a value, as shown here:
     config.Odin1 = "<ODIN-1 value goes here>";
 
-    Tapstream.Create("TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", config);
+    Tapstream.Create("TAPSTREAM_ACCOUNT_NAME", "TAPSTREAM_SDK_SECRET", config);
 
 To generate the device's ODIN-1 identifier, please see the [ODIN-1 documentation](https://code.google.com/p/odinmobile/wiki/ODIN1).
 
@@ -220,7 +219,7 @@ Here's an example:
     // If you wish to send it, you must opt-in by providing a value, as shown here:
     config.Odin1 = "<ODIN-1 value goes here>";
 
-    Tapstream.Create("TAPSTREAM_ACCOUNT_NAME", "DEV_SECRET_KEY", config);
+    Tapstream.Create("TAPSTREAM_ACCOUNT_NAME", "TAPSTREAM_SDK_SECRET", config);
 
 To generate the device's ODIN-1 identifier, please see the [ODIN-1 documentation](https://code.google.com/p/odinmobile/wiki/ODIN1).
 

@@ -4,115 +4,143 @@ This document assumes you are using PhoneGap to target both Android and iOS.  "A
 to the native projects that you generated with the PhoneGap tools. "Tapstream PhoneGap SDK" will refer to the archive containing
 the Tapstream SDK and PhoneGap plugin files that you are integrating into your projects.
 
+## Preventing conflicts with Tapstream's JavaScript
+
+If you're using your website inside of PhoneGap, and your website loads Tapstream's JavaScript, you need to modify your Tapstream JavaScript before proceeding. (Otherwise, proceed to the next section.)
+
+First, add the following JavaScript snippet in PhoneGap so that it fires before `onload`:
+
+    :::javascript
+    window.__ts_suppress = true;
+
+Then, modify your site's Tapstream JavaScript from this:
+
+    :::javascript
+    <script type="text/javascript">
+
+    var _tsq = _tsq || [];
+    _tsq.push(["setAccountName", "ergerg"]);
+    _tsq.push(["fireHit", "javascript_tracker", []]);
+
+    (function() {
+        function z(){
+            var s = document.createElement("script");
+            s.type = "text/javascript";
+    ...
+
+to this:
+
+    :::javascript
+    <script type="text/javascript">
+
+    var _tsq = _tsq || [];
+    _tsq.push(["setAccountName", "ergerg"]);
+    _tsq.push(["fireHit", "javascript_tracker", []]);
+
+    (function() {
+        function z(){
+            // Return if the PhoneGap-only window variable is set
+            if(window.__ts_suppress) return;
+            var s = document.createElement("script");
+            s.type = "text/javascript";
+    ...
+
+This will prevent Tapstream's JavaScript from firing hits from within your app.
 
 ## For the Android project
 
 * Add an entry for the Tapstream plugin to the plugins list in `config.xml`
 
-&nbsp;
-
-	:::xml
-	<plugin name="Tapstream" value="com.tapstream.phonegap.TapstreamPlugin"/>
+        :::xml
+        <plugin name="Tapstream" value="com.tapstream.phonegap.TapstreamPlugin"/>
 
 * Add the following domain whitelist entry to `config.xml`
 
-&nbsp;
-
-	:::xml
-	<access origin="https://api.tapstream.com" />
+        :::xml
+        <access origin="https://api.tapstream.com" />
 
 * Copy `Tapstream.jar` from the Tapstream PhoneGap SDK into the `libs` folder of your Android project.
 * Add the following permissions to the `AndroidManifest.xml` file in your Android project:
 
-&nbsp;
-
-	:::xml
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+        :::xml
+        <uses-permission android:name="android.permission.INTERNET" />
+        <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+        <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
 * Copy the `java_plugin/com` folder from the Tapstream PhoneGap SDK and paste it into your Android project's `src` folder,
 merging the two folder structures.
-
 
 
 ## For the iOS project
 
 * Add an entry for the Tapstream plugin to the plugins list in `config.xml`
 
-&nbsp;
-
-	:::xml
-	<plugin name="Tapstream" value="TSTapstreamPlugin" />
+        :::xml
+        <plugin name="Tapstream" value="TSTapstreamPlugin" />
 
 * Add the following domain whitelist entry to `config.xml`
 
-&nbsp;
+        :::xml
+        <access origin="https://api.tapstream.com" />
 
-	:::xml
-	<access origin="https://api.tapstream.com" />
-
-* Open your iOS project in XCode.
+* Open your iOS project in Xcode.
 * Drag `objc_plugin/TSTapstreamPlugin.h` and `objc_plugin/TSTapstreamPlugin.m` from the Tapstream PhoneGap SDK
-and drop them into XCode, depositing them in the `Plugins` folder.
-* Drag the `Tapstream` folder from the Tapstream PhoneGap SDK and drop it into XCode, as a child of the root project node.
+and drop them into Xcode, depositing them in the `Plugins` folder.
+* Drag the `Tapstream` folder from the Tapstream PhoneGap SDK and drop it into Xcode, as a child of the root project node.
 
 
 
-## In your PhoneGap javascript files
+## In your PhoneGap JavaScript files
 
-* Copy `tapstream.js` from the Tapstream PhoneGap SDK and paste it in the `www/js` folder with the rest of your javascript source files.
+* Copy `tapstream.js` from the Tapstream PhoneGap SDK and paste it in the `www/js` folder with the rest of your JavaScript source files.
 
-* In your html file, __before__ importing the javascript for your various pages, import the Tapstream javascript file:
+* In your html file, __before__ importing the JavaScript for your various pages, import the Tapstream javascript file:
 
-&nbsp;
-
-	:::xml
-	<script type="text/javascript" src="js/tapstream.js"></script>
+        :::xml
+        <script type="text/javascript" src="js/tapstream.js"></script>
 
 This will cause an object called `tapstream` to be attached to the global window object.
 
 * Initialize Tapstream from your `onDeviceReady:` function like this:
 
-&nbsp;
+        :::javascript
+        window.tapstream.create('TAPSTREAM_ACCOUNT_NAME', 'TAPSTREAM_SDK_SECRET', {});
 
-	:::javascript
-	window.tapstream.create('TAPSTREAM_ACCOUNT_NAME', 'DEV_SECRET_KEY', {});
+### Firing extra events
 
-* To change the default Tapstream config, provide config overrides like this:
+By default, Tapstream fires an event whenever a user runs the app. You can define further events for recording key actions in your app by using the syntax below:
 
-&nbsp;
+    :::javascript
+    // Regular event:
+    window.tapstream.fireEvent('test-event', false);
 
-	:::javascript
-	window.tapstream.create('TAPSTREAM_ACCOUNT_NAME', 'DEV_SECRET_KEY', {
-		collectWifiMac: false,
-		secureUdid: '<udid goes here>',
-		idfa: '<idfa goes here>',
-		collectDeviceId: true,
-		installEventName: 'custom-install-event-name',
-	});
+    // Regular event with custom params:
+    window.tapstream.fireEvent('test-event', false, {
+        'my-custom-param': 3,
+    });
 
-Consult the platform specific sdk documentation to see what config variables are available.  Don't use accessor methods, just set the variables directly, using camel-case capitalization
+    // One-time-only event:
+    window.tapstream.fireEvent('install', true);
 
+    // One-time-only event with custom params:
+    window.tapstream.fireEvent('install', true, {
+        'my-custom-param': 'hello world',
+    });
 
+## Changing the default behavior of the Tapstream SDK
 
-* Fire events from your code like this:
+**Note**: Changing this behavior is not usually required.
 
-&nbsp;
+To change the default Tapstream config, provide config overrides like this:
 
-	:::javascript
-	// Regular event:
-	window.tapstream.fireEvent('test-event', false);
-	
-	// Regular event with custom params:
-	window.tapstream.fireEvent('test-event', false, {
-	    'my-custom-param': 3,
-	});
+    :::javascript
+    window.tapstream.create('TAPSTREAM_ACCOUNT_NAME', 'TAPSTREAM_SDK_SECRET', {
+        collectWifiMac: false,
+        secureUdid: '<SecureUDID goes here>',
+        idfa: '<IDFA goes here>',
+        collectDeviceId: true,
+        installEventName: 'custom-install-event-name',
+    });
 
-	// One-time-only event:
-	window.tapstream.fireEvent('install', true);
-	
-	// One-time-only event with custom params:
-	window.tapstream.fireEvent('install', true, {
-	    'my-custom-param': 'hello world',
-	});
+Consult the platform-specific SDK documentation to see what config variables are available.  Don't use accessor methods, just set the variables directly, using camel-case capitalization
+
