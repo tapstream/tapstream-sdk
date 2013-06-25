@@ -28,17 +28,30 @@ namespace TapstreamMetrics.Sdk
         private const string FIRED_EVENTS_KEY = "__tapstream_sdk_fired_events";
         private const string UUID_KEY = "__tapstream_sdk_uuid";
 
+#if TEST_WINPHONE || WINDOWS_PHONE
+        private static Mutex storageMutex = new Mutex(false, null);
+#endif
+
         public string LoadUuid()
         {
 #if TEST_WINPHONE || WINDOWS_PHONE
             string guid = null;
-            if(IsolatedStorageSettings.ApplicationSettings.TryGetValue<string>(UUID_KEY, out guid))
+
+            storageMutex.WaitOne();
+            try
             {
-                return guid;
+                if (IsolatedStorageSettings.ApplicationSettings.TryGetValue<string>(UUID_KEY, out guid))
+                {
+                    return guid;
+                }
+                guid = Guid.NewGuid().ToString();
+                IsolatedStorageSettings.ApplicationSettings[UUID_KEY] = guid;
+                IsolatedStorageSettings.ApplicationSettings.Save();
             }
-            guid = Guid.NewGuid().ToString();
-            IsolatedStorageSettings.ApplicationSettings[UUID_KEY] = guid;
-            IsolatedStorageSettings.ApplicationSettings.Save();
+            finally
+            {
+                storageMutex.ReleaseMutex();
+            }
             return guid;
 #else
             Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
@@ -57,9 +70,18 @@ namespace TapstreamMetrics.Sdk
 #if TEST_WINPHONE || WINDOWS_PHONE
             HashSet<string> firedEvents = new HashSet<string>();
             Dictionary<string, bool> contents;
-            if(IsolatedStorageSettings.ApplicationSettings.TryGetValue<Dictionary<string, bool>>(FIRED_EVENTS_KEY, out contents))
+
+            storageMutex.WaitOne();
+            try
             {
-                firedEvents.dict = contents;
+                if (IsolatedStorageSettings.ApplicationSettings.TryGetValue<Dictionary<string, bool>>(FIRED_EVENTS_KEY, out contents))
+                {
+                    firedEvents.dict = contents;
+                }
+            }
+            finally
+            {
+                storageMutex.ReleaseMutex();
             }
             return firedEvents;
 #else
@@ -75,8 +97,16 @@ namespace TapstreamMetrics.Sdk
         public void SaveFiredEvents(HashSet<string> firedEvents)
         {
 #if TEST_WINPHONE || WINDOWS_PHONE
-            IsolatedStorageSettings.ApplicationSettings[FIRED_EVENTS_KEY] = firedEvents.dict;
-            IsolatedStorageSettings.ApplicationSettings.Save();
+            storageMutex.WaitOne();
+            try
+            {
+                IsolatedStorageSettings.ApplicationSettings[FIRED_EVENTS_KEY] = firedEvents.dict;
+                IsolatedStorageSettings.ApplicationSettings.Save();
+            }
+            finally
+            {
+                storageMutex.ReleaseMutex();
+            }
 #else
             Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
             localSettings.Values[FIRED_EVENTS_KEY] = firedEvents.ToArray();
