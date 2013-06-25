@@ -11,6 +11,7 @@ package com.tapstream.titanium;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.kroll.common.Log;
@@ -40,7 +41,7 @@ public class TapstreamModule extends KrollModule
 	}
 	
 	@Kroll.method
-	public void create(String accountName, String developerSecret, Map<String, Object> configVals)
+	public void create(String accountName, String developerSecret, KrollDict configVals)
 	{
 		Config config = new Config();
 		for(Map.Entry<String, Object> item : configVals.entrySet())
@@ -86,7 +87,7 @@ public class TapstreamModule extends KrollModule
 	}
 	
 	@Kroll.method
-	public void fireEvent(String eventName, boolean oneTimeOnly, Map<String, Object> params)
+	public void fireEvent(String eventName, boolean oneTimeOnly, KrollDict params)
 	{
 		Event e = new Event(eventName, oneTimeOnly);
         if(params != null) {

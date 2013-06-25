@@ -10,12 +10,31 @@ var win = Ti.UI.createWindow({
 });
 win.open();
 
-// TODO: write your module tests here
+
 var tapstream = require('com.tapstream.titanium');
 Ti.API.info("module is => " + tapstream);
 
-if (Ti.Platform.name == "android") {
-	
-	tapstream.create("sdktest", "YGP2pezGTI6ec48uti4o1w", config);
-}
+var config = {
+	collectWifiMac: false,
+    secureUdid: '<SecureUDID goes here>',
+    idfa: '<IDFA goes here>',
+    collectDeviceId: true,
+    installEventName: 'custom-install-event-name',
+};
+tapstream.create("sdktest", "YGP2pezGTI6ec48uti4o1w", config);
 
+// Regular event:
+tapstream.fireEvent('test-event', false);
+
+// Regular event with custom params:
+tapstream.fireEvent('test-event', false, {
+    'my-custom-param': 3,
+});
+
+// One-time-only event:
+tapstream.fireEvent('install', true);
+
+// One-time-only event with custom params:
+tapstream.fireEvent('install', true, {
+    'my-custom-param': 'hello world',
+});
