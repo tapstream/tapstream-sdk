@@ -3,6 +3,7 @@ from paver.easy import path
 import re
 import json
 import itertools
+import platform
 
 """
 Notes:
@@ -37,6 +38,14 @@ DEBUG = False
 CONFIGURATION = 'Release'
 
 VERSION = json.load(open('current_version.json'))['version']
+
+
+def _zip(archive_file, *args):
+	if platform.system() == 'Windows':
+		sh('7z a -tzip %s "%s"' % (archive_file, '", "'.join(args)))
+	else:
+		sh('zip %s "%s"' % (archive_file, '", "'.join(args)))
+
 
 @task
 def debug():
@@ -80,7 +89,7 @@ def _package_java():
 	path.copy(path('./java/Tapstream/build/jar/Tapstream.jar'), path('./examples/Android/Example/libs/'))
 	path('builds/TapstreamSDK-%s-android.zip' % VERSION).remove()
 	with pushd('builds/android'):
-		sh('7z a -tzip ../TapstreamSDK-%s-android.zip Tapstream.jar' % VERSION)
+		_zip("../TapstreamSDK-%s-android.zip" % VERSION, 'Tapstream.jar')
 
 def _package_java_whitelabel():
 	path('builds/android-whitelabel').rmtree()
@@ -88,7 +97,7 @@ def _package_java_whitelabel():
 	path.copy(path('./java-whitelabel/Tapstream/build/jar/Tapstream.jar'), path('./builds/android-whitelabel/ConversionTracker.jar'))
 	path('builds/TapstreamSDK-%s-android-whitelabel.zip' % VERSION).remove()
 	with pushd('builds/android-whitelabel'):
-		sh('7z a -tzip ../TapstreamSDK-%s-android-whitelabel.zip ConversionTracker.jar' % VERSION)
+		_zip("../TapstreamSDK-%s-android-whitelabel.zip" % VERSION, 'ConversionTracker.jar')
 	path('java-whitelabel').rmtree()
 
 @task
