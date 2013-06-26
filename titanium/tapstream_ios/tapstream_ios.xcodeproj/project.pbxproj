@@ -1,0 +1,513 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		24416B8111C4CA220047AFDD /* Build & Test */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 24416B8A11C4CA520047AFDD /* Build configuration list for PBXAggregateTarget "Build & Test" */;
+			buildPhases = (
+				24416B8011C4CA220047AFDD /* ShellScript */,
+			);
+			dependencies = (
+				24416B8511C4CA280047AFDD /* PBXTargetDependency */,
+			);
+			name = "Build & Test";
+			productName = "Build & test";
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		12DB072F177BB16D00EC11BD /* TSApi.h in Headers */ = {isa = PBXBuildFile; fileRef = 12DB0717177BB16D00EC11BD /* TSApi.h */; };
+		12DB0730177BB16D00EC11BD /* TSConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = 12DB0718177BB16D00EC11BD /* TSConfig.h */; };
+		12DB0731177BB16D00EC11BD /* TSConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DB0719177BB16D00EC11BD /* TSConfig.m */; };
+		12DB0732177BB16D00EC11BD /* TSCore.h in Headers */ = {isa = PBXBuildFile; fileRef = 12DB071A177BB16D00EC11BD /* TSCore.h */; };
+		12DB0733177BB16D00EC11BD /* TSCore.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DB071B177BB16D00EC11BD /* TSCore.m */; };
+		12DB0734177BB16D00EC11BD /* TSCoreListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 12DB071C177BB16D00EC11BD /* TSCoreListener.h */; };
+		12DB0735177BB16D00EC11BD /* TSCoreListenerImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 12DB071D177BB16D00EC11BD /* TSCoreListenerImpl.h */; };
+		12DB0736177BB16D00EC11BD /* TSCoreListenerImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DB071E177BB16D00EC11BD /* TSCoreListenerImpl.m */; };
+		12DB0737177BB16D00EC11BD /* TSDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 12DB071F177BB16D00EC11BD /* TSDelegate.h */; };
+		12DB0738177BB16D00EC11BD /* TSEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 12DB0720177BB16D00EC11BD /* TSEvent.h */; };
+		12DB0739177BB16D00EC11BD /* TSEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DB0721177BB16D00EC11BD /* TSEvent.m */; };
+		12DB073A177BB16D00EC11BD /* TSHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 12DB0722177BB16D00EC11BD /* TSHelpers.h */; };
+		12DB073B177BB16D00EC11BD /* TSHit.h in Headers */ = {isa = PBXBuildFile; fileRef = 12DB0723177BB16D00EC11BD /* TSHit.h */; };
+		12DB073C177BB16D00EC11BD /* TSHit.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DB0724177BB16D00EC11BD /* TSHit.m */; };
+		12DB073D177BB16D00EC11BD /* TSLogging.h in Headers */ = {isa = PBXBuildFile; fileRef = 12DB0725177BB16D00EC11BD /* TSLogging.h */; };
+		12DB073E177BB16D00EC11BD /* TSLogging.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DB0726177BB16D00EC11BD /* TSLogging.m */; };
+		12DB073F177BB16D00EC11BD /* TSLogLevel.h in Headers */ = {isa = PBXBuildFile; fileRef = 12DB0727177BB16D00EC11BD /* TSLogLevel.h */; };
+		12DB0740177BB16D00EC11BD /* TSPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 12DB0728177BB16D00EC11BD /* TSPlatform.h */; };
+		12DB0741177BB16D00EC11BD /* TSPlatformImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 12DB0729177BB16D00EC11BD /* TSPlatformImpl.h */; };
+		12DB0742177BB16D00EC11BD /* TSPlatformImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DB072A177BB16D00EC11BD /* TSPlatformImpl.m */; };
+		12DB0743177BB16D00EC11BD /* TSResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 12DB072B177BB16D00EC11BD /* TSResponse.h */; };
+		12DB0744177BB16D00EC11BD /* TSResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DB072C177BB16D00EC11BD /* TSResponse.m */; };
+		12DB0745177BB16D00EC11BD /* TSTapstream.h in Headers */ = {isa = PBXBuildFile; fileRef = 12DB072D177BB16D00EC11BD /* TSTapstream.h */; };
+		12DB0746177BB16D00EC11BD /* TSTapstream.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DB072E177BB16D00EC11BD /* TSTapstream.m */; };
+		12DB0749177BB1E100EC11BD /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12DB0748177BB1E100EC11BD /* UIKit.framework */; };
+		24DD6CF91134B3F500162E58 /* ComTapstreamSdkModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 24DD6CF71134B3F500162E58 /* ComTapstreamSdkModule.h */; };
+		24DD6CFA1134B3F500162E58 /* ComTapstreamSdkModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 24DD6CF81134B3F500162E58 /* ComTapstreamSdkModule.m */; };
+		24DE9E1111C5FE74003F90F6 /* ComTapstreamSdkModuleAssets.h in Headers */ = {isa = PBXBuildFile; fileRef = 24DE9E0F11C5FE74003F90F6 /* ComTapstreamSdkModuleAssets.h */; };
+		24DE9E1211C5FE74003F90F6 /* ComTapstreamSdkModuleAssets.m in Sources */ = {isa = PBXBuildFile; fileRef = 24DE9E1011C5FE74003F90F6 /* ComTapstreamSdkModuleAssets.m */; };
+		AA747D9F0F9514B9006C5449 /* ComTapstreamSdk_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = AA747D9E0F9514B9006C5449 /* ComTapstreamSdk_Prefix.pch */; };
+		AACBBE4A0F95108600F1A2B1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AACBBE490F95108600F1A2B1 /* Foundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		24416B8411C4CA280047AFDD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC07D0554694100DB518D;
+			remoteInfo = tapstream_ios;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		12DB0717177BB16D00EC11BD /* TSApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSApi.h; sourceTree = "<group>"; };
+		12DB0718177BB16D00EC11BD /* TSConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSConfig.h; sourceTree = "<group>"; };
+		12DB0719177BB16D00EC11BD /* TSConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSConfig.m; sourceTree = "<group>"; };
+		12DB071A177BB16D00EC11BD /* TSCore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSCore.h; sourceTree = "<group>"; };
+		12DB071B177BB16D00EC11BD /* TSCore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSCore.m; sourceTree = "<group>"; };
+		12DB071C177BB16D00EC11BD /* TSCoreListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSCoreListener.h; sourceTree = "<group>"; };
+		12DB071D177BB16D00EC11BD /* TSCoreListenerImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSCoreListenerImpl.h; sourceTree = "<group>"; };
+		12DB071E177BB16D00EC11BD /* TSCoreListenerImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSCoreListenerImpl.m; sourceTree = "<group>"; };
+		12DB071F177BB16D00EC11BD /* TSDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSDelegate.h; sourceTree = "<group>"; };
+		12DB0720177BB16D00EC11BD /* TSEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSEvent.h; sourceTree = "<group>"; };
+		12DB0721177BB16D00EC11BD /* TSEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSEvent.m; sourceTree = "<group>"; };
+		12DB0722177BB16D00EC11BD /* TSHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSHelpers.h; sourceTree = "<group>"; };
+		12DB0723177BB16D00EC11BD /* TSHit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSHit.h; sourceTree = "<group>"; };
+		12DB0724177BB16D00EC11BD /* TSHit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSHit.m; sourceTree = "<group>"; };
+		12DB0725177BB16D00EC11BD /* TSLogging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSLogging.h; sourceTree = "<group>"; };
+		12DB0726177BB16D00EC11BD /* TSLogging.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSLogging.m; sourceTree = "<group>"; };
+		12DB0727177BB16D00EC11BD /* TSLogLevel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSLogLevel.h; sourceTree = "<group>"; };
+		12DB0728177BB16D00EC11BD /* TSPlatform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSPlatform.h; sourceTree = "<group>"; };
+		12DB0729177BB16D00EC11BD /* TSPlatformImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSPlatformImpl.h; sourceTree = "<group>"; };
+		12DB072A177BB16D00EC11BD /* TSPlatformImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSPlatformImpl.m; sourceTree = "<group>"; };
+		12DB072B177BB16D00EC11BD /* TSResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSResponse.h; sourceTree = "<group>"; };
+		12DB072C177BB16D00EC11BD /* TSResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSResponse.m; sourceTree = "<group>"; };
+		12DB072D177BB16D00EC11BD /* TSTapstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSTapstream.h; sourceTree = "<group>"; };
+		12DB072E177BB16D00EC11BD /* TSTapstream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSTapstream.m; sourceTree = "<group>"; };
+		12DB0748177BB1E100EC11BD /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		24DD6CF71134B3F500162E58 /* ComTapstreamSdkModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ComTapstreamSdkModule.h; path = Classes/ComTapstreamSdkModule.h; sourceTree = "<group>"; };
+		24DD6CF81134B3F500162E58 /* ComTapstreamSdkModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ComTapstreamSdkModule.m; path = Classes/ComTapstreamSdkModule.m; sourceTree = "<group>"; };
+		24DD6D1B1134B66800162E58 /* titanium.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = titanium.xcconfig; sourceTree = "<group>"; };
+		24DE9E0F11C5FE74003F90F6 /* ComTapstreamSdkModuleAssets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ComTapstreamSdkModuleAssets.h; path = Classes/ComTapstreamSdkModuleAssets.h; sourceTree = "<group>"; };
+		24DE9E1011C5FE74003F90F6 /* ComTapstreamSdkModuleAssets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ComTapstreamSdkModuleAssets.m; path = Classes/ComTapstreamSdkModuleAssets.m; sourceTree = "<group>"; };
+		AA747D9E0F9514B9006C5449 /* ComTapstreamSdk_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComTapstreamSdk_Prefix.pch; sourceTree = SOURCE_ROOT; };
+		AACBBE490F95108600F1A2B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		D2AAC07E0554694100DB518D /* libComTapstreamSdk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libComTapstreamSdk.a; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D2AAC07C0554694100DB518D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				12DB0749177BB1E100EC11BD /* UIKit.framework in Frameworks */,
+				AACBBE4A0F95108600F1A2B1 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		034768DFFF38A50411DB9C8B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D2AAC07E0554694100DB518D /* libComTapstreamSdk.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		0867D691FE84028FC02AAC07 /* tapstream_ios */ = {
+			isa = PBXGroup;
+			children = (
+				12DB0748177BB1E100EC11BD /* UIKit.framework */,
+				08FB77AEFE84172EC02AAC07 /* Classes */,
+				32C88DFF0371C24200C91783 /* Other Sources */,
+				0867D69AFE84028FC02AAC07 /* Frameworks */,
+				034768DFFF38A50411DB9C8B /* Products */,
+				12DB0716177BB16D00EC11BD /* Tapstream */,
+			);
+			name = tapstream_ios;
+			sourceTree = "<group>";
+		};
+		0867D69AFE84028FC02AAC07 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AACBBE490F95108600F1A2B1 /* Foundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		08FB77AEFE84172EC02AAC07 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				24DE9E0F11C5FE74003F90F6 /* ComTapstreamSdkModuleAssets.h */,
+				24DE9E1011C5FE74003F90F6 /* ComTapstreamSdkModuleAssets.m */,
+				24DD6CF71134B3F500162E58 /* ComTapstreamSdkModule.h */,
+				24DD6CF81134B3F500162E58 /* ComTapstreamSdkModule.m */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		12DB0716177BB16D00EC11BD /* Tapstream */ = {
+			isa = PBXGroup;
+			children = (
+				12DB0717177BB16D00EC11BD /* TSApi.h */,
+				12DB0718177BB16D00EC11BD /* TSConfig.h */,
+				12DB0719177BB16D00EC11BD /* TSConfig.m */,
+				12DB071A177BB16D00EC11BD /* TSCore.h */,
+				12DB071B177BB16D00EC11BD /* TSCore.m */,
+				12DB071C177BB16D00EC11BD /* TSCoreListener.h */,
+				12DB071D177BB16D00EC11BD /* TSCoreListenerImpl.h */,
+				12DB071E177BB16D00EC11BD /* TSCoreListenerImpl.m */,
+				12DB071F177BB16D00EC11BD /* TSDelegate.h */,
+				12DB0720177BB16D00EC11BD /* TSEvent.h */,
+				12DB0721177BB16D00EC11BD /* TSEvent.m */,
+				12DB0722177BB16D00EC11BD /* TSHelpers.h */,
+				12DB0723177BB16D00EC11BD /* TSHit.h */,
+				12DB0724177BB16D00EC11BD /* TSHit.m */,
+				12DB0725177BB16D00EC11BD /* TSLogging.h */,
+				12DB0726177BB16D00EC11BD /* TSLogging.m */,
+				12DB0727177BB16D00EC11BD /* TSLogLevel.h */,
+				12DB0728177BB16D00EC11BD /* TSPlatform.h */,
+				12DB0729177BB16D00EC11BD /* TSPlatformImpl.h */,
+				12DB072A177BB16D00EC11BD /* TSPlatformImpl.m */,
+				12DB072B177BB16D00EC11BD /* TSResponse.h */,
+				12DB072C177BB16D00EC11BD /* TSResponse.m */,
+				12DB072D177BB16D00EC11BD /* TSTapstream.h */,
+				12DB072E177BB16D00EC11BD /* TSTapstream.m */,
+			);
+			path = Tapstream;
+			sourceTree = "<group>";
+		};
+		32C88DFF0371C24200C91783 /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				AA747D9E0F9514B9006C5449 /* ComTapstreamSdk_Prefix.pch */,
+				24DD6D1B1134B66800162E58 /* titanium.xcconfig */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D2AAC07A0554694100DB518D /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA747D9F0F9514B9006C5449 /* ComTapstreamSdk_Prefix.pch in Headers */,
+				24DD6CF91134B3F500162E58 /* ComTapstreamSdkModule.h in Headers */,
+				24DE9E1111C5FE74003F90F6 /* ComTapstreamSdkModuleAssets.h in Headers */,
+				12DB072F177BB16D00EC11BD /* TSApi.h in Headers */,
+				12DB0730177BB16D00EC11BD /* TSConfig.h in Headers */,
+				12DB0732177BB16D00EC11BD /* TSCore.h in Headers */,
+				12DB0734177BB16D00EC11BD /* TSCoreListener.h in Headers */,
+				12DB0735177BB16D00EC11BD /* TSCoreListenerImpl.h in Headers */,
+				12DB0737177BB16D00EC11BD /* TSDelegate.h in Headers */,
+				12DB0738177BB16D00EC11BD /* TSEvent.h in Headers */,
+				12DB073A177BB16D00EC11BD /* TSHelpers.h in Headers */,
+				12DB073B177BB16D00EC11BD /* TSHit.h in Headers */,
+				12DB073D177BB16D00EC11BD /* TSLogging.h in Headers */,
+				12DB073F177BB16D00EC11BD /* TSLogLevel.h in Headers */,
+				12DB0740177BB16D00EC11BD /* TSPlatform.h in Headers */,
+				12DB0741177BB16D00EC11BD /* TSPlatformImpl.h in Headers */,
+				12DB0743177BB16D00EC11BD /* TSResponse.h in Headers */,
+				12DB0745177BB16D00EC11BD /* TSTapstream.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		D2AAC07D0554694100DB518D /* tapstream_ios */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB921E08733DC00010E9CD /* Build configuration list for PBXNativeTarget "tapstream_ios" */;
+			buildPhases = (
+				D2AAC07A0554694100DB518D /* Headers */,
+				D2AAC07B0554694100DB518D /* Sources */,
+				D2AAC07C0554694100DB518D /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = tapstream_ios;
+			productName = tapstream_ios;
+			productReference = D2AAC07E0554694100DB518D /* libComTapstreamSdk.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0867D690FE84028FC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB922208733DC00010E9CD /* Build configuration list for PBXProject "tapstream_ios" */;
+			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 0867D691FE84028FC02AAC07 /* tapstream_ios */;
+			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D2AAC07D0554694100DB518D /* tapstream_ios */,
+				24416B8111C4CA220047AFDD /* Build & Test */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		24416B8011C4CA220047AFDD /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# shell script goes here\n\npython \"${TITANIUM_SDK}/titanium.py\" run --dir=\"${PROJECT_DIR}\"\nexit $?\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D2AAC07B0554694100DB518D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				24DD6CFA1134B3F500162E58 /* ComTapstreamSdkModule.m in Sources */,
+				24DE9E1211C5FE74003F90F6 /* ComTapstreamSdkModuleAssets.m in Sources */,
+				12DB0731177BB16D00EC11BD /* TSConfig.m in Sources */,
+				12DB0733177BB16D00EC11BD /* TSCore.m in Sources */,
+				12DB0736177BB16D00EC11BD /* TSCoreListenerImpl.m in Sources */,
+				12DB0739177BB16D00EC11BD /* TSEvent.m in Sources */,
+				12DB073C177BB16D00EC11BD /* TSHit.m in Sources */,
+				12DB073E177BB16D00EC11BD /* TSLogging.m in Sources */,
+				12DB0742177BB16D00EC11BD /* TSPlatformImpl.m in Sources */,
+				12DB0744177BB16D00EC11BD /* TSResponse.m in Sources */,
+				12DB0746177BB16D00EC11BD /* TSTapstream.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		24416B8511C4CA280047AFDD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D2AAC07D0554694100DB518D /* tapstream_ios */;
+			targetProxy = 24416B8411C4CA280047AFDD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB921F08733DC00010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 24DD6D1B1134B66800162E58 /* titanium.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DSTROOT = /tmp/ComTapstreamSdk.dst;
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = ComTapstreamSdk_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = "TI_VERSION=$(TI_VERSION)";
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = NO;
+				GCC_WARN_MISSING_PARENTHESES = NO;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_STRICT_SELECTOR_MATCH = NO;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_PARAMETER = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_CFLAGS = (
+					"-DDEBUG",
+					"-DTI_POST_1_2",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = ComTapstreamSdk;
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				RUN_CLANG_STATIC_ANALYZER = NO;
+				SDKROOT = iphoneos;
+				USER_HEADER_SEARCH_PATHS = "";
+			};
+			name = Debug;
+		};
+		1DEB922008733DC00010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 24DD6D1B1134B66800162E58 /* titanium.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DSTROOT = /tmp/ComTapstreamSdk.dst;
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = ComTapstreamSdk_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = "TI_VERSION=$(TI_VERSION)";
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = NO;
+				GCC_WARN_MISSING_PARENTHESES = NO;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_STRICT_SELECTOR_MATCH = NO;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_PARAMETER = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				INSTALL_PATH = /usr/local/lib;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_CFLAGS = "-DTI_POST_1_2";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = ComTapstreamSdk;
+				RUN_CLANG_STATIC_ANALYZER = NO;
+				SDKROOT = iphoneos;
+				USER_HEADER_SEARCH_PATHS = "";
+			};
+			name = Release;
+		};
+		1DEB922308733DC00010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 24DD6D1B1134B66800162E58 /* titanium.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DSTROOT = /tmp/ComTapstreamSdk.dst;
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = ComTapstreamSdk_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = "TI_VERSION=$(TI_VERSION)";
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = NO;
+				GCC_WARN_MISSING_PARENTHESES = NO;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_STRICT_SELECTOR_MATCH = NO;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_PARAMETER = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				INSTALL_PATH = /usr/local/lib;
+				OTHER_CFLAGS = (
+					"-DDEBUG",
+					"-DTI_POST_1_2",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = ComTapstreamSdk;
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				RUN_CLANG_STATIC_ANALYZER = NO;
+				SDKROOT = iphoneos;
+				USER_HEADER_SEARCH_PATHS = "";
+			};
+			name = Debug;
+		};
+		1DEB922408733DC00010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 24DD6D1B1134B66800162E58 /* titanium.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DSTROOT = /tmp/ComTapstreamSdk.dst;
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = ComTapstreamSdk_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = "TI_VERSION=$(TI_VERSION)";
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = NO;
+				GCC_WARN_MISSING_PARENTHESES = NO;
+				GCC_WARN_SHADOW = NO;
+				GCC_WARN_STRICT_SELECTOR_MATCH = NO;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_PARAMETER = NO;
+				GCC_WARN_UNUSED_VALUE = NO;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				INSTALL_PATH = /usr/local/lib;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
+				OTHER_CFLAGS = "-DTI_POST_1_2";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = ComTapstreamSdk;
+				RUN_CLANG_STATIC_ANALYZER = NO;
+				SDKROOT = iphoneos;
+				USER_HEADER_SEARCH_PATHS = "";
+			};
+			name = Release;
+		};
+		24416B8211C4CA220047AFDD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 24DD6D1B1134B66800162E58 /* titanium.xcconfig */;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "Build & test";
+			};
+			name = Debug;
+		};
+		24416B8311C4CA220047AFDD /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 24DD6D1B1134B66800162E58 /* titanium.xcconfig */;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = "Build & test";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB921E08733DC00010E9CD /* Build configuration list for PBXNativeTarget "tapstream_ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB921F08733DC00010E9CD /* Debug */,
+				1DEB922008733DC00010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB922208733DC00010E9CD /* Build configuration list for PBXProject "tapstream_ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB922308733DC00010E9CD /* Debug */,
+				1DEB922408733DC00010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		24416B8A11C4CA520047AFDD /* Build configuration list for PBXAggregateTarget "Build & Test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				24416B8211C4CA220047AFDD /* Debug */,
+				24416B8311C4CA220047AFDD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0867D690FE84028FC02AAC07 /* Project object */;
+}
