@@ -44,7 +44,7 @@ def _zip(archive_file, *args):
 	if platform.system() == 'Windows':
 		sh('7z a -tzip %s "%s"' % (archive_file, '", "'.join(args)))
 	else:
-		sh('zip %s "%s"' % (archive_file, '", "'.join(args)))
+		sh('zip -r %s "%s"' % (archive_file, '", "'.join(args)))
 
 
 @task
@@ -142,9 +142,9 @@ def test_cs():
 	test_cs_win8()
 	test_cs_winphone()
 
+@needs('make_cs')
 @task
 def package_cs():
-	make_cs()
 	path('builds/win8').rmtree()
 	path('builds/win8').makedirs()
 	path.copy(path('./cs/Tapstream/bin/%s/TapstreamMetrics.winmd' % CONFIGURATION), path('./builds/win8/'))
@@ -231,9 +231,9 @@ def test_objc():
 	test_objc_mac()
 	test_objc_ios()
 
+@needs('make_objc')
 @task
 def package_objc():
-	make_objc()
 	path('builds').mkdir()
 	for sdk in ('mac', 'ios'):
 		path('builds/%s' % sdk).rmtree()
@@ -268,28 +268,57 @@ def package_objc():
 			sh('zip -r ../TapstreamSDK-%s-%s-whitelabel.zip ConversionTracker' % (VERSION, sdk))
 
 
-
+@needs('make_java', 'make_objc')
 @task
 def make_phonegap():
 	path('builds/phonegap').rmtree()
 	path('builds/phonegap').makedirs()
-	sh('cp ./phonegap/tapstream.js ./builds/phonegap/')
-	sh('cp -r ./phonegap/objc_plugin ./builds/phonegap/')
-	sh('cp -r ./phonegap/java_plugin ./builds/phonegap/')
-	sh('cp builds/android/Tapstream.jar ./builds/phonegap')
-	sh('cp -r builds/ios/Tapstream ./builds/phonegap')
+	sh('cp phonegap/tapstream.js builds/phonegap/')
+	sh('cp -r phonegap/objc_plugin builds/phonegap/')
+	sh('cp -r phonegap/java_plugin builds/phonegap/')
+	sh('cp builds/android/Tapstream.jar builds/phonegap')
+	sh('cp -r builds/ios/Tapstream builds/phonegap')
 
-
+@needs('make_phonegap')
 @task
 def package_phonegap():
-	assert(path('builds/phonegap/Tapstream.jar').exists())
-	assert(path('builds/phonegap/Tapstream').exists())
-
 	path('builds/TapstreamSDK-%s-phonegap.zip' % VERSION).remove()
 	with pushd('builds'):
 		sh('cp -r phonegap TapstreamSDK-%s-phonegap' % VERSION)
-		sh('7z a -tzip TapstreamSDK-%s-phonegap.zip TapstreamSDK-%s-phonegap' % (VERSION, VERSION))
+		_zip('TapstreamSDK-%s-phonegap.zip' % VERSION, 'TapstreamSDK-%s-phonegap' % VERSION)
 		sh('rm -rf TapstreamSDK-%s-phonegap' % VERSION)
+
+
+
+@needs('make_java', 'make_objc')
+@task
+def make_titanium():
+	path('builds/titanium').rmtree()
+	path('builds/titanium').makedirs()
+	sh('cp builds/android/Tapstream.jar titanium/tapstream_android/lib/Tapstream.jar')
+	path('titanium/tapstream_ios/Tapstream').rmtree()
+	sh('cp -r builds/ios/Tapstream titanium/tapstream_ios')
+
+	with pushd('titanium/tapstream_android'):
+		sh('ant clean')
+		sh('ant')
+	sh('cp titanium/tapstream_android/dist/com.tapstream.sdk-android-*.zip builds/titanium')
+
+	with pushd('titanium/tapstream_ios'):
+		sh('rm -f com.tapstream.sdk-ios-*.zip')
+		sh('python build.py')
+	sh('cp titanium/tapstream_ios/com.tapstream.sdk-iphone-*.zip builds/titanium')
+
+@needs('make_titanium')
+@task
+def package_titanium():
+	path('builds/TapstreamSDK-%s-titanium.zip' % VERSION).remove()
+	with pushd('builds'):
+		sh('cp -r titanium TapstreamSDK-%s-titanium' % VERSION)
+		_zip('TapstreamSDK-%s-titanium.zip' % VERSION, 'TapstreamSDK-%s-titanium' % VERSION)
+		sh('rm -rf TapstreamSDK-%s-titanium' % VERSION)
+
+
 
 
 
