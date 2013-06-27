@@ -94,7 +94,11 @@
 {
     NSString *accountName = [args objectAtIndex:0];
     NSString *developerSecret = [args objectAtIndex:1];
-    NSDictionary *configVals = [args objectAtIndex:2];
+
+    NSDictionary *configVals = nil;
+    if([args count] > 2) {
+        configVals = [args objectAtIndex:2];
+    }
     
     TSConfig *config = [TSConfig configWithDefaults];
         
@@ -121,11 +125,15 @@
 {
     NSString *eventName = [args objectAtIndex:0];
     NSNumber *oneTimeOnly = [args objectAtIndex:1];
-    NSDictionary *params = [args objectAtIndex:2];
+
+    NSDictionary *params = nil;
+    if([args count] > 2) {
+        params = [args objectAtIndex:2];
+    }
     
     TSEvent *event = [TSEvent eventWithName:eventName oneTimeOnly:[oneTimeOnly boolValue]];
         
-    if((id)params != [NSNull null])
+    if(params != nil)
     {
         for(NSString *key in params)
         {

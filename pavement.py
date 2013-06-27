@@ -302,21 +302,19 @@ def make_titanium():
 	with pushd('titanium/tapstream_android'):
 		sh('ant clean')
 		sh('ant')
-	sh('cp titanium/tapstream_android/dist/com.tapstream.sdk-android-*.zip builds/titanium')
+	sh('unzip titanium/tapstream_android/dist/com.tapstream.sdk-android-*.zip -d builds/titanium')
 
 	with pushd('titanium/tapstream_ios'):
-		sh('rm -f com.tapstream.sdk-ios-*.zip')
+		sh('rm -f com.tapstream.sdk-iphone-*.zip')
 		sh('python build.py')
-	sh('cp titanium/tapstream_ios/com.tapstream.sdk-iphone-*.zip builds/titanium')
+	sh('unzip titanium/tapstream_ios/com.tapstream.sdk-iphone-*.zip -d builds/titanium')
 
 @needs('make_titanium')
 @task
 def package_titanium():
 	path('builds/TapstreamSDK-%s-titanium.zip' % VERSION).remove()
-	with pushd('builds'):
-		sh('cp -r titanium TapstreamSDK-%s-titanium' % VERSION)
-		_zip('TapstreamSDK-%s-titanium.zip' % VERSION, 'TapstreamSDK-%s-titanium' % VERSION)
-		sh('rm -rf TapstreamSDK-%s-titanium' % VERSION)
+	with pushd('builds/titanium'):		
+		_zip('../TapstreamSDK-%s-titanium.zip' % VERSION, 'modules')
 
 
 

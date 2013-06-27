@@ -44,62 +44,77 @@ public class TapstreamAndroidModule extends KrollModule
 	public void create(String accountName, String developerSecret, KrollDict configVals)
 	{
 		Config config = new Config();
-		for(Map.Entry<String, Object> item : configVals.entrySet())
+
+		if(configVals != null)
 		{
-			String key = item.getKey();
-			Object value = item.getValue();
+			for(Map.Entry<String, Object> item : configVals.entrySet())
+			{
+				String key = item.getKey();
+				Object value = item.getValue();
 
-			if (value == null) {
-				Log.e(TAG, "Config object will not accept null values, skipping field named: " + key);
-				continue;
-			}
-
-			try {
-				if (value instanceof String) {
-					Method method = lookupMethod(key, String.class);
-					if (method != null) {
-						method.invoke(config, (String) value);
-					}
-				} else if (value instanceof Boolean) {
-					Method method = lookupMethod(key, boolean.class);
-					if (method != null) {
-						method.invoke(config, (Boolean) value);
-					}
-				} else if (value instanceof Integer) {
-					Method method = lookupMethod(key, int.class);
-					if (method != null) {
-						method.invoke(config, (Integer) value);
-					}
-				} else if (value instanceof Float) {
-					Method method = lookupMethod(key, float.class);
-					if (method != null) {
-						method.invoke(config, (Float) value);
-					}
-				} else {
-					Log.e(TAG, "Config object will not accept type: " + value.getClass().toString());
+				if (value == null) {
+					Log.e(TAG, "Config object will not accept null values, skipping field named: " + key);
+					continue;
 				}
-			} catch (Exception e) {
-				Log.e(TAG, "Error setting field on config object (key=" + key + "). " + e.getMessage());
+
+				try {
+					if (value instanceof String) {
+						Method method = lookupMethod(key, String.class);
+						if (method != null) {
+							method.invoke(config, (String) value);
+						}
+					} else if (value instanceof Boolean) {
+						Method method = lookupMethod(key, boolean.class);
+						if (method != null) {
+							method.invoke(config, (Boolean) value);
+						}
+					} else if (value instanceof Integer) {
+						Method method = lookupMethod(key, int.class);
+						if (method != null) {
+							method.invoke(config, (Integer) value);
+						}
+					} else if (value instanceof Float) {
+						Method method = lookupMethod(key, float.class);
+						if (method != null) {
+							method.invoke(config, (Float) value);
+						}
+					} else {
+						Log.e(TAG, "Config object will not accept type: " + value.getClass().toString());
+					}
+				} catch (Exception e) {
+					Log.e(TAG, "Error setting field on config object (key=" + key + "). " + e.getMessage());
+				}
 			}
 		}
 
 		Tapstream.create(context, accountName, developerSecret, config);
+	}
+
+	@Kroll.method
+	public void create(String accountName, String developerSecret)
+	{
+		create(accountName, developerSecret, null);
 	}
 	
 	@Kroll.method
 	public void fireEvent(String eventName, boolean oneTimeOnly, KrollDict params)
 	{
 		Event e = new Event(eventName, oneTimeOnly);
-        if(params != null) {
-            for(Map.Entry<String, Object> item : params.entrySet())
-            {
-                e.addPair(item.getKey(), item.getValue());
-            }
-        }
-        Tapstream.getInstance().fireEvent(e);
+		if(params != null) {
+			for(Map.Entry<String, Object> item : params.entrySet())
+			{
+				e.addPair(item.getKey(), item.getValue());
+			}
+		}
+		Tapstream.getInstance().fireEvent(e);
 	}
-	
-	
+
+	@Kroll.method
+	public void fireEvent(String eventName, boolean oneTimeOnly)
+	{
+		fireEvent(eventName, oneTimeOnly, null);
+	}
+		
 	private Method lookupMethod(String propertyName, Class<?> argType) {
 		String methodName = propertyName;
 		if (methodName.length() > 0) {
