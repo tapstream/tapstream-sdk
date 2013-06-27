@@ -353,3 +353,11 @@ def docs():
 		with pushd('builds/docs'):
 			with open('docs_phonegap.html', 'w') as f:
 				f.write(page)
+
+	path.copy(path('titanium/Titanium.md'), path('./builds/docs/docs_titanium.md'))
+	with open('titanium/Titanium.md') as f:
+		md = markdown.markdown(f.read(), ['fenced_code', 'codehilite'])
+		page = base_template.render(Context({'md': md}))
+		with pushd('builds/docs'):
+			with open('docs_titanium.html', 'w') as f:
+				f.write(page)
