@@ -12,6 +12,7 @@ Debug/
 dist/
 titanium/tapstream_ios/*.zip
 
+*.lock
 *.class
 *.suo
 *.xcuserstate
