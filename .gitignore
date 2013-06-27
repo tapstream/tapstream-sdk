@@ -5,15 +5,17 @@ obj/
 bin/
 gen/
 .metadata/
+.settings/
 xcuserdata/
 Release/
 Debug/
+dist/
+titanium/tapstream_ios/*.zip
 
 *.class
 *.suo
 *.xcuserstate
 *.pyc
-
 
 
 # Visual studio stuff
