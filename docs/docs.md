@@ -140,7 +140,7 @@ If you wish to avoid requesting the ACCESS_WIFI_STATE and READ_PHONE_STATE permi
 {% elif platform == 'ios' %}
 
     :::objective-c
-    Config *config = [Config configWithDefaults];
+    TSConfig *config = [TSConfig configWithDefaults];
 
     // This hardware identifier will be automatically collected and sent
     // unless you opt-out by setting it to NO, as shown here:
@@ -149,14 +149,14 @@ If you wish to avoid requesting the ACCESS_WIFI_STATE and READ_PHONE_STATE permi
     // These hardware identifiers are not collected automatically.
     // If you wish to send them, you must opt-in by providing values, as shown here:
     config.odin1 = @"<ODIN-1 value goes here>";
-    config.udid = @"<UDID value goes here>";
-    config.idfa = @"<IDFA value goes here>";
+    config.udid = [[UIDevice currentDevice] uniqueIdentifier];
+    config.idfa = [[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString];
     config.openUdid = @"<OpenUDID value goes here>";
     config.secureUdid = @"<SecureUDID value goes here>";
 
     [TSTapstream createWithAccountName:@"TAPSTREAM_ACCOUNT_NAME" developerSecret:@"TAPSTREAM_SDK_SECRET" config:config];
 
-**We strongly recommend that you collect and provide the IDFA value to the Tapstream SDK.** Please see [Apple's documentation on collecting the IDFA](http://developer.apple.com/library/ios/#documentation/AdSupport/Reference/ASIdentifierManager_Ref/ASIdentifierManager.html).
+**We strongly recommend that you collect and provide the iOS Advertising Identifier (IDFA) value to the Tapstream SDK.** Please see [Apple's documentation on collecting the IDFA](http://developer.apple.com/library/ios/#documentation/AdSupport/Reference/ASIdentifierManager_Ref/ASIdentifierManager.html).
 
 To generate the device's ODIN-1 identifier, please see the [ODIN-1 documentation](https://code.google.com/p/odinmobile/wiki/ODIN1).
 
@@ -167,7 +167,7 @@ To get the device's SecureUDID identifier, please see the [Official SecureUDID p
 {% elif platform == 'mac' %}
 
     :::objective-c
-    Config *config = [Config configWithDefaults];
+    TSConfig *config = [TSConfig configWithDefaults];
 
     // This hardware identifier will be automatically collected and sent
     // unless you opt-out by setting it to NO, as shown here:
