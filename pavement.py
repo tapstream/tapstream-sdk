@@ -26,7 +26,7 @@ pip install markdown django
 
 """
 
-PRETTY_PLATFORMS = {
+PLATFORMS = {
 	'ios': 'iOS',
 	'mac': 'Mac',
 	'android': 'Android',
@@ -337,8 +337,8 @@ def docs():
 	with open('docs/docs.md') as f:
 		md_template = Template(f.read())
 	with pushd('builds/docs'):
-		for platform in ('android', 'ios', 'mac', 'win8', 'winphone'):
-			md = md_template.render(Context({'platform': platform, 'pretty_platform': PRETTY_PLATFORMS[platform]}))
+		for platform in PLATFORMS:
+			md = md_template.render(Context({'platform': platform, 'pretty_platform': PLATFORMS[platform]}))
 			with open('docs_%s.md' % platform, 'w') as f:
 				f.write(md)
 			md = markdown.markdown(md, ['fenced_code', 'codehilite'])
