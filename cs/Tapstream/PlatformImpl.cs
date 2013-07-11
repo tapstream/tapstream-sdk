@@ -29,7 +29,7 @@ namespace TapstreamMetrics.Sdk
         private const string UUID_KEY = "__tapstream_sdk_uuid";
 
 #if TEST_WINPHONE || WINDOWS_PHONE
-        private static Mutex storageMutex = new Mutex(false, null);
+        private static Mutex storageMutex = new Mutex(false, "__tapstream_mutex");
 #endif
 
         public string LoadUuid()

@@ -48,7 +48,7 @@ namespace WindowsPhoneApp80
             e.AddPair("score", 5);
             tracker.FireEvent(e);
 
-            e = new Event("test-event-oto", true);
+            e = new Event("test-event-oto-again", true);
             tracker.FireEvent(e);
 
 
