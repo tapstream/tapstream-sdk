@@ -343,6 +343,8 @@ If you wanted to suppress the automatic install and open events, you would set t
 
 The log output of Tapstream can be redirected (or quelled) by providing a handler to receive the messages.
 
+Make sure to define the logging behavior **before** you initialize the SDK.
+
 Here's how you might redirect Tapstream messages to a custom logging system:
 
 {% if platform == 'android' %}
