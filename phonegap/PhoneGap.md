@@ -127,6 +127,8 @@ By default, Tapstream fires an event whenever a user runs the app. You can defin
         'my-custom-param': 'hello world',
     });
 
+**Note**: Custom event parameters are not exposed in Tapstream's dashboard. The key/value pairs are exposed via Tapstream's postback system and Conversion API. Custom parameters are usually used for integration with a third-party ad network or your in-house dashboard or CRM.
+
 ## Changing the default behavior of the Tapstream SDK
 
 **Note**: Changing this behavior is not usually required.

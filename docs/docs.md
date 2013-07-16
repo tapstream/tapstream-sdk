@@ -268,6 +268,8 @@ The ***Tapstream SDK is threadsafe***, so you may fire events from any thread yo
 
 Tapstream also allows you to attach key/value pairs to your events.  The keys and values must be no more than 255 characters each (once in string form).
 
+**Note**: Custom event parameters are not exposed in Tapstream's dashboard. The key/value pairs are exposed via Tapstream's postback system and Conversion API. Custom parameters are usually used for integration with a third-party ad network or your in-house dashboard or CRM.
+
 In the following example, an event called `level-complete` with custom parameters for `score` and `skill` is fired.
 
 {% if platform == 'android' %}
