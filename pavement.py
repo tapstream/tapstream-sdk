@@ -315,3 +315,58 @@ def package_titanium():
 	path('builds/TapstreamSDK-%s-titanium.zip' % VERSION).remove()
 	with pushd('builds/titanium'):		
 		_zip('../TapstreamSDK-%s-titanium.zip' % VERSION, 'modules')
+
+
+
+
+# Don't need make_objc here because we will build the objc sources ourselves
+#@needs('make_java')
+@task
+def make_xamarin():
+	path('builds/xamarin').rmtree()
+	path('builds/xamarin').makedirs()
+
+	# Compile Tapstream objc sources into static library
+	with pushd('objc'):
+		include_dirs = listify(['Core', '/usr/local/include/'], prefix='-I')
+		core_sources = listify(path('Core').walkfiles('*.m'))
+		tapstream_sources = ' '.join((
+			core_sources,
+			listify(path('Tapstream').walkfiles('*.m'))
+		))
+		sdk_root = sh('echo $(xcodebuild -version -sdk iphoneos Path)', capture=True).strip()
+		sh('rm -f ./*.o')
+		sh('xcrun -sdk iphoneos clang -isysroot %s -miphoneos-version-min=4.3 -arch armv7 -fno-objc-arc %s -c %s' % (
+			sdk_root, include_dirs, tapstream_sources
+		))
+		sh('xcrun -sdk iphoneos ar rcu TapstreamArm7.a ./*.o')
+		sh('rm ./*.o')
+
+		sh('xcrun -sdk iphoneos clang -isysroot %s -miphoneos-version-min=4.3 -arch armv7s -fno-objc-arc %s -c %s' % (
+			sdk_root, include_dirs, tapstream_sources
+		))
+		sh('xcrun -sdk iphoneos ar rcu TapstreamArm7s.a ./*.o')
+		sh('rm ./*.o')
+	
+		sh('xcrun -sdk iphoneos lipo -create TapstreamArm7.a TapstreamArm7s.a -output ../xamarin/TapstreamiOS/TapstreamiOS.a')
+		sh('rm ./Tapstream*.a')
+
+	# Copy android library
+	sh('cp builds/android/Tapstream.jar builds/xamarin')
+
+
+@needs('make_xamarin')
+@task
+def package_xamarin():
+	path('builds/TapstreamSDK-%s-xamarin.zip' % VERSION).remove()
+	with pushd('builds'):
+		sh('cp -r xamarin TapstreamSDK-%s-xamarin' % VERSION)
+		_zip('TapstreamSDK-%s-xamarin.zip' % VERSION, 'TapstreamSDK-%s-xamarin' % VERSION)
+		sh('rm -rf TapstreamSDK-%s-xamarin' % VERSION)
+
+
+
+
+
+
+
