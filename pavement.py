@@ -317,15 +317,7 @@ def package_titanium():
 		_zip('../TapstreamSDK-%s-titanium.zip' % VERSION, 'modules')
 
 
-
-
-# Don't need make_objc here because we will build the objc sources ourselves
-#@needs('make_java')
-@task
-def make_xamarin():
-	path('builds/xamarin').rmtree()
-	path('builds/xamarin').makedirs()
-
+def build_objc_static_lib(dest_path):
 	# Compile Tapstream objc sources into static library
 	with pushd('objc'):
 		include_dirs = listify(['Core', '/usr/local/include/'], prefix='-I')
@@ -348,9 +340,18 @@ def make_xamarin():
 		sh('xcrun -sdk iphoneos ar rcu TapstreamArm7s.a ./*.o')
 		sh('rm ./*.o')
 	
-		sh('xcrun -sdk iphoneos lipo -create TapstreamArm7.a TapstreamArm7s.a -output ../xamarin/TapstreamiOS/TapstreamiOS.a')
+		sh('xcrun -sdk iphoneos lipo -create TapstreamArm7.a TapstreamArm7s.a -output %s' % (path('..') / dest_path))
 		sh('rm ./Tapstream*.a')
 
+
+# Don't need make_objc here because we will build the objc sources ourselves
+#@needs('make_java')
+@task
+def make_xamarin():
+	path('builds/xamarin').rmtree()
+	path('builds/xamarin').makedirs()
+	bulid_objc_static_lib('xamarin/TapstreamiOS/TapstreamiOS.a')
+	
 	# Copy android library
 	sh('cp builds/android/Tapstream.jar builds/xamarin')
 
@@ -364,6 +365,19 @@ def package_xamarin():
 		_zip('TapstreamSDK-%s-xamarin.zip' % VERSION, 'TapstreamSDK-%s-xamarin' % VERSION)
 		sh('rm -rf TapstreamSDK-%s-xamarin' % VERSION)
 
+
+
+
+# Don't need make_objc here because we will build the objc sources ourselves
+#@needs('make_java')
+@task
+def make_unity():
+	path('builds/unity').rmtree()
+	path('builds/unity').makedirs()
+	build_objc_static_lib('unity/TapstreamiOS.a')
+	sh('cp builds/android/Tapstream.jar unity')
+	with pushd('unity'):
+		sh('clang -fno-objc-arc TapstreamObjcInterface.m -I../objc/Tapstream -I../objc/Core -o Tapstream.a -lTapstreamiOS.a -framework Foundation -framework UIKit')
 
 
 
