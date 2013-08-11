@@ -317,31 +317,28 @@ def package_titanium():
 		_zip('../TapstreamSDK-%s-titanium.zip' % VERSION, 'modules')
 
 
-def build_objc_static_lib(dest_path):
+def build_objc_static_lib(dest_path, additional_sources=[], addition_include_dirs=[]):
 	# Compile Tapstream objc sources into static library
-	with pushd('objc'):
-		include_dirs = listify(['Core', '/usr/local/include/'], prefix='-I')
-		core_sources = listify(path('Core').walkfiles('*.m'))
-		tapstream_sources = ' '.join((
-			core_sources,
-			listify(path('Tapstream').walkfiles('*.m'))
-		))
-		sdk_root = sh('echo $(xcodebuild -version -sdk iphoneos Path)', capture=True).strip()
-		sh('rm -f ./*.o')
-		sh('xcrun -sdk iphoneos clang -isysroot %s -miphoneos-version-min=4.3 -arch armv7 -fno-objc-arc %s -c %s' % (
-			sdk_root, include_dirs, tapstream_sources
-		))
-		sh('xcrun -sdk iphoneos ar rcu TapstreamArm7.a ./*.o')
-		sh('rm ./*.o')
+	sdk_root = sh('echo $(xcodebuild -version -sdk iphoneos Path)', capture=True).strip()
+	include_dirs = listify(['objc/Core', 'objc/Tapstream', '/usr/local/include/']+addition_include_dirs, prefix='-I')
+	core_sources = list(path('objc/Core').walkfiles('*.m'))
+	inputs = core_sources + list(path('objc/Tapstream').walkfiles('*.m')) + [path(p) for p in additional_sources]
 
-		sh('xcrun -sdk iphoneos clang -isysroot %s -miphoneos-version-min=4.3 -arch armv7s -fno-objc-arc %s -c %s' % (
-			sdk_root, include_dirs, tapstream_sources
-		))
-		sh('xcrun -sdk iphoneos ar rcu TapstreamArm7s.a ./*.o')
-		sh('rm ./*.o')
-	
-		sh('xcrun -sdk iphoneos lipo -create TapstreamArm7.a TapstreamArm7s.a -output %s' % (path('..') / dest_path))
-		sh('rm ./Tapstream*.a')
+	sh('rm -f ./*.o')
+	sh('xcrun -sdk iphoneos clang -isysroot %s -miphoneos-version-min=4.3 -arch armv7 -fno-objc-arc %s -c %s' % (
+		sdk_root, include_dirs, listify(inputs)
+	))
+	sh('xcrun -sdk iphoneos ar rcu objc/TapstreamArm7.a ./*.o')
+	sh('rm ./*.o')
+
+	sh('xcrun -sdk iphoneos clang -isysroot %s -miphoneos-version-min=4.3 -arch armv7s -fno-objc-arc %s -c %s' % (
+		sdk_root, include_dirs, listify(inputs)
+	))
+	sh('xcrun -sdk iphoneos ar rcu objc/TapstreamArm7s.a ./*.o')
+	sh('rm ./*.o')
+
+	sh('xcrun -sdk iphoneos lipo -create objc/TapstreamArm7.a objc/TapstreamArm7s.a -output %s' % dest_path)
+	sh('rm objc/Tapstream*.a')
 
 
 # Don't need make_objc here because we will build the objc sources ourselves
@@ -374,11 +371,9 @@ def package_xamarin():
 def make_unity():
 	path('builds/unity').rmtree()
 	path('builds/unity').makedirs()
-	build_objc_static_lib('unity/TapstreamiOS.a')
+	build_objc_static_lib('unity/Tapstream.a', ['unity/TapstreamObjcInterface.m'], ['unity'])
 	sh('cp builds/android/Tapstream.jar unity')
-	with pushd('unity'):
-		sh('clang -fno-objc-arc TapstreamObjcInterface.m -I../objc/Tapstream -I../objc/Core -o Tapstream.a -lTapstreamiOS.a -framework Foundation -framework UIKit')
-
+	
 
 
 

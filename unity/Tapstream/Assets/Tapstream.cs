@@ -6,21 +6,27 @@ using System.Runtime.InteropServices;
 public class Tapstream : MonoBehaviour
 {
 #if UNITY_IPHONE
+	
+	[DllImport ("__Internal")]
+	private static extern IntPtr Config_New();
 
 	[DllImport ("__Internal")]
-	private static extern void Config_SetString(string key, string val);
+	private static extern void Config_Delete(IntPtr conf);
+	
+	[DllImport ("__Internal")]
+	private static extern void Config_SetString(IntPtr conf, string key, string val);
 
 	[DllImport ("__Internal")]
-	private static extern void Config_SetBool(string key, bool val);
+	private static extern void Config_SetBool(IntPtr conf, string key, bool val);
 
 	[DllImport ("__Internal")]
-	private static extern void Config_SetInt(string key, int val);
+	private static extern void Config_SetInt(IntPtr conf, string key, int val);
 
 	[DllImport ("__Internal")]
-	private static extern void Config_SetUInt(string key, uint val);
+	private static extern void Config_SetUInt(IntPtr conf, string key, uint val);
 
 	[DllImport ("__Internal")]
-	private static extern void Config_SetDouble(string key, double val);
+	private static extern void Config_SetDouble(IntPtr conf, string key, double val);
 
 	[DllImport ("__Internal")]
 	private static extern IntPtr Event_New(string name, bool oneTimeOnly);
@@ -44,36 +50,48 @@ public class Tapstream : MonoBehaviour
 	private static extern void Event_AddPairDouble(IntPtr ev, string key, double val);
 
 	[DllImport ("__Internal")]
-	private static extern void Tapstream_Create(string accountName, string developerSecret);
+	private static extern void Tapstream_Create(string accountName, string developerSecret, IntPtr conf);
 
 	[DllImport ("__Internal")]
 	private static extern void Tapstream_FireEvent(IntPtr ev);
 
 
-	public static class Config
+	public class Config
 	{
-		public static void Set(string key, object val)
+		protected internal IntPtr handle = (IntPtr)0;
+
+		public Config()
+		{
+			handle = Config_New();
+		}
+
+		~Config()
+		{
+			Config_Delete(handle);
+		}
+		
+		public void Set(string key, object val)
 		{
 			Type t = val.GetType();
 			if(t == typeof(string))
 			{
-				Config_SetString(key, (string)val);
+				Config_SetString(handle, key, (string)val);
 			}
 			else if(t == typeof(bool))
 			{
-				Config_SetBool(key, (bool)val);
+				Config_SetBool(handle, key, (bool)val);
 			}
 			else if(t == typeof(int) )
 			{
-				Config_SetInt(key, (int)val);
+				Config_SetInt(handle, key, (int)val);
 			}
 			else if(t == typeof(uint))
 			{
-				Config_SetUInt(key, (uint)val);
+				Config_SetUInt(handle, key, (uint)val);
 			}
 			else if(t == typeof(double))
 			{
-				Config_SetDouble(key, (double)val);
+				Config_SetDouble(handle, key, (double)val);
 			}
 			else
 			{
@@ -93,10 +111,7 @@ public class Tapstream : MonoBehaviour
 
 		~Event()
 		{
-			if(handle != (IntPtr)0)
-			{
-				Event_Delete(handle);
-			}
+			Event_Delete(handle);
 		}
 
 		public void AddPair(string key, object val)
@@ -129,15 +144,14 @@ public class Tapstream : MonoBehaviour
 		}
 	}
 
-	public static void Create(string accountName, string developerSecret)
+	public static void Create(string accountName, string developerSecret, Config conf)
 	{
-		Tapstream_Create(accountName, developerSecret);
+		Tapstream_Create(accountName, developerSecret, conf.handle);
 	}
 
 	public static void FireEvent(Event e)
 	{
 		Tapstream_FireEvent(e.handle);
-		e.handle = (IntPtr)0;
 	}
 
 #elif UNITY_ANDROID
@@ -145,5 +159,5 @@ public class Tapstream : MonoBehaviour
 	
 	
 #endif
-	
+
 }
