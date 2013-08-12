@@ -11,6 +11,7 @@ Release/
 Debug/
 dist/
 titanium/tapstream_ios/*.zip
+Temp/
 
 *.lock
 *.class
