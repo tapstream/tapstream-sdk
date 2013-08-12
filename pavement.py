@@ -366,7 +366,7 @@ def package_xamarin():
 
 
 # Don't need make_objc here because we will build the objc sources ourselves
-#@needs('make_java')
+@needs('make_java')
 @task
 def make_unity():
 	path('builds/unity').rmtree()
