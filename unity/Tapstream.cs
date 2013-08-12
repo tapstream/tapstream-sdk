@@ -155,9 +155,58 @@ public class Tapstream : MonoBehaviour
 	}
 
 #elif UNITY_ANDROID
-	
-	
-	
+
+
+	public class Config
+	{
+		protected internal AndroidJavaObject handle = null;
+
+		public Config()
+		{
+			handle = new AndroidJavaObject("com.tapstream.sdk.Config");
+		}
+
+		public void Set(string key, object val)
+		{
+			handle.Set(key, val);
+		}
+	}
+
+	public class Event
+	{
+		protected internal AndroidJavaObject handle = null;
+
+		public Event(string name, bool oneTimeOnly)
+		{
+			handle = new AndroidJavaObject("com.tapstream.sdk.Event", name, oneTimeOnly);
+		}
+
+		public void AddPair(string key, object val)
+		{
+			handle.Call("addPair", key, val);
+		}
+	}
+
+	public static void Create(string accountName, string developerSecret, Config conf)
+	{
+		using(AndroidJavaClass cls = new AndroidJavaClass("com.tapstream.sdk.Tapstream"))
+		{
+			cls.CallStatic("create", accountName, developerSecret, conf.handle);
+		}
+	}
+
+	public static void FireEvent(Event e)
+	{
+		using(AndroidJavaClass cls = new AndroidJavaClass("com.tapstream.sdk.Tapstream"))
+		{
+			using(AndroidJavaObject inst = cls.CallStatic<AndroidJavaObject>("getInstance"))
+			{
+				inst.Call("fireEvent", e.handle);
+			}
+		}
+	}
+
+
 #endif
 
 }
