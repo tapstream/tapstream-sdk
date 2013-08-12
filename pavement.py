@@ -371,8 +371,13 @@ def package_xamarin():
 def make_unity():
 	path('builds/unity').rmtree()
 	path('builds/unity').makedirs()
-	build_objc_static_lib('unity/Tapstream.a', ['unity/TapstreamObjcInterface.m'], ['unity'])
-	sh('cp builds/android/Tapstream.jar unity')
+	path('builds/unity/Plugins/iOS').makedirs()
+	path('builds/unity/Plugins/Android').makedirs()
+	sh('cp builds/android/Tapstream.jar builds/unity/Plugins/Android')
+	sh('cp objc/Core/* builds/unity/Plugins/iOS')
+	sh('cp objc/Tapstream/* builds/unity/Plugins/iOS')
+	sh('cp unity/TapstreamObjcInterface.m builds/unity/Plugins/iOS')
+	sh('cp unity/Tapstream.cs builds/unity')
 	
 
 
