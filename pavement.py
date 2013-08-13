@@ -379,7 +379,14 @@ def make_unity():
 	sh('cp unity/TapstreamObjcInterface.m builds/unity/Plugins/iOS')
 	sh('cp unity/Tapstream.cs builds/unity')
 	
-
+@needs('make_unity')
+@task
+def package_unity():
+	path('builds/TapstreamSDK-%s-unity.zip' % VERSION).remove()
+	with pushd('builds'):
+		sh('cp -r unity TapstreamSDK-%s-unity' % VERSION)
+		_zip('TapstreamSDK-%s-unity.zip' % VERSION, 'TapstreamSDK-%s-unity' % VERSION)
+		sh('rm -rf TapstreamSDK-%s-unity' % VERSION)
 
 
 
