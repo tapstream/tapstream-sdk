@@ -317,6 +317,8 @@ def package_titanium():
 		_zip('../TapstreamSDK-%s-titanium.zip' % VERSION, 'modules')
 
 
+
+
 def build_objc_static_lib(dest_path, additional_sources=[], addition_include_dirs=[]):
 	# Compile Tapstream objc sources into static library
 	sdk_root = sh('echo $(xcodebuild -version -sdk iphoneos Path)', capture=True).strip()
@@ -341,17 +343,22 @@ def build_objc_static_lib(dest_path, additional_sources=[], addition_include_dir
 	sh('rm objc/Tapstream*.a')
 
 
-# Don't need make_objc here because we will build the objc sources ourselves
-#@needs('make_java')
+@needs('make_java')
 @task
 def make_xamarin():
 	path('builds/xamarin').rmtree()
 	path('builds/xamarin').makedirs()
-	bulid_objc_static_lib('xamarin/TapstreamiOS/TapstreamiOS.a')
-	
-	# Copy android library
-	sh('cp builds/android/Tapstream.jar builds/xamarin')
+	build_objc_static_lib('xamarin/Tapstream/TapstreamiOS/TapstreamiOS.a', ['xamarin/TapstreamObjcInterface.m'], ['objc/Core', 'objc/Tapstream'])
+	sh('cp builds/android/Tapstream.jar xamarin/Tapstream/TapstreamAndroid')
 
+	sh('xbuild /t:Clean /p:Configuration=Release xamarin/Tapstream/TapstreamiOS/TapstreamiOS.csproj')
+	sh('xbuild /t:Clean /p:Configuration=Release xamarin/Tapstream/TapstreamAndroid/TapstreamAndroid.csproj')
+
+	sh('xbuild /t:Build /p:Configuration=Release xamarin/Tapstream/TapstreamiOS/TapstreamiOS.csproj')
+	sh('xbuild /t:Build /p:Configuration=Release xamarin/Tapstream/TapstreamAndroid/TapstreamAndroid.csproj')
+
+	sh('cp xamarin/Tapstream/TapstreamiOS/bin/Release/TapstreamiOS.dll builds/xamarin')
+	sh('cp xamarin/Tapstream/TapstreamAndroid/bin/Release/TapstreamAndroid.dll builds/xamarin')
 
 @needs('make_xamarin')
 @task

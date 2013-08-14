@@ -62,57 +62,5 @@ namespace TapstreamiOS
 	//
 	// For more information, see http://docs.xamarin.com/ios/advanced_topics/binding_objective-c_libraries
 	//
-
-	[BaseType (typeof(NSObject))]
-	interface Config
-	{
-
-	}
-
-	[BaseType (typeof(NSObject))]
-	[DisableDefaultCtor]
-	interface Event
-	{
-		// + (id)eventWithName:(NSString *)name oneTimeOnly:(BOOL)oneTimeOnly;
-		[Static, Export ("eventWithName:oneTimeOnly:")]
-		Event EventWithName(string name, bool oneTimeOnly);
-
-		// - (void)addValue:(NSString *)value forKey:(NSString *)key;
-		[Export ("addValue:forKey:")]
-		void AddValue(string value, string key);
-
-		// - (void)addIntegerValue:(int)value forKey:(NSString *)key;
-		[Export ("addIntegerValue:forKey:")]
-		void AddIntegerValue(int value, string key);
-
-		// - (void)addUnsignedIntegerValue:(uint)value forKey:(NSString *)key;
-		[Export ("addUnsignedIntegerValue:forKey:")]
-		void AddUnsignedIntegerValue(uint value, string key);
-
-		// - (void)addDoubleValue:(double)value forKey:(NSString *)key;
-		[Export ("addDoubleValue:forKey:")]
-		void AddDoubleValue(double value, string key);
-
-		// - (void)addBooleanValue:(BOOL)value forKey:(NSString *)key;
-		[Export ("addBooleanValue:forKey:")]
-		void AddBooleanValue(bool value, string key);
-	}
-
-	[BaseType (typeof(NSObject))]
-	[DisableDefaultCtor]
-	interface Tapstream
-	{
-		[Static, Export ("createWithAccountName:developerSecret:config:")]
-		void Create (string accountName, string developerSecret, Config config);
-
-		// + (id)instance;
-		[Static, Export ("instance")]
-		Tapstream Instance { get; }
-
-		[Export ("fireEvent:")]
-		void FireEvent (Event ev);
-	}
-
-
 }
 

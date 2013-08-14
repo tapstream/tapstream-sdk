@@ -1,9 +1,8 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="TapstreamiOS.linkwith.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="TapstreamAndroid/Tapstream.cs">
     <Files>
-      <File FileName="ApiDefinition.cs" Line="101" Column="31" />
-      <File FileName="TapstreamiOS.linkwith.cs" Line="5" Column="1" />
+      <File FileName="TapstreamAndroid/Tapstream.cs" Line="33" Column="32" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
