@@ -1,5 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
+using MonoTouch.Foundation;
+using MonoTouch.UIKit;
 
 namespace TapstreamMetrics
 {

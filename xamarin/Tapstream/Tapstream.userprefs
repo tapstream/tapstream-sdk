@@ -1,9 +1,9 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="TapstreamAndroid/Wrapper.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="TapstreamiOS/TapstreamiOS.linkwith.cs">
     <Files>
-      <File FileName="TapstreamAndroid/Wrapper.cs" Line="115" Column="106" />
-      <File FileName="TapstreamiOS/TapstreamiOS.linkwith.cs" Line="1" Column="1" />
+      <File FileName="TapstreamiOS/Wrapper.cs" Line="1" Column="1" />
+      <File FileName="TapstreamiOS/TapstreamiOS.linkwith.cs" Line="9" Column="25" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
