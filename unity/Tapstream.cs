@@ -168,26 +168,28 @@ public class Tapstream : MonoBehaviour
 
 		public void Set(string key, object val)
 		{
+			string setter = "set" + char.ToUpper(key[0]) + key.Substring(1);
+
 			Type t = val.GetType();
 			if(t == typeof(string))
 			{
-				handle.Set<string>(key, (string)val);
+				handle.Call(setter, (string)val);
 			}
 			else if(t == typeof(bool))
 			{
-				handle.Set<bool>(key, (bool)val);
+				handle.Call(setter, (bool)val);
 			}
 			else if(t == typeof(int) )
 			{
-				handle.Set<int>(key, (int)val);
+				handle.Call(setter, (int)val);
 			}
 			else if(t == typeof(uint))
 			{
-				handle.Set<uint>(key, (uint)val);
+				handle.Call(setter, (uint)val);
 			}
 			else if(t == typeof(double))
 			{
-				handle.Set<double>(key, (double)val);
+				handle.Call(setter, (double)val);
 			}
 			else
 			{

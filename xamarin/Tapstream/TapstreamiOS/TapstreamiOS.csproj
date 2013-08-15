@@ -48,5 +48,11 @@
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Xamarin.ObjcBinding.CSharp.targets" />
   <ItemGroup>
     <Compile Include="Wrapper.cs" />
+    <Compile Include="TapstreamiOS.linkwith.cs">
+      <DependentUpon>TapstreamiOS.a</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ObjcBindingNativeLibrary Include="TapstreamiOS.a" />
   </ItemGroup>
 </Project>

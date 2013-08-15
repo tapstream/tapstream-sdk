@@ -322,6 +322,8 @@ def package_titanium():
 def build_objc_static_lib(dest_path, additional_sources=[], addition_include_dirs=[]):
 	# Compile Tapstream objc sources into static library
 	sdk_root = sh('echo $(xcodebuild -version -sdk iphoneos Path)', capture=True).strip()
+	simulator_sdk_root = sh('echo $(xcodebuild -version -sdk iphonesimulator Path)', capture=True).strip()
+
 	include_dirs = listify(['objc/Core', 'objc/Tapstream', '/usr/local/include/']+addition_include_dirs, prefix='-I')
 	core_sources = list(path('objc/Core').walkfiles('*.m'))
 	inputs = core_sources + list(path('objc/Tapstream').walkfiles('*.m')) + [path(p) for p in additional_sources]
@@ -339,7 +341,13 @@ def build_objc_static_lib(dest_path, additional_sources=[], addition_include_dir
 	sh('xcrun -sdk iphoneos ar rcu objc/TapstreamArm7s.a ./*.o')
 	sh('rm ./*.o')
 
-	sh('xcrun -sdk iphoneos lipo -create objc/TapstreamArm7.a objc/TapstreamArm7s.a -output %s' % dest_path)
+	sh('xcrun -sdk iphonesimulator clang -isysroot %s -miphoneos-version-min=4.3 -arch i386 -fno-objc-arc %s -c %s' % (
+		simulator_sdk_root, include_dirs, listify(inputs)
+	))
+	sh('xcrun -sdk iphonesimulator ar rcu objc/Tapstreami386.a ./*.o')
+	sh('rm ./*.o')
+
+	sh('xcrun -sdk iphoneos lipo -create objc/TapstreamArm7.a objc/TapstreamArm7s.a objc/Tapstreami386.a -output %s' % dest_path)
 	sh('rm objc/Tapstream*.a')
 
 
@@ -380,8 +388,10 @@ def make_unity():
 	path('builds/unity/Plugins/iOS').makedirs()
 	path('builds/unity/Plugins/Android').makedirs()
 	sh('cp builds/android/Tapstream.jar builds/unity/Plugins/Android')
-	sh('cp objc/Core/* builds/unity/Plugins/iOS')
-	sh('cp objc/Tapstream/* builds/unity/Plugins/iOS')
+	sh('cp objc/Core/*.m builds/unity/Plugins/iOS')
+	sh('cp objc/Core/*.h builds/unity/Plugins/iOS')
+	sh('cp objc/Tapstream/*.m builds/unity/Plugins/iOS')
+	sh('cp objc/Tapstream/*.h builds/unity/Plugins/iOS')
 	sh('cp unity/TapstreamObjcInterface.m builds/unity/Plugins/iOS')
 	sh('cp unity/Tapstream.cs builds/unity')
 	

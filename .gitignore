@@ -18,7 +18,8 @@ Temp/
 *.suo
 *.xcuserstate
 *.pyc
-
+*.o
+*.a
 
 # Visual studio stuff
 *.cdf

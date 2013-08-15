@@ -21,6 +21,6 @@ Global
 		{C1FA3F09-5302-412E-A856-BAB54D3C06B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = TapstreamAndroid\TapstreamAndroid.csproj
+		StartupItem = TapstreamiOS\TapstreamiOS.csproj
 	EndGlobalSection
 EndGlobal

@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Tapstream
+namespace TapstreamMetrics
 {
 
 	internal class NativeApi
