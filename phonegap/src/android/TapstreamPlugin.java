@@ -4,7 +4,8 @@ import android.util.Log;
 import com.tapstream.sdk.*;
 import java.lang.reflect.Method;
 import java.util.*;
-import org.apache.cordova.api.*;
+import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CallbackContext;
 import org.json.*;
 
 public class TapstreamPlugin extends CordovaPlugin {

@@ -268,16 +268,29 @@ def package_objc():
 			sh('zip -r ../TapstreamSDK-%s-%s-whitelabel.zip ConversionTracker' % (VERSION, sdk))
 
 
-@needs('make_java', 'make_objc')
+#@needs('make_java', 'make_objc')
 @task
 def make_phonegap():
 	path('builds/phonegap').rmtree()
 	path('builds/phonegap').makedirs()
-	sh('cp phonegap/tapstream.js builds/phonegap/')
-	sh('cp -r phonegap/objc_plugin builds/phonegap/')
-	sh('cp -r phonegap/java_plugin builds/phonegap/')
-	sh('cp builds/android/Tapstream.jar builds/phonegap')
-	sh('cp -r builds/ios/Tapstream builds/phonegap')
+	sh('cp -r phonegap builds')
+	sh('cp -r builds/ios/Tapstream builds/phonegap/src/ios')
+	sh('cp builds/android/Tapstream.jar builds/phonegap/src/android')
+
+	# Generate plugin xml elements that will copy each ios source file to the right place
+	# Format these elements into the plugin file
+	sources = path('builds/phonegap/src/ios/Tapstream').walkfiles('*.m')
+	headers = path('builds/phonegap/src/ios/Tapstream').walkfiles('*.h')
+	base = path('builds/phonegap')
+	elements = ['        <source-file src="%s" />' % base.relpathto(s) for s in sources]
+	elements += ['        <header-file src="%s" />' % base.relpathto(h) for h in headers]
+	elements = '\n'.join(elements)
+
+	with open('builds/phonegap/plugin.xml') as file:
+		data = file.read()
+	data = re.sub(r'{{\s*ios_sources\s*}}', elements, data)
+	with open('builds/phonegap/plugin.xml', 'w') as file:
+		file.write(data)
 
 @needs('make_phonegap')
 @task

@@ -1,0 +1,43 @@
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="com.tapstream.phonegap" version="1.0.0">
+    <engines>
+        <engine name="cordova" version=">=2.3.0" />
+    </engines>
+    
+    <name>Tapstream</name>
+    <license>MIT</license>
+    
+    <asset src="www/tapstream.js" target="tapstream.js" />
+
+    <config-file target="config.xml" parent="/*">
+        <access origin="https://api.tapstream.com" />
+    </config-file>
+
+    <platform name="android">
+        <config-file target="res/xml/plugins.xml" parent="/plugins">
+            <plugin name="com.tapstream.phonegap" value="TapstreamPlugin"/>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.INTERNET" />
+            <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+            <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+        </config-file>
+
+        <source-file src="src/android/TapstreamPlugin.java" target-dir="src/com/tapstream/phonegap" />
+        <source-file src="src/android/Tapstream.jar" target-dir="libs"/>
+    </platform>
+    
+    <platform name="ios">
+        <plugins-plist key="com.tapstream.phonegap" string="TSTapstreamPlugin" />
+
+        <config-file target="config.xml" parent="plugins">
+            <plugin name="com.tapstream.phonegap" value="TSTapstreamPlugin"/>
+        </config-file>
+
+        <source-file src="src/ios/TSTapstreamPlugin.m" />
+        <header-file src="src/ios/TSTapstreamPlugin.h" />
+
+{{ ios_sources }}
+
+    </platform>
+</plugin>
