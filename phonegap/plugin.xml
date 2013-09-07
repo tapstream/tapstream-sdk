@@ -37,9 +37,7 @@
     </platform>
     
     <platform name="ios">
-        <plugins-plist key="com.tapstream.phonegap" string="TSTapstreamPlugin" />
-
-        <config-file target="config.xml" parent="plugins">
+        <config-file target="config.xml" parent="/plugins">
             <plugin name="com.tapstream.phonegap" value="TSTapstreamPlugin"/>
         </config-file>
 
