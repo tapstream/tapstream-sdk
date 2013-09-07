@@ -1,12 +1,21 @@
-<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="com.tapstream.phonegap" version="1.0.0">
+<plugin
+    xmlns="http://www.phonegap.com/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="com.tapstream.phonegap"
+    version="1.0.0">
+
     <engines>
         <engine name="cordova" version=">=2.3.0" />
     </engines>
     
     <name>Tapstream</name>
+    <description>Official Tapstream marketing analytics SDK (http://tapstream.com)</description>
     <license>MIT</license>
     
-    <asset src="www/tapstream.js" target="tapstream.js" />
+    <!-- <asset src="www/tapstream.js" target="tapstream.js" /> -->
+    <js-module src="www/tapstream.js" name="tapstream">
+        <clobbers target="window.tapstream" />
+    </js-module>
 
     <config-file target="config.xml" parent="/*">
         <access origin="https://api.tapstream.com" />
