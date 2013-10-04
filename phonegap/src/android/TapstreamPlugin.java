@@ -13,16 +13,36 @@ public class TapstreamPlugin extends CordovaPlugin {
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         if(action.equals("create")) {
-            String accountName = args.getString(0);
-            String developerSecret = args.getString(1);
-            JSONObject config = args.optJSONObject(2);
-            this.create(accountName, developerSecret, config);
+            final String accountName = args.getString(0);
+            final String developerSecret = args.getString(1);
+            final JSONObject config = args.optJSONObject(2);
+
+            final TapstreamPlugin self = this;
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    try {
+                        self.create(accountName, developerSecret, config);
+                    } catch(JSONException ex) {
+                        Log.e(self.getClass().getSimpleName(), "Tapstream.create failed: " + ex.toString());
+                    }
+                }
+            });
             return true;
         } else if(action.equals("fireEvent")) {
-            String eventName = args.getString(0);
-            boolean oneTimeOnly = args.getBoolean(1);
-            JSONObject params = args.optJSONObject(2);
-            this.fireEvent(eventName, oneTimeOnly, params);
+            final String eventName = args.getString(0);
+            final boolean oneTimeOnly = args.getBoolean(1);
+            final JSONObject params = args.optJSONObject(2);
+
+            final TapstreamPlugin self = this;
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    try {
+                        self.fireEvent(eventName, oneTimeOnly, params);
+                    } catch(JSONException ex) {
+                        Log.e(self.getClass().getSimpleName(), "Tapstream.fireEvent failed: " + ex.toString());
+                    }
+                }
+            });
             return true;
         }
         return false;
