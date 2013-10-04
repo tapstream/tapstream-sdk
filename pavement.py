@@ -268,7 +268,7 @@ def package_objc():
 			sh('zip -r ../TapstreamSDK-%s-%s-whitelabel.zip ConversionTracker' % (VERSION, sdk))
 
 
-#@needs('make_java', 'make_objc')
+@needs('make_java', 'make_objc')
 @task
 def make_phonegap():
 	path('builds/phonegap').rmtree()
