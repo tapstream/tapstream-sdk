@@ -1,8 +1,8 @@
-#import "TSTapstreamPlugin.h"
+#import "TapstreamPlugin.h"
 #import "TSTapstream.h"
 #import <Cordova/CDV.h>
 
-@implementation TSTapstreamPlugin
+@implementation TapstreamPlugin
 
 - (void)create:(CDVInvokedUrlCommand *)command
 {
