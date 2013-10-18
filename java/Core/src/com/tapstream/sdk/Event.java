@@ -94,13 +94,13 @@ public class Event {
 
 	public String getPostData() {
 		String data = postData != null ? postData.toString() : "";
-		return String.format(Locale.US, "&created=%.0f", firstFiredTime) + data;
+		return String.format(Locale.US, "&created-ms=%.0f", firstFiredTime) + data;
 	}
 
 	void firing() {
 		// Only record the time of the first fire attempt
 		if (firstFiredTime == 0) {
-			firstFiredTime = System.currentTimeMillis() / 1000;
+			firstFiredTime = System.currentTimeMillis();
 		}
 	}
 

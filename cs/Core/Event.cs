@@ -93,7 +93,7 @@ namespace TapstreamMetrics.Sdk
             get
             {
                 string result = postData != null ? postData.ToString() : "";
-                return String.Format("&created={0}", firstFiredTime) + result;
+                return String.Format("&created-ms={0}", firstFiredTime) + result;
             }
         }
 
@@ -103,7 +103,7 @@ namespace TapstreamMetrics.Sdk
             if(firstFiredTime == 0)
             {
                 TimeSpan t = (DateTime.UtcNow - new DateTime(1970, 1, 1));
-                firstFiredTime = (uint)t.TotalSeconds;
+                firstFiredTime = (uint)t.TotalMilliseconds;
             }
         }
 

@@ -96,7 +96,7 @@
 - (NSString *)postData
 {
 	NSString *data = postData != nil ? (NSString *)postData : @"";
-	return [[NSString stringWithFormat:@"&created=%u", (unsigned int)firstFiredTime] stringByAppendingString:data];
+	return [[NSString stringWithFormat:@"&created-ms=%u", (unsigned int)(firstFiredTime*1000)] stringByAppendingString:data];
 }
 
 - (void)firing
@@ -110,11 +110,8 @@
 
 - (NSString *)makeUid
 {
-	struct timeval time;
-	gettimeofday(&time, NULL);
-	long millis = (time.tv_sec * 1000) + (time.tv_usec / 1000);
-
-	return [NSString stringWithFormat:@"%ld:%f", millis, arc4random() / (float)0x10000000];
+	NSTimeInterval t = [[NSDate date] timeIntervalSince1970];
+	return [NSString stringWithFormat:@"%ld:%f", (unsigned int)(t*1000), arc4random() / (float)0x10000000];
 }
 
 - (void)dealloc
