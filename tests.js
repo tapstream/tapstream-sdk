@@ -122,35 +122,35 @@ test('event-params', function() {
 	callMethod(e, 'addPair', 'key1', 'val1');
 	callMethod(e, 'addPair', 'key2', 'val2');
 	util.assertEqual(
-		'&created=0&custom-key1=val1&custom-key2=val2',
+		'&created-ms=0&custom-key1=val1&custom-key2=val2',
 		callGetter(e, 'postData')
 	);
 });
 test('event-null-param', function() {
 	var e = util.newEvent('test', false);
 	callMethod(e, 'addPair', 'key', null);
-	util.assertEqual('&created=0', callGetter(e, 'postData'));
+	util.assertEqual('&created-ms=0', callGetter(e, 'postData'));
 });
 test('event-param-int', function() {
 	var e = util.newEvent('test', false);
 	callMethod(e, 'addPair', 'key', -13);
-	util.assertEqual('&created=0&custom-key=-13', callGetter(e, 'postData'));
+	util.assertEqual('&created-ms=0&custom-key=-13', callGetter(e, 'postData'));
 });
 test('event-param-uint', function() {
 	var e = util.newEvent('test', false);
 	callMethod(e, 'addPair', 'key', 4294967295);
-	util.assertEqual('&created=0&custom-key=4294967295', callGetter(e, 'postData'));
+	util.assertEqual('&created-ms=0&custom-key=4294967295', callGetter(e, 'postData'));
 });
 test('event-param-double', function() {
 	var e = util.newEvent('test', false);
 	callMethod(e, 'addPair', 'key', 4.8);
-	util.assertEqual('&created=0&custom-key=4.8', callGetter(e, 'postData'));
+	util.assertEqual('&created-ms=0&custom-key=4.8', callGetter(e, 'postData'));
 });
 test('event-param-encoding', function() {
 	var e = util.newEvent('test', false);
 	callMethod(e, 'addPair', " !#$&'()+,/:;=?@[]", " !#$&'()+,/:;=?@[]-_.");
 	util.assertEqual(
-		'&created=0&custom-%20%21%23%24%26%27%28%29%2B%2C%2F%3A%3B%3D%3F%40%5B%5D=%20%21%23%24%26%27%28%29%2B%2C%2F%3A%3B%3D%3F%40%5B%5D-_.',
+		'&created-ms=0&custom-%20%21%23%24%26%27%28%29%2B%2C%2F%3A%3B%3D%3F%40%5B%5D=%20%21%23%24%26%27%28%29%2B%2C%2F%3A%3B%3D%3F%40%5B%5D-_.',
 		callGetter(e, 'postData')
 	);
 });
@@ -158,19 +158,19 @@ test('event-param-encoding-unicode', function() {
 	var e = util.newEvent('test', false);
 	callMethod(e, 'addPair', 'key\u01c5\u1667', 'value\u1511\u167b');
 	util.assertEqual(
-		'&created=0&custom-key%C7%85%E1%99%A7=value%E1%94%91%E1%99%BB',
+		'&created-ms=0&custom-key%C7%85%E1%99%A7=value%E1%94%91%E1%99%BB',
 		callGetter(e, 'postData')
 	);
 });
 test('event-long-key', function() {
 	var e = util.newEvent('test', false);
 	callMethod(e, 'addPair', string256, 'val');
-	util.assertEqual('&created=0', callGetter(e, 'postData'));
+	util.assertEqual('&created-ms=0', callGetter(e, 'postData'));
 });
 test('event-long-value', function() {
 	var e = util.newEvent('test', false);
 	callMethod(e, 'addPair', 'key', string256);
-	util.assertEqual('&created=0', callGetter(e, 'postData'));
+	util.assertEqual('&created-ms=0', callGetter(e, 'postData'));
 });
 
 
@@ -402,8 +402,8 @@ test('succeeded-event-has-created-time', function() {
 	expect(q, 'event-succeeded', 'job-ended');
 	var pd = callGetter(e, 'postData');
 	util.log(pd);
-	util.assertTrue(pd.search('&created=') == 0);
-	util.assertTrue(parseInt(pd.substring(9)) > 1300000000);
+	util.assertTrue(pd.search('&created-ms=') == 0);
+	util.assertTrue(parseInt(pd.substring(12)) > 3400000000);
 });
 test('failed', function() {
 	var q = util.newOperationQueue(),
@@ -426,8 +426,8 @@ test('failed-event-has-created-time', function() {
 	expect(q, 'increased-delay', 'event-failed', 'retry', 'job-ended');
 	var pd = callGetter(e, 'postData');
 	util.log(pd);
-	util.assertTrue(pd.search('&created=') == 0);
-	util.assertTrue(parseInt(pd.substring(9)) > 1300000000);
+	util.assertTrue(pd.search('&created-ms=') == 0);
+	util.assertTrue(parseInt(pd.substring(12)) > 3400000000);
 });
 test('failed-non-500-range-doesnt-retry', function() {
 	var q = util.newOperationQueue(),

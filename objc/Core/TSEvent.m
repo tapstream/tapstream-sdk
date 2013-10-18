@@ -111,7 +111,7 @@
 - (NSString *)makeUid
 {
 	NSTimeInterval t = [[NSDate date] timeIntervalSince1970];
-	return [NSString stringWithFormat:@"%ld:%f", (unsigned int)(t*1000), arc4random() / (float)0x10000000];
+	return [NSString stringWithFormat:@"%u:%f", (unsigned int)(t*1000), arc4random() / (float)0x10000000];
 }
 
 - (void)dealloc
