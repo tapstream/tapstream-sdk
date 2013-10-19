@@ -1,15 +1,15 @@
 package com.tapstream.sdk.api14;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.Application.ActivityLifecycleCallbacks;
-import android.content.Context;
 import android.os.Bundle;
 
 import com.tapstream.sdk.ActivityEventSource;
 
 public class ActivityCallbacks extends ActivityEventSource implements ActivityLifecycleCallbacks {
 
-	private final Context context;
+	private final Application app;
 	
 	// For Android, the Tapstream SDK is initialized in the main activity's onCreate method, which
 	// is called before the activity is shown, so it will be followed by a call to onStart.
@@ -23,9 +23,10 @@ public class ActivityCallbacks extends ActivityEventSource implements ActivityLi
 	// startedActivities counter to negative one.
 	private int startedActivities = -1;
 	
-	public ActivityCallbacks(Context context) {
+	public ActivityCallbacks(Application app) {
 		super();
-		this.context = context;
+		this.app = app;
+		app.registerActivityLifecycleCallbacks(this);
 	}
 	
 	@Override
@@ -45,7 +46,7 @@ public class ActivityCallbacks extends ActivityEventSource implements ActivityLi
 
 	@Override
 	public void onActivityStarted(Activity activity) {
-		if(this.context == activity.getApplicationContext()) {
+		if(this.app == activity.getApplication()) {
 			synchronized(this) {
 				startedActivities++;
 				if(startedActivities == 1 && listener != null) {
@@ -59,7 +60,7 @@ public class ActivityCallbacks extends ActivityEventSource implements ActivityLi
 
 	@Override
 	public void onActivityStopped(Activity activity) {
-		if(this.context == activity.getApplicationContext()) {
+		if(this.app == activity.getApplication()) {
 			synchronized(this) {
 				startedActivities--;
 				if(startedActivities < 0) {

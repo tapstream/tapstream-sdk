@@ -16,7 +16,7 @@ public class MainActivity extends Activity {
 
 		Config config = new Config();
 		config.setOdin1("TestODINValue");
-		Tapstream.create(getApplicationContext(), "sdktest", "YGP2pezGTI6ec48uti4o1w", config);
+		Tapstream.create(getApplication(), "sdktest", "YGP2pezGTI6ec48uti4o1w", config);
 		
 		Tapstream tracker = Tapstream.getInstance();
 
@@ -36,4 +36,9 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
+	@Override
+	protected void onStart() {
+		Log.i("Test", "onStart");
+		super.onStart();
+	}
 }

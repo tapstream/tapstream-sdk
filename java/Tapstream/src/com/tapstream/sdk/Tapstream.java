@@ -2,17 +2,17 @@ package com.tapstream.sdk;
 
 import java.lang.reflect.Constructor;
 
-import android.content.Context;
+import android.app.Application;
 
 import com.tapstream.sdk.Hit.CompletionHandler;
 
 public class Tapstream implements Api {
 	private static Tapstream instance;
 
-	public static void create(Context context, String accountName, String developerSecret, Config config) {
+	public static void create(Application app, String accountName, String developerSecret, Config config) {
 		synchronized (Tapstream.class) {
 			if (instance == null) {
-				instance = new Tapstream(context, accountName, developerSecret, config);
+				instance = new Tapstream(app, accountName, developerSecret, config);
 			} else {
 				Logging.log(Logging.WARN, "Tapstream Warning: Tapstream already instantiated, it cannot be re-created.");
 			}
@@ -46,9 +46,9 @@ public class Tapstream implements Api {
 	private CoreListener listener;
 	private Core core;
 
-	private Tapstream(Context context, String accountName, String developerSecret, Config config) {
+	private Tapstream(Application app, String accountName, String developerSecret, Config config) {
 		delegate = new DelegateImpl();
-		platform = new PlatformImpl(context);
+		platform = new PlatformImpl(app);
 		listener = new CoreListenerImpl();
 		
 		// Using reflection, try to instantiate the ActivityCallbacks class.  ActivityCallbacks
@@ -57,8 +57,8 @@ public class Tapstream implements Api {
 		ActivityEventSource aes;
 		try {
 		    Class<?> cls = Class.forName("com.tapstream.sdk.api14.ActivityCallbacks");
-		    Constructor<?> constructor = cls.getConstructor(Context.class);
-		    aes = (ActivityEventSource)constructor.newInstance(context);
+		    Constructor<?> constructor = cls.getConstructor(Application.class);
+		    aes = (ActivityEventSource)constructor.newInstance(app);
 	    } catch(Exception x) {
 			aes = new ActivityEventSource();
 		}
