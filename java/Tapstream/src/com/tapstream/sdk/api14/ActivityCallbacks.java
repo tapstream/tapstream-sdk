@@ -12,10 +12,10 @@ public class ActivityCallbacks extends ActivityEventSource implements ActivityLi
 	private final Context context;
 	
 	// For Android, the Tapstream SDK is initialized in the main activity's onCreate method, which
-	// is called before the activity is shown.
+	// is called before the activity is shown, so it will be followed by a call to onStart.
 	//
 	// For iOS, the Tapstream SDK is initialized in the didFinishLaunchingWithOptions method, which
-	// is called after the app is shown.
+	// is not followed by a call to applicationWillEnterForeground.
 	//
 	// In order to maintain consistency with the iOS SDK, and to ensure proper behaviour on pre-API-14
 	// versions of Android, we need to ignore the first onActivityStarted call that we get (since the
