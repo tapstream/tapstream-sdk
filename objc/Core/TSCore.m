@@ -18,13 +18,13 @@
 @property(nonatomic, STRONG_OR_RETAIN) id<TSDelegate> del;
 @property(nonatomic, STRONG_OR_RETAIN) id<TSPlatform> platform;
 @property(nonatomic, STRONG_OR_RETAIN) id<TSCoreListener> listener;
+@property(nonatomic, STRONG_OR_RETAIN) id<TSAppEventSource> appEventSource;
 @property(nonatomic, STRONG_OR_RETAIN) TSConfig *config;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *accountName;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableString *postData;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableSet *firingEvents;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableSet *firedEvents;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *failingEventId;
-@property(nonatomic, STRONG_OR_RETAIN) id foregroundedEventObserver;
 
 - (NSString *)clean:(NSString *)s;
 - (void)increaseDelay;
@@ -35,11 +35,12 @@
 
 @implementation TSCore
 
-@synthesize del, platform, listener, config, accountName, postData, firingEvents, firedEvents, failingEventId, foregroundedEventObserver;
+@synthesize del, platform, listener, appEventSource, config, accountName, postData, firingEvents, firedEvents, failingEventId;
 
 - (id)initWithDelegate:(id<TSDelegate>)delegateVal
 	platform:(id<TSPlatform>)platformVal
 	listener:(id<TSCoreListener>)listenerVal
+	appEventSource:(id<TSAppEventSource>)appEventSourceVal
 	accountName:(NSString *)accountNameVal
 	developerSecret:(NSString *)developerSecretVal
 	config:(TSConfig *)configVal
@@ -50,10 +51,10 @@
 		self.platform = platformVal;
 		self.listener = listenerVal;
 		self.config = configVal;
+		self.appEventSource = appEventSourceVal;
 		self.accountName = [self clean:accountNameVal];
 		self.postData = nil;
 		self.failingEventId = nil;
-		self.foregroundedEventObserver = nil;
 
 		[self makePostArgsWithSecret:developerSecretVal];
 
@@ -65,14 +66,10 @@
 
 - (void)dealloc
 {
-	if(foregroundedEventObserver != nil) {
-		[[NSNotificationCenter defaultCenter] removeObserver:foregroundedEventObserver];
-	}
-	
-	RELEASE(foregroundedEventObserver);
 	RELEASE(del);
 	RELEASE(platform);
 	RELEASE(listener);
+	RELEASE(appEventSource);
 	RELEASE(accountName);
 	RELEASE(postData);
 	RELEASE(firingEvents);
@@ -122,17 +119,18 @@
 	}
 
 	// Subscribe to be notified whenever the app enters the foreground
-	foregroundedEventObserver = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationWillEnterForegroundNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
-		if(config.fireAutomaticOpenEvent)
+	__unsafe_unretained TSCore *me = self;
+	[appEventSource setOnOpenHandler:^() {
+		if(me.config.fireAutomaticOpenEvent)
 		{
-			if(config.openEventName != nil)
+			if(me.config.openEventName != nil)
 			{
-				[self fireEvent:[TSEvent eventWithName:config.openEventName oneTimeOnly:NO]];
+				[me fireEvent:[TSEvent eventWithName:me.config.openEventName oneTimeOnly:NO]];
 			}
 			else
 			{
 				NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, appName];
-				[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
+				[me fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
 			}
 		}
 	}];

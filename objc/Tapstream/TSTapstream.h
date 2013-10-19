@@ -4,6 +4,7 @@
 #import "TSDelegate.h"
 #import "TSPlatform.h"
 #import "TSCoreListener.h"
+#import "TSAppEventSource.h"
 #import "TSCore.h"
 #import "TSEvent.h"
 #import "TSResponse.h"
@@ -14,6 +15,7 @@
 	id<TSDelegate> del;
 	id<TSPlatform> platform;
 	id<TSCoreListener> listener;
+	id<TSAppEventSource> appEventSource;
 	TSCore *core;
 }
 

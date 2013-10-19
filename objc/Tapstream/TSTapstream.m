@@ -2,6 +2,7 @@
 #import "TSHelpers.h"
 #import "TSPlatformImpl.h"
 #import "TSCoreListenerImpl.h"
+#import "TSAppEventSourceImpl.h"
 
 @interface TSDelegateImpl : NSObject<TSDelegate> {
 	TSTapstream *ts;
@@ -21,9 +22,6 @@ static TSTapstream *instance = nil;
 
 @interface TSTapstream()
 
-@property(nonatomic, STRONG_OR_RETAIN) id<TSDelegate> del;
-@property(nonatomic, STRONG_OR_RETAIN) id<TSPlatform> platform;
-@property(nonatomic, STRONG_OR_RETAIN) id<TSCoreListener> listener;
 @property(nonatomic, STRONG_OR_RETAIN) TSCore *core;
 
 - (id)initWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)config;
@@ -33,7 +31,7 @@ static TSTapstream *instance = nil;
 
 @implementation TSTapstream
 
-@synthesize del, platform, listener, core;
+@synthesize core;
 
 + (void)createWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)config
 {
@@ -54,7 +52,7 @@ static TSTapstream *instance = nil;
 {
 	@synchronized(self)
 	{
-		NSAssert(instance != nil, @"You must first call +createWithAccountName:developerSecret:");
+		NSAssert(instance != nil, @"You must first call +createWithAccountName:developerSecret:config:");
 		return instance;
 	}
 }
@@ -67,12 +65,18 @@ static TSTapstream *instance = nil;
 		del = [[TSDelegateImpl alloc] initWithTapstream:self];
 		platform = [[TSPlatformImpl alloc] init];
 		listener = [[TSCoreListenerImpl alloc] init];
-		core = [[TSCore alloc] initWithDelegate:del
+
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+		appEventSource = [[TSAppEventSourceImpl alloc] init];
+#endif
+
+		core = AUTORELEASE([[TSCore alloc] initWithDelegate:del
 			platform:platform
 			listener:listener
+			appEventSource:appEventSource
 			accountName:accountName
 			developerSecret:developerSecret
-			config:config];
+			config:config]);
 		[core start];
 	}
 	return self;
@@ -83,6 +87,7 @@ static TSTapstream *instance = nil;
 	RELEASE(del);
 	RELEASE(platform);
 	RELEASE(listener);
+	RELEASE(appEventSource);
 	RELEASE(core);
 	SUPER_DEALLOC;
 }

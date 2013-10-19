@@ -56,6 +56,7 @@
 		core = [[TSCore alloc] initWithDelegate:del
 			platform:platform
 			listener:listener
+			appEventSource:nil
 			accountName:accountName
 			developerSecret:developerSecret
 			config:config];
