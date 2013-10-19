@@ -20,6 +20,7 @@
 	NSMutableSet *firedEvents;
 	NSString *failingEventId;
 	int delay;
+	id foregroundedEventObserver;
 }
 
 - (id)initWithDelegate:(id<TSDelegate>)delegate platform:(id<TSPlatform>)platform listener:(id<TSCoreListener>)listener accountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)config;

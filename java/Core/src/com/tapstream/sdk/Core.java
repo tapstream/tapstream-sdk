@@ -19,6 +19,7 @@ class Core {
 	private Delegate delegate;
 	private Platform platform;
 	private CoreListener listener;
+	private ActivityEventSource activityEventSource;
 	private Config config;
 	private String accountName;
 	private ScheduledThreadPoolExecutor executor;
@@ -28,10 +29,11 @@ class Core {
 	private String failingEventId = null;
 	private int delay = 0;
 
-	Core(Delegate delegate, Platform platform, CoreListener listener, String accountName, String developerSecret, Config config) {
+	Core(Delegate delegate, Platform platform, CoreListener listener, ActivityEventSource activityEventSource, String accountName, String developerSecret, Config config) {
 		this.delegate = delegate;
 		this.platform = platform;
 		this.listener = listener;
+		this.activityEventSource = activityEventSource;
 		this.config = config;
 
 		this.accountName = clean(accountName);
@@ -45,11 +47,12 @@ class Core {
 
 	public void start() {
 		// Automatically fire run event
-		String appName = platform.getAppName();
-		if(appName == null) {
-			appName = "";
+		String an = platform.getAppName();
+		if(an == null) {
+			an = "";
 		}
-
+		final String appName = an;
+		
 		if(config.getFireAutomaticInstallEvent()) {
 			String installEventName = config.getInstallEventName();
 			if(installEventName != null) {
@@ -67,8 +70,22 @@ class Core {
 				fireEvent(new Event(String.format(Locale.US, "android-%s-open", appName), false));	
 			}
 		}
-	}
 
+		activityEventSource.setListener(new ActivityEventSource.ActivityListener() {
+			@Override
+			public void onOpen() {
+				if(config.getFireAutomaticOpenEvent()) {
+					String openEventName = config.getOpenEventName();
+					if(openEventName != null) {
+						fireEvent(new Event(openEventName, false));
+					} else {
+						fireEvent(new Event(String.format(Locale.US, "android-%s-open", appName), false));	
+					}
+				}
+			}
+		});
+	}
+	
 	public synchronized void fireEvent(final Event e) {
 		// Notify the event that we are going to fire it so it can record the
 		// time
