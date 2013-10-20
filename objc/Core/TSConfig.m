@@ -21,6 +21,7 @@
 
 @synthesize fireAutomaticInstallEvent = fireAutomaticInstallEvent;
 @synthesize fireAutomaticOpenEvent = fireAutomaticOpenEvent;
+@synthesize fireAutomaticIAPEvents = fireAutomaticIAPEvents;
 
 
 + (id)configWithDefaults
@@ -35,6 +36,7 @@
 		collectWifiMac = YES;
 		fireAutomaticInstallEvent = YES;
 		fireAutomaticOpenEvent = YES;
+		fireAutomaticIAPEvents = YES;
 	}
 	return self;
 }

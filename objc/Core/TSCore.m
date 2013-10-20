@@ -120,7 +120,8 @@
 
 	// Subscribe to be notified whenever the app enters the foreground
 	__unsafe_unretained TSCore *me = self;
-	[appEventSource setOnOpenHandler:^() {
+	
+	[appEventSource setOpenHandler:^() {
 		if(me.config.fireAutomaticOpenEvent)
 		{
 			if(me.config.openEventName != nil)
@@ -132,6 +133,19 @@
 				NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, appName];
 				[me fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
 			}
+		}
+	}];
+
+	[appEventSource setTransactionHandler:^(NSString *transactionId, NSString *productId, int quantity, int priceCents, NSString *priceLocale) {
+		if(me.config.fireAutomaticIAPEvents)
+		{
+			TSEvent *e = [TSEvent eventWithName:@"iap" oneTimeOnly:NO];
+			[e addValue:transactionId forKey:@"transaction-id"];
+			[e addValue:productId forKey:@"product-id"];
+			[e addValue:quantity forKey:@"quantity"];
+			[e addValue:priceCents forKey:@"price-cents"];
+			[e addValue:priceLocale forKey:@"price-locale"];
+			[me fireEvent:e];
 		}
 	}];
 }

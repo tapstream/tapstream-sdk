@@ -27,6 +27,7 @@
 	// Unset these if you want to disable the sending of the automatic events
 	BOOL fireAutomaticInstallEvent;
 	BOOL fireAutomaticOpenEvent;
+	BOOL fireAutomaticIAPEvents;
 }
 
 @property(nonatomic, retain) NSString *hardware;
@@ -47,6 +48,7 @@
 
 @property(nonatomic, assign) BOOL fireAutomaticInstallEvent;
 @property(nonatomic, assign) BOOL fireAutomaticOpenEvent;
+@property(nonatomic, assign) BOOL fireAutomaticIAPEvents;
 
 - (id)init;
 + (id)configWithDefaults;

@@ -1,6 +1,13 @@
 #pragma once
 #import <Foundation/Foundation.h>
 
+typedef void(^TSOpenHandler)();
+
+// Args: transactionId, productId, quantity, priceCents, priceLocale
+typedef void(^TSTransactionHandler)(NSString *, NSString *, int, int, NSString *);
+
+
 @protocol TSAppEventSource<NSObject>
-- (void)setOnOpenHandler:(void(^)())handler;
+- (void)setOpenHandler:(TSOpenHandler)handler;
+- (void)setTransactionHandler:(TSTransactionHandler)handler;
 @end

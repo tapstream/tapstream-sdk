@@ -5,13 +5,15 @@
 
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 
-@interface TSAppEventSourceImpl : NSObject<TSAppEventSource> {
+@interface TSAppEventSourceImpl : NSObject<TSAppEventSource, SKPaymentTransactionObserver> {
 @private
 	id<NSObject> foregroundedEventObserver;
-	void(^onOpen)();
+	TSOpenHandler onOpen;
+	TSTransactionHandler onTransaction;
 }
 
-- (void)setOnOpenHandler:(void(^)())handler;
+- (void)setOpenHandler:(TSOpenHandler)handler;
+- (void)setTransactionHandler:(TSTransactionHandler)handler;
 
 @end
 
