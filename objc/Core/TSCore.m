@@ -142,8 +142,8 @@
 			TSEvent *e = [TSEvent eventWithName:@"iap" oneTimeOnly:NO];
 			[e addValue:transactionId forKey:@"transaction-id"];
 			[e addValue:productId forKey:@"product-id"];
-			[e addValue:quantity forKey:@"quantity"];
-			[e addValue:priceCents forKey:@"price-cents"];
+			[e addIntegerValue:quantity forKey:@"quantity"];
+			[e addIntegerValue:priceCents forKey:@"price-cents"];
 			[e addValue:priceLocale forKey:@"price-locale"];
 			[me fireEvent:e];
 		}

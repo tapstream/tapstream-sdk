@@ -4,6 +4,7 @@
 #import "TSAppEventSource.h"
 
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#import <StoreKit/StoreKit.h>
 
 @interface TSAppEventSourceImpl : NSObject<TSAppEventSource, SKPaymentTransactionObserver> {
 @private

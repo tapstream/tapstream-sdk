@@ -3,10 +3,22 @@
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 #import <UIKit/UIKit.h>
 
+Class TSSKPaymentQueue = nil;
+Class TSSKProductsRequest = nil;
+
+void TSLoadStoreKitClasses()
+{
+	if(TSSKPaymentQueue == nil)
+	{
+		TSSKPaymentQueue = NSClassFromString(@"SKPaymentQueue");
+		TSSKProductsRequest = NSClassFromString(@"SKProductsRequest");
+	}	
+}
 
 
 
-typedef (void)(^TSProductRequestCompletion)(SKProduct *);
+
+typedef void(^TSProductRequestCompletion)(SKProduct *);
 
 @interface TSProductRequestDelegate : NSObject<SKProductsRequestDelegate>
 
@@ -72,6 +84,8 @@ typedef (void)(^TSProductRequestCompletion)(SKProduct *);
 {
 	if((self = [super init]) != nil)
 	{
+		TSLoadStoreKitClasses();
+
 		self.foregroundedEventObserver = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationWillEnterForegroundNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
 			if(onOpen != nil)
 			{
@@ -79,7 +93,10 @@ typedef (void)(^TSProductRequestCompletion)(SKProduct *);
 			}
 		}];
 
-		[[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+		if(TSSKPaymentQueue != nil)
+		{
+			[[TSSKPaymentQueue defaultQueue] addTransactionObserver:self];
+		}
 	}
 	return self;
 }
@@ -88,14 +105,14 @@ typedef (void)(^TSProductRequestCompletion)(SKProduct *);
 {
 	if(onTransaction != nil)
 	{
-		for(SKTransaction *trans in transactions)
+		for(SKPaymentTransaction *trans in transactions)
 		{
 			if(trans.transactionState == SKPaymentTransactionStatePurchased)
 			{
 				dispatch_async(dispatch_get_main_queue(), ^() {
-					SKProductsRequest *req = AUTORELEASE([[SKProductsRequest alloc]
+					SKProductsRequest *req = AUTORELEASE([[TSSKProductsRequest alloc]
 						initWithProductIdentifiers:[NSSet setWithObject:trans.payment.productIdentifier]
-						);
+						]);
 					req.delegate = AUTORELEASE([[TSProductRequestDelegate alloc] initWithCompletion:^(SKProduct *product) {
 						onTransaction(trans.transactionIdentifier,
 							product.productIdentifier,
@@ -122,7 +139,10 @@ typedef (void)(^TSProductRequestCompletion)(SKProduct *);
 
 - (void)dealloc
 {
-	[[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
+	if(TSSKPaymentQueue != nil)
+	{
+		[[TSSKPaymentQueue defaultQueue] removeTransactionObserver:self];
+	}
 
 	if(foregroundedEventObserver != nil)
 	{
