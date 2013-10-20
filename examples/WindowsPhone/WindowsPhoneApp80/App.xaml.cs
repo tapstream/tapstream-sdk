@@ -36,6 +36,11 @@ namespace WindowsPhoneApp80
             // Global handler for uncaught exceptions.
             UnhandledException += Application_UnhandledException;
 
+            // Standard XAML initialization
+            InitializeComponent();
+
+
+
             Logging.SetLogger(new MyLogger());
 
             Config config = new Config();
@@ -52,8 +57,6 @@ namespace WindowsPhoneApp80
             tracker.FireEvent(e);
 
 
-            // Standard XAML initialization
-            InitializeComponent();
 
             // Phone-specific initialization
             InitializePhoneApplication();
@@ -93,6 +96,7 @@ namespace WindowsPhoneApp80
         // This code will not execute when the application is first launched
         private void Application_Activated(object sender, ActivatedEventArgs e)
         {
+            int temp = 10;
         }
 
         // Code to execute when the application is deactivated (sent to background)

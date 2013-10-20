@@ -72,6 +72,7 @@ namespace TapstreamMetrics.Sdk
         private Delegate del;
         private Platform platform;
         private CoreListener listener;
+        private AppEventSource appEventSource;
         private Core core;
 
         private Tapstream(string accountName, string developerSecret, Config config)
@@ -79,7 +80,10 @@ namespace TapstreamMetrics.Sdk
             del = new DelegateImpl(this);
             platform = new PlatformImpl();
             listener = new CoreListenerImpl();
-            core = new Core(del, platform, listener, accountName, developerSecret, config);
+#if TEST_WINPHONE || WINDOWS_PHONE
+            appEventSource = new AppEventSourceImpl();
+#endif
+            core = new Core(del, platform, listener, appEventSource, accountName, developerSecret, config);
             core.Start();
         }
 

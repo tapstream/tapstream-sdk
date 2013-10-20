@@ -40,7 +40,7 @@ namespace TapstreamMetrics.Sdk
             del = new DelegateImpl();
             platform = new PlatformImpl();
             listener = new CoreListenerImpl(queue);
-            core = new Core(del, platform, listener, accountName, developerSecret, config);
+            core = new Core(del, platform, listener, null, accountName, developerSecret, config);
             core.Start();
         }
 

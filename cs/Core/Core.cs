@@ -29,6 +29,7 @@ namespace TapstreamMetrics.Sdk
 		private Delegate del;
 		private Platform platform;
 		private CoreListener listener;
+        private AppEventSource appEventSource;
 		private Config config;
 		private string accountName;
 		private StringBuilder postData = null;
@@ -38,11 +39,12 @@ namespace TapstreamMetrics.Sdk
 		private string failingEventId = null;
 		private int delay = 0;
 
-		public Core(Delegate del, Platform platform, CoreListener listener, String accountName, String developerSecret, Config config)
+		public Core(Delegate del, Platform platform, CoreListener listener, AppEventSource appEventSource, String accountName, String developerSecret, Config config)
 		{
 			this.del = del;
 			this.platform = platform;
 			this.listener = listener;
+            this.appEventSource = appEventSource;
 			this.config = config;
 		
 			this.accountName = Clean(accountName);
@@ -87,6 +89,24 @@ namespace TapstreamMetrics.Sdk
 					FireEvent(new Event(string.Format("{0}-{1}-open", platformName, appName), false));
 				}
 			}
+
+            if (appEventSource != null)
+            {
+                appEventSource.OnShow += (object sender, EventArgs e) =>
+                {
+                    if (config.FireAutomaticOpenEvent)
+                    {
+                        if (config.OpenEventName != null)
+                        {
+                            FireEvent(new Event(config.OpenEventName, false));
+                        }
+                        else
+                        {
+                            FireEvent(new Event(string.Format("{0}-{1}-open", platformName, appName), false));
+                        }
+                    }
+                };
+            }
 		}
 
 		public void FireEvent(Event e)

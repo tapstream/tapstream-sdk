@@ -42,6 +42,10 @@ namespace WindowsPhoneApp71
             // Global handler for uncaught exceptions. 
             UnhandledException += Application_UnhandledException;
 
+            // Standard Silverlight initialization
+            InitializeComponent();
+
+            
             Logging.SetLogger(new MyLogger());
 
             Config config = new Config();
@@ -58,10 +62,6 @@ namespace WindowsPhoneApp71
             e = new Event("test-event-oto", true);
             tracker.FireEvent(e);
 
-
-
-            // Standard Silverlight initialization
-            InitializeComponent();
 
             // Phone-specific initialization
             InitializePhoneApplication();
