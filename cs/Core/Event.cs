@@ -24,36 +24,20 @@ namespace TapstreamMetrics.Sdk
             encodedName = Uri.EscapeDataString(this.name);
         }
 
+        // This constructor is only to be used for creating custom IAP events.
+        public Event(string name, string transactionId, string productId, int quantity, int priceInCents, string currencyCode)
+            : this(name, false)
+        {
+            AddPair("", "purchase-transaction-id", transactionId);
+            AddPair("", "purchase-product-id", productId);
+            AddPair("", "purchase-quantity", quantity);
+            AddPair("", "purchase-price", priceInCents);
+            AddPair("", "purchase-currency", currencyCode);
+        }
+
         public void AddPair(string key, Object value)
         {
-            if(value == null)
-            {
-                return;
-            }
-
-            if(key.Length > 255)
-            {
-                Logging.Log(LogLevel.WARN, "Tapstream Warning: Custom key exceeds 255 characters, this field will not be included in the post (key={0})", key);
-                return;
-            }
-            string encodedName = Uri.EscapeDataString("custom-" + key);
-            
-            string stringifiedValue = value.ToString();
-            if(stringifiedValue.Length > 255)
-            {
-                Logging.Log(LogLevel.WARN, "Tapstream Warning: Custom value exceeds 255 characters, this field will not be included in the post (value={0})", value);
-                return;
-            }
-            string encodedValue = Uri.EscapeDataString(stringifiedValue);
-            
-            if (postData == null)
-            {
-                postData = new StringBuilder();
-            }
-            postData.Append("&");
-            postData.Append(encodedName);
-            postData.Append("=");
-            postData.Append(encodedValue);
+            AddPair("custom-", key, value);
         }
 
         public string Uid
@@ -110,6 +94,38 @@ namespace TapstreamMetrics.Sdk
         private string MakeUid()
         {
             return String.Format("{0}:{1}", Environment.TickCount, rng.NextDouble());
+        }
+
+        private void AddPair(string prefix, string key, Object value)
+        {
+            if(value == null)
+            {
+                return;
+            }
+
+            if(key.Length > 255)
+            {
+                Logging.Log(LogLevel.WARN, "Tapstream Warning: Custom key exceeds 255 characters, this field will not be included in the post (key={0})", key);
+                return;
+            }
+            string encodedName = Uri.EscapeDataString(prefix + key);
+            
+            string stringifiedValue = value.ToString();
+            if(stringifiedValue.Length > 255)
+            {
+                Logging.Log(LogLevel.WARN, "Tapstream Warning: Custom value exceeds 255 characters, this field will not be included in the post (value={0})", value);
+                return;
+            }
+            string encodedValue = Uri.EscapeDataString(stringifiedValue);
+            
+            if (postData == null)
+            {
+                postData = new StringBuilder();
+            }
+            postData.Append("&");
+            postData.Append(encodedName);
+            postData.Append("=");
+            postData.Append(encodedValue);
         }
     }
 }

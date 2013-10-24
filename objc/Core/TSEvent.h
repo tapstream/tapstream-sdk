@@ -19,6 +19,13 @@
 @property(nonatomic, assign, readonly) BOOL oneTimeOnly;
 
 + (id)eventWithName:(NSString *)name oneTimeOnly:(BOOL)oneTimeOnly;
++ (id)iapEventWithTransactionId:(NSString *)transactionId
+	productId:(NSString *)productId
+	quantity:(int)quantity
+	priceInCents:(int)priceInCents
+	currency:(NSString *)currencyCode;
+
+
 - (void)addValue:(NSString *)value forKey:(NSString *)key;
 - (void)addIntegerValue:(int)value forKey:(NSString *)key;
 - (void)addUnsignedIntegerValue:(uint)value forKey:(NSString *)key;

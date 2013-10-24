@@ -3,7 +3,7 @@
 
 typedef void(^TSOpenHandler)();
 
-// Args: transactionId, productId, quantity, priceCents, priceLocale
+// Args: transactionId, productId, quantity, priceCents, currencyCode
 typedef void(^TSTransactionHandler)(NSString *, NSString *, int, int, NSString *);
 
 

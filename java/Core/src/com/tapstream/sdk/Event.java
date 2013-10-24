@@ -23,7 +23,54 @@ public class Event {
 		}
 	}
 
+	// This constructor is only to be used for creating custom IAP events.
+	public Event(String name, String transactionId, String productId, int quantity, int priceInCents, String currencyCode)
+	{
+		this(name, false);
+		addPair("", "purchase-transaction-id", transactionId);
+		addPair("", "purchase-product-id", productId);
+		addPair("", "purchase-quantity", quantity);
+		addPair("", "purchase-price", priceInCents);
+		addPair("", "purchase-currency", currencyCode);
+	}
+
 	public void addPair(String key, Object value) {
+		addPair("custom-", key, value);
+	}
+
+	public String getUid() {
+		return uid;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getEncodedName() {
+		return encodedName;
+	}
+
+	public boolean isOneTimeOnly() {
+		return oneTimeOnly;
+	}
+
+	public String getPostData() {
+		String data = postData != null ? postData.toString() : "";
+		return String.format(Locale.US, "&created-ms=%.0f", firstFiredTime) + data;
+	}
+
+	void firing() {
+		// Only record the time of the first fire attempt
+		if (firstFiredTime == 0) {
+			firstFiredTime = System.currentTimeMillis();
+		}
+	}
+
+	private String makeUid() {
+		return String.format(Locale.US, "%d:%f", System.currentTimeMillis(), Math.random());
+	}
+
+	private void addPair(String prefix, String key, Object value) {
 		if(value == null) {
 			return;
 		}
@@ -35,7 +82,7 @@ public class Event {
 
 		String encodedName = null;
 		try {
-			encodedName = URLEncoder.encode("custom-" + key, "UTF-8").replace("+", "%20");
+			encodedName = URLEncoder.encode(prefix + key, "UTF-8").replace("+", "%20");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 			return;
@@ -74,37 +121,5 @@ public class Event {
 		postData.append(encodedName);
 		postData.append("=");
 		postData.append(encodedValue);
-	}
-
-	public String getUid() {
-		return uid;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public String getEncodedName() {
-		return encodedName;
-	}
-
-	public boolean isOneTimeOnly() {
-		return oneTimeOnly;
-	}
-
-	public String getPostData() {
-		String data = postData != null ? postData.toString() : "";
-		return String.format(Locale.US, "&created-ms=%.0f", firstFiredTime) + data;
-	}
-
-	void firing() {
-		// Only record the time of the first fire attempt
-		if (firstFiredTime == 0) {
-			firstFiredTime = System.currentTimeMillis();
-		}
-	}
-
-	private String makeUid() {
-		return String.format(Locale.US, "%d:%f", System.currentTimeMillis(), Math.random());
 	}
 };

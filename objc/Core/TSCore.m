@@ -139,13 +139,13 @@
 	[appEventSource setTransactionHandler:^(NSString *transactionId, NSString *productId, int quantity, int priceCents, NSString *priceLocale) {
 		if(me.config.fireAutomaticIAPEvents)
 		{
-			TSEvent *e = [TSEvent eventWithName:@"iap" oneTimeOnly:NO];
-			[e addValue:transactionId forKey:@"transaction-id"];
-			[e addValue:productId forKey:@"product-id"];
-			[e addIntegerValue:quantity forKey:@"quantity"];
-			[e addIntegerValue:priceCents forKey:@"price-cents"];
-			[e addValue:priceLocale forKey:@"price-locale"];
-			[me fireEvent:e];
+			TSEvent *e = [TSEvent
+				iapEventWithName:[NSString stringWithFormat:@"%@-%@-purchase-%@", platformName, appName, productId]
+				transactionId:transactionId
+				productId:productId
+				quantity:quantity
+				price:priceInCents
+				currency:currencyCode];
 		}
 	}];
 }

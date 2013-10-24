@@ -118,7 +118,7 @@ typedef void(^TSProductRequestCompletion)(SKProduct *);
 							product.productIdentifier,
 							trans.payment.quantity,
 							(int)([product.price doubleValue] * 100),
-							product.priceLocale.localeIdentifier
+							[product.priceLocale objectForKey:NSLocaleCurrencyCode]
 							);
 					}]);
 				});
