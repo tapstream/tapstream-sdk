@@ -5,6 +5,7 @@ import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -250,89 +251,54 @@ class Core {
 		listener.reportOperation("increased-delay");
 	}
 
-	private void appendPostPair(String key, String value) {
-		if(value == null) {
+	private void appendPostPair(String prefix, String key, Object value) {
+		String encodedPair = Utils.encodeEventPair(prefix, key, value);
+		if(encodedPair == null) {
 			return;
 		}
-
-		String encodedName = null;
-		try {
-			encodedName = URLEncoder.encode(key, "UTF-8").replace("+", "%20");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			return;
-		}
-
-		String encodedValue = null;
-		try {
-			encodedValue = URLEncoder.encode(value, "UTF-8").replace("+", "%20");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			return;
-		}
-
 		if (postData == null) {
 			postData = new StringBuilder();
 		} else {
 			postData.append("&");
 		}
-		postData.append(encodedName);
-		postData.append("=");
-		postData.append(encodedValue);
+		postData.append(encodedPair);
 	}
 
 	private void makePostArgs(String secret) {
-		appendPostPair("secret", secret);
-		appendPostPair("sdkversion", VERSION);
+		appendPostPair("", "secret", secret);
+		appendPostPair("", "sdkversion", VERSION);
 		
-		String hardware = config.getHardware();
-		if (hardware != null) {
-			if (hardware.length() > 255) {
-				Logging.log(Logging.WARN, "Tapstream Warning: Hardware argument exceeds 255 characters, it will not be included with fired events");
-			} else {
-				appendPostPair("hardware", hardware);
-			}
-		}
-
-		String odin1 = config.getOdin1();
-		if (odin1 != null) {
-			if (odin1.length() > 255) {
-				Logging.log(Logging.WARN, "Tapstream Warning: ODIN-1 argument exceeds 255 characters, it will not be included with fired events");
-			} else {
-				appendPostPair("hardware-odin1", odin1);
-			}
-		}
-
-		String openUdid = config.getOpenUdid();
-		if (openUdid != null) {
-			if (openUdid.length() > 255) {
-				Logging.log(Logging.WARN, "Tapstream Warning: OpenUDID argument exceeds 255 characters, it will not be included with fired events");
-			} else {
-				appendPostPair("hardware-open-udid", openUdid);
-			}
-		}
-
+		appendPostPair("", "hardware", config.getHardware());
+		appendPostPair("", "hardware-odin1", config.getOdin1());
+		appendPostPair("", "hardware-open-udid", config.getOpenUdid());
+		appendPostPair("", "hardware", config.getHardware());
+		
 		if (config.getCollectWifiMac()) {
-			appendPostPair("hardware-wifi-mac", platform.getWifiMac());
+			appendPostPair("", "hardware-wifi-mac", platform.getWifiMac());
 		}
 		if (config.getCollectDeviceId()) {
-			appendPostPair("hardware-android-device-id", platform.getDeviceId());
+			appendPostPair("", "hardware-android-device-id", platform.getDeviceId());
 		}
 		if (config.getCollectAndroidId()) {
-			appendPostPair("hardware-android-android-id", platform.getAndroidId());
+			appendPostPair("", "hardware-android-android-id", platform.getAndroidId());
 		}
 
-		appendPostPair("uuid", platform.loadUuid());
-		appendPostPair("platform", "Android");
-		appendPostPair("vendor", platform.getManufacturer());
-		appendPostPair("model", platform.getModel());
-		appendPostPair("os", platform.getOs());
-		appendPostPair("resolution", platform.getResolution());
-		appendPostPair("locale", platform.getLocale());
-		appendPostPair("app-name", platform.getAppName());
-		appendPostPair("package-name", platform.getPackageName());
+		appendPostPair("", "uuid", platform.loadUuid());
+		appendPostPair("", "platform", "Android");
+		appendPostPair("", "vendor", platform.getManufacturer());
+		appendPostPair("", "model", platform.getModel());
+		appendPostPair("", "os", platform.getOs());
+		appendPostPair("", "resolution", platform.getResolution());
+		appendPostPair("", "locale", platform.getLocale());
+		appendPostPair("", "app-name", platform.getAppName());
+		appendPostPair("", "package-name", platform.getPackageName());
 
 		int offsetFromUtc = TimeZone.getDefault().getOffset((new Date()).getTime()) / 1000;
-		appendPostPair("gmtoffset", Integer.toString(offsetFromUtc));
+		appendPostPair("", "gmtoffset", offsetFromUtc);
+		
+		// Add global custom params
+		for(Map.Entry<String, Object> entry : config.globalEventParams.entrySet()) {
+			appendPostPair("custom-", entry.getKey(), entry.getValue());
+		}
 	}
 }

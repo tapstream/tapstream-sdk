@@ -71,55 +71,14 @@ public class Event {
 	}
 
 	private void addPair(String prefix, String key, Object value) {
-		if(value == null) {
+		String encodedPair = Utils.encodeEventPair(prefix, key, value);
+		if(encodedPair == null) {
 			return;
 		}
-
-		if (key.length() > 255) {
-			Logging.log(Logging.WARN, "Tapstream Warning: Custom key exceeds 255 characters, this field will not be included in the post (key=%s)", key);
-			return;
-		}
-
-		String encodedName = null;
-		try {
-			encodedName = URLEncoder.encode(prefix + key, "UTF-8").replace("+", "%20");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			return;
-		}
-
-		String stringifiedValue = null;
-		try {
-			double d = (Double) value;
-			double truncated = Math.floor(d);
-			if (truncated == d) {
-				stringifiedValue = String.format(Locale.US, "%.0f", d);
-			} else {
-				stringifiedValue = value.toString();
-			}
-		} catch (ClassCastException ex) {
-			stringifiedValue = value.toString();
-		}
-	
-		if (stringifiedValue.length() > 255) {
-			Logging.log(Logging.WARN, "Tapstream Warning: Custom value exceeds 255 characters, this field will not be included in the post (value=%s)", value);
-			return;
-		}
-
-		String encodedValue = null;
-		try {
-			encodedValue = URLEncoder.encode(stringifiedValue, "UTF-8").replace("+", "%20");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			return;
-		}
-
-		if (postData == null) {
+		if(postData == null) {
 			postData = new StringBuilder();
 		}
 		postData.append("&");
-		postData.append(encodedName);
-		postData.append("=");
-		postData.append(encodedValue);
+		postData.append(encodedPair);
 	}
 };

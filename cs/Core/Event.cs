@@ -21,7 +21,7 @@ namespace TapstreamMetrics.Sdk
             uid = MakeUid();
             this.name = name.ToLower().Trim();
             this.oneTimeOnly = oneTimeOnly;
-            encodedName = Uri.EscapeDataString(this.name);
+            encodedName = Utils.EncodeString(this.name);
         }
 
         // This constructor is only to be used for creating custom IAP events.
@@ -98,34 +98,18 @@ namespace TapstreamMetrics.Sdk
 
         private void AddPair(string prefix, string key, Object value)
         {
-            if(value == null)
+            string encodedPair = Utils.EncodeEventPair("custom-", key, value);
+            if (encodedPair == null)
             {
                 return;
             }
 
-            if(key.Length > 255)
-            {
-                Logging.Log(LogLevel.WARN, "Tapstream Warning: Custom key exceeds 255 characters, this field will not be included in the post (key={0})", key);
-                return;
-            }
-            string encodedName = Uri.EscapeDataString(prefix + key);
-            
-            string stringifiedValue = value.ToString();
-            if(stringifiedValue.Length > 255)
-            {
-                Logging.Log(LogLevel.WARN, "Tapstream Warning: Custom value exceeds 255 characters, this field will not be included in the post (value={0})", value);
-                return;
-            }
-            string encodedValue = Uri.EscapeDataString(stringifiedValue);
-            
             if (postData == null)
             {
                 postData = new StringBuilder();
             }
             postData.Append("&");
-            postData.Append(encodedName);
-            postData.Append("=");
-            postData.Append(encodedValue);
+            postData.Append(encodedPair);
         }
     }
 }

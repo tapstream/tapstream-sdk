@@ -87,6 +87,9 @@
     <Compile Include="..\Core\Response.cs">
       <Link>Response.cs</Link>
     </Compile>
+    <Compile Include="..\Core\Utils.cs">
+      <Link>Utils.cs</Link>
+    </Compile>
     <Compile Include="..\Tapstream\Tapstream.cs">
       <Link>Tapstream.cs</Link>
     </Compile>

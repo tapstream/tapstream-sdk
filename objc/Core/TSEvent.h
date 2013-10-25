@@ -25,11 +25,18 @@
 	priceInCents:(int)priceInCents
 	currency:(NSString *)currencyCode;
 
+- (void)addValue:(id)value forKey:(NSString *)key;
 
-- (void)addValue:(NSString *)value forKey:(NSString *)key;
-- (void)addIntegerValue:(int)value forKey:(NSString *)key;
-- (void)addUnsignedIntegerValue:(uint)value forKey:(NSString *)key;
-- (void)addDoubleValue:(double)value forKey:(NSString *)key;
-- (void)addBooleanValue:(BOOL)value forKey:(NSString *)key;
+
+
+
+// DEPRECATED:
+// These type-specific methods are deprecated.
+// Instead, use the generic method:
+//	- addValue:forKey:
+- (void)addIntegerValue:(int)value forKey:(NSString *)key __attribute__((deprecated));
+- (void)addUnsignedIntegerValue:(uint)value forKey:(NSString *)key __attribute__((deprecated));
+- (void)addDoubleValue:(double)value forKey:(NSString *)key __attribute__((deprecated));
+- (void)addBooleanValue:(BOOL)value forKey:(NSString *)key __attribute__((deprecated));
 
 @end

@@ -23,6 +23,8 @@
 @synthesize fireAutomaticOpenEvent = fireAutomaticOpenEvent;
 @synthesize fireAutomaticIAPEvents = fireAutomaticIAPEvents;
 
+@synthesize globalEventParams = globalEventParams;
+
 
 + (id)configWithDefaults
 {
@@ -37,6 +39,7 @@
 		fireAutomaticInstallEvent = YES;
 		fireAutomaticOpenEvent = YES;
 		fireAutomaticIAPEvents = YES;
+		globalEventParams = [NSMutableDictionary dicationaryWithCapacity:16];
 	}
 	return self;
 }

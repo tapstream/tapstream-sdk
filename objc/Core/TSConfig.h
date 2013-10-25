@@ -1,5 +1,6 @@
 #pragma once
 #import <Foundation/Foundation.h>
+#import "TSHelpers.h"
 
 @interface TSConfig : NSObject {
 @private
@@ -28,29 +29,34 @@
 	BOOL fireAutomaticInstallEvent;
 	BOOL fireAutomaticOpenEvent;
 	BOOL fireAutomaticIAPEvents;
+
+	// These parameters will be automatically attached to all events fired by the sdk
+	NSMutableDictionary *globalEventParams;
 }
 
-@property(nonatomic, retain) NSString *hardware;
-@property(nonatomic, retain) NSString *odin1;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *hardware;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *odin1;
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR	
-@property(nonatomic, retain) NSString *udid;
-@property(nonatomic, retain) NSString *idfa;
-@property(nonatomic, retain) NSString *secureUdid;
-@property(nonatomic, retain) NSString *openUdid;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *udid;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *idfa;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *secureUdid;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *openUdid;
 #else
-@property(nonatomic, retain) NSString *serialNumber;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *serialNumber;
 #endif
 
 @property(nonatomic, assign) BOOL collectWifiMac;
 
-@property(nonatomic, retain) NSString *installEventName;
-@property(nonatomic, retain) NSString *openEventName;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *installEventName;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *openEventName;
 
 @property(nonatomic, assign) BOOL fireAutomaticInstallEvent;
 @property(nonatomic, assign) BOOL fireAutomaticOpenEvent;
 @property(nonatomic, assign) BOOL fireAutomaticIAPEvents;
 
-- (id)init;
+@property(nonatomic, STRONG_OR_RETAIN) NSMutableDictionary *globalEventParams;
+
 + (id)configWithDefaults;
+- (id)init;
 
 @end

@@ -1,6 +1,7 @@
 #import "TSCore.h"
 #import "TSHelpers.h"
 #import "TSLogging.h"
+#import "TSUtils.h"
 
 #define kTSVersion @"2.3"
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
@@ -336,9 +337,10 @@
 	[listener reportOperation:@"increased-delay"];
 }
 
-- (void)appendPostPairWithKey:(NSString *)key value:(NSString *)value
+- (void)appendPostPairWithPrefix:(NSString *)prefix key:(NSString *)key value:(NSString *)value
 {
-	if(value == nil)
+	NSString *encodedPair = [TSUtils encodeEventPairWithPrefix:prefix key:key value:value];
+	if(encodedPair == nil)
 	{
 		return;
 	}
@@ -351,128 +353,52 @@
 	{
 		[postData appendString:@"&"];
 	}
-	[postData appendString:[self encodeString:key]];
-	[postData appendString:@"="];
-	[postData appendString:[self encodeString:value]];
+	[postData appendString:encodedPair];
 }
 
 - (void)makePostArgsWithSecret:(NSString *)secret
 {
-	[self appendPostPairWithKey:@"secret" value:secret];
-	[self appendPostPairWithKey:@"sdkversion" value:kTSVersion];
+	[self appendPostPairWithPrefix:@"" key:@"secret" value:secret];
+	[self appendPostPairWithPrefix:@"" key:@"sdkversion" value:kTSVersion];
 
-	if(config.hardware != nil)
-	{
-		if([config.hardware length] > 255)
-		{
-			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Hardware argument exceeds 255 characters, it will not be included with fired events"];
-		}
-		else
-		{
-			[self appendPostPairWithKey:@"hardware" value:config.hardware];
-		}
-	}
-
-	if(config.odin1 != nil)
-	{
-		if([config.odin1 length] > 255)
-		{
-			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: ODIN-1 argument exceeds 255 characters, it will not be included with fired events"];
-		}
-		else
-		{
-			[self appendPostPairWithKey:@"hardware-odin1" value:config.odin1];
-		}
-	}
-
+	[self appendPostPairWithPrefix:@"" key:@"hardware" value:config.hardware];
+	[self appendPostPairWithPrefix:@"" key:@"hardware-odin1" value:config.odin1];
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-
-	if(config.openUdid != nil)
-	{
-		if([config.openUdid length] > 255)
-		{
-			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: OpenUDID argument exceeds 255 characters, it will not be included with fired events"];
-		}
-		else
-		{
-			[self appendPostPairWithKey:@"hardware-open-udid" value:config.openUdid];
-		}
-	}
-
-	if(config.udid != nil)
-	{
-		if([config.udid length] > 255)
-		{
-			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: UDID argument exceeds 255 characters, it will not be included with fired events"];
-		}
-		else
-		{
-			[self appendPostPairWithKey:@"hardware-ios-udid" value:config.udid];
-		}
-	}
-
-	if(config.idfa != nil)
-	{
-		if([config.idfa length] > 255)
-		{
-			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: IDFA argument exceeds 255 characters, it will not be included with fired events"];
-		}
-		else
-		{
-			[self appendPostPairWithKey:@"hardware-ios-idfa" value:config.idfa];
-		}
-	}
-
-	if(config.secureUdid != nil)
-	{
-		if([config.secureUdid length] > 255)
-		{
-			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: SecureUDID argument exceeds 255 characters, it will not be included with fired events"];
-		}
-		else
-		{
-			[self appendPostPairWithKey:@"hardware-ios-secure-udid" value:config.secureUdid];
-		}
-	}
-
+	[self appendPostPairWithPrefix:@"" key:@"hardware-open-udid" value:config.openUdid];
+	[self appendPostPairWithPrefix:@"" key:@"hardware-ios-udid" value:config.udid];
+	[self appendPostPairWithPrefix:@"" key:@"hardware-ios-idfa" value:config.idfa];
+	[self appendPostPairWithPrefix:@"" key:@"hardware-ios-secure-udid" value:config.secureUdid];
 #else
-
-	if([config.serialNumber length] > 255)
-	{
-		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Serial number argument exceeds 255 characters, it will not be included with fired events"];
-	}
-	else
-	{
-		[self appendPostPairWithKey:@"hardware-mac-serial-number" value:config.serialNumber];
-	}
-
+	[self appendPostPairWithPrefix:@"" key:@"hardware-mac-serial-number" value:config.serialNumber];
 #endif
-
-
 
 	if(config.collectWifiMac)
 	{
-		[self appendPostPairWithKey:@"hardware-wifi-mac" value:[platform getWifiMac]];
+		[self appendPostPairWithPrefix:@"" key:@"hardware-wifi-mac" value:[platform getWifiMac]];
 	}
 
-	[self appendPostPairWithKey:@"uuid" value:[platform loadUuid]];
+	[self appendPostPairWithPrefix:@"" key:@"uuid" value:[platform loadUuid]];
 
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-	[self appendPostPairWithKey:@"platform" value:@"iOS"];
+	[self appendPostPairWithPrefix:@"" key:@"platform" value:@"iOS"];
 #else
-	[self appendPostPairWithKey:@"platform" value:@"Mac"];
+	[self appendPostPairWithPrefix:@"" key:@"platform" value:@"Mac"];
 #endif
 
-	[self appendPostPairWithKey:@"vendor" value:[platform getManufacturer]];
-	[self appendPostPairWithKey:@"model" value:[platform getModel]];
-	[self appendPostPairWithKey:@"os" value:[platform getOs]];
-	[self appendPostPairWithKey:@"resolution" value:[platform getResolution]];
-	[self appendPostPairWithKey:@"locale" value:[platform getLocale]];
-	[self appendPostPairWithKey:@"app-name" value:[platform getAppName]];
-	[self appendPostPairWithKey:@"package-name" value:[platform getPackageName]];
+	[self appendPostPairWithPrefix:@"" key:@"vendor" value:[platform getManufacturer]];
+	[self appendPostPairWithPrefix:@"" key:@"model" value:[platform getModel]];
+	[self appendPostPairWithPrefix:@"" key:@"os" value:[platform getOs]];
+	[self appendPostPairWithPrefix:@"" key:@"resolution" value:[platform getResolution]];
+	[self appendPostPairWithPrefix:@"" key:@"locale" value:[platform getLocale]];
+	[self appendPostPairWithPrefix:@"" key:@"app-name" value:[platform getAppName]];
+	[self appendPostPairWithPrefix:@"" key:@"package-name" value:[platform getPackageName]];
+	[self appendPostPairWithPrefix:@"" key:@"gmtoffset" value:(int)[[NSTimeZone systemTimeZone] secondsFromGMT]];
 
-	NSString *offset = [NSString stringWithFormat:@"%d", (int)[[NSTimeZone systemTimeZone] secondsFromGMT]];
-	[self appendPostPairWithKey:@"gmtoffset" value:offset];
+	// Add global custom params
+	for (NSString *key in config.globalEventParams) {
+		id value = [config.globalEventParams objectForKey:key];
+		[self appendPostPairWithPrefix:@"custom-" key:key value:value];
+	}
 }
 
 

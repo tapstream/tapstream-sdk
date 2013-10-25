@@ -1,5 +1,8 @@
 package com.tapstream.sdk;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Config {
 	// Deprecated, hardware-id field
 	private String hardware = null;
@@ -16,11 +19,13 @@ public class Config {
 	// Set these if you want to override the names of the automatic events sent by the sdk
 	private String installEventName = null;
 	private String openEventName = null;
-
+	
 	// Unset these if you want to disable the sending of the automatic events
 	private boolean fireAutomaticInstallEvent = true;
 	private boolean fireAutomaticOpenEvent = true;
 
+	// These parameters will be automatically attached to all events fired by the sdk.
+	public Map<String, Object> globalEventParams = new HashMap<String, Object>();
 
 	// Accessors for the private members above:
 	public String getHardware() { return hardware; }
@@ -33,23 +38,24 @@ public class Config {
 	public void setOpenUdid(String openUdid) { this.openUdid = openUdid; }
 
 	public boolean getCollectWifiMac() { return collectWifiMac; }
-	public void setCollectWifiMac(boolean collect) { this.collectWifiMac = collect; }
+	public void setCollectWifiMac(boolean collect) { collectWifiMac = collect; }
 
 	public boolean getCollectDeviceId() { return collectDeviceId; }
-	public void setCollectDeviceId(boolean collect) { this.collectDeviceId = collect; }
+	public void setCollectDeviceId(boolean collect) { collectDeviceId = collect; }
 
 	public boolean getCollectAndroidId() { return collectAndroidId; }
-	public void setCollectAndroidId(boolean collect) { this.collectAndroidId = collect; }
+	public void setCollectAndroidId(boolean collect) { collectAndroidId = collect; }
 
 	public String getInstallEventName() { return installEventName; }
-	public void setInstallEventName(String name) { this.installEventName = name; }
+	public void setInstallEventName(String name) { installEventName = name; }
 
 	public String getOpenEventName() { return openEventName; }
-	public void setOpenEventName(String name) { this.openEventName = name; }
+	public void setOpenEventName(String name) { openEventName = name; }
 
 	public boolean getFireAutomaticInstallEvent() { return fireAutomaticInstallEvent; }
-	public void setFireAutomaticInstallEvent(boolean fire) { this.fireAutomaticInstallEvent = fire; }
+	public void setFireAutomaticInstallEvent(boolean fire) { fireAutomaticInstallEvent = fire; }
 
 	public boolean getFireAutomaticOpenEvent() { return fireAutomaticOpenEvent; }
-	public void setFireAutomaticOpenEvent(boolean fire) { this.fireAutomaticOpenEvent = fire; }
+	public void setFireAutomaticOpenEvent(boolean fire) { fireAutomaticOpenEvent = fire; }
 }
+

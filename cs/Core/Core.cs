@@ -319,9 +319,10 @@ namespace TapstreamMetrics.Sdk
 			listener.ReportOperation("increased-delay");
 		}
 
-		private void AppendPostPair(string key, string value)
+		private void AppendPostPair(string prefix, string key, object value)
 		{
-			if (value == null)
+            string encodedPair = Utils.EncodeEventPair(prefix, key, value);
+            if (encodedPair == null)
 			{
 				return;
 			}
@@ -334,67 +335,48 @@ namespace TapstreamMetrics.Sdk
 			{
 				postData.Append("&");
 			}
-			postData.Append(Uri.EscapeDataString(key));
-			postData.Append("=");
-			postData.Append(Uri.EscapeDataString(value));
+			postData.Append(encodedPair);
 		}
 
 		private void MakePostArgs(string secret)
 		{
-			AppendPostPair("secret", secret);
-			AppendPostPair("sdkversion", VERSION);
+			AppendPostPair("", "secret", secret);
+            AppendPostPair("", "sdkversion", VERSION);
 
-			if (config.Hardware != null)
-			{
-				if (config.Hardware.Length > 255)
-				{
-					Logging.Log(LogLevel.WARN, "Tapstream Warning: Hardware argument exceeds 255 characters, it will not be included with fired events");
-				}
-				else
-				{
-					AppendPostPair("hardware", config.Hardware);
-				}
-			}
-
-			if (config.Odin1 != null)
-			{
-				if (config.Odin1.Length > 255)
-				{
-					Logging.Log(LogLevel.WARN, "Tapstream Warning: ODIN-1 argument exceeds 255 characters, it will not be included with fired events");
-				}
-				else
-				{
-					AppendPostPair("hardware-odin1", config.Odin1);
-				}
-			}
-
+			AppendPostPair("", "hardware", config.Hardware);
+			AppendPostPair("", "hardware-odin1", config.Odin1);
 #if TEST_WINPHONE || WINDOWS_PHONE
 			if (config.CollectDeviceUniqueId)
 			{
-				AppendPostPair("hardware-winphone-device-unique-id", platform.GetDeviceUniqueId());
+				AppendPostPair("", "hardware-winphone-device-unique-id", platform.GetDeviceUniqueId());
 			}
 #else
-			if (config.CollectAppSpecificHardwareId)
+            if (config.CollectAppSpecificHardwareId)
 			{
-				AppendPostPair("hardware-windows-ashwid", platform.GetAppSpecificHardwareId());
+                AppendPostPair("", "hardware-windows-ashwid", platform.GetAppSpecificHardwareId());
 			}
 #endif
 
-			AppendPostPair("uuid", platform.LoadUuid());
-
+            AppendPostPair("", "uuid", platform.LoadUuid());
 #if TEST_WINPHONE || WINDOWS_PHONE
-			AppendPostPair("platform", "Windows Phone");
+			AppendPostPair("", "platform", "Windows Phone");
 #else
-			AppendPostPair("platform", "Windows");
+            AppendPostPair("", "platform", "Windows");
 #endif
-			AppendPostPair("vendor", platform.GetManufacturer());
-			AppendPostPair("model", platform.GetModel());
-			AppendPostPair("os", platform.GetOs());
-			AppendPostPair("resolution", platform.GetResolution());
-			AppendPostPair("locale", platform.GetLocale());
-			AppendPostPair("app-name", platform.GetAppName());
-			AppendPostPair("package-name", platform.GetPackageName());
-			AppendPostPair("gmtoffset", DateTimeOffset.Now.Offset.TotalSeconds.ToString());
+            AppendPostPair("", "vendor", platform.GetManufacturer());
+            AppendPostPair("", "model", platform.GetModel());
+            AppendPostPair("", "os", platform.GetOs());
+            AppendPostPair("", "resolution", platform.GetResolution());
+            AppendPostPair("", "locale", platform.GetLocale());
+            AppendPostPair("", "app-name", platform.GetAppName());
+            AppendPostPair("", "package-name", platform.GetPackageName());
+            AppendPostPair("", "gmtoffset", DateTimeOffset.Now.Offset.TotalSeconds);
+
+            // Add global custom params
+            foreach (string key in config.GlobalEventParams.Keys)
+            {
+                AppendPostPair("custom-", key, config.GlobalEventParams[key]);
+            }
 		}
 
 	}

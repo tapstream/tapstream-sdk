@@ -3,6 +3,7 @@
 #import <stdio.h>
 #import <stdlib.h>
 #import "TSLogging.h"
+#import "TSUtils.h"
 
 @interface TSEvent()
 
@@ -53,41 +54,15 @@
 	return self;
 }
 
-- (void)addValue:(NSString *)value forKey:(NSString *)key
+- (void)addValue:(id)value forKey:(NSString *)key
 {
 	[self addValue:value forKey:key withPrefix:@"custom-"];
-}
-
-- (void)addIntegerValue:(int)value forKey:(NSString *)key
-{
-	[self addValue:[NSString stringWithFormat:@"%d", value] forKey:key];
-}
-
-- (void)addUnsignedIntegerValue:(uint)value forKey:(NSString *)key
-{
-	[self addValue:[NSString stringWithFormat:@"%u", value] forKey:key];
-}
-
-- (void)addDoubleValue:(double)value forKey:(NSString *)key
-{
-	[self addValue:[NSString stringWithFormat:@"%g", value] forKey:key];
-}
-
-- (void)addBooleanValue:(BOOL)value forKey:(NSString *)key
-{
-	[self addValue:(value ? @"true" : @"false") forKey:key];
 }
 
 - (NSString *)postData
 {
 	NSString *data = postData != nil ? (NSString *)postData : @"";
 	return [[NSString stringWithFormat:@"&created-ms=%u", (unsigned int)(firstFiredTime*1000)] stringByAppendingString:data];
-}
-
-- (NSString *)encodeString:(NSString *)s
-{
-	return AUTORELEASE((BRIDGE_TRANSFER NSString *)CFURLCreateStringByAddingPercentEscapes(
-		NULL, (CFStringRef)s, NULL, (CFStringRef)@"!*'();:@&=+$,/?%#[]", kCFStringEncodingUTF8));
 }
 
 - (void)firing
@@ -105,24 +80,11 @@
 	return [NSString stringWithFormat:@"%u:%f", (unsigned int)(t*1000), arc4random() / (float)0x10000000];
 }
 
-- (void)addValue:(NSString *)value forKey:(NSString *)key withPrefix:(NSString *)prefix
+- (void)addValue:(id)value forKey:(NSString *)key withPrefix:(NSString *)prefix
 {
-	if(value == nil)
+	NSString *encodedPair = [TSUtils encodeEventPairWithPrefix:prefix key:key value:value];
+	if(encodedPair == nil)
 	{
-		return;
-	}
-
-	if(key.length > 255)
-	{
-		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Custom key exceeds 255 characters, this field will not be included in the post (key=%@)", key];
-		return;
-	}
-	NSString *encodedKey = [self encodeString:[prefix stringByAppendingString:key]];
-
-	NSString *encodedValue = [self encodeString:value];
-	if(encodedValue.length > 255)
-	{
-		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Custom value exceeds 255 characters, this field will not be included in the post (value=%@)", value];
 		return;
 	}
 
@@ -131,9 +93,7 @@
 		postData = RETAIN([NSMutableString stringWithCapacity:64]);
 	}
 	[postData appendString:@"&"];
-	[postData appendString:encodedKey];
-	[postData appendString:@"="];
-	[postData appendString:encodedValue];
+	[postData appendString:encodedPair];
 }
 
 - (void)dealloc
@@ -143,6 +103,28 @@
 	RELEASE(encodedName);
 	RELEASE(postData);
 	SUPER_DEALLOC;
+}
+
+
+
+
+
+// DEPRECATED:
+- (void)addIntegerValue:(int)value forKey:(NSString *)key
+{
+	[self addValue:value forKey:key];
+}
+- (void)addUnsignedIntegerValue:(uint)value forKey:(NSString *)key
+{
+	[self addValue:value forKey:key];
+}
+- (void)addDoubleValue:(double)value forKey:(NSString *)key
+{
+	[self addValue:value forKey:key];
+}
+- (void)addBooleanValue:(BOOL)value forKey:(NSString *)key
+{
+	[self addValue:value forKey:key];
 }
 
 @end

@@ -28,6 +28,8 @@ namespace TapstreamMetrics.Sdk
 		private bool fireAutomaticInstallEvent = true;
 		private bool fireAutomaticOpenEvent = true;
 
+        // These parameters will be automatically attached to all events fired by the sdk
+        private IDictionary<string, object> globalEventParams = new Dictionary<string, object>();
 
 		// Properties for the private members above:
 		public string Hardware
@@ -79,5 +81,11 @@ namespace TapstreamMetrics.Sdk
 			get { return fireAutomaticOpenEvent; }
 			set { fireAutomaticOpenEvent = value; }
 		}
+
+        public IDictionary<string, object> GlobalEventParams
+        {
+            get { return globalEventParams; }
+            set { globalEventParams = value; }
+        }
 	}
 }

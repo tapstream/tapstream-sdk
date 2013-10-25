@@ -63,40 +63,7 @@
             for(NSString *key in params)
             {
                 id value = [params objectForKey:key];
-                if([value isKindOfClass:[NSString class]])
-                {
-                    [event addValue:(NSString *)value forKey:(NSString *)key];
-                }
-                else if([value isKindOfClass:[NSNumber class]])
-                {
-                    NSNumber *number = (NSNumber *)value;
-                    
-                    if(strcmp([number objCType], @encode(int)) == 0)
-                    {
-                        [event addIntegerValue:[number intValue] forKey:key];
-                    }
-                    else if(strcmp([number objCType], @encode(uint)) == 0)
-                    {
-                        [event addUnsignedIntegerValue:[number unsignedIntValue] forKey:key];
-                    }
-                    else if(strcmp([number objCType], @encode(double)) == 0 ||
-                        strcmp([number objCType], @encode(float)) == 0)
-                    {
-                        [event addDoubleValue:[number doubleValue] forKey:key];
-                    }
-                    else if(strcmp([number objCType], @encode(BOOL)) == 0)
-                    {
-                        [event addBooleanValue:[number boolValue] forKey:key];
-                    }
-                    else
-                    {
-                        NSLog(@"Tapstream Event cannot accept an NSNumber param holding this type, skipping param");
-                    }
-                }
-                else
-                {
-                    NSLog(@"Tapstream Event cannot accept a param of this type, skipping param");
-                }
+                [event addValue:value forKey:key];
             }
         }
 
