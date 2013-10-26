@@ -35,8 +35,8 @@
 	TSEvent *e = AUTORELEASE([[self alloc] initWithName:name oneTimeOnly:NO]);
 	[e addValue:transactionId forKey:@"purchase-transaction-id" withPrefix:@""];
 	[e addValue:productId forKey:@"purchase-product-id" withPrefix:@""];
-	[e addValue:[NSString stringWithFormat:@"%d", quantity] forKey:@"purchase-quantity" withPrefix:@""];
-	[e addValue:[NSString stringWithFormat:@"%d", priceInCents] forKey:@"purchase-price" withPrefix:@""];
+	[e addValue:[TSUtils stringifyInteger:quantity] forKey:@"purchase-quantity" withPrefix:@""];
+	[e addValue:[TSUtils stringifyInteger:priceInCents] forKey:@"purchase-price" withPrefix:@""];
 	[e addValue:currencyCode forKey:@"purchase-currency" withPrefix:@""];
 	return e;
 }
@@ -46,9 +46,9 @@
 	if((self = [super init]) != nil)
 	{
 		firstFiredTime = 0;
-		uid = RETAIN([self makeUid]);
-		name = RETAIN([[eventName lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]);
-		encodedName = RETAIN([self encodeString:name]);
+		uid = [self makeUid];
+		name = [[eventName lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		encodedName = [TSUtils encodeString:name];
 		oneTimeOnly = oneTimeOnlyArg;
 	}
 	return self;
@@ -57,6 +57,31 @@
 - (void)addValue:(id)value forKey:(NSString *)key
 {
 	[self addValue:value forKey:key withPrefix:@"custom-"];
+}
+
+- (void)addIntegerValue:(int)value forKey:(NSString *)key
+{
+	[self addValue:[TSUtils stringifyInteger:value] forKey:key];
+}
+
+- (void)addUnsignedIntegerValue:(uint)value forKey:(NSString *)key
+{
+	[self addValue:[TSUtils stringifyUnsignedInteger:value] forKey:key];
+}
+
+- (void)addDoubleValue:(double)value forKey:(NSString *)key
+{
+	[self addValue:[TSUtils stringifyDouble:value] forKey:key];
+}
+
+- (void)addFloatValue:(double)value forKey:(NSString *)key
+{
+	[self addValue:[TSUtils stringifyFloat:value] forKey:key];
+}
+
+- (void)addBooleanValue:(BOOL)value forKey:(NSString *)key
+{
+	[self addValue:[TSUtils stringifyBOOL:value] forKey:key];
 }
 
 - (NSString *)postData
@@ -103,28 +128,6 @@
 	RELEASE(encodedName);
 	RELEASE(postData);
 	SUPER_DEALLOC;
-}
-
-
-
-
-
-// DEPRECATED:
-- (void)addIntegerValue:(int)value forKey:(NSString *)key
-{
-	[self addValue:value forKey:key];
-}
-- (void)addUnsignedIntegerValue:(uint)value forKey:(NSString *)key
-{
-	[self addValue:value forKey:key];
-}
-- (void)addDoubleValue:(double)value forKey:(NSString *)key
-{
-	[self addValue:value forKey:key];
-}
-- (void)addBooleanValue:(BOOL)value forKey:(NSString *)key
-{
-	[self addValue:value forKey:key];
 }
 
 @end

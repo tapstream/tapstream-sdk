@@ -1,4 +1,6 @@
-#include "TSUtil.h"
+#import "TSUtils.h"
+#import "TSHelpers.h"
+#import "TSLogging.h"
 
 
 @implementation TSUtils
@@ -31,20 +33,23 @@
 		
 		if(strcmp([number objCType], @encode(int)) == 0)
 		{
-			return [NSString stringWithFormat:@"%d", [number intValue]];
+			return [TSUtils stringifyInteger:[number intValue]];
 		}
 		else if(strcmp([number objCType], @encode(uint)) == 0)
 		{
-			return [NSString stringWithFormat:@"%u", [number unsignedIntValue]];
+			return [TSUtils stringifyUnsignedInteger:[number unsignedIntValue]];
 		}
-		else if(strcmp([number objCType], @encode(double)) == 0 ||
-			strcmp([number objCType], @encode(float)) == 0)
+		else if(strcmp([number objCType], @encode(double)) == 0)
 		{
-			return [NSString stringWithFormat:@"%g", [number doubleValue]];
+			return [TSUtils stringifyDouble:[number doubleValue]];
+		}
+		else if(strcmp([number objCType], @encode(float)) == 0)
+		{
+			return [TSUtils stringifyFloat:[number floatValue]];
 		}
 		else if(strcmp([number objCType], @encode(BOOL)) == 0)
 		{
-			return [value boolValue] ? @"true" : @"false";
+			return [TSUtils stringifyBOOL:[number boolValue]];
 		}
 		else
 		{
@@ -58,6 +63,37 @@
 
 	return nil;
 }
+
++ (NSString *)stringifyInteger:(int)value
+{
+	return [NSString stringWithFormat:@"%d", value];
+}
+
++ (NSString *)stringifyUnsignedInteger:(uint)value
+{
+	return [NSString stringWithFormat:@"%u", value];
+}
+
++ (NSString *)stringifyDouble:(double)value
+{
+	return [NSString stringWithFormat:@"%g", value];
+}
+
++ (NSString *)stringifyFloat:(float)value
+{
+	return [NSString stringWithFormat:@"%g", value];
+}
+
++ (NSString *)stringifyBOOL:(BOOL)value
+{
+	return value ? @"true" : @"false";
+}
+
++ (NSString *)stringifyBool:(bool)value
+{
+	return value ? @"true" : @"false";
+}
+
 
 + (NSString *)encodeEventPairWithPrefix:(NSString *)prefix key:(NSString *)key value:(id)value;
 {

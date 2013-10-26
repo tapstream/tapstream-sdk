@@ -39,7 +39,7 @@
 		fireAutomaticInstallEvent = YES;
 		fireAutomaticOpenEvent = YES;
 		fireAutomaticIAPEvents = YES;
-		globalEventParams = [NSMutableDictionary dicationaryWithCapacity:16];
+		globalEventParams = [NSMutableDictionary dictionaryWithCapacity:16];
 	}
 	return self;
 }

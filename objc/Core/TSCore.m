@@ -29,7 +29,6 @@
 
 - (NSString *)clean:(NSString *)s;
 - (void)increaseDelay;
-- (void)appendPostPairWithKey:(NSString *)key value:(NSString *)value;
 - (void)makePostArgsWithSecret:(NSString *)secret;
 @end
 
@@ -137,7 +136,7 @@
 		}
 	}];
 
-	[appEventSource setTransactionHandler:^(NSString *transactionId, NSString *productId, int quantity, int priceCents, NSString *priceLocale) {
+	[appEventSource setTransactionHandler:^(NSString *transactionId, NSString *productId, int quantity, int priceInCents, NSString *currencyCode) {
 		if(me.config.fireAutomaticIAPEvents)
 		{
 			TSEvent *e = [TSEvent
@@ -145,7 +144,7 @@
 				transactionId:transactionId
 				productId:productId
 				quantity:quantity
-				price:priceInCents
+				priceInCents:priceInCents
 				currency:currencyCode];
 		}
 	}];
@@ -308,17 +307,11 @@
 	return delay;
 }
 
-- (NSString *)encodeString:(NSString *)s
-{
-	return AUTORELEASE((BRIDGE_TRANSFER NSString *)CFURLCreateStringByAddingPercentEscapes(
-		NULL, (CFStringRef)s, NULL, (CFStringRef)@"!*'();:@&=+$,/?%#[]", kCFStringEncodingUTF8));
-}
-
 - (NSString *)clean:(NSString *)s
 {
 	s = [s lowercaseString];
 	s = [s stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	return [self encodeString:s];
+	return [TSUtils encodeString:s];
 }
 
 - (void)increaseDelay
@@ -392,7 +385,7 @@
 	[self appendPostPairWithPrefix:@"" key:@"locale" value:[platform getLocale]];
 	[self appendPostPairWithPrefix:@"" key:@"app-name" value:[platform getAppName]];
 	[self appendPostPairWithPrefix:@"" key:@"package-name" value:[platform getPackageName]];
-	[self appendPostPairWithPrefix:@"" key:@"gmtoffset" value:(int)[[NSTimeZone systemTimeZone] secondsFromGMT]];
+	[self appendPostPairWithPrefix:@"" key:@"gmtoffset" value:[TSUtils stringifyInteger:[[NSTimeZone systemTimeZone] secondsFromGMT]]];
 
 	// Add global custom params
 	for (NSString *key in config.globalEventParams) {
