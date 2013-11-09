@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TapstreamMetrics.Sdk
 {
-    public class Utils
+    public sealed class Utils
     {
         public static string EncodeString(string s)
         {
@@ -16,18 +16,18 @@ namespace TapstreamMetrics.Sdk
             return Uri.EscapeDataString(s);
         }
 
-        public static string Stringify(Object value)
+        public static string Stringify(Object val)
         {
-            if (value == null)
+            if (val == null)
             {
                 return null;
             }
-            return value.ToString();
+            return val.ToString();
         }
 
-        public static string EncodeEventPair(string prefix, string key, object value)
+        public static string EncodeEventPair(string prefix, string key, object val)
         {
-            if (key == null || value == null)
+            if (key == null || val == null)
             {
                 return null;
             }
@@ -44,10 +44,10 @@ namespace TapstreamMetrics.Sdk
                 return null;
             }
 
-            string stringifiedValue = Utils.Stringify(value);
+            string stringifiedValue = Utils.Stringify(val);
             if (stringifiedValue.Length > 255)
             {
-                Logging.Log(LogLevel.WARN, "Tapstream Warning: Event value exceeds 255 characters, this field will not be included in the post (value={0})", value);
+                Logging.Log(LogLevel.WARN, "Tapstream Warning: Event value exceeds 255 characters, this field will not be included in the post (value={0})", val);
                 return null;
             }
 
