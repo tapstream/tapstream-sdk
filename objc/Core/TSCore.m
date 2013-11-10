@@ -20,6 +20,7 @@
 @property(nonatomic, STRONG_OR_RETAIN) id<TSCoreListener> listener;
 @property(nonatomic, STRONG_OR_RETAIN) TSConfig *config;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *accountName;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *secret;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableString *postData;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableSet *firingEvents;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableSet *firedEvents;
@@ -28,13 +29,13 @@
 - (NSString *)clean:(NSString *)s;
 - (void)increaseDelay;
 - (void)appendPostPairWithKey:(NSString *)key value:(NSString *)value;
-- (void)makePostArgsWithSecret:(NSString *)secret;
+- (void)makePostArgs;
 @end
 
 
 @implementation TSCore
 
-@synthesize del, platform, listener, config, accountName, postData, firingEvents, firedEvents, failingEventId;
+@synthesize del, platform, listener, config, accountName, secret, postData, firingEvents, firedEvents, failingEventId;
 
 - (id)initWithDelegate:(id<TSDelegate>)delegateVal
 	platform:(id<TSPlatform>)platformVal
@@ -50,10 +51,11 @@
 		self.listener = listenerVal;
 		self.config = configVal;
 		self.accountName = [self clean:accountNameVal];
+		self.secret = developerSecretVal;
 		self.postData = nil;
 		self.failingEventId = nil;
 
-		[self makePostArgsWithSecret:developerSecretVal];
+		[self makePostArgs];
 
 		self.firingEvents = [[NSMutableSet alloc] initWithCapacity:32];
 		self.firedEvents = [platform loadFiredEvents];
@@ -113,6 +115,63 @@
 			[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
 		}
 	}
+
+	if(config.onConversion != nil)
+	{
+		__block int tries = 0;
+		
+		[NSString stringWithFormat:@"http://reporting.tapstream.com/v1/conversions/lookup?secret=%@&event_session=%@", secret, [platform loadUuid]];
+
+		// returns true if it should be retried
+		void (^conversionCheck)() = nil;
+		conversionCheck = ^{
+			if(tries >= 10)
+			{
+				return;
+			}			
+			
+			tries++;
+
+			bool retry = true;
+
+			TSResponse *response = [platform request:url data:nil method:@"GET"];
+			if(response.status >= 200 && response.status < 300)
+			{
+				if(NSClassFromString(@"NSJSONSerialization"))
+				{
+					NSError *error = nil;
+					id object = [NSJSONSerialization JSONObjectWithData:response.data options:0 error:&error];
+					if(error == nil && [object isKindOfClass:[NSArray class]])
+					{
+						retry = false;
+						if([object count] > 0)
+						{
+							config.onConversion(object, nil);
+						}
+					}
+				}
+				else
+				{
+					retry = false;
+					NSString *jsonString = AUTORELEASE([[NSString alloc] initWithData:response.data encoding:NSUTF8StringEncoding]);
+					
+					// If it is not an empty json array, then make the callback
+					NSError *error = nil;
+					NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\[\\s*\\]" options:0 error:&error];
+					if(error == nil && [regex numberOfMatchesInString:jsonString options:0 range:NSMakeRange(0, [jsonString length])] == 0)
+					{
+						config.onConversion(nil, jsonString);
+					}
+				}
+			}
+			
+			if(retry)
+			{
+				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 2), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), conversionCheck);	
+			}
+		};
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 2), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), conversionCheck);
+	}
 }
 
 - (void)fireEvent:(TSEvent *)e
@@ -150,7 +209,7 @@
 		dispatch_time_t dispatchTime = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * actualDelay);
 		dispatch_after(dispatchTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 
-			TSResponse *response = [platform request:url data:data];
+			TSResponse *response = [platform request:url data:data method:@"POST"];
 			bool failed = response.status < 200 || response.status >= 300;
 			bool shouldRetry = response.status < 0 || (response.status >= 500 && response.status < 600);
 
@@ -248,7 +307,7 @@
 	NSString *data = hit.postData;
 
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		TSResponse *response = [platform request:url data:data];
+		TSResponse *response = [platform request:url data:data method:@"POST"];
 		if(response.status < 200 || response.status >= 300)
 		{
 			[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire hit, http code: %d", response.status];
@@ -321,7 +380,7 @@
 	[postData appendString:[self encodeString:value]];
 }
 
-- (void)makePostArgsWithSecret:(NSString *)secret
+- (void)makePostArgs
 {
 	[self appendPostPairWithKey:@"secret" value:secret];
 	[self appendPostPairWithKey:@"sdkversion" value:kTSVersion];

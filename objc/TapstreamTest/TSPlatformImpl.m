@@ -9,7 +9,7 @@
 {
 	if((self = [super init]) != nil)
 	{
-		response = [[TSResponse alloc] initWithStatus:200 message:nil];
+		response = [[TSResponse alloc] initWithStatus:200 message:nil data:nil];
 		savedFiredList = nil;
 	}
 	return self;
@@ -77,7 +77,7 @@
 	return @"com.test.TestApp";
 }
 
-- (TSResponse *)request:(NSString *)url data:(NSString *)data
+- (TSResponse *)request:(NSString *)url data:(NSString *)data method:(NSString *)method
 {
 	return response;
 }

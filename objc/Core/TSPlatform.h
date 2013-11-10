@@ -14,5 +14,5 @@
 - (NSString *)getWifiMac;
 - (NSString *)getAppName;
 - (NSString *)getPackageName;
-- (TSResponse *)request:(NSString *)url data:(NSString *)data;
+- (TSResponse *)request:(NSString *)url data:(NSString *)data method:(NSString *)method;
 @end

@@ -1,6 +1,8 @@
 #pragma once
 #import <Foundation/Foundation.h>
 
+typedef void(^TSConversionHandler)(id jsonObject, NSString *jsonString);
+
 @interface TSConfig : NSObject {
 @private
 	// Deprecated, hardware-id field
@@ -27,6 +29,12 @@
 	// Unset these if you want to disable the sending of the automatic events
 	BOOL fireAutomaticInstallEvent;
 	BOOL fireAutomaticOpenEvent;
+
+	// If set, this will be called with conversion details (if the automatic install event
+	// triggered a conversion).  On iOS >= 5, the first parameter will be an instance of a
+	// json object, and the second parameter will be nil.  On iOS < 5, the first parameter
+	// will be nil, and the second will be a string containing a json object definition.
+	TSConversionHandler onConversion;
 }
 
 @property(nonatomic, retain) NSString *hardware;
@@ -47,6 +55,8 @@
 
 @property(nonatomic, assign) BOOL fireAutomaticInstallEvent;
 @property(nonatomic, assign) BOOL fireAutomaticOpenEvent;
+
+@property(nonatomic, copy) TSConversionHandler onConversion;
 
 - (id)init;
 + (id)configWithDefaults;

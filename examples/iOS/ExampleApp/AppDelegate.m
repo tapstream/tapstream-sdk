@@ -21,6 +21,10 @@
     }
     
     TSConfig *config = [TSConfig configWithDefaults];
+    config.onConversion = ^(id jsonObject, NSString *jsonString) {
+        NSLog(@"Json object: %@", jsonObject);
+    };
+    
     [TSTapstream createWithAccountName:@"sdktest" developerSecret:@"YGP2pezGTI6ec48uti4o1w" config:config];
     
     TSTapstream *tracker = [TSTapstream instance];

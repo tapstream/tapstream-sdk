@@ -22,6 +22,7 @@
 @synthesize fireAutomaticInstallEvent = fireAutomaticInstallEvent;
 @synthesize fireAutomaticOpenEvent = fireAutomaticOpenEvent;
 
+@synthesize onConversion = onConversion;
 
 + (id)configWithDefaults
 {
