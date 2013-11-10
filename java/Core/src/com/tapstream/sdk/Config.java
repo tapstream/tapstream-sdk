@@ -1,6 +1,6 @@
 package com.tapstream.sdk;
 
-public class Config {
+public class Config {	
 	// Deprecated, hardware-id field
 	private String hardware = null;
 
@@ -20,6 +20,10 @@ public class Config {
 	// Unset these if you want to disable the sending of the automatic events
 	private boolean fireAutomaticInstallEvent = true;
 	private boolean fireAutomaticOpenEvent = true;
+	
+	// If this handler is set, and if there was a conversion that lead to this application
+	// install, then the handler will be called with the conversion details (as a json object).
+	public ConversionListener onConversion = null;
 
 
 	// Accessors for the private members above:

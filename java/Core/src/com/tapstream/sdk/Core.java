@@ -10,10 +10,14 @@ import java.util.TimeZone;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 class Core {
 	public static final String VERSION = "2.3";
 	private static final String EVENT_URL_TEMPLATE = "https://api.tapstream.com/%s/event/%s/";
 	private static final String HIT_URL_TEMPLATE = "http://api.tapstream.com/%s/hit/%s.gif";
+	private static final String CONVERSION_URL_TEMPLATE = "http://reporting.tapstream.com/v1/conversions/lookup?secret=%s&event_session=%s";
 	private static final int MAX_THREADS = 1;
 
 	private Delegate delegate;
@@ -21,6 +25,7 @@ class Core {
 	private CoreListener listener;
 	private Config config;
 	private String accountName;
+	private String secret;
 	private ScheduledThreadPoolExecutor executor;
 	private StringBuilder postData = null;
 	private Set<String> firingEvents = new HashSet<String>(16);
@@ -35,7 +40,8 @@ class Core {
 		this.config = config;
 
 		this.accountName = clean(accountName);
-		makePostArgs(developerSecret);
+		this.secret = developerSecret;
+		makePostArgs();
 
 		firedEvents = platform.loadFiredEvents();
 
@@ -67,6 +73,38 @@ class Core {
 				fireEvent(new Event(String.format(Locale.US, "android-%s-open", appName), false));	
 			}
 		}
+		
+		if(config.onConversion != null) {
+			final String url = String.format(Locale.US, CONVERSION_URL_TEMPLATE, secret, platform.loadUuid());
+			Runnable task = new Runnable() {
+				private int tries = 0;
+				
+				@Override
+				public void run() {
+					tries++;
+					
+					boolean retry = true;
+					
+					Response res = platform.request(url, null, "GET");
+					if(res.status >= 200 && res.status < 300) {
+						try {
+							JSONArray obj = new JSONArray(res.data);
+							if(obj.length() > 0) {
+								retry = false;
+								config.onConversion.conversionInfo(obj);
+							}
+						} catch (JSONException e) {
+							retry = false;
+						}
+					}
+					
+					if(retry && tries <= 10) {
+						executor.schedule(this, 2, TimeUnit.SECONDS);
+					}
+				}
+			};
+			executor.schedule(task, 2, TimeUnit.SECONDS);
+		}
 	}
 
 	public synchronized void fireEvent(final Event e) {
@@ -96,7 +134,7 @@ class Core {
 
 		Runnable task = new Runnable() {
 			public void innerRun() {
-				Response response = platform.request(url, data);
+				Response response = platform.request(url, data, "POST");
 				boolean failed = response.status < 200 || response.status >= 300;
 				boolean shouldRetry = response.status < 0 || (response.status >= 500 && response.status < 600);
 
@@ -188,7 +226,7 @@ class Core {
 		final String data = h.getPostData();
 		Runnable task = new Runnable() {
 			public void run() {
-				Response response = platform.request(url, data);
+				Response response = platform.request(url, data, "POST");
 				if (response.status < 200 || response.status >= 300) {
 					Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire hit, http code: %d", response.status);
 					listener.reportOperation("hit-failed");
@@ -264,7 +302,7 @@ class Core {
 		postData.append(encodedValue);
 	}
 
-	private void makePostArgs(String secret) {
+	private void makePostArgs() {
 		appendPostPair("secret", secret);
 		appendPostPair("sdkversion", VERSION);
 		

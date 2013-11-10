@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 
 class PlatformImpl implements Platform {
-	public Response response = new Response(200, null);
+	public Response response = new Response(200, null, null);
 	public Set<String> savedFiredList = null;
 
 	public PlatformImpl() {
@@ -67,7 +67,7 @@ class PlatformImpl implements Platform {
 		return "com.test.TestApp";
 	}
 
-	public Response request(String url, String data) {
+	public Response request(String url, String data, String method) {
 		return response;
 	}
 }

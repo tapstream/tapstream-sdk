@@ -1,5 +1,8 @@
 package com.tapstream.sdk;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Locale;
@@ -11,7 +14,9 @@ import java.util.concurrent.ThreadFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.params.CoreProtocolPNames;
 
@@ -20,8 +25,8 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.net.wifi.WifiManager;
 import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
@@ -141,38 +146,57 @@ class PlatformImpl implements Platform {
 		return context.getPackageName();
 	}
 
-	public Response request(String url, String data) {
+	public Response request(String url, String data, String method) {
 		WorkerThread th = (WorkerThread) Thread.currentThread();
 
-		HttpPost post = new HttpPost(url);
-		post.getParams().setBooleanParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, false);
-
-		StringEntity se = null;
-		try {
-			se = new StringEntity(data);	
-		} catch (UnsupportedEncodingException e) {
-			return new Response(-1, e.toString());
+		HttpRequestBase req;
+		if(method == "POST") {
+			req = new HttpPost(url);
+			if(data != null) {
+				StringEntity se = null;
+				try {
+					se = new StringEntity(data);	
+				} catch (UnsupportedEncodingException e) {
+					return new Response(-1, e.toString(), null);
+				}
+				se.setContentType("application/x-www-form-urlencoded");
+				((HttpPost)req).setEntity(se);
+			}
+		} else {
+			req = new HttpGet(url);
 		}
-		se.setContentType("application/x-www-form-urlencoded");
-		post.setEntity(se);
+		req.getParams().setBooleanParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, false);
 
 		HttpResponse response = null;
 		try {
-			response = th.client.execute(post);
+			response = th.client.execute(req);
 		} catch (Exception e) {
-			return new Response(-1, e.toString());
+			return new Response(-1, e.toString(), null);
 		}
 
 		StatusLine statusLine = response.getStatusLine();
+		String responseData = null;
 		try {
-			response.getEntity().getContent().close();
+			InputStream is = response.getEntity().getContent();
+			try {
+				InputStreamReader isr = new InputStreamReader(is);
+				BufferedReader br = new BufferedReader(isr);
+				StringBuilder sb = new StringBuilder();
+				String line;
+				while((line = br.readLine()) != null) {
+					sb.append(line);
+				}
+				responseData = sb.toString();
+			} finally {
+				is.close();
+			}
 		} catch (Exception e) {
-			return new Response(-1, e.toString());
+			return new Response(-1, e.toString(), null);
 		}
 
 		if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
-			return new Response(200, null);
+			return new Response(200, null, responseData);
 		}
-		return new Response(statusLine.getStatusCode(), statusLine.getReasonPhrase());
+		return new Response(statusLine.getStatusCode(), statusLine.getReasonPhrase(), null);
 	}
 }

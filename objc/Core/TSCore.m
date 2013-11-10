@@ -5,6 +5,7 @@
 #define kTSVersion @"2.3"
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
 #define kTSHitUrlTemplate @"http://api.tapstream.com/%@/hit/%@.gif"
+#define kTSConversionUrlTemplate @"http://reporting.tapstream.com/v1/conversions/lookup?secret=%@&event_session=%@"
 
 @interface TSEvent(hidden)
 - (void)firing;
@@ -120,18 +121,12 @@
 	{
 		__block int tries = 0;
 		
-		[NSString stringWithFormat:@"http://reporting.tapstream.com/v1/conversions/lookup?secret=%@&event_session=%@", secret, [platform loadUuid]];
+		[NSString stringWithFormat:kTSConversionUrlTemplate, secret, [platform loadUuid]];
 
 		// returns true if it should be retried
 		void (^conversionCheck)() = nil;
 		conversionCheck = ^{
-			if(tries >= 10)
-			{
-				return;
-			}			
-			
 			tries++;
-
 			bool retry = true;
 
 			TSResponse *response = [platform request:url data:nil method:@"GET"];
@@ -143,16 +138,20 @@
 					id object = [NSJSONSerialization JSONObjectWithData:response.data options:0 error:&error];
 					if(error == nil && [object isKindOfClass:[NSArray class]])
 					{
-						retry = false;
 						if([object count] > 0)
 						{
+							retry = false;
 							config.onConversion(object, nil);
 						}
+					}
+					else
+					{
+						// Response was not a valid json array, stop trying.
+						retry = false;
 					}
 				}
 				else
 				{
-					retry = false;
 					NSString *jsonString = AUTORELEASE([[NSString alloc] initWithData:response.data encoding:NSUTF8StringEncoding]);
 					
 					// If it is not an empty json array, then make the callback
@@ -160,12 +159,13 @@
 					NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\[\\s*\\]" options:0 error:&error];
 					if(error == nil && [regex numberOfMatchesInString:jsonString options:0 range:NSMakeRange(0, [jsonString length])] == 0)
 					{
+						retry = false;
 						config.onConversion(nil, jsonString);
 					}
 				}
 			}
 			
-			if(retry)
+			if(retry && tries <= 10)
 			{
 				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 2), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), conversionCheck);	
 			}

@@ -63,7 +63,7 @@ public class TestRunner {
 		}
 
 		public void setResponseStatus(Tapstream ts, int status) {
-			((PlatformImpl) ts.platform).response = new Response(status, String.format(Locale.US, "Http %d", status));
+			((PlatformImpl) ts.platform).response = new Response(status, String.format(Locale.US, "Http %d", status), "");
 		}
 
 		public OperationQueue newOperationQueue() {

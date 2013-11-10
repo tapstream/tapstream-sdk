@@ -30,10 +30,12 @@ typedef void(^TSConversionHandler)(id jsonObject, NSString *jsonString);
 	BOOL fireAutomaticInstallEvent;
 	BOOL fireAutomaticOpenEvent;
 
-	// If set, this will be called with conversion details (if the automatic install event
-	// triggered a conversion).  On iOS >= 5, the first parameter will be an instance of a
-	// json object, and the second parameter will be nil.  On iOS < 5, the first parameter
-	// will be nil, and the second will be a string containing a json object definition.
+	// If this handler is set, and if there was a conversion that lead to this application
+	// install, then the handler will be called with the conversion details.
+	//
+	// On iOS >= 5, the first parameter will be an instance of a json object, and the
+	// second parameter will be nil.  On iOS < 5, the first parameter will be nil,
+	// and the second will be a string containing a json object definition.
 	TSConversionHandler onConversion;
 }
 

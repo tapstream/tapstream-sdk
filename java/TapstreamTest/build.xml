@@ -6,6 +6,7 @@
         <pathelement path="../Core/build/classes/"/>
         <pathelement path="lib/js.jar"/>
         <pathelement path="lib/junit-4.11.jar"/>
+        <pathelement path="lib/org.json-20120521.jar"/>
     </path>
 
     <target name="clean">
