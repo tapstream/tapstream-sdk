@@ -1,7 +1,7 @@
 #pragma once
 #import <Foundation/Foundation.h>
 
-typedef void(^TSConversionHandler)(id jsonObject, NSString *jsonString);
+typedef void(^TSConversionListener)(id jsonObject, NSString *jsonString);
 
 @interface TSConfig : NSObject {
 @private
@@ -36,7 +36,7 @@ typedef void(^TSConversionHandler)(id jsonObject, NSString *jsonString);
 	// On iOS >= 5, the first parameter will be an instance of a json object, and the
 	// second parameter will be nil.  On iOS < 5, the first parameter will be nil,
 	// and the second will be a string containing a json object definition.
-	TSConversionHandler onConversion;
+	TSConversionListener conversionListener;
 }
 
 @property(nonatomic, retain) NSString *hardware;
@@ -58,7 +58,7 @@ typedef void(^TSConversionHandler)(id jsonObject, NSString *jsonString);
 @property(nonatomic, assign) BOOL fireAutomaticInstallEvent;
 @property(nonatomic, assign) BOOL fireAutomaticOpenEvent;
 
-@property(nonatomic, copy) TSConversionHandler onConversion;
+@property(nonatomic, copy) TSConversionListener conversionListener;
 
 - (id)init;
 + (id)configWithDefaults;

@@ -9,11 +9,13 @@ namespace TapstreamMetrics.Sdk
     {
         private int status;
         private string message;
+        private string data;
 
-        public Response(int status, string message)
+        public Response(int status, string message, string data)
         {
             this.status = status;
             this.message = message;
+            this.data = data;
         }
 
         public int Status
@@ -29,6 +31,14 @@ namespace TapstreamMetrics.Sdk
             get
             {
                 return message;
+            }
+        }
+
+        public string Data
+        {
+            get
+            {
+                return data;
             }
         }
     }

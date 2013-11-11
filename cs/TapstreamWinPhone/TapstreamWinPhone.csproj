@@ -43,6 +43,9 @@
   <ItemGroup>
     <Reference Include="Microsoft.Phone" />
     <Reference Include="Microsoft.Phone.Reactive" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\portable-net40+sl4+wp7+win8\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
@@ -56,6 +59,9 @@
     </Compile>
     <Compile Include="..\Core\Config.cs">
       <Link>Config.cs</Link>
+    </Compile>
+    <Compile Include="..\Core\ConversionListener.cs">
+      <Link>ConversionListener.cs</Link>
     </Compile>
     <Compile Include="..\Core\Core.cs">
       <Link>Core.cs</Link>
@@ -95,6 +101,9 @@
     </Compile>
     <Compile Include="HashSet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />

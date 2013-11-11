@@ -22,8 +22,8 @@ public class Config {
 	private boolean fireAutomaticOpenEvent = true;
 	
 	// If this handler is set, and if there was a conversion that lead to this application
-	// install, then the handler will be called with the conversion details (as a json object).
-	public ConversionListener onConversion = null;
+	// install, then the handler will be called with the conversion details (as a json array).
+	private ConversionListener conversionListener = null;
 
 
 	// Accessors for the private members above:
@@ -56,4 +56,7 @@ public class Config {
 
 	public boolean getFireAutomaticOpenEvent() { return fireAutomaticOpenEvent; }
 	public void setFireAutomaticOpenEvent(boolean fire) { this.fireAutomaticOpenEvent = fire; }
+
+	public ConversionListener getConversionListener() { return conversionListener; }
+	public void setConversionListener(ConversionListener listener) { conversionListener = listener; }
 }

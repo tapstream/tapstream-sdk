@@ -19,6 +19,8 @@ class Core {
 	private static final String HIT_URL_TEMPLATE = "http://api.tapstream.com/%s/hit/%s.gif";
 	private static final String CONVERSION_URL_TEMPLATE = "http://reporting.tapstream.com/v1/conversions/lookup?secret=%s&event_session=%s";
 	private static final int MAX_THREADS = 1;
+	private static final int CONVERSION_POLL_INTERVAL = 2;
+	private static final int CONVERSION_POLL_COUNT = 10;
 
 	private Delegate delegate;
 	private Platform platform;
@@ -74,7 +76,7 @@ class Core {
 			}
 		}
 		
-		if(config.onConversion != null) {
+		if(config.getConversionListener() != null) {
 			final String url = String.format(Locale.US, CONVERSION_URL_TEMPLATE, secret, platform.loadUuid());
 			Runnable task = new Runnable() {
 				private int tries = 0;
@@ -91,19 +93,19 @@ class Core {
 							JSONArray obj = new JSONArray(res.data);
 							if(obj.length() > 0) {
 								retry = false;
-								config.onConversion.conversionInfo(obj);
+								config.getConversionListener().conversionInfo(obj);
 							}
 						} catch (JSONException e) {
 							retry = false;
 						}
 					}
 					
-					if(retry && tries <= 10) {
-						executor.schedule(this, 2, TimeUnit.SECONDS);
+					if(retry && tries <= CONVERSION_POLL_COUNT) {
+						executor.schedule(this, CONVERSION_POLL_INTERVAL, TimeUnit.SECONDS);
 					}
 				}
 			};
-			executor.schedule(task, 2, TimeUnit.SECONDS);
+			executor.schedule(task, CONVERSION_POLL_INTERVAL, TimeUnit.SECONDS);
 		}
 	}
 

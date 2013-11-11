@@ -105,6 +105,9 @@
     <Compile Include="..\Core\Config.cs">
       <Link>Config.cs</Link>
     </Compile>
+    <Compile Include="..\Core\ConversionListener.cs">
+      <Link>ConversionListener.cs</Link>
+    </Compile>
     <Compile Include="..\Core\Core.cs">
       <Link>Core.cs</Link>
     </Compile>

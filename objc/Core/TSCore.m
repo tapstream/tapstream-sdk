@@ -6,6 +6,8 @@
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
 #define kTSHitUrlTemplate @"http://api.tapstream.com/%@/hit/%@.gif"
 #define kTSConversionUrlTemplate @"http://reporting.tapstream.com/v1/conversions/lookup?secret=%@&event_session=%@"
+#define kTSConversionPollInterval 2
+#define kTSConversionPollCount 10
 
 @interface TSEvent(hidden)
 - (void)firing;
@@ -117,7 +119,7 @@
 		}
 	}
 
-	if(config.onConversion != nil)
+	if(config.conversionListener != nil)
 	{
 		__block int tries = 0;
 		
@@ -141,7 +143,7 @@
 						if([object count] > 0)
 						{
 							retry = false;
-							config.onConversion(object, nil);
+							config.conversionListener(object, nil);
 						}
 					}
 					else
@@ -160,17 +162,17 @@
 					if(error == nil && [regex numberOfMatchesInString:jsonString options:0 range:NSMakeRange(0, [jsonString length])] == 0)
 					{
 						retry = false;
-						config.onConversion(nil, jsonString);
+						config.conversionListener(nil, jsonString);
 					}
 				}
 			}
 			
-			if(retry && tries <= 10)
+			if(retry && tries <= kTSConversionPollCount)
 			{
-				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 2), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), conversionCheck);	
+				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * kTSConversionPollInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), conversionCheck);	
 			}
 		};
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 2), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), conversionCheck);
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * kTSConversionPollInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), conversionCheck);
 	}
 }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 #if WINDOWS_PHONE
+using Newtonsoft.Json.Linq;
 using Microsoft.Phone.Reactive;
 using Microsoft.Phone.Info;
 #else
@@ -12,6 +13,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.System.Threading;
+using Windows.Data.Json;
 #endif
 
 namespace TapstreamMetrics.Sdk
@@ -21,7 +23,10 @@ namespace TapstreamMetrics.Sdk
 		public const string VERSION = "2.3";
 		private const string EVENT_URL_TEMPLATE = "https://api.tapstream.com/{0}/event/{1}/";
 		private const string HIT_URL_TEMPLATE = "http://api.tapstream.com/{0}/hit/{1}.gif";
+        private const string CONVERSION_URL_TEMPLATE = "http://reporting.tapstream.com/v1/conversions/lookup?secret={0}&event_session={1}";
 		private const int MAX_THREADS = 1;
+        private const int CONVERSION_POLL_INTERVAL = 2;
+        private const int CONVERSION_POLL_COUNT = 10;
 
 #if WINDOWS_PHONE
 		private IScheduler scheduler = Scheduler.NewThread;
@@ -31,6 +36,7 @@ namespace TapstreamMetrics.Sdk
 		private CoreListener listener;
 		private Config config;
 		private string accountName;
+        private string secret;
 		private StringBuilder postData = null;
 		private HashSet<string> firingEvents = new HashSet<string>();
 		private HashSet<string> firedEvents = new HashSet<string>();
@@ -46,7 +52,8 @@ namespace TapstreamMetrics.Sdk
 			this.config = config;
 		
 			this.accountName = Clean(accountName);
-			MakePostArgs(developerSecret);
+            this.secret = developerSecret;
+			MakePostArgs();
 		
 			firedEvents = platform.LoadFiredEvents();
 		}
@@ -87,6 +94,68 @@ namespace TapstreamMetrics.Sdk
 					FireEvent(new Event(string.Format("{0}-{1}-open", platformName, appName), false));
 				}
 			}
+
+            if(config.ConversionListener != null)
+            {
+                string url = String.Format(CONVERSION_URL_TEMPLATE, secret, platform.LoadUuid());
+                int tries = 0;
+
+#if WINDOWS_PHONE
+                Action conversionCheck = null;
+                conversionCheck = new Action(() =>
+#else
+                Action<Task> conversionCheck = null;
+                conversionCheck = new Action<Task>((prevResult) =>
+#endif
+                {
+                    tries++;
+                    bool retry = true;
+
+                    Response res = platform.Request(url, null, "GET");
+                    if (res.Status >= 200 && res.Status < 300)
+                    {
+#if WINDOWS_PHONE
+                        JArray obj = null;
+                        try
+                        {
+                            obj = JArray.Parse(res.Data);
+                        }
+                        catch (Exception) { }
+#else
+                        JsonArray obj = null;
+                        JsonArray.TryParse(res.Data, out obj);
+#endif
+                        if (obj != null)
+                        {
+                            if (obj.Count > 0)
+                            {
+                                retry = false;
+                                config.ConversionListener.ConversionInfo(obj);
+                            }
+                        }
+                        else
+                        {
+                            // Response was not a valid json array, stop trying.
+                            retry = false;
+                        }
+                    }
+
+                    if (retry && tries <= CONVERSION_POLL_COUNT)
+                    {
+#if WINDOWS_PHONE
+                        scheduler.Schedule(conversionCheck, TimeSpan.FromSeconds(CONVERSION_POLL_INTERVAL));
+#else
+                        Task.Delay(TimeSpan.FromSeconds(CONVERSION_POLL_INTERVAL)).ContinueWith(conversionCheck);
+#endif
+                    }
+                });
+
+#if WINDOWS_PHONE
+				scheduler.Schedule(conversionCheck, TimeSpan.FromSeconds(CONVERSION_POLL_INTERVAL));
+#else
+                Task.Delay(TimeSpan.FromSeconds(CONVERSION_POLL_INTERVAL)).ContinueWith(conversionCheck);
+#endif
+            }
 		}
 
 		public void FireEvent(Event e)
@@ -131,7 +200,7 @@ namespace TapstreamMetrics.Sdk
 				Task.Delay(TimeSpan.FromSeconds(actualDelay)).ContinueWith((prevResult) =>
 				{
 #endif
-					Response response = platform.Request(url, data);
+					Response response = platform.Request(url, data, "POST");
 					bool failed = response.Status < 200 || response.Status >= 300;
 					bool shouldRetry = response.Status < 0 || (response.Status >= 500 && response.Status < 600);
 				
@@ -222,7 +291,7 @@ namespace TapstreamMetrics.Sdk
 					listener.ReportOperation("job-ended", e.Name);
 
 #if WINDOWS_PHONE
-				}), TimeSpan.FromSeconds( actualDelay ) );
+				}), TimeSpan.FromSeconds(actualDelay));
 #else
 				});
 #endif
@@ -244,7 +313,7 @@ namespace TapstreamMetrics.Sdk
 			return Task<Response>.Run(() =>
 				{
 #endif
-					Response response = platform.Request(url, data);
+					Response response = platform.Request(url, data, "POST");
 					if(response.Status < 200 || response.Status >= 300)
 					{
 						Logging.Log(LogLevel.ERROR, "Tapstream Error: Failed to fire hit, http code: {0}", response.Status);
@@ -319,7 +388,7 @@ namespace TapstreamMetrics.Sdk
 			postData.Append(Uri.EscapeDataString(value));
 		}
 
-		private void MakePostArgs(string secret)
+		private void MakePostArgs()
 		{
 			AppendPostPair("secret", secret);
 			AppendPostPair("sdkversion", VERSION);

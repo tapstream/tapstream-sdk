@@ -222,11 +222,12 @@ namespace TapstreamMetrics.Sdk
 #endif
         }
 
-        public Response Request(string url, string data)
+        public Response Request(string url, string data, string method)
         {
 #if TEST_WINPHONE || WINDOWS_PHONE
             int status = -1;
             string message = null;
+            string responseData = null;
             AutoResetEvent signal = new AutoResetEvent(false);
             
             HttpWebRequest req = (HttpWebRequest)HttpWebRequest.CreateHttp(url);
@@ -249,6 +250,7 @@ namespace TapstreamMetrics.Sdk
                             HttpWebResponse response = (HttpWebResponse)req.EndGetResponse(respState);
                             status = (int)response.StatusCode;
                             message = response.StatusDescription;
+                            responseData = new StreamReader(response.GetResponseStream()).ReadToEnd();
                         }
                         catch (WebException we)
                         {
@@ -279,18 +281,31 @@ namespace TapstreamMetrics.Sdk
             }
 
             signal.WaitOne();
-            return new Response(status, message);
+            return new Response(status, message, responseData);
 #else
 
             int status = -1;
             string message = null;
+            string responseData = null;
             try
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    HttpResponseMessage response = client.PostAsync(url, new StringContent(data, Encoding.UTF8, "application/x-www-form-urlencoded")).Result;
+                    HttpResponseMessage response;
+                    if (method == "POST")
+                    {
+                        response = client.PostAsync(url, new StringContent(data != null ? data : "", Encoding.UTF8, "application/x-www-form-urlencoded")).Result;
+                    }
+                    else
+                    {
+                        response = client.GetAsync(url).Result;
+                    }
                     status = (int)response.StatusCode;
-                    if(!response.IsSuccessStatusCode)
+                    if (response.IsSuccessStatusCode)
+                    {
+                        responseData = response.Content.ReadAsStringAsync().Result;
+                    }
+                    else
                     {
                         message = response.ReasonPhrase;
                     }
@@ -305,7 +320,7 @@ namespace TapstreamMetrics.Sdk
                 }
                 message = ex.Message;
             }
-            return new Response(status, message);
+            return new Response(status, message, responseData);
 #endif
         }
     }
