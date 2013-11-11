@@ -22,9 +22,9 @@ namespace TapstreamMetrics.Sdk
 		public const string VERSION = "2.3";
 		private const string EVENT_URL_TEMPLATE = "https://api.tapstream.com/{0}/event/{1}/";
 		private const string HIT_URL_TEMPLATE = "http://api.tapstream.com/{0}/hit/{1}.gif";
-        private const string CONVERSION_URL_TEMPLATE = "http://reporting.tapstream.com/v1/conversions/lookup?secret={0}&event_session={1}";
+        private const string CONVERSION_URL_TEMPLATE = "https://reporting.tapstream.com/v1/conversions/lookup?secret={0}&event_session={1}";
 		private const int MAX_THREADS = 1;
-        private const int CONVERSION_POLL_INTERVAL = 2;
+        private const int CONVERSION_POLL_INTERVAL = 1;
         private const int CONVERSION_POLL_COUNT = 10;
 
 #if WINDOWS_PHONE

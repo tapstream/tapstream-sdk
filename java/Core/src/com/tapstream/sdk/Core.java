@@ -9,17 +9,16 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import org.json.JSONArray;
-import org.json.JSONException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class Core {
 	public static final String VERSION = "2.3";
 	private static final String EVENT_URL_TEMPLATE = "https://api.tapstream.com/%s/event/%s/";
 	private static final String HIT_URL_TEMPLATE = "http://api.tapstream.com/%s/hit/%s.gif";
-	private static final String CONVERSION_URL_TEMPLATE = "http://reporting.tapstream.com/v1/conversions/lookup?secret=%s&event_session=%s";
+	private static final String CONVERSION_URL_TEMPLATE = "https://reporting.tapstream.com/v1/conversions/lookup?secret=%s&event_session=%s";
 	private static final int MAX_THREADS = 1;
-	private static final int CONVERSION_POLL_INTERVAL = 2;
+	private static final int CONVERSION_POLL_INTERVAL = 1;
 	private static final int CONVERSION_POLL_COUNT = 10;
 
 	private Delegate delegate;
@@ -88,8 +87,8 @@ class Core {
 					
 					Response res = platform.request(url, null, "GET");
 					if(res.status >= 200 && res.status < 300) {
-						Matcher m = Pattern.compile("^\\s*\\[\\s*\\]\\s*$").matcher(inputString);
-						if(!m.matches(res.data))
+						Matcher m = Pattern.compile("^\\s*\\[\\s*\\]\\s*$").matcher(res.data);
+						if(!m.matches())
 						{
 							retry = false;
 							config.getConversionListener().conversionInfo(res.data);

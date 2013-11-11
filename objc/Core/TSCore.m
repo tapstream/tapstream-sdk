@@ -5,8 +5,8 @@
 #define kTSVersion @"2.3"
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
 #define kTSHitUrlTemplate @"http://api.tapstream.com/%@/hit/%@.gif"
-#define kTSConversionUrlTemplate @"http://reporting.tapstream.com/v1/conversions/lookup?secret=%@&event_session=%@"
-#define kTSConversionPollInterval 2
+#define kTSConversionUrlTemplate @"https://reporting.tapstream.com/v1/conversions/lookup?secret=%@&event_session=%@"
+#define kTSConversionPollInterval 1
 #define kTSConversionPollCount 10
 
 @interface TSEvent(hidden)

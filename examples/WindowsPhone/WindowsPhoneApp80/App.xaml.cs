@@ -7,6 +7,7 @@ using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using WindowsPhoneApp80.Resources;
+using Newtonsoft.Json.Linq;
 
 using TapstreamMetrics.Sdk;
 
@@ -19,6 +20,20 @@ namespace WindowsPhoneApp80
             int temp = 1;
         }
     }
+
+    class MyConversionListener : ConversionListener
+    {
+        public void ConversionInfo(string jsonInfo)
+        {
+            try
+            {
+                JArray obj = JArray.Parse(jsonInfo);
+                // Read some data from this json object, and modify your application's behaviour accordingly
+                // ...
+            }
+            catch (Exception) { }
+        }
+    };
 
     public partial class App : Application
     {
@@ -39,6 +54,8 @@ namespace WindowsPhoneApp80
             Logging.SetLogger(new MyLogger());
 
             Config config = new Config();
+            config.ConversionListener = new MyConversionListener();
+
             Tapstream.Create("sdktest", "YGP2pezGTI6ec48uti4o1w", config);
 
             Tapstream tracker = Tapstream.Instance;
