@@ -84,19 +84,15 @@ class Core {
 				@Override
 				public void run() {
 					tries++;
-					
 					boolean retry = true;
 					
 					Response res = platform.request(url, null, "GET");
 					if(res.status >= 200 && res.status < 300) {
-						try {
-							JSONArray obj = new JSONArray(res.data);
-							if(obj.length() > 0) {
-								retry = false;
-								config.getConversionListener().conversionInfo(obj);
-							}
-						} catch (JSONException e) {
+						Matcher m = Pattern.compile("^\\s*\\[\\s*\\]\\s*$").matcher(inputString);
+						if(!m.matches(res.data))
+						{
 							retry = false;
+							config.getConversionListener().conversionInfo(res.data);
 						}
 					}
 					

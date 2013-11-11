@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 #if WINDOWS_PHONE
-using Newtonsoft.Json.Linq;
 using Microsoft.Phone.Reactive;
 using Microsoft.Phone.Info;
 #else
@@ -13,7 +13,6 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.System.Threading;
-using Windows.Data.Json;
 #endif
 
 namespace TapstreamMetrics.Sdk
@@ -114,29 +113,10 @@ namespace TapstreamMetrics.Sdk
                     Response res = platform.Request(url, null, "GET");
                     if (res.Status >= 200 && res.Status < 300)
                     {
-#if WINDOWS_PHONE
-                        JArray obj = null;
-                        try
+                        if (!new Regex("^\\s*\\[\\s*\\]\\s*$").IsMatch(res.Data))
                         {
-                            obj = JArray.Parse(res.Data);
-                        }
-                        catch (Exception) { }
-#else
-                        JsonArray obj = null;
-                        JsonArray.TryParse(res.Data, out obj);
-#endif
-                        if (obj != null)
-                        {
-                            if (obj.Count > 0)
-                            {
-                                retry = false;
-                                config.ConversionListener.ConversionInfo(obj);
-                            }
-                        }
-                        else
-                        {
-                            // Response was not a valid json array, stop trying.
                             retry = false;
+                            config.ConversionListener.ConversionInfo(res.Data);
                         }
                     }
 

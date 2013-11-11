@@ -8,7 +8,7 @@ namespace TapstreamMetrics.Sdk
 {
     class PlatformImpl : Platform
     {
-        public Response response = new Response(200, null);
+        public Response response = new Response(200, null, null);
         public HashSet<string> savedFiredList = null;
 
         public string LoadUuid()
@@ -73,7 +73,7 @@ namespace TapstreamMetrics.Sdk
             return "com.test.TestApp";
         }
 
-        public Response Request(string url, string data)
+        public Response Request(string url, string data, string method)
         {
             return response;
         }

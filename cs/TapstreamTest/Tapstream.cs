@@ -61,7 +61,7 @@ namespace TapstreamMetrics.Sdk
 
         public void SetResponseStatus(int status)
         {
-            ((PlatformImpl)platform).response = new Response(status, String.Format("Http %d", status));
+            ((PlatformImpl)platform).response = new Response(status, String.Format("Http %d", status), null);
         }
 
         public string[] GetSavedFiredList()

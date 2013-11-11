@@ -134,36 +134,15 @@
 			TSResponse *response = [platform request:url data:nil method:@"GET"];
 			if(response.status >= 200 && response.status < 300)
 			{
-				if(NSClassFromString(@"NSJSONSerialization"))
+				NSString *jsonString = AUTORELEASE([[NSString alloc] initWithData:response.data encoding:NSUTF8StringEncoding]);
+				
+				// If it is not an empty json array, then make the callback
+				NSError *error = nil;
+				NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^\\s*\\[\\s*\\]\\s*$" options:0 error:&error];
+				if(error == nil && [regex numberOfMatchesInString:jsonString options:NSMatchingAnchored range:NSMakeRange(0, [jsonString length])] == 0)
 				{
-					NSError *error = nil;
-					id object = [NSJSONSerialization JSONObjectWithData:response.data options:0 error:&error];
-					if(error == nil && [object isKindOfClass:[NSArray class]])
-					{
-						if([object count] > 0)
-						{
-							retry = false;
-							config.conversionListener(object, nil);
-						}
-					}
-					else
-					{
-						// Response was not a valid json array, stop trying.
-						retry = false;
-					}
-				}
-				else
-				{
-					NSString *jsonString = AUTORELEASE([[NSString alloc] initWithData:response.data encoding:NSUTF8StringEncoding]);
-					
-					// If it is not an empty json array, then make the callback
-					NSError *error = nil;
-					NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\[\\s*\\]" options:0 error:&error];
-					if(error == nil && [regex numberOfMatchesInString:jsonString options:0 range:NSMakeRange(0, [jsonString length])] == 0)
-					{
-						retry = false;
-						config.conversionListener(nil, jsonString);
-					}
+					retry = false;
+					config.conversionListener(nil, jsonString);
 				}
 			}
 			

@@ -22,7 +22,8 @@ public class Config {
 	private boolean fireAutomaticOpenEvent = true;
 	
 	// If this handler is set, and if there was a conversion that lead to this application
-	// install, then the handler will be called with the conversion details (as a json array).
+	// install, then the handler will be called with a string containing a json description
+	// of the the conversion details.
 	private ConversionListener conversionListener = null;
 
 

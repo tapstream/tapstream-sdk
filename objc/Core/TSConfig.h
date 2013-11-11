@@ -1,7 +1,7 @@
 #pragma once
 #import <Foundation/Foundation.h>
 
-typedef void(^TSConversionListener)(id jsonObject, NSString *jsonString);
+typedef void(^TSConversionListener)(NSString *jsonInfo);
 
 @interface TSConfig : NSObject {
 @private
@@ -31,11 +31,8 @@ typedef void(^TSConversionListener)(id jsonObject, NSString *jsonString);
 	BOOL fireAutomaticOpenEvent;
 
 	// If this handler is set, and if there was a conversion that lead to this application
-	// install, then the handler will be called with the conversion details.
-	//
-	// On iOS >= 5, the first parameter will be an instance of a json object, and the
-	// second parameter will be nil.  On iOS < 5, the first parameter will be nil,
-	// and the second will be a string containing a json object definition.
+	// install, then the handler will be called with a string containing a json description
+	// of the the conversion details.
 	TSConversionListener conversionListener;
 }
 
