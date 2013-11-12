@@ -1,14 +1,16 @@
 package com.example.example;
 
+import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import android.os.Bundle;
 import android.app.Activity;
-import android.util.Log;
+import android.os.Bundle;
 import android.view.Menu;
 
-import com.tapstream.sdk.*;
+import com.tapstream.sdk.Config;
+import com.tapstream.sdk.ConversionListener;
+import com.tapstream.sdk.Event;
+import com.tapstream.sdk.Tapstream;
 
 public class MainActivity extends Activity {
 	
@@ -24,7 +26,7 @@ public class MainActivity extends Activity {
 			@Override
 			public void conversionInfo(String jsonInfo) {
 				try {
-					JSONObject obj = new JSONObject(jsonInfo);
+					JSONArray obj = new JSONArray(jsonInfo);
 					// Read some data from this json object, and modify your application's behaviour accordingly
 	                // ...
 				} catch (JSONException e) {
