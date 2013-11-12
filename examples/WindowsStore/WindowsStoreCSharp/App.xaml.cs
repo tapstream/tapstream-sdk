@@ -52,7 +52,7 @@ namespace WindowsStoreCSharp
             this.Suspending += OnSuspending;
 
             Config config = new Config();
-            config.ConversionListener = new ConversionListener() { };
+            config.ConversionListener = new ConversionListener();
 
             Tapstream.Create("sdktest", "YGP2pezGTI6ec48uti4o1w", config);
 
