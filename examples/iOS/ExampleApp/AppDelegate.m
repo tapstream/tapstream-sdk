@@ -21,8 +21,14 @@
     }
     
     TSConfig *config = [TSConfig configWithDefaults];
-    config.onConversion = ^(id jsonObject, NSString *jsonString) {
-        NSLog(@"Json object: %@", jsonObject);
+    config.conversionListener = ^(NSData *jsonInfo) {
+        NSError *error;
+        NSArray *json = [NSJSONSerialization JSONObjectWithData:jsonInfo options:kNilOptions error:&error];
+        if(json && !error)
+        {
+            // Read some data from this json object, and modify your application's behaviour accordingly
+            // ...
+        }
     };
     
     [TSTapstream createWithAccountName:@"sdktest" developerSecret:@"YGP2pezGTI6ec48uti4o1w" config:config];

@@ -1,7 +1,7 @@
 #pragma once
 #import <Foundation/Foundation.h>
 
-typedef void(^TSConversionListener)(NSString *jsonInfo);
+typedef void(^TSConversionListener)(NSData *jsonInfo);
 
 @interface TSConfig : NSObject {
 @private

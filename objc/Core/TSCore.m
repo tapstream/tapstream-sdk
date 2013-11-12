@@ -123,11 +123,12 @@
 	{
 		__block int tries = 0;
 		
-		[NSString stringWithFormat:kTSConversionUrlTemplate, secret, [platform loadUuid]];
+		NSString *url = [NSString stringWithFormat:kTSConversionUrlTemplate, secret, [platform loadUuid]];
 
-		// returns true if it should be retried
-		void (^conversionCheck)() = nil;
-		conversionCheck = ^{
+		__block void (^conversionCheck)();
+		__block void (^ __unsafe_unretained weakConversionCheck)();
+		
+		weakConversionCheck = conversionCheck = ^{
 			tries++;
 			bool retry = true;
 
@@ -142,15 +143,16 @@
 				if(error == nil && [regex numberOfMatchesInString:jsonString options:NSMatchingAnchored range:NSMakeRange(0, [jsonString length])] == 0)
 				{
 					retry = false;
-					config.conversionListener(nil, jsonString);
+					config.conversionListener(response.data);
 				}
 			}
 			
 			if(retry && tries <= kTSConversionPollCount)
 			{
-				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * kTSConversionPollInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), conversionCheck);	
+				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * kTSConversionPollInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), weakConversionCheck);	
 			}
 		};
+
 		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * kTSConversionPollInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), conversionCheck);
 	}
 }

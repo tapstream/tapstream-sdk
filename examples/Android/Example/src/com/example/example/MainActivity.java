@@ -28,7 +28,7 @@ public class MainActivity extends Activity {
 				try {
 					JSONArray obj = new JSONArray(jsonInfo);
 					// Read some data from this json object, and modify your application's behaviour accordingly
-	                // ...
+					// ...
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -40,12 +40,12 @@ public class MainActivity extends Activity {
 		Tapstream tracker = Tapstream.getInstance();
 
 		Event e = new Event("test-event", false);
-        e.addPair("player", "John Doe");
-        e.addPair("score", 5);
-        tracker.fireEvent(e);
+		e.addPair("player", "John Doe");
+		e.addPair("score", 5);
+		tracker.fireEvent(e);
 
-        e = new Event("test-event-oto", true);
-        tracker.fireEvent(e);
+		e = new Event("test-event-oto", true);
+		tracker.fireEvent(e);
 	}
 
 	@Override
