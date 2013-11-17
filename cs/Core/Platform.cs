@@ -22,6 +22,6 @@ namespace TapstreamMetrics.Sdk
 #endif
         string GetAppName();
         string GetPackageName();
-        Response Request(string url, string data);
+        Response Request(string url, string data, string method);
     }
 }

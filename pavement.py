@@ -122,7 +122,7 @@ def package_java():
 @task
 def make_cs():
 	with pushd('cs'):
-		sh('msbuild /m Tapstream.sln /t:Build /p:Configuration=%s' % CONFIGURATION)
+		sh('msbuild /m Tapstream.sln /t:Build /p:Configuration=%s /p:VisualStudioVersion=12.0' % CONFIGURATION)
 		sh('msbuild /m TapstreamWinPhone.sln /t:Build /p:Configuration=%s' % CONFIGURATION)
 		# Build win8 test code
 		sh('msbuild /m TapstreamTest.sln /t:Build /p:Configuration=Debug;OutDir=bin/Debug/win8')

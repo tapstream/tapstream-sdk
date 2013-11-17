@@ -5,5 +5,6 @@
 	<classpathentry kind="lib" path="../Core/bin"/>
 	<classpathentry kind="lib" path="lib/js.jar"/>
 	<classpathentry kind="lib" path="lib/junit-4.11.jar"/>
+	<classpathentry kind="lib" path="lib/org.json-20120521.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

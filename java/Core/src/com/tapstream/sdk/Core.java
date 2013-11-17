@@ -10,12 +10,17 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class Core {
-	public static final String VERSION = "2.3";
+	public static final String VERSION = "2.4";
 	private static final String EVENT_URL_TEMPLATE = "https://api.tapstream.com/%s/event/%s/";
 	private static final String HIT_URL_TEMPLATE = "http://api.tapstream.com/%s/hit/%s.gif";
+	private static final String CONVERSION_URL_TEMPLATE = "https://reporting.tapstream.com/v1/timelines/lookup?secret=%s&event_session=%s";
 	private static final int MAX_THREADS = 1;
+	private static final int CONVERSION_POLL_INTERVAL = 1;
+	private static final int CONVERSION_POLL_COUNT = 10;
 
 	private Delegate delegate;
 	private Platform platform;
@@ -23,6 +28,7 @@ class Core {
 	private ActivityEventSource activityEventSource;
 	private Config config;
 	private String accountName;
+	private String secret;
 	private ScheduledThreadPoolExecutor executor;
 	private StringBuilder postData = null;
 	private Set<String> firingEvents = new HashSet<String>(16);
@@ -38,7 +44,8 @@ class Core {
 		this.config = config;
 
 		this.accountName = clean(accountName);
-		makePostArgs(developerSecret);
+		this.secret = developerSecret;
+		makePostArgs();
 
 		firedEvents = platform.loadFiredEvents();
 
@@ -71,7 +78,7 @@ class Core {
 				fireEvent(new Event(String.format(Locale.US, "android-%s-open", appName), false));	
 			}
 		}
-
+		
 		activityEventSource.setListener(new ActivityEventSource.ActivityListener() {
 			@Override
 			public void onOpen() {
@@ -85,6 +92,34 @@ class Core {
 				}
 			}
 		});
+
+		if(config.getConversionListener() != null) {
+			final String url = String.format(Locale.US, CONVERSION_URL_TEMPLATE, secret, platform.loadUuid());
+			Runnable task = new Runnable() {
+				private int tries = 0;
+				
+				@Override
+				public void run() {
+					tries++;
+					boolean retry = true;
+					
+					Response res = platform.request(url, null, "GET");
+					if(res.status >= 200 && res.status < 300) {
+						Matcher m = Pattern.compile("^\\s*\\[\\s*\\]\\s*$").matcher(res.data);
+						if(!m.matches())
+						{
+							retry = false;
+							config.getConversionListener().conversionInfo(res.data);
+						}
+					}
+					
+					if(retry && tries <= CONVERSION_POLL_COUNT) {
+						executor.schedule(this, CONVERSION_POLL_INTERVAL, TimeUnit.SECONDS);
+					}
+				}
+			};
+			executor.schedule(task, CONVERSION_POLL_INTERVAL, TimeUnit.SECONDS);
+		}
 	}
 	
 	public synchronized void fireEvent(final Event e) {
@@ -114,7 +149,7 @@ class Core {
 
 		Runnable task = new Runnable() {
 			public void innerRun() {
-				Response response = platform.request(url, data);
+				Response response = platform.request(url, data, "POST");
 				boolean failed = response.status < 200 || response.status >= 300;
 				boolean shouldRetry = response.status < 0 || (response.status >= 500 && response.status < 600);
 
@@ -206,7 +241,7 @@ class Core {
 		final String data = h.getPostData();
 		Runnable task = new Runnable() {
 			public void run() {
-				Response response = platform.request(url, data);
+				Response response = platform.request(url, data, "POST");
 				if (response.status < 200 || response.status >= 300) {
 					Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire hit, http code: %d", response.status);
 					listener.reportOperation("hit-failed");
@@ -264,6 +299,7 @@ class Core {
 		postData.append(encodedPair);
 	}
 
+<<<<<<< HEAD
 	private void makePostArgs(String secret) {
 		appendPostPair("", "secret", secret);
 		appendPostPair("", "sdkversion", VERSION);
@@ -272,6 +308,11 @@ class Core {
 		appendPostPair("", "hardware-odin1", config.getOdin1());
 		appendPostPair("", "hardware-open-udid", config.getOpenUdid());
 		appendPostPair("", "hardware", config.getHardware());
+=======
+	private void makePostArgs() {
+		appendPostPair("secret", secret);
+		appendPostPair("sdkversion", VERSION);
+>>>>>>> master
 		
 		if (config.getCollectWifiMac()) {
 			appendPostPair("", "hardware-wifi-mac", platform.getWifiMac());

@@ -31,6 +31,11 @@ namespace TapstreamMetrics.Sdk
         // These parameters will be automatically attached to all events fired by the sdk
         private IDictionary<string, object> globalEventParams = new Dictionary<string, object>();
 
+        // If this handler is set, and if there was a conversion that lead to this application
+        // install, then the handler will be called with the conversion details (as a json array).
+        private ConversionListener conversionListener = null;
+
+
 		// Properties for the private members above:
 		public string Hardware
 		{
@@ -86,6 +91,12 @@ namespace TapstreamMetrics.Sdk
         {
             get { return globalEventParams; }
             set { globalEventParams = value; }
+        }
+
+        public ConversionListener ConversionListener
+        {
+            get { return conversionListener; }
+            set { conversionListener = value; }
         }
 	}
 }

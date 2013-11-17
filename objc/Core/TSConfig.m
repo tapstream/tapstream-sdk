@@ -25,6 +25,7 @@
 
 @synthesize globalEventParams = globalEventParams;
 
+@synthesize conversionListener = conversionListener;
 
 + (id)configWithDefaults
 {

@@ -3,7 +3,8 @@ package com.tapstream.sdk;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Config {
+public class Config {	
+
 	// Deprecated, hardware-id field
 	private String hardware = null;
 
@@ -23,6 +24,11 @@ public class Config {
 	// Unset these if you want to disable the sending of the automatic events
 	private boolean fireAutomaticInstallEvent = true;
 	private boolean fireAutomaticOpenEvent = true;
+	
+	// If this handler is set, and if there was a conversion that lead to this application
+	// install, then the handler will be called with a string containing a json description
+	// of the the conversion details.
+	private ConversionListener conversionListener = null;
 
 	// These parameters will be automatically attached to all events fired by the sdk.
 	public Map<String, Object> globalEventParams = new HashMap<String, Object>();
@@ -57,5 +63,7 @@ public class Config {
 
 	public boolean getFireAutomaticOpenEvent() { return fireAutomaticOpenEvent; }
 	public void setFireAutomaticOpenEvent(boolean fire) { fireAutomaticOpenEvent = fire; }
-}
 
+	public ConversionListener getConversionListener() { return conversionListener; }
+	public void setConversionListener(ConversionListener listener) { conversionListener = listener; }
+}

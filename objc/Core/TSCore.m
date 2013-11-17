@@ -3,9 +3,12 @@
 #import "TSLogging.h"
 #import "TSUtils.h"
 
-#define kTSVersion @"2.3"
+#define kTSVersion @"2.4"
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
 #define kTSHitUrlTemplate @"http://api.tapstream.com/%@/hit/%@.gif"
+#define kTSConversionUrlTemplate @"https://reporting.tapstream.com/v1/timelines/lookup?secret=%@&event_session=%@"
+#define kTSConversionPollInterval 1
+#define kTSConversionPollCount 10
 
 @interface TSEvent(hidden)
 - (void)firing;
@@ -22,6 +25,7 @@
 @property(nonatomic, STRONG_OR_RETAIN) id<TSAppEventSource> appEventSource;
 @property(nonatomic, STRONG_OR_RETAIN) TSConfig *config;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *accountName;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *secret;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableString *postData;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableSet *firingEvents;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableSet *firedEvents;
@@ -29,13 +33,14 @@
 
 - (NSString *)clean:(NSString *)s;
 - (void)increaseDelay;
-- (void)makePostArgsWithSecret:(NSString *)secret;
+- (void)appendPostPairWithKey:(NSString *)key value:(NSString *)value;
+- (void)makePostArgs;
 @end
 
 
 @implementation TSCore
 
-@synthesize del, platform, listener, appEventSource, config, accountName, postData, firingEvents, firedEvents, failingEventId;
+@synthesize del, platform, listener, appEventSource, config, accountName, secret, postData, firingEvents, firedEvents, failingEventId;
 
 - (id)initWithDelegate:(id<TSDelegate>)delegateVal
 	platform:(id<TSPlatform>)platformVal
@@ -53,10 +58,11 @@
 		self.config = configVal;
 		self.appEventSource = appEventSourceVal;
 		self.accountName = [self clean:accountNameVal];
+		self.secret = developerSecretVal;
 		self.postData = nil;
 		self.failingEventId = nil;
 
-		[self makePostArgsWithSecret:developerSecretVal];
+		[self makePostArgs];
 
 		self.firingEvents = [[NSMutableSet alloc] initWithCapacity:32];
 		self.firedEvents = [platform loadFiredEvents];
@@ -148,6 +154,43 @@
 				currency:currencyCode];
 		}
 	}];
+
+	if(config.conversionListener != nil)
+	{
+		__block int tries = 0;
+		
+		NSString *url = [NSString stringWithFormat:kTSConversionUrlTemplate, secret, [platform loadUuid]];
+
+		__block void (^conversionCheck)();
+		__block void (^ __unsafe_unretained weakConversionCheck)();
+		
+		weakConversionCheck = conversionCheck = ^{
+			tries++;
+			bool retry = true;
+
+			TSResponse *response = [platform request:url data:nil method:@"GET"];
+			if(response.status >= 200 && response.status < 300)
+			{
+				NSString *jsonString = AUTORELEASE([[NSString alloc] initWithData:response.data encoding:NSUTF8StringEncoding]);
+				
+				// If it is not an empty json array, then make the callback
+				NSError *error = nil;
+				NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^\\s*\\[\\s*\\]\\s*$" options:0 error:&error];
+				if(error == nil && [regex numberOfMatchesInString:jsonString options:NSMatchingAnchored range:NSMakeRange(0, [jsonString length])] == 0)
+				{
+					retry = false;
+					config.conversionListener(response.data);
+				}
+			}
+			
+			if(retry && tries <= kTSConversionPollCount)
+			{
+				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * kTSConversionPollInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), weakConversionCheck);	
+			}
+		};
+
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * kTSConversionPollInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), conversionCheck);
+	}
 }
 
 - (void)fireEvent:(TSEvent *)e
@@ -185,7 +228,7 @@
 		dispatch_time_t dispatchTime = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * actualDelay);
 		dispatch_after(dispatchTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 
-			TSResponse *response = [platform request:url data:data];
+			TSResponse *response = [platform request:url data:data method:@"POST"];
 			bool failed = response.status < 200 || response.status >= 300;
 			bool shouldRetry = response.status < 0 || (response.status >= 500 && response.status < 600);
 
@@ -283,7 +326,7 @@
 	NSString *data = hit.postData;
 
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		TSResponse *response = [platform request:url data:data];
+		TSResponse *response = [platform request:url data:data method:@"POST"];
 		if(response.status < 200 || response.status >= 300)
 		{
 			[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire hit, http code: %d", response.status];
@@ -349,7 +392,7 @@
 	[postData appendString:encodedPair];
 }
 
-- (void)makePostArgsWithSecret:(NSString *)secret
+- (void)makePostArgs
 {
 	[self appendPostPairWithPrefix:@"" key:@"secret" value:secret];
 	[self appendPostPairWithPrefix:@"" key:@"sdkversion" value:kTSVersion];

@@ -222,75 +222,130 @@ namespace TapstreamMetrics.Sdk
 #endif
         }
 
-        public Response Request(string url, string data)
-        {
 #if TEST_WINPHONE || WINDOWS_PHONE
-            int status = -1;
-            string message = null;
+        private Response DoPost(HttpWebRequest req, string postData)
+        {
+            Response res = null;
             AutoResetEvent signal = new AutoResetEvent(false);
-            
-            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.CreateHttp(url);
-            req.Method = "POST";
-            req.ContentType = "application/x-www-form-urlencoded;charset=UTF-8";
             try
             {
                 req.BeginGetRequestStream(reqState =>
                 {
-                    Stream postStream = req.EndGetRequestStream(reqState);
+                    try
+                    {
+                        Stream reqStream = req.EndGetRequestStream(reqState);
+                        if (postData != null)
+                        {
+                            Encoding enc = new System.Text.UTF8Encoding();
+                            reqStream.Write(enc.GetBytes(postData), 0, postData.Length);
+                        }
+                        reqStream.Close();
+                        res = DoRequest(req);
+                    }
+                    catch (Exception ex)
+                    {
+                        res = new Response(-1, ex.ToString(), null);
+                    }
+                    finally
+                    {
+                        signal.Set();
+                    }
+                }, null);
+            }
+            catch (Exception ex)
+            {
+                res = new Response(-1, ex.ToString(), null);
+                signal.Set();
+            }
 
-                    Encoding enc = new System.Text.UTF8Encoding();
-                    postStream.Write(enc.GetBytes(data), 0, data.Length);
-                    postStream.Close();
+            signal.WaitOne();
+            return res;
+        }
 
-                    req.BeginGetResponse(respState =>
+        private Response DoRequest(HttpWebRequest req)
+        {
+            Response res = null;
+            AutoResetEvent signal = new AutoResetEvent(false);
+
+            try
+            {
+                req.BeginGetResponse(respState =>
+                {
+                    try
+                    {
+                        HttpWebResponse response = (HttpWebResponse)req.EndGetResponse(respState);
+                        res = new Response((int)response.StatusCode, response.StatusDescription, new StreamReader(response.GetResponseStream()).ReadToEnd());
+                    }
+                    catch (WebException we)
                     {
                         try
                         {
-                            HttpWebResponse response = (HttpWebResponse)req.EndGetResponse(respState);
-                            status = (int)response.StatusCode;
-                            message = response.StatusDescription;
-                        }
-                        catch (WebException we)
-                        {
                             var resp = we.Response as HttpWebResponse;
-                            if (resp == null)
-                            {
-                                throw;
-                            }
-                            status = (int)resp.StatusCode;
-                            message = we.ToString();
+                            res = new Response((int)resp.StatusCode, we.ToString(), null);
                         }
                         catch (Exception ex)
                         {
-                            status = -1;
-                            message = ex.ToString();
+                            res = new Response(-1, ex.ToString(), null);
                         }
-
+                    }
+                    catch (Exception ex)
+                    {
+                        res = new Response(-1, ex.ToString(), null);
+                    }
+                    finally
+                    {
                         signal.Set();
-
-                    }, null);
+                    }
 
                 }, null);
             }
             catch (Exception ex)
             {
-                status = -1;
-                message = ex.ToString();
+                res = new Response(-1, ex.ToString(), null);
+                signal.Set();
             }
 
             signal.WaitOne();
-            return new Response(status, message);
+            return res;
+        }
+
+#endif
+
+        public Response Request(string url, string data, string method)
+        {
+#if TEST_WINPHONE || WINDOWS_PHONE
+            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.CreateHttp(url);
+            req.Method = method;
+            if (method == "POST")
+            {
+                req.ContentType = "application/x-www-form-urlencoded;charset=UTF-8";
+                return DoPost(req, data);
+            }
+            return DoRequest(req);
 #else
 
             int status = -1;
             string message = null;
+            string responseData = null;
             try
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    HttpResponseMessage response = client.PostAsync(url, new StringContent(data, Encoding.UTF8, "application/x-www-form-urlencoded")).Result;
+                    HttpResponseMessage response;
+                    if (method == "POST")
+                    {
+                        response = client.PostAsync(url, new StringContent(data != null ? data : "", Encoding.UTF8, "application/x-www-form-urlencoded")).Result;
+                    }
+                    else
+                    {
+                        response = client.GetAsync(url).Result;
+                    }
                     status = (int)response.StatusCode;
-                    if(!response.IsSuccessStatusCode)
+                    if (response.IsSuccessStatusCode)
+                    {
+                        responseData = response.Content.ReadAsStringAsync().Result;
+                    }
+                    else
                     {
                         message = response.ReasonPhrase;
                     }
@@ -305,7 +360,7 @@ namespace TapstreamMetrics.Sdk
                 }
                 message = ex.Message;
             }
-            return new Response(status, message);
+            return new Response(status, message, responseData);
 #endif
         }
     }

@@ -174,24 +174,28 @@
 	return [[NSBundle mainBundle] bundleIdentifier];
 }
 
-- (TSResponse *)request:(NSString *)url data:(NSString *)data
+- (TSResponse *)request:(NSString *)url data:(NSString *)data method:(NSString *)method
 {
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
-	[request setHTTPMethod:@"POST"];
-	[request setHTTPBody:[data dataUsingEncoding:NSUTF8StringEncoding]];
+	[request setHTTPMethod:method];
+	if(data != nil)
+	{
+		[request setHTTPBody:[data dataUsingEncoding:NSUTF8StringEncoding]];
+	}
 
 	NSError *error = nil;
 	NSHTTPURLResponse *response = nil;
-	if(![NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error] || !response)
+	NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+	if(responseData == nil || !response)
 	{
-		if(error)
+		if(error != nil)
 		{
 			NSString *msg = [NSString stringWithFormat:@"%@", error];
-			return AUTORELEASE([[TSResponse alloc] initWithStatus:-1 message:msg]);
+			return AUTORELEASE([[TSResponse alloc] initWithStatus:-1 message:msg data:nil]);
 		}
-		return AUTORELEASE([[TSResponse alloc] initWithStatus:-1 message:@"Unknown"]);
+		return AUTORELEASE([[TSResponse alloc] initWithStatus:-1 message:@"Unknown" data:nil]);
 	}
-	return AUTORELEASE([[TSResponse alloc] initWithStatus:response.statusCode message:[NSHTTPURLResponse localizedStringForStatusCode:response.statusCode]]);
+	return AUTORELEASE([[TSResponse alloc] initWithStatus:response.statusCode message:[NSHTTPURLResponse localizedStringForStatusCode:response.statusCode] data:responseData]);
 }
 
 - (NSString *)systemInfoByName:(NSString *)name

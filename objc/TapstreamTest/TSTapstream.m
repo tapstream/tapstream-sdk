@@ -87,7 +87,7 @@
 - (void)setResponseStatus:(int)status
 {
 	NSString *msg = [NSString stringWithFormat:@"Http %d", status];
-	((TSPlatformImpl *)platform).response = AUTORELEASE([[TSResponse alloc] initWithStatus:status message:msg]);
+	((TSPlatformImpl *)platform).response = AUTORELEASE([[TSResponse alloc] initWithStatus:status message:msg data:nil]);
 }
 
 - (NSArray *)getSavedFiredList

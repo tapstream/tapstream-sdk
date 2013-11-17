@@ -2,6 +2,8 @@
 #import <Foundation/Foundation.h>
 #import "TSHelpers.h"
 
+typedef void(^TSConversionListener)(NSData *jsonInfo);
+
 @interface TSConfig : NSObject {
 @private
 	// Deprecated, hardware-id field
@@ -32,6 +34,11 @@
 
 	// These parameters will be automatically attached to all events fired by the sdk
 	NSMutableDictionary *globalEventParams;
+
+	// If this handler is set, and if there was a conversion that lead to this application
+	// install, then the handler will be called with a string containing a json description
+	// of the the conversion details.
+	TSConversionListener conversionListener;
 }
 
 @property(nonatomic, STRONG_OR_RETAIN) NSString *hardware;
@@ -55,6 +62,8 @@
 @property(nonatomic, assign) BOOL fireAutomaticIAPEvents;
 
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableDictionary *globalEventParams;
+
+@property(nonatomic, copy) TSConversionListener conversionListener;
 
 + (id)configWithDefaults;
 - (id)init;

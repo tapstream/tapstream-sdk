@@ -32,5 +32,5 @@ interface Platform {
 
 	public String getPackageName();
 
-	public Response request(String url, String data);
+	public Response request(String url, String data, String method);
 }

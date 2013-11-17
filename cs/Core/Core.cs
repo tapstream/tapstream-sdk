@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 #if WINDOWS_PHONE
 using Microsoft.Phone.Reactive;
@@ -18,10 +19,13 @@ namespace TapstreamMetrics.Sdk
 {
 	class Core
 	{
-		public const string VERSION = "2.3";
+		public const string VERSION = "2.4";
 		private const string EVENT_URL_TEMPLATE = "https://api.tapstream.com/{0}/event/{1}/";
 		private const string HIT_URL_TEMPLATE = "http://api.tapstream.com/{0}/hit/{1}.gif";
+        private const string CONVERSION_URL_TEMPLATE = "https://reporting.tapstream.com/v1/timelines/lookup?secret={0}&event_session={1}";
 		private const int MAX_THREADS = 1;
+        private const int CONVERSION_POLL_INTERVAL = 1;
+        private const int CONVERSION_POLL_COUNT = 10;
 
 #if WINDOWS_PHONE
 		private IScheduler scheduler = Scheduler.NewThread;
@@ -32,6 +36,7 @@ namespace TapstreamMetrics.Sdk
         private AppEventSource appEventSource;
 		private Config config;
 		private string accountName;
+        private string secret;
 		private StringBuilder postData = null;
 		private HashSet<string> firingEvents = new HashSet<string>();
 		private HashSet<string> firedEvents = new HashSet<string>();
@@ -48,7 +53,8 @@ namespace TapstreamMetrics.Sdk
 			this.config = config;
 		
 			this.accountName = Clean(accountName);
-			MakePostArgs(developerSecret);
+            this.secret = developerSecret;
+			MakePostArgs();
 		
 			firedEvents = platform.LoadFiredEvents();
 		}
@@ -107,6 +113,49 @@ namespace TapstreamMetrics.Sdk
                     }
                 };
             }
+
+            if(config.ConversionListener != null)
+            {
+                string url = String.Format(CONVERSION_URL_TEMPLATE, secret, platform.LoadUuid());
+                int tries = 0;
+
+#if WINDOWS_PHONE
+                Action conversionCheck = null;
+                conversionCheck = new Action(() =>
+#else
+                Action<Task> conversionCheck = null;
+                conversionCheck = new Action<Task>((prevResult) =>
+#endif
+                {
+                    tries++;
+                    bool retry = true;
+
+                    Response res = platform.Request(url, null, "GET");
+                    if (res.Status >= 200 && res.Status < 300)
+                    {
+                        if (!new Regex("^\\s*\\[\\s*\\]\\s*$").IsMatch(res.Data))
+                        {
+                            retry = false;
+                            config.ConversionListener.ConversionInfo(res.Data);
+                        }
+                    }
+
+                    if (retry && tries <= CONVERSION_POLL_COUNT)
+                    {
+#if WINDOWS_PHONE
+                        scheduler.Schedule(conversionCheck, TimeSpan.FromSeconds(CONVERSION_POLL_INTERVAL));
+#else
+                        Task.Delay(TimeSpan.FromSeconds(CONVERSION_POLL_INTERVAL)).ContinueWith(conversionCheck);
+#endif
+                    }
+                });
+
+#if WINDOWS_PHONE
+				scheduler.Schedule(conversionCheck, TimeSpan.FromSeconds(CONVERSION_POLL_INTERVAL));
+#else
+                Task.Delay(TimeSpan.FromSeconds(CONVERSION_POLL_INTERVAL)).ContinueWith(conversionCheck);
+#endif
+            }
 		}
 
 		public void FireEvent(Event e)
@@ -151,7 +200,7 @@ namespace TapstreamMetrics.Sdk
 				Task.Delay(TimeSpan.FromSeconds(actualDelay)).ContinueWith((prevResult) =>
 				{
 #endif
-					Response response = platform.Request(url, data);
+					Response response = platform.Request(url, data, "POST");
 					bool failed = response.Status < 200 || response.Status >= 300;
 					bool shouldRetry = response.Status < 0 || (response.Status >= 500 && response.Status < 600);
 				
@@ -242,7 +291,7 @@ namespace TapstreamMetrics.Sdk
 					listener.ReportOperation("job-ended", e.Name);
 
 #if WINDOWS_PHONE
-				}), TimeSpan.FromSeconds( actualDelay ) );
+				}), TimeSpan.FromSeconds(actualDelay));
 #else
 				});
 #endif
@@ -264,7 +313,7 @@ namespace TapstreamMetrics.Sdk
 			return Task<Response>.Run(() =>
 				{
 #endif
-					Response response = platform.Request(url, data);
+					Response response = platform.Request(url, data, "POST");
 					if(response.Status < 200 || response.Status >= 300)
 					{
 						Logging.Log(LogLevel.ERROR, "Tapstream Error: Failed to fire hit, http code: {0}", response.Status);
@@ -338,7 +387,7 @@ namespace TapstreamMetrics.Sdk
 			postData.Append(encodedPair);
 		}
 
-		private void MakePostArgs(string secret)
+		private void MakePostArgs()
 		{
 			AppendPostPair("", "secret", secret);
             AppendPostPair("", "sdkversion", VERSION);

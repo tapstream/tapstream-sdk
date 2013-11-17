@@ -13,6 +13,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.Data.Json;
 
 using TapstreamMetrics.Sdk;
 using System.Threading.Tasks;
@@ -22,6 +23,19 @@ using System.Threading.Tasks;
 
 namespace WindowsStoreCSharp
 {
+    class ConversionListener : TapstreamMetrics.Sdk.ConversionListener
+    {
+        public void ConversionInfo(string jsonInfo)
+        {
+            JsonArray obj;
+            if (JsonArray.TryParse(jsonInfo, out obj))
+            {
+                // Read some data from this json object, and modify your application's behaviour accordingly
+                // ...
+            }
+        }
+    };
+
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
     /// </summary>
@@ -38,6 +52,8 @@ namespace WindowsStoreCSharp
             this.Suspending += OnSuspending;
 
             Config config = new Config();
+            config.ConversionListener = new ConversionListener();
+
             Tapstream.Create("sdktest", "YGP2pezGTI6ec48uti4o1w", config);
 
             Tapstream tracker = Tapstream.Instance;
