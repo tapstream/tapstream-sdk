@@ -11,6 +11,8 @@
 
 @implementation AppDelegate
 
+@synthesize products;
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
@@ -21,15 +23,15 @@
     }
     
     TSConfig *config = [TSConfig configWithDefaults];
-    config.conversionListener = ^(NSData *jsonInfo) {
-        NSError *error;
-        NSArray *json = [NSJSONSerialization JSONObjectWithData:jsonInfo options:kNilOptions error:&error];
-        if(json && !error)
-        {
-            // Read some data from this json object, and modify your application's behaviour accordingly
-            // ...
-        }
-    };
+//    config.conversionListener = ^(NSData *jsonInfo) {
+//        NSError *error;
+//        NSArray *json = [NSJSONSerialization JSONObjectWithData:jsonInfo options:kNilOptions error:&error];
+//        if(json && !error)
+//        {
+//            // Read some data from this json object, and modify your application's behaviour accordingly
+//            // ...
+//        }
+//    };
     
     [TSTapstream createWithAccountName:@"sdktest" developerSecret:@"YGP2pezGTI6ec48uti4o1w" config:config];
     
@@ -39,9 +41,62 @@
     [e addValue:@"John Doe" forKey:@"player"];
     [e addIntegerValue:5 forKey:@"score"];
     [tracker fireEvent:e];
+
+    
+    [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+    
+    NSArray *productIds = @[@"com.tapstream.catalog.tiddlywinks"];
+    SKProductsRequest *productsRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithArray:productIds]];
+    productsRequest.delegate = self;
+    [productsRequest start];
     
     return YES;
 }
+
+// SKProductsRequestDelegate protocol method
+- (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response
+{
+    self.products = response.products;
+    
+    for (NSString *ident in response.invalidProductIdentifiers) {
+        NSLog(@"Invalid product id: %@", ident);
+    }
+    
+    for (NSString *ident in response.products) {
+        NSLog(@"Product id: %@", ident);
+    }
+    
+    if(self.products.count > 0) {
+        SKProduct *product = [self.products objectAtIndex:0];
+        
+        SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
+        payment.quantity = 2;
+        
+        [[SKPaymentQueue defaultQueue] addPayment:payment];
+    }
+}
+
+- (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
+{
+    for (SKPaymentTransaction *transaction in transactions) {
+        switch (transaction.transactionState) {
+                // Call the appropriate custom method.
+            case SKPaymentTransactionStatePurchased:
+                NSLog(@"StatePurchased %@", transaction.payment.productIdentifier);
+                break;
+            case SKPaymentTransactionStateFailed:
+                NSLog(@"StateFailed %@", transaction.payment.productIdentifier);
+                break;
+            case SKPaymentTransactionStateRestored:
+                NSLog(@"StateRestored %@", transaction.payment.productIdentifier);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+
 							
 - (void)applicationWillResignActive:(UIApplication *)application
 {

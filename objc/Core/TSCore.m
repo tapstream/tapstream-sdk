@@ -33,7 +33,6 @@
 
 - (NSString *)clean:(NSString *)s;
 - (void)increaseDelay;
-- (void)appendPostPairWithKey:(NSString *)key value:(NSString *)value;
 - (void)makePostArgs;
 @end
 
