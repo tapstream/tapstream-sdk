@@ -16,50 +16,55 @@ void TSLoadStoreKitClasses()
 }
 
 
-
-
-typedef void(^TSProductRequestCompletion)(SKProduct *);
-
-@interface TSProductRequestDelegate : NSObject<SKProductsRequestDelegate>
-
-@property(nonatomic, STRONG_OR_RETAIN) SKProduct *product;
-@property(nonatomic, copy) TSProductRequestCompletion completion;
-
+@interface TSRequestWrapper : NSObject<NSCopying>
+@property(nonatomic, STRONG_OR_RETAIN) SKProductsRequest *request;
++ (id)requestWrapperWithRequest:(SKProductsRequest *)req;
+- (id)copyWithZone:(NSZone *)zone;
+- (BOOL)isEqual:(id)other;
+- (NSUInteger)hash;
 @end
 
-@implementation TSProductRequestDelegate
-
-@synthesize product, completion;
-
-- (id)initWithCompletion:(TSProductRequestCompletion)completionVal
+@implementation TSRequestWrapper
+@synthesize request;
++ (id)requestWrapperWithRequest:(SKProductsRequest *)req
+{
+	return AUTORELEASE([[self alloc] initWithRequest:req]);
+}
+- (id)initWithRequest:(SKProductsRequest *)req
 {
 	if((self = [super init]) != nil)
 	{
-		self.completion = completionVal;
+		self.request = req;
 	}
 	return self;
 }
-
+- (id)copyWithZone:(NSZone *)zone
+{
+	return [[[self class] allocWithZone:zone] initWithRequest:self.request];
+}
+- (BOOL)isEqual:(id)other
+{
+	if(self == other)
+	{
+		return YES;
+	}
+	if(!other || ![other isKindOfClass:[self class]])
+	{
+		return NO;
+	}
+	return self.request == ((TSRequestWrapper *)other).request;
+}
+- (NSUInteger)hash
+{
+	return (NSUInteger)self.request;
+}
 - (void)dealloc
 {
-	RELEASE(product);
+	self.request = nil;
 	SUPER_DEALLOC;
 }
-
-- (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response
-{
-	for(SKProduct *prod in response.products)
-	{
-		product = prod;
-		break;
-	}
-	if(product != nil && completion != nil)
-	{
-		completion(product);
-	}
-}
-
 @end
+
 
 
 
@@ -69,6 +74,7 @@ typedef void(^TSProductRequestCompletion)(SKProduct *);
 @property(nonatomic, STRONG_OR_RETAIN) id<NSObject> foregroundedEventObserver;
 @property(nonatomic, copy) TSOpenHandler onOpen;
 @property(nonatomic, copy) TSTransactionHandler onTransaction;
+@property(nonatomic, STRONG_OR_RETAIN) NSMutableDictionary *requestTransactions;
 
 - (id)init;
 - (void)dealloc;
@@ -78,7 +84,7 @@ typedef void(^TSProductRequestCompletion)(SKProduct *);
 
 @implementation TSAppEventSourceImpl
 
-@synthesize foregroundedEventObserver, onOpen, onTransaction;
+@synthesize foregroundedEventObserver, onOpen, onTransaction, requestTransactions;
 
 - (id)init
 {
@@ -95,6 +101,7 @@ typedef void(^TSProductRequestCompletion)(SKProduct *);
 
 		if(TSSKPaymentQueue != nil)
 		{
+			self.requestTransactions = [NSMutableDictionary dictionary];
 			[[TSSKPaymentQueue defaultQueue] addTransactionObserver:self];
 		}
 	}
@@ -105,23 +112,50 @@ typedef void(^TSProductRequestCompletion)(SKProduct *);
 {
 	if(onTransaction != nil)
 	{
+		NSMutableDictionary *transForProduct = [NSMutableDictionary dictionary];
 		for(SKPaymentTransaction *trans in transactions)
 		{
 			if(trans.transactionState == SKPaymentTransactionStatePurchased)
 			{
-				dispatch_async(dispatch_get_main_queue(), ^() {
-					SKProductsRequest *req = AUTORELEASE([[TSSKProductsRequest alloc]
-						initWithProductIdentifiers:[NSSet setWithObject:trans.payment.productIdentifier]
-						]);
-					req.delegate = AUTORELEASE([[TSProductRequestDelegate alloc] initWithCompletion:^(SKProduct *product) {
-						onTransaction(trans.transactionIdentifier,
-							product.productIdentifier,
-							trans.payment.quantity,
-							(int)([product.price doubleValue] * 100),
-							[product.priceLocale objectForKey:NSLocaleCurrencyCode]
-							);
-					}]);
-				});
+				[transForProduct setValue:trans forKey:trans.payment.productIdentifier];
+			}
+		}
+
+		if([transForProduct count] > 0)
+		{
+			SKProductsRequest *req = AUTORELEASE([[TSSKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithArray:[transForProduct allKeys]]]);
+			req.delegate = self;
+			@synchronized(self)
+			{
+				[self.requestTransactions setObject:transForProduct forKey:[TSRequestWrapper requestWrapperWithRequest:req]];
+			}
+			[req start];
+		}
+	}
+}
+
+- (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response
+{
+	NSMutableDictionary *transactions = nil;
+	@synchronized(self)
+	{
+		TSRequestWrapper *key = [TSRequestWrapper requestWrapperWithRequest:request];
+		transactions = [self.requestTransactions objectForKey:key];
+		[self.requestTransactions removeObjectForKey:key];
+	}
+	if(transactions)
+	{
+		for(SKProduct *product in response.products)
+		{
+			SKPaymentTransaction *transaction = [transactions objectForKey:product.productIdentifier];
+			if(transaction)
+			{
+				onTransaction(transaction.transactionIdentifier,
+					product.productIdentifier,
+					transaction.payment.quantity,
+					(int)([product.price doubleValue] * 100),
+					[product.priceLocale objectForKey:NSLocaleCurrencyCode]
+					);
 			}
 		}
 	}
@@ -149,9 +183,8 @@ typedef void(^TSProductRequestCompletion)(SKProduct *);
 		[[NSNotificationCenter defaultCenter] removeObserver:foregroundedEventObserver];
 	}
 
-	RELEASE(onOpen);
-	RELEASE(onTransaction);
 	RELEASE(foregroundedEventObserver);
+	RELEASE(requestTransactions);
 	SUPER_DEALLOC;
 }
 
