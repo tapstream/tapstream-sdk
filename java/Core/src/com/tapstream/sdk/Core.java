@@ -299,7 +299,6 @@ class Core {
 		postData.append(encodedPair);
 	}
 
-<<<<<<< HEAD
 	private void makePostArgs(String secret) {
 		appendPostPair("", "secret", secret);
 		appendPostPair("", "sdkversion", VERSION);
@@ -308,12 +307,7 @@ class Core {
 		appendPostPair("", "hardware-odin1", config.getOdin1());
 		appendPostPair("", "hardware-open-udid", config.getOpenUdid());
 		appendPostPair("", "hardware", config.getHardware());
-=======
-	private void makePostArgs() {
-		appendPostPair("secret", secret);
-		appendPostPair("sdkversion", VERSION);
->>>>>>> master
-		
+
 		if (config.getCollectWifiMac()) {
 			appendPostPair("", "hardware-wifi-mac", platform.getWifiMac());
 		}
