@@ -73,25 +73,5 @@ public class ActivityCallbacks extends ActivityEventSource implements ActivityLi
 			}
 		}
 	}
-	
 
-//	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//		if(resultCode == Activity.RESULT_OK) {
-//			if(data.getIntExtra("RESPONSE_CODE", -1) == 0) {
-//				String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
-//				if(purchaseData != null) {
-//					try {
-//						JSONObject jo = new JSONObject(purchaseData);
-//						String transactionId = jo.getString("orderId");
-//						String productId = jo.getString("productId");
-//						
-//						
-//						
-//					} catch (JSONException e) {
-//						e.printStackTrace();
-//					}
-//				}
-//			}
-//		}
-//	}
 }

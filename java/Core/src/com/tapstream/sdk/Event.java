@@ -7,31 +7,15 @@ import java.util.Locale;
 public class Event {
 	private double firstFiredTime = 0;
 	private String uid;
-	private String name;
+	protected String name;
 	private String encodedName;
 	private boolean oneTimeOnly;
 	private StringBuilder postData = null;
 
 	public Event(String name, boolean oneTimeOnly) {
 		uid = makeUid();
-		this.name = name.toLowerCase().trim();
 		this.oneTimeOnly = oneTimeOnly;
-		try {
-			encodedName = URLEncoder.encode(this.name, "UTF-8").replace("+", "%20");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-	}
-
-	// This constructor is only to be used for creating custom IAP events.
-	public Event(String name, String transactionId, String productId, int quantity, int priceInCents, String currencyCode)
-	{
-		this(name, false);
-		addPair("", "purchase-transaction-id", transactionId);
-		addPair("", "purchase-product-id", productId);
-		addPair("", "purchase-quantity", quantity);
-		addPair("", "purchase-price", priceInCents);
-		addPair("", "purchase-currency", currencyCode);
+		setName(name);
 	}
 
 	public void addPair(String key, Object value) {
@@ -66,11 +50,20 @@ public class Event {
 		}
 	}
 
+	void setName(String name) {
+		this.name = name.toLowerCase().trim();
+		try {
+			encodedName = URLEncoder.encode(this.name, "UTF-8").replace("+", "%20");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private String makeUid() {
 		return String.format(Locale.US, "%d:%f", System.currentTimeMillis(), Math.random());
 	}
 
-	private void addPair(String prefix, String key, Object value) {
+	protected void addPair(String prefix, String key, Object value) {
 		String encodedPair = Utils.encodeEventPair(prefix, key, value);
 		if(encodedPair == null) {
 			return;

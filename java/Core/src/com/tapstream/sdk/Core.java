@@ -121,10 +121,16 @@ class Core {
 			executor.schedule(task, CONVERSION_POLL_INTERVAL, TimeUnit.SECONDS);
 		}
 	}
-	
+
 	public synchronized void fireEvent(final Event e) {
-		// Notify the event that we are going to fire it so it can record the
-		// time
+
+		// Transaction events need their names prefixed with platform and app name
+		if(e instanceof PurchaseEvent) {
+			String appName = platform.getAppName();
+			((PurchaseEvent)e).SetNamePrefix(appName == null ? "" : appName);
+		}
+
+		// Notify the event that we are going to fire it so it can record the time
 		e.firing();
 
 		if (e.isOneTimeOnly()) {
@@ -159,8 +165,7 @@ class Core {
 					}
 
 					if (failed) {
-						// Only increase delays if we actually intend to retry
-						// the event
+						// Only increase delays if we actually intend to retry the event
 						if (shouldRetry) {
 							// Not every job that fails will increase the retry
 							// delay. It will be the responsibility of
@@ -299,7 +304,7 @@ class Core {
 		postData.append(encodedPair);
 	}
 
-	private void makePostArgs(String secret) {
+	private void makePostArgs() {
 		appendPostPair("", "secret", secret);
 		appendPostPair("", "sdkversion", VERSION);
 		
