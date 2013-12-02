@@ -73,44 +73,53 @@ public class TapstreamPlugin extends CordovaPlugin {
             Iterator<?> iter = configVals.keys();
             while(iter.hasNext()) {
                 String key = (String)iter.next();
-                Object value = configVals.get(key);
 
-                if(value == null) {
-                    Log.e(getClass().getSimpleName(), "Config object will not accept null values, skipping field named: " + key);
-                    continue;
-                }
-
-                try {
-                    if(value instanceof String) {
-                        Method method = lookupMethod(key, String.class);
-                        if(method != null) {
-                            method.invoke(config, (String)value);
+                if(key.equals("globalEventParams")) {
+                    JSONObject globalEventParams = configVals.getJSONObject(key);
+                    if(globalEventParams != null) {
+                        Iterator<?> paramsIter = globalEventParams.keys();
+                        while(paramsIter.hasNext()) {
+                            String paramKey = (String)paramsIter.next();
+                            Object paramValue = globalEventParams.get(paramKey);
+                            config.globalEventParams.put(paramKey, paramValue);
                         }
-                    } else if(value instanceof Boolean) {
-                        Method method = lookupMethod(key, boolean.class);
-                        if(method != null) {
-                            method.invoke(config, (Boolean)value);
-                        }
-                    } else if(value instanceof Integer) {
-                        Method method = lookupMethod(key, int.class);
-                        if(method != null) {
-                            method.invoke(config, (Integer)value);
-                        }
-                    } else if(value instanceof Float) {
-                        Method method = lookupMethod(key, float.class);
-                        if(method != null) {
-                            method.invoke(config, (Float)value);
-                        }
-                    } else {
-                        Log.e(getClass().getSimpleName(), "Config object will not accept type: " + value.getClass().toString());
                     }
-                } catch(Exception e) {
-                    Log.e(getClass().getSimpleName(), "Error setting field on config object (key=" + key + "). " + e.getMessage());
+                } else {
+                    Object value = configVals.get(key);
+                    if(value != null) {
+                        try {
+                            if(value instanceof String) {
+                                Method method = lookupMethod(key, String.class);
+                                if(method != null) {
+                                    method.invoke(config, (String)value);
+                                }
+                            } else if(value instanceof Boolean) {
+                                Method method = lookupMethod(key, boolean.class);
+                                if(method != null) {
+                                    method.invoke(config, (Boolean)value);
+                                }
+                            } else if(value instanceof Integer) {
+                                Method method = lookupMethod(key, int.class);
+                                if(method != null) {
+                                    method.invoke(config, (Integer)value);
+                                }
+                            } else if(value instanceof Float) {
+                                Method method = lookupMethod(key, float.class);
+                                if(method != null) {
+                                    method.invoke(config, (Float)value);
+                                }
+                            } else {
+                                Log.e(getClass().getSimpleName(), "Config object will not accept type: " + value.getClass().toString());
+                            }
+                        } catch(Exception e) {
+                            Log.e(getClass().getSimpleName(), "Error setting field on config object (key=" + key + "). " + e.getMessage());
+                        }
+                    }
                 }
             }
         }
 
-        Tapstream.create(this.cordova.getActivity().getApplicationContext(), accountName, developerSecret, config);
+        Tapstream.create(this.cordova.getActivity().getApplication(), accountName, developerSecret, config);
     }
 
     private void fireEvent(String eventName, boolean oneTimeOnly, JSONObject params) throws JSONException {

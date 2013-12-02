@@ -23,14 +23,26 @@
         {
             for(NSString *key in configVals)
             {
-                if([config respondsToSelector:NSSelectorFromString(key)])
+                if([key isEqualToString:@"globalEventParams"])
                 {
-                    NSObject *value = [configVals objectForKey:key];
-                    [config setValue:value forKey:key];
+                    NSDictionary *globalEventParams = [configVals objectForKey:key];
+                    for(NSString *eventParamName in globalEventParams)
+                    {
+                        NSObject *value = [globalEventParams objectForKey:eventParamName];
+                        [config.globalEventParams setValue:value forKey:eventParamName];
+                    }
                 }
                 else
                 {
-                    NSLog(@"Ignoring config field named '%@', probably not meant for this platform.", key);
+                    if([config respondsToSelector:NSSelectorFromString(key)])
+                    {
+                        NSObject *value = [configVals objectForKey:key];
+                        [config setValue:value forKey:key];
+                    }
+                    else
+                    {
+                        NSLog(@"Ignoring config field named '%@', probably not meant for this platform.", key);
+                    }
                 }
             }
         }

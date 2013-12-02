@@ -29,6 +29,7 @@ class Core {
 	private Config config;
 	private String accountName;
 	private String secret;
+	private String encodedAppName;
 	private ScheduledThreadPoolExecutor executor;
 	private StringBuilder postData = null;
 	private Set<String> firingEvents = new HashSet<String>(16);
@@ -55,11 +56,16 @@ class Core {
 
 	public void start() {
 		// Automatically fire run event
-		String an = platform.getAppName();
-		if(an == null) {
-			an = "";
+		encodedAppName = platform.getAppName();
+		if(encodedAppName == null) {
+			encodedAppName = "";
 		}
-		final String appName = an;
+		try {
+			encodedAppName = URLEncoder.encode(encodedAppName, "UTF-8").replace("+", "%20");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		final String appName = encodedAppName;
 		
 		if(config.getFireAutomaticInstallEvent()) {
 			String installEventName = config.getInstallEventName();
@@ -126,8 +132,7 @@ class Core {
 
 		// Transaction events need their names prefixed with platform and app name
 		if(e instanceof PurchaseEvent) {
-			String appName = platform.getAppName();
-			((PurchaseEvent)e).SetNamePrefix(appName == null ? "" : appName);
+			((PurchaseEvent)e).SetNamePrefix(encodedAppName);
 		}
 
 		// Notify the event that we are going to fire it so it can record the time

@@ -26,6 +26,7 @@
 @property(nonatomic, STRONG_OR_RETAIN) TSConfig *config;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *accountName;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *secret;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *encodedAppName;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableString *postData;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableSet *firingEvents;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableSet *firedEvents;
@@ -39,7 +40,7 @@
 
 @implementation TSCore
 
-@synthesize del, platform, listener, appEventSource, config, accountName, secret, postData, firingEvents, firedEvents, failingEventId;
+@synthesize del, platform, listener, appEventSource, config, accountName, secret, encodedAppName, postData, firingEvents, firedEvents, failingEventId;
 
 - (id)initWithDelegate:(id<TSDelegate>)delegateVal
 	platform:(id<TSPlatform>)platformVal
@@ -58,6 +59,7 @@
 		self.appEventSource = appEventSourceVal;
 		self.accountName = [self clean:accountNameVal];
 		self.secret = developerSecretVal;
+		self.encodedAppName = nil;
 		self.postData = nil;
 		self.failingEventId = nil;
 
@@ -76,6 +78,8 @@
 	RELEASE(listener);
 	RELEASE(appEventSource);
 	RELEASE(accountName);
+	RELEASE(secret);
+	RELEASE(encodedAppName);
 	RELEASE(postData);
 	RELEASE(firingEvents);
 	RELEASE(firedEvents);
@@ -91,11 +95,13 @@
 	NSString *platformName = @"mac";
 #endif
 
-	NSString *appName = [platform getAppName];
-	if(appName == nil)
+	self.encodedAppName = [platform getAppName];
+	if(self.encodedAppName == nil)
 	{
-		appName = @"";
+		self.encodedAppName = @"";
 	}
+	self.encodedAppName = [TSUtils encodeString:self.encodedAppName];
+
 
 	if(config.fireAutomaticInstallEvent)
 	{
@@ -105,38 +111,35 @@
 		}
 		else
 		{
-			NSString *eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, appName];
+			NSString *eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, self.encodedAppName];
 			[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:YES]];
 		}
 	}
 
+	__unsafe_unretained TSCore *me = self;
+		
 	if(config.fireAutomaticOpenEvent)
 	{
+		// Fire the initial open event
 		if(config.openEventName != nil)
 		{
 			[self fireEvent:[TSEvent eventWithName:config.openEventName oneTimeOnly:NO]];
 		}
 		else
 		{
-			NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, appName];
+			NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, self.encodedAppName];
 			[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
 		}
-	}
-
-	// Subscribe to be notified whenever the app enters the foreground
-	__unsafe_unretained TSCore *me = self;
 	
-	if(config.fireAutomaticOpenEvent)
-	{
+		// Subscribe to be notified whenever the app enters the foreground
 		[appEventSource setOpenHandler:^() {
-		
 			if(me.config.openEventName != nil)
 			{
 				[me fireEvent:[TSEvent eventWithName:me.config.openEventName oneTimeOnly:NO]];
 			}
 			else
 			{
-				NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, appName];
+				NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, me.encodedAppName];
 				[me fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
 			}
 		}];
@@ -146,7 +149,7 @@
 	{
 		[appEventSource setTransactionHandler:^(NSString *transactionId, NSString *productId, int quantity, int priceInCents, NSString *currencyCode) {
 			[me fireEvent:[TSEvent
-				iapEventWithName:[NSString stringWithFormat:@"%@-%@-purchase-%@", platformName, appName, productId]
+				iapEventWithName:[NSString stringWithFormat:@"%@-%@-purchase-%@", platformName, me.encodedAppName, productId]
 				transactionId:transactionId
 				productId:productId
 				quantity:quantity
