@@ -50,21 +50,6 @@ function callSetter(obj, propertyName) {
 	obj[methodName].apply(obj, args);
 }
 
-function dictAdd(obj, dictMemberName, key, value) {
-	var d;
-	if(language == 'cs') {
-		dictMemberName = dictMemberName.charAt(0).toUpperCase() + dictMemberName.slice(1);
-		d = obj[dictMemberName];
-	} else {
-		d = obj[dictMemberName];
-	}
-	if(language == 'java') {
-		d.put(key, value);
-	} else {
-		d[key] = value;
-	}
-}
-
 // Jint (the js interpreter used in the c# test runner) has a bug that breaks its indexOf
 // implementation, so we have to use a custom one
 function indexOf(list, item) {
@@ -663,13 +648,13 @@ test('hit-failed', function() {
 test('global-params', function() {
 	var q = util.newOperationQueue(),
 		conf = util.newConfig();
-	dictAdd(conf, 'globalEventParams', 'global-test-1', 'hello');
-	dictAdd(conf, 'globalEventParams', 'global-test-2', 2);
+	util.setSetGlobalParam(conf, 'global-test-1', 'hello world');
+	util.setSetGlobalParam(conf, 'global-test-2', 'test');
 	var ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
 		pd = util.getPostData(ts);
 	util.log(pd);
-	util.assertTrue(pd.search('custom-global-test-1=hello') != -1);
-	util.assertTrue(pd.search('custom-global-test-2=2') != -1);
+	util.assertTrue(pd.search('custom-global-test-1=hello%20world') != -1);
+	util.assertTrue(pd.search('custom-global-test-2=test') != -1);
 });
 
 

@@ -744,6 +744,26 @@ Handle<Value> Util_newHit(const Arguments &args)
 	return scope.Close(obj);
 }
 
+Handle<Value> Util_objcSetSetGlobalParam(const Arguments &args)
+{
+	Locker locker;
+	HandleScope scope;
+
+	if(args.Length() < 3) return ThrowException(String::New("Expected 3 arguments"));
+
+	if(!args[0]->IsObject()) return ThrowException(String::New("Arg 0 must be an object"));
+	TSConfig *conf = (BRIDGE TSConfig *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
+	
+	if(!args[1]->IsString()) return ThrowException(String::New("Arg 1 must be a string"));
+	String::Utf8Value key(args[1]);
+
+	if(!args[2]->IsString()) return ThrowException(String::New("Arg 2 must be a string (for the purposes of this test interface)"));
+	String::Utf8Value value(args[2]);
+	
+	[conf.globalEventParams setValue:[NSString stringWithUTF8String:*value] forKey:[NSString stringWithUTF8String:*key]];
+	return Undefined();
+}
+
 
 
 
@@ -809,6 +829,7 @@ int main(int argc, char *argv[])
 		templ->Set(String::New("newTapstream"), FunctionTemplate::New(InvocationCallback(Util_newTapstream))->GetFunction(), ReadOnly);
 		templ->Set(String::New("newEvent"), FunctionTemplate::New(InvocationCallback(Util_newEvent))->GetFunction(), ReadOnly);
 		templ->Set(String::New("newHit"), FunctionTemplate::New(InvocationCallback(Util_newHit))->GetFunction(), ReadOnly);
+		templ->Set(String::New("setSetGlobalParam"), FunctionTemplate::New(InvocationCallback(Util_objcSetSetGlobalParam))->GetFunction(), ReadOnly);
 		Handle<Object> util = templ->NewInstance();
 		context->Global()->Set(String::New("util"), util, ReadOnly);
 

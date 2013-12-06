@@ -104,6 +104,11 @@ namespace TapstreamMetrics.Sdk
         {
             return new Hit(trackerName);
         }
+
+        public void setSetGlobalParam(Config conf, string key, string val)
+        {
+            conf.GlobalEventParams[key] = val;
+        }
     }
 
     class ConsoleLogger : Logger
