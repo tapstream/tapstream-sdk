@@ -39,6 +39,9 @@ public class MainActivity extends Activity {
 
 		Config config = new Config();
 		
+		config.globalEventParams.put("locale", "ENU");
+		config.globalEventParams.put("user_id", "92429d82a41e");
+		
 		config.setOdin1("TestODINValue");
 		config.setConversionListener(new ConversionListener() {
 			@Override
