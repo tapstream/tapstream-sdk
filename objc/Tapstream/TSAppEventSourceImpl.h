@@ -1,10 +1,8 @@
 #pragma once
 #import <Foundation/Foundation.h>
+#import <StoreKit/StoreKit.h>
 #import "TSHelpers.h"
 #import "TSAppEventSource.h"
-
-#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-#import <StoreKit/StoreKit.h>
 
 @interface TSAppEventSourceImpl : NSObject<TSAppEventSource, SKPaymentTransactionObserver, SKProductsRequestDelegate> {
 @private
@@ -18,5 +16,3 @@
 - (void)setTransactionHandler:(TSTransactionHandler)handler;
 
 @end
-
-#endif

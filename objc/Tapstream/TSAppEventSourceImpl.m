@@ -2,6 +2,9 @@
 
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 #import <UIKit/UIKit.h>
+#else
+#import <AppKit/AppKit.h>
+#endif
 
 Class TSSKPaymentQueue = nil;
 Class TSSKProductsRequest = nil;
@@ -92,13 +95,15 @@ void TSLoadStoreKitClasses()
 	{
 		TSLoadStoreKitClasses();
 
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 		self.foregroundedEventObserver = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationWillEnterForegroundNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
 			if(onOpen != nil)
 			{
 				onOpen();
 			}
 		}];
-
+#endif
+		
 		if(TSSKPaymentQueue != nil)
 		{
 			self.requestTransactions = [NSMutableDictionary dictionary];
@@ -190,4 +195,6 @@ void TSLoadStoreKitClasses()
 
 @end
 
-#endif
+
+
+

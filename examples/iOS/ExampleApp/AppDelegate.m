@@ -23,6 +23,13 @@
     }
     
     TSConfig *config = [TSConfig configWithDefaults];
+
+    config.fireAutomaticIAPEvents = false;
+    
+    [config.globalEventParams setValue:@"ENU" forKey:@"locale"];
+    [config.globalEventParams setValue:@"92429d82a41e" forKey:@"user_id"];
+
+    
 //    config.conversionListener = ^(NSData *jsonInfo) {
 //        NSError *error;
 //        NSArray *json = [NSJSONSerialization JSONObjectWithData:jsonInfo options:kNilOptions error:&error];
