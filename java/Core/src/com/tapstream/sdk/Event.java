@@ -9,12 +9,12 @@ import org.json.JSONObject;
 public class Event {
 	private double firstFiredTime = 0;
 	private String uid;
-	protected String name;
+	private String name;
 	private String encodedName;
 	private boolean oneTimeOnly;
 	private StringBuilder postData = null;
 
-	private bool isTransaction = false;
+	private boolean isTransaction = false;
 	private String productSku;
 
 	public Event(String name, boolean oneTimeOnly) {
@@ -25,21 +25,21 @@ public class Event {
 
 	// Only to be used for creating IAB purchase events
 	public Event(String orderId, String productSku, int quantity) {
-		super("", false);
+		this("", false);
 		isTransaction = true;
 		initialize(orderId, productSku, quantity);
 	}
 
 	// Only to be used for creating IAB purchase events
 	public Event(String orderId, String productSku, int quantity, int priceInCents, String currencyCode) {
-		super("", false);
+		this("", false);
 		isTransaction = true;
 		initialize(orderId, productSku, quantity, priceInCents, currencyCode);
 	}
 
 	// Only to be used for creating IAB purchase events
 	public Event(JSONObject purchase, JSONObject skuDetails) throws JSONException {
-		super("", false);
+		this("", false);
 		isTransaction = true;
 		productSku = purchase.getString("productId");
 		String orderId = purchase.getString("orderId");
@@ -110,7 +110,7 @@ public class Event {
 		addPair("", "purchase-quantity", quantity);
 	}
 
-	private void nitialize(String orderId, String productSku, int quantity, int priceInCents, String currencyCode) {
+	private void initialize(String orderId, String productSku, int quantity, int priceInCents, String currencyCode) {
 		addPair("", "purchase-transaction-id", orderId);
 		addPair("", "purchase-product-id", productSku);
 		addPair("", "purchase-quantity", quantity);
