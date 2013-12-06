@@ -82,6 +82,8 @@ namespace TapstreamMetrics.Sdk
             listener = new CoreListenerImpl();
 #if TEST_WINPHONE || WINDOWS_PHONE
             appEventSource = new AppEventSourceImpl();
+#else
+            appEventSource = null;
 #endif
             core = new Core(del, platform, listener, appEventSource, accountName, developerSecret, config);
             core.Start();
