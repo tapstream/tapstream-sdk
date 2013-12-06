@@ -50,6 +50,21 @@ function callSetter(obj, propertyName) {
 	obj[methodName].apply(obj, args);
 }
 
+function dictAdd(obj, dictMemberName, key, value) {
+	var d;
+	if(language == 'cs') {
+		dictMemberName = dictMemberName.charAt(0).toUpperCase() + dictMemberName.slice(1);
+		d = obj[dictMemberName];
+	} else {
+		d = obj[dictMemberName];
+	}
+	if(language == 'java') {
+		d.put(key, value);
+	} else {
+		d[key] = value;
+	}
+}
+
 // Jint (the js interpreter used in the c# test runner) has a bug that breaks its indexOf
 // implementation, so we have to use a custom one
 function indexOf(list, item) {
@@ -70,7 +85,7 @@ function expect(q) {
 
 function consumeEvent(q, event_name) {
 	var arg = callMethod(q, 'expectEventually', 'job-ended');
-	util.assertEqual(arg, event_name);
+	util.assertEqual(event_name, arg);
 }
 
 function consumeEventsUnordered(q, name1, name2) {
@@ -621,6 +636,7 @@ test('only-first-event-to-fail-can-increase-delay', function() {
 	expect(q, 'event-failed', 'retry', 'job-ended');
 	util.assertEqual(4, util.getDelay(ts));
 });
+
 test('hit-success', function() {
 	var q = util.newOperationQueue(),
 		conf = util.newConfig(),
@@ -640,5 +656,84 @@ test('hit-failed', function() {
 	callMethod(ts, 'fireHit', h);
 	expect(q, 'hit-failed');
 });
+
+
+
+// Global event params
+test('global-params', function() {
+	var q = util.newOperationQueue(),
+		conf = util.newConfig();
+	dictAdd(conf, 'globalEventParams', 'global-test-1', 'hello');
+	dictAdd(conf, 'globalEventParams', 'global-test-2', 2);
+	var ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
+		pd = util.getPostData(ts);
+	util.log(pd);
+	util.assertTrue(pd.search('custom-global-test-1=hello') != -1);
+	util.assertTrue(pd.search('custom-global-test-2=2') != -1);
+});
+
+
+
+// Purchase events
+
+if(language == 'java' || language == 'cs') {
+
+	test('purchase-no-price', function() {
+		var q = util.newOperationQueue(),
+			conf = util.newConfig(),
+			ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
+			e = util.newEvent('order123abc', 'com.product.sku', 2),
+			pd = callGetter(e, 'postData');
+		util.log(pd);
+		util.assertTrue(pd.search('purchase-transaction-id=order123abc') != -1);
+		util.assertTrue(pd.search('purchase-product-id=com.product.sku') != -1);
+		util.assertTrue(pd.search('purchase-quantity=2') != -1);
+		consumeAutomaticEvents(q);
+		callMethod(ts, 'fireEvent', e);
+		consumeEvent(q, platform+'-testapp-purchase-com.product.sku');
+	});
+
+	test('purchase-with-price', function() {
+		var q = util.newOperationQueue(),
+			conf = util.newConfig(),
+			ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
+			e = util.newEvent('order123abc', 'com.product.sku', 2, 299, 'USD'),
+			pd = callGetter(e, 'postData');
+		util.log(pd);
+		util.assertTrue(pd.search('purchase-transaction-id=order123abc') != -1);
+		util.assertTrue(pd.search('purchase-product-id=com.product.sku') != -1);
+		util.assertTrue(pd.search('purchase-quantity=2') != -1);
+		util.assertTrue(pd.search('purchase-price=299') != -1);
+		util.assertTrue(pd.search('purchase-currency=USD') != -1);
+		consumeAutomaticEvents(q);
+		callMethod(ts, 'fireEvent', e);
+		consumeEvent(q, platform+'-testapp-purchase-com.product.sku');
+	});
+
+}
+
+if(language == 'java') {
+
+	test('purchase-with-json', function() {
+		var q = util.newOperationQueue(),
+			conf = util.newConfig(),
+			ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
+			e = util.newEvent(
+				'{"orderId": "order123abc", "productId": "com.product.sku"}',
+				'{"productId": "com.product.sku", "type": "inapp", "price": "$2.99", "title": "Gold Coins", "Description": "Coins to buy stuff with", "price_amount_micros": 2990000, "price_currency_code": "USD"}'),
+			pd = callGetter(e, 'postData');
+		util.log(pd);
+		util.assertTrue(pd.search('purchase-transaction-id=order123abc') != -1);
+		util.assertTrue(pd.search('purchase-product-id=com.product.sku') != -1);
+		util.assertTrue(pd.search('purchase-quantity=1') != -1);
+		util.assertTrue(pd.search('purchase-price=299') != -1);
+		util.assertTrue(pd.search('purchase-currency=USD') != -1);
+		consumeAutomaticEvents(q);
+		callMethod(ts, 'fireEvent', e);
+		consumeEvent(q, platform+'-testapp-purchase-com.product.sku');
+	});
+
+}
+
 
 util.log('\n' + tests_count + ' tests ok');

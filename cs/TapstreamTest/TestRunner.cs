@@ -90,6 +90,16 @@ namespace TapstreamMetrics.Sdk
             return new Event(name, oneTimeOnly);
         }
 
+        public Event newEvent(string transactionId, string productId, int quantity)
+        {
+            return new Event(transactionId, productId, quantity);
+        }
+
+        public Event newEvent(string transactionId, string productId, int quantity, int priceInCents, string currencyCode)
+        {
+            return new Event(transactionId, productId, quantity, priceInCents, currencyCode);
+        }
+
         public Hit newHit(string trackerName)
         {
             return new Hit(trackerName);

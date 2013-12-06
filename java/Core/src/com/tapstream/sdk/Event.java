@@ -27,6 +27,7 @@ public class Event {
 	public Event(String orderId, String productSku, int quantity) {
 		this("", false);
 		isTransaction = true;
+		this.productSku = productSku;
 		initialize(orderId, productSku, quantity);
 	}
 
@@ -34,6 +35,7 @@ public class Event {
 	public Event(String orderId, String productSku, int quantity, int priceInCents, String currencyCode) {
 		this("", false);
 		isTransaction = true;
+		this.productSku = productSku; 
 		initialize(orderId, productSku, quantity, priceInCents, currencyCode);
 	}
 

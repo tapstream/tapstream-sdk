@@ -16,6 +16,9 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class TestRunner {
 	public class Util {
 		private Context context;
@@ -80,6 +83,20 @@ public class TestRunner {
 
 		public Event newEvent(String name, boolean oneTimeOnly) {
 			return new Event(name, oneTimeOnly);
+		}
+
+		public Event newEvent(String orderId, String productSku, int quantity) {
+			return new Event(orderId, productSku, quantity);
+		}
+
+		public Event newEvent(String orderId, String productSku, int quantity, int priceInCents, String currencyCode) {
+			return new Event(orderId, productSku, quantity, priceInCents, currencyCode);
+		}
+
+		public Event newEvent(String purchaseJson, String skuDetailsJson) throws JSONException {
+			JSONObject purchase = new JSONObject(purchaseJson);
+			JSONObject skuDetails = new JSONObject(skuDetailsJson);
+			return new Event(purchase, skuDetails);
 		}
 
 		public Hit newHit(String trackerName) {
