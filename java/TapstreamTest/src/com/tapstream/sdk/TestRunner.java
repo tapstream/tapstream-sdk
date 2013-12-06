@@ -103,7 +103,7 @@ public class TestRunner {
 			return new Hit(trackerName);
 		}
 
-		public void setSetGlobalParam(TSConfig conf, String key, String value) {
+		public void setSetGlobalParam(Config conf, String key, String value) {
 			conf.globalEventParams.put(key, value);
 		}
 	};
