@@ -52,6 +52,9 @@ namespace WindowsStoreCSharp
             this.Suspending += OnSuspending;
 
             Config config = new Config();
+            config.GlobalEventParams["locale"] = "ENU";
+            config.GlobalEventParams["user_id"] = "92429d82a41e";
+
             config.ConversionListener = new ConversionListener();
 
             Tapstream.Create("sdktest", "YGP2pezGTI6ec48uti4o1w", config);

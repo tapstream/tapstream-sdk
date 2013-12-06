@@ -16,6 +16,9 @@ namespace TapstreamMetrics.Sdk
         private bool oneTimeOnly;
         private StringBuilder postData = null;
 
+        private bool isTransaction = false;
+        private string productId;
+
         public Event(string name, bool oneTimeOnly)
         {
             uid = MakeUid();
@@ -25,14 +28,27 @@ namespace TapstreamMetrics.Sdk
         }
 
         // This constructor is only to be used for creating custom IAP events.
-        public Event(string name, string transactionId, string productId, int quantity, int priceInCents, string currencyCode)
-            : this(name, false)
+        public Event(string transactionId, string productId, int quantity, int priceInCents, string currencyCode)
+            : this("", false)
         {
+            this.productId = productId;
+            isTransaction = true;
             AddPair("", "purchase-transaction-id", transactionId);
             AddPair("", "purchase-product-id", productId);
             AddPair("", "purchase-quantity", quantity);
             AddPair("", "purchase-price", priceInCents);
             AddPair("", "purchase-currency", currencyCode);
+        }
+
+        // This constructor is only to be used for creating custom IAP events.
+        public Event(string transactionId, string productId, int quantity)
+            : this("", false)
+        {
+            this.productId = productId;
+            isTransaction = true;
+            AddPair("", "purchase-transaction-id", transactionId);
+            AddPair("", "purchase-product-id", productId);
+            AddPair("", "purchase-quantity", quantity);
         }
 
         public void AddPair(string key, Object value)
@@ -81,6 +97,14 @@ namespace TapstreamMetrics.Sdk
             }
         }
 
+        internal bool IsTransaction
+        {
+            get
+            {
+                return isTransaction;
+            }
+        }
+
         internal void Firing()
         {
             // Only record the time of the first fire attempt
@@ -89,6 +113,12 @@ namespace TapstreamMetrics.Sdk
                 TimeSpan t = (DateTime.UtcNow - new DateTime(1970, 1, 1));
                 firstFiredTime = (uint)t.TotalMilliseconds;
             }
+        }
+
+        internal void SetNamePrefix(string platform, string appName)
+        {
+            this.name = String.Format("{0}-{1}-purchase-{2}", platform, appName, productId);
+            encodedName = Utils.EncodeString(this.name);
         }
 
         private string MakeUid()

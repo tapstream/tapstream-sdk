@@ -37,6 +37,12 @@ namespace TapstreamMetrics.Sdk
 		private Config config;
 		private string accountName;
         private string secret;
+        private string appName;
+#if TEST_WINPHONE || WINDOWS_PHONE
+		private const string platformName = "winphone";
+#else
+        private const string platformName = "windows";
+#endif
 		private StringBuilder postData = null;
 		private HashSet<string> firingEvents = new HashSet<string>();
 		private HashSet<string> firedEvents = new HashSet<string>();
@@ -60,13 +66,8 @@ namespace TapstreamMetrics.Sdk
 		}
 
 		public void Start() {
-#if TEST_WINPHONE || WINDOWS_PHONE
-			string platformName = "winphone";
-#else
-			string platformName = "windows";
-#endif
 
-			string appName = platform.GetAppName();
+            appName = platform.GetAppName();
 			if (appName == null)
 			{
 				appName = "";
@@ -162,6 +163,12 @@ namespace TapstreamMetrics.Sdk
 		{
 			lock (this)
 			{
+                // Transaction events need their names prefixed with platform and app name
+		        if(e.IsTransaction) {
+                    e.SetNamePrefix(platformName, appName);
+		        }
+
+
 				// Notify the event that we are going to fire it so it can record the time
 				e.Firing();
 

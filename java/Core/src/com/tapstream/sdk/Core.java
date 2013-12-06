@@ -29,7 +29,7 @@ class Core {
 	private Config config;
 	private String accountName;
 	private String secret;
-	private String encodedAppName;
+	private String appName;
 	private ScheduledThreadPoolExecutor executor;
 	private StringBuilder postData = null;
 	private Set<String> firingEvents = new HashSet<String>(16);
@@ -56,16 +56,11 @@ class Core {
 
 	public void start() {
 		// Automatically fire run event
-		encodedAppName = platform.getAppName();
-		if(encodedAppName == null) {
-			encodedAppName = "";
+		appName = platform.getAppName();
+		if(appName == null) {
+			appName = "";
 		}
-		try {
-			encodedAppName = URLEncoder.encode(encodedAppName, "UTF-8").replace("+", "%20");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		final String appName = encodedAppName;
+		final String appNameFinal = appName;
 		
 		if(config.getFireAutomaticInstallEvent()) {
 			String installEventName = config.getInstallEventName();
@@ -93,7 +88,7 @@ class Core {
 					if(openEventName != null) {
 						fireEvent(new Event(openEventName, false));
 					} else {
-						fireEvent(new Event(String.format(Locale.US, "android-%s-open", appName), false));	
+						fireEvent(new Event(String.format(Locale.US, "android-%s-open", appNameFinal), false));	
 					}
 				}
 			}
@@ -131,8 +126,8 @@ class Core {
 	public synchronized void fireEvent(final Event e) {
 
 		// Transaction events need their names prefixed with platform and app name
-		if(e instanceof PurchaseEvent) {
-			((PurchaseEvent)e).SetNamePrefix(encodedAppName);
+		if(e.isTransaction()) {
+			e.setNamePrefix(appName);
 		}
 
 		// Notify the event that we are going to fire it so it can record the time
