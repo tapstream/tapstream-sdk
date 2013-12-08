@@ -87,17 +87,17 @@ def _package_java():
 	path('builds/android').makedirs()
 	path.copy(path('./java/Tapstream/build/jar/Tapstream.jar'), path('./builds/android/'))
 	path.copy(path('./java/Tapstream/build/jar/Tapstream.jar'), path('./examples/Android/Example/libs/'))
-	path('builds/TapstreamSDK-%s-android.zip' % VERSION).remove()
+	path('builds/tapstream-%s-android.zip' % VERSION).remove()
 	with pushd('builds/android'):
-		_zip("../TapstreamSDK-%s-android.zip" % VERSION, 'Tapstream.jar')
+		_zip("../tapstream-%s-android.zip" % VERSION, 'Tapstream.jar')
 
 def _package_java_whitelabel():
 	path('builds/android-whitelabel').rmtree()
 	path('builds/android-whitelabel').makedirs()
 	path.copy(path('./java-whitelabel/Tapstream/build/jar/Tapstream.jar'), path('./builds/android-whitelabel/ConversionTracker.jar'))
-	path('builds/TapstreamSDK-%s-android-whitelabel.zip' % VERSION).remove()
+	path('builds/tapstream-%s-android-whitelabel.zip' % VERSION).remove()
 	with pushd('builds/android-whitelabel'):
-		_zip("../TapstreamSDK-%s-android-whitelabel.zip" % VERSION, 'ConversionTracker.jar')
+		_zip("../tapstream-%s-android-whitelabel.zip" % VERSION, 'ConversionTracker.jar')
 	path('java-whitelabel').rmtree()
 
 @task
@@ -153,13 +153,13 @@ def package_cs():
 	path('builds/winphone').makedirs()
 	path.copy(path('./cs/TapstreamWinPhone/Bin/%s/TapstreamMetrics.dll' % CONFIGURATION), path('./builds/winphone/'))
 
-	path('builds/TapstreamSDK-%s-win8.zip' % VERSION).remove()
+	path('builds/tapstream-%s-win8.zip' % VERSION).remove()
 	with pushd('builds/win8'):
-		sh('7z a -tzip ../TapstreamSDK-%s-win8.zip TapstreamMetrics.winmd' % VERSION)
+		sh('7z a -tzip ../tapstream-%s-win8.zip TapstreamMetrics.winmd' % VERSION)
 
 	path('builds/TapstreamSDK-winphone.zip').remove()
 	with pushd('builds/winphone'):
-		sh('7z a -tzip ../TapstreamSDK-%s-winphone.zip TapstreamMetrics.dll' % VERSION)
+		sh('7z a -tzip ../tapstream-%s-winphone.zip TapstreamMetrics.dll' % VERSION)
 
 
 
@@ -241,9 +241,9 @@ def package_objc():
 		for file_type in ('.h', '.m'):
 			sh('cp ./objc/Tapstream/*%s ./builds/%s/Tapstream/' % (file_type, sdk))
 			sh('cp ./objc/Core/*%s ./builds/%s/Tapstream/' % (file_type, sdk))
-		path('builds/TapstreamSDK-%s-%s.zip' % (VERSION, sdk)).remove()
+		path('builds/tapstream-%s-%s.zip' % (VERSION, sdk)).remove()
 		with pushd('builds/%s' % sdk):
-			sh('zip -r ../TapstreamSDK-%s-%s.zip Tapstream' % (VERSION, sdk))
+			sh('zip -r ../tapstream-%s-%s.zip Tapstream' % (VERSION, sdk))
 
 		# Generate whitelabel
 		path('builds/%s-whitelabel' % sdk).rmtree()
@@ -263,9 +263,9 @@ def package_objc():
 					f.write(data)
 					f.truncate()
 
-		path('builds/TapstreamSDK-%s-%s-whitelabel.zip' % (VERSION, sdk)).remove()
+		path('builds/tapstream-%s-%s-whitelabel.zip' % (VERSION, sdk)).remove()
 		with pushd('builds/%s-whitelabel' % sdk):
-			sh('zip -r ../TapstreamSDK-%s-%s-whitelabel.zip ConversionTracker' % (VERSION, sdk))
+			sh('zip -r ../tapstream-%s-%s-whitelabel.zip ConversionTracker' % (VERSION, sdk))
 
 
 @needs('make_java', 'make_objc')
@@ -295,11 +295,11 @@ def make_phonegap():
 @needs('make_phonegap')
 @task
 def package_phonegap():
-	path('builds/TapstreamSDK-%s-phonegap.zip' % VERSION).remove()
+	path('builds/tapstream-%s-phonegap.zip' % VERSION).remove()
 	with pushd('builds'):
-		sh('cp -r phonegap TapstreamSDK-%s-phonegap' % VERSION)
-		_zip('TapstreamSDK-%s-phonegap.zip' % VERSION, 'TapstreamSDK-%s-phonegap' % VERSION)
-		sh('rm -rf TapstreamSDK-%s-phonegap' % VERSION)
+		sh('cp -r phonegap tapstream-%s-phonegap' % VERSION)
+		_zip('tapstream-%s-phonegap.zip' % VERSION, 'tapstream-%s-phonegap' % VERSION)
+		sh('rm -rf tapstream-%s-phonegap' % VERSION)
 
 
 
@@ -325,9 +325,9 @@ def make_titanium():
 @needs('make_titanium')
 @task
 def package_titanium():
-	path('builds/TapstreamSDK-%s-titanium.zip' % VERSION).remove()
+	path('builds/tapstream-%s-titanium.zip' % VERSION).remove()
 	with pushd('builds/titanium'):		
-		_zip('../TapstreamSDK-%s-titanium.zip' % VERSION, 'modules')
+		_zip('../tapstream-%s-titanium.zip' % VERSION, 'modules')
 
 
 
@@ -384,11 +384,11 @@ def make_xamarin():
 @needs('make_xamarin')
 @task
 def package_xamarin():
-	path('builds/TapstreamSDK-%s-xamarin.zip' % VERSION).remove()
+	path('builds/tapstream-%s-xamarin.zip' % VERSION).remove()
 	with pushd('builds'):
-		sh('cp -r xamarin TapstreamSDK-%s-xamarin' % VERSION)
-		_zip('TapstreamSDK-%s-xamarin.zip' % VERSION, 'TapstreamSDK-%s-xamarin' % VERSION)
-		sh('rm -rf TapstreamSDK-%s-xamarin' % VERSION)
+		sh('cp -r xamarin tapstream-%s-xamarin' % VERSION)
+		_zip('tapstream-%s-xamarin.zip' % VERSION, 'tapstream-%s-xamarin' % VERSION)
+		sh('rm -rf tapstream-%s-xamarin' % VERSION)
 
 
 
@@ -411,11 +411,11 @@ def make_unity():
 @needs('make_unity')
 @task
 def package_unity():
-	path('builds/TapstreamSDK-%s-unity.zip' % VERSION).remove()
+	path('builds/tapstream-%s-unity.zip' % VERSION).remove()
 	with pushd('builds'):
-		sh('cp -r unity TapstreamSDK-%s-unity' % VERSION)
-		_zip('TapstreamSDK-%s-unity.zip' % VERSION, 'TapstreamSDK-%s-unity' % VERSION)
-		sh('rm -rf TapstreamSDK-%s-unity' % VERSION)
+		sh('cp -r unity tapstream-%s-unity' % VERSION)
+		_zip('tapstream-%s-unity.zip' % VERSION, 'tapstream-%s-unity' % VERSION)
+		sh('rm -rf tapstream-%s-unity' % VERSION)
 
 
 
