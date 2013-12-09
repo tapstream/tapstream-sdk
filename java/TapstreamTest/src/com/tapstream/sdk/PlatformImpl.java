@@ -60,7 +60,7 @@ class PlatformImpl implements Platform {
 	}
 
 	public String getAppName() {
-		return "TestApp";
+		return "Test App";
 	}
 
 	public String getPackageName() {

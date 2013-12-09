@@ -136,13 +136,13 @@ class Core {
 		if (e.isOneTimeOnly()) {
 			if (firedEvents.contains(e.getName())) {
 				Logging.log(Logging.INFO, "Tapstream ignoring event named \"%s\" because it is a one-time-only event that has already been fired", e.getName());
-				listener.reportOperation("event-ignored-already-fired", e.getName());
-				listener.reportOperation("job-ended", e.getName());
+				listener.reportOperation("event-ignored-already-fired", e.getEncodedName());
+				listener.reportOperation("job-ended", e.getEncodedName());
 				return;
 			} else if (firingEvents.contains(e.getName())) {
 				Logging.log(Logging.INFO, "Tapstream ignoring event named \"%s\" because it is a one-time-only event that is already in progress", e.getName());
-				listener.reportOperation("event-ignored-already-in-progress", e.getName());
-				listener.reportOperation("job-ended", e.getName());
+				listener.reportOperation("event-ignored-already-in-progress", e.getEncodedName());
+				listener.reportOperation("job-ended", e.getEncodedName());
 				return;
 			}
 
@@ -186,7 +186,7 @@ class Core {
 							self.firedEvents.add(e.getName());
 
 							self.platform.saveFiredEvents(self.firedEvents);
-							self.listener.reportOperation("fired-list-saved", e.getName());
+							self.listener.reportOperation("fired-list-saved", e.getEncodedName());
 						}
 
 						// Success of any event resets the delay
@@ -209,10 +209,10 @@ class Core {
 						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d.%s", response.status, retryMsg);
 					}
 
-					self.listener.reportOperation("event-failed", e.getName());
+					self.listener.reportOperation("event-failed", e.getEncodedName());
 					if (shouldRetry) {
-						self.listener.reportOperation("retry", e.getName());
-						self.listener.reportOperation("job-ended", e.getName());
+						self.listener.reportOperation("retry", e.getEncodedName());
+						self.listener.reportOperation("job-ended", e.getEncodedName());
 						if (self.delegate.isRetryAllowed()) {
 							self.fireEvent(e);
 						}
@@ -220,10 +220,10 @@ class Core {
 					}
 				} else {
 					Logging.log(Logging.INFO, "Tapstream fired event named \"%s\"", e.getName());
-					self.listener.reportOperation("event-succeeded", e.getName());
+					self.listener.reportOperation("event-succeeded", e.getEncodedName());
 				}
 
-				self.listener.reportOperation("job-ended", e.getName());
+				self.listener.reportOperation("job-ended", e.getEncodedName());
 			}
 			public void run() {
 				try {

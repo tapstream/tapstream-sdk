@@ -69,7 +69,7 @@
 
 - (NSString *)getAppName
 {
-	return @"TestApp";
+	return @"Test App";
 }
 
 - (NSString *)getPackageName

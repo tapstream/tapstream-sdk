@@ -117,8 +117,8 @@ namespace TapstreamMetrics.Sdk
 
         internal void SetNamePrefix(string platform, string appName)
         {
-            this.name = String.Format("{0}-{1}-purchase-{2}", platform, appName.ToLower().Trim(), productId);
-            encodedName = Utils.EncodeString(this.name);
+            name = String.Format("{0}-{1}-purchase-{2}", platform, appName.ToLower().Trim(), productId);
+            encodedName = Utils.EncodeString(name);
         }
 
         private string MakeUid()

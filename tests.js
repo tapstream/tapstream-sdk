@@ -87,7 +87,7 @@ function consumeEventsUnordered(q, name1, name2) {
 }
 
 function consumeAutomaticEvents(q) {
-	consumeEventsUnordered(q, platform+'-testapp-install', platform+'-testapp-open');
+	consumeEventsUnordered(q, platform+'-test%20app-install', platform+'-test%20app-open');
 }
 
 
@@ -338,23 +338,23 @@ test('automatic-events', function() {
 		ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
 	consumeAutomaticEvents(q);
 	var fired_events = util.getSavedFiredList(ts);
-	util.assertTrue(indexOf(fired_events, platform+'-testapp-install') != -1);
+	util.assertTrue(indexOf(fired_events, platform+'-test app-install') != -1);
 });
 test('automatic-events-suppress-install', function() {
 	var q = util.newOperationQueue(),
 		conf = util.newConfig();
 	callSetter(conf, 'fireAutomaticInstallEvent', false);
 	var ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
-	consumeEvent(q, platform+'-testapp-open');
+	consumeEvent(q, platform+'-test%20app-open');
 });
 test('automatic-events-suppress-open', function() {
 	var q = util.newOperationQueue(),
 		conf = util.newConfig();
 	callSetter(conf, 'fireAutomaticOpenEvent', false);
 	var ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
-	consumeEvent(q, platform+'-testapp-install');
+	consumeEvent(q, platform+'-test%20app-install');
 	var fired_events = util.getSavedFiredList(ts);
-	util.assertTrue(indexOf(fired_events, platform+'-testapp-install') != -1);
+	util.assertTrue(indexOf(fired_events, platform+'-test app-install') != -1);
 });
 test('automatic-events-custom-names', function() {
 	var q = util.newOperationQueue(),
@@ -660,42 +660,37 @@ test('global-params', function() {
 
 
 // Purchase events
+test('purchase-no-price', function() {
+	var q = util.newOperationQueue(),
+		conf = util.newConfig(),
+		ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
+		e = util.newEvent('order123abc', 'com.product.sku', 2),
+		pd = callGetter(e, 'postData');
+	util.log(pd);
+	util.assertTrue(pd.search('purchase-transaction-id=order123abc') != -1);
+	util.assertTrue(pd.search('purchase-product-id=com.product.sku') != -1);
+	util.assertTrue(pd.search('purchase-quantity=2') != -1);
+	consumeAutomaticEvents(q);
+	callMethod(ts, 'fireEvent', e);
+	consumeEvent(q, platform+'-test%20app-purchase-com.product.sku');
+});
+test('purchase-with-price', function() {
+	var q = util.newOperationQueue(),
+		conf = util.newConfig(),
+		ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
+		e = util.newEvent('order123abc', 'com.product.sku', 2, 299, 'USD'),
+		pd = callGetter(e, 'postData');
+	util.log(pd);
+	util.assertTrue(pd.search('purchase-transaction-id=order123abc') != -1);
+	util.assertTrue(pd.search('purchase-product-id=com.product.sku') != -1);
+	util.assertTrue(pd.search('purchase-quantity=2') != -1);
+	util.assertTrue(pd.search('purchase-price=299') != -1);
+	util.assertTrue(pd.search('purchase-currency=USD') != -1);
+	consumeAutomaticEvents(q);
+	callMethod(ts, 'fireEvent', e);
+	consumeEvent(q, platform+'-test%20app-purchase-com.product.sku');
+});
 
-if(language == 'java' || language == 'cs') {
-
-	test('purchase-no-price', function() {
-		var q = util.newOperationQueue(),
-			conf = util.newConfig(),
-			ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
-			e = util.newEvent('order123abc', 'com.product.sku', 2),
-			pd = callGetter(e, 'postData');
-		util.log(pd);
-		util.assertTrue(pd.search('purchase-transaction-id=order123abc') != -1);
-		util.assertTrue(pd.search('purchase-product-id=com.product.sku') != -1);
-		util.assertTrue(pd.search('purchase-quantity=2') != -1);
-		consumeAutomaticEvents(q);
-		callMethod(ts, 'fireEvent', e);
-		consumeEvent(q, platform+'-testapp-purchase-com.product.sku');
-	});
-
-	test('purchase-with-price', function() {
-		var q = util.newOperationQueue(),
-			conf = util.newConfig(),
-			ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
-			e = util.newEvent('order123abc', 'com.product.sku', 2, 299, 'USD'),
-			pd = callGetter(e, 'postData');
-		util.log(pd);
-		util.assertTrue(pd.search('purchase-transaction-id=order123abc') != -1);
-		util.assertTrue(pd.search('purchase-product-id=com.product.sku') != -1);
-		util.assertTrue(pd.search('purchase-quantity=2') != -1);
-		util.assertTrue(pd.search('purchase-price=299') != -1);
-		util.assertTrue(pd.search('purchase-currency=USD') != -1);
-		consumeAutomaticEvents(q);
-		callMethod(ts, 'fireEvent', e);
-		consumeEvent(q, platform+'-testapp-purchase-com.product.sku');
-	});
-
-}
 
 if(language == 'java') {
 
@@ -715,7 +710,7 @@ if(language == 'java') {
 		util.assertTrue(pd.search('purchase-currency=USD') != -1);
 		consumeAutomaticEvents(q);
 		callMethod(ts, 'fireEvent', e);
-		consumeEvent(q, platform+'-testapp-purchase-com.product.sku');
+		consumeEvent(q, platform+'-test%20app-purchase-com.product.sku');
 	});
 
 }

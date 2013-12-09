@@ -688,15 +688,58 @@ Handle<Value> Util_newEvent(const Arguments &args)
 	Locker locker;
 	HandleScope scope;
 
-	if(args.Length() < 2) return ThrowException(String::New("Expected 2 arguments"));
-	
-	if(!args[0]->IsString()) return ThrowException(String::New("Arg 0 must be a string"));
-	String::Utf8Value name(args[0]);
+	TSEvent *event = nil;
 
-	if(!args[1]->IsBoolean()) return ThrowException(String::New("Arg 1 must be a boolean"));
-	bool oneTimeOnly = args[1]->BooleanValue();
+	if(args.Length() == 2) {
+		if(!args[0]->IsString()) return ThrowException(String::New("Arg 0 must be a string"));
+		String::Utf8Value name(args[0]);
 
-	TSEvent *event = [TSEvent eventWithName:[NSString stringWithUTF8String:*name] oneTimeOnly:oneTimeOnly];
+		if(!args[1]->IsBoolean()) return ThrowException(String::New("Arg 1 must be a boolean"));
+		bool oneTimeOnly = args[1]->BooleanValue();
+
+		event = [TSEvent eventWithName:[NSString stringWithUTF8String:*name] oneTimeOnly:oneTimeOnly];
+
+	} else if(args.Length() == 3) {
+		if(!args[0]->IsString()) return ThrowException(String::New("Arg 0 must be a string"));
+		String::Utf8Value transactionId(args[0]);
+
+		if(!args[1]->IsString()) return ThrowException(String::New("Arg 1 must be a string"));
+		String::Utf8Value productId(args[1]);
+
+		if(!args[2]->IsInt32()) return ThrowException(String::New("Arg 2 must be an int"));
+		int quantity = args[2]->Int32Value();
+
+		event = [TSEvent eventWithTransactionId:[NSString stringWithUTF8String:*transactionId]
+			productId:[NSString stringWithUTF8String:*productId]
+			quantity:quantity];
+
+	} else if(args.Length() == 5) {
+		if(!args[0]->IsString()) return ThrowException(String::New("Arg 0 must be a string"));
+		String::Utf8Value transactionId(args[0]);
+
+		if(!args[1]->IsString()) return ThrowException(String::New("Arg 1 must be a string"));
+		String::Utf8Value productId(args[1]);
+
+		if(!args[2]->IsInt32()) return ThrowException(String::New("Arg 2 must be an int"));
+		int quantity = args[2]->Int32Value();
+
+		if(!args[3]->IsInt32()) return ThrowException(String::New("Arg 3 must be an int"));
+		int cents = args[3]->Int32Value();
+
+		if(!args[4]->IsString()) return ThrowException(String::New("Arg 4 must be a string"));
+		String::Utf8Value currency(args[4]);
+
+		event = [TSEvent eventWithTransactionId:[NSString stringWithUTF8String:*transactionId]
+			productId:[NSString stringWithUTF8String:*productId]
+			quantity:quantity
+			priceInCents:cents
+			currency:[NSString stringWithUTF8String:*currency]];
+
+	} else {
+		 return ThrowException(String::New("Invalid argument count for event constructor"));
+	}
+
+
 	void *ptr = (BRIDGE_RETAINED void *)RETAIN(event);
 
 	Handle<ObjectTemplate> templ = ObjectTemplate::New();

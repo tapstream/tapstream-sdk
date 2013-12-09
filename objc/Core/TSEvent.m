@@ -11,6 +11,10 @@
 - (void)addValue:(NSString *)value forKey:(NSString *)key withPrefix:(NSString *)prefix;
 - (void)firing;
 - (NSString *)makeUid;
+- (void)setName:(NSString *)name;
+- (void)setTransactionNameWithAppName:(NSString *)appName platform:(NSString *)platformName;
+
+@property(nonatomic, STRONG_OR_RETAIN) NSString *productId;
 
 @end
 
@@ -18,27 +22,27 @@
 
 @implementation TSEvent
 
-@synthesize uid, name, encodedName, oneTimeOnly, postData;
+@synthesize uid, name, encodedName, oneTimeOnly, postData, productId, isTransaction;
 
 + (id)eventWithName:(NSString *)eventName oneTimeOnly:(BOOL)oneTimeOnlyArg
 {
 	return AUTORELEASE([[self alloc] initWithName:eventName oneTimeOnly:oneTimeOnlyArg]);
 }
 
-+ (id)iapEventWithName:(NSString *)name
-	transactionId:(NSString *)transactionId
++ (id)eventWithTransactionId:(NSString *)transactionId
+	productId:(NSString *)productId
+	quantity:(int)quantity
+{
+	return AUTORELEASE([[self alloc] initWithTransactionId:transactionId productId:productId quantity:quantity]);
+}
+
++ (id)eventWithTransactionId:(NSString *)transactionId
 	productId:(NSString *)productId
 	quantity:(int)quantity
 	priceInCents:(int)priceInCents
 	currency:(NSString *)currencyCode
 {
-	TSEvent *e = AUTORELEASE([[self alloc] initWithName:name oneTimeOnly:NO]);
-	[e addValue:transactionId forKey:@"purchase-transaction-id" withPrefix:@""];
-	[e addValue:productId forKey:@"purchase-product-id" withPrefix:@""];
-	[e addValue:[TSUtils stringifyInteger:quantity] forKey:@"purchase-quantity" withPrefix:@""];
-	[e addValue:[TSUtils stringifyInteger:priceInCents] forKey:@"purchase-price" withPrefix:@""];
-	[e addValue:currencyCode forKey:@"purchase-currency" withPrefix:@""];
-	return e;
+	return AUTORELEASE([[self alloc] initWithTransactionId:transactionId productId:productId quantity:quantity priceInCents:priceInCents currency:currencyCode]);
 }
 
 - (id)initWithName:(NSString *)eventName oneTimeOnly:(BOOL)oneTimeOnlyArg
@@ -50,6 +54,49 @@
 		name = [[eventName lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 		encodedName = [TSUtils encodeString:name];
 		oneTimeOnly = oneTimeOnlyArg;
+		isTransaction = NO;
+	}
+	return self;
+}
+
+- (id)initWithTransactionId:(NSString *)transactionId
+	productId:(NSString *)productIdVal
+	quantity:(int)quantity
+{
+	if((self = [super init]) != nil)
+	{
+		firstFiredTime = 0;
+		uid = [self makeUid];
+		oneTimeOnly = NO;
+		isTransaction = YES;
+		productId = productIdVal;
+
+		[self addValue:transactionId forKey:@"purchase-transaction-id" withPrefix:@""];
+		[self addValue:productId forKey:@"purchase-product-id" withPrefix:@""];
+		[self addValue:[TSUtils stringifyInteger:quantity] forKey:@"purchase-quantity" withPrefix:@""];
+	}
+	return self;
+}
+
+- (id)initWithTransactionId:(NSString *)transactionId
+	productId:(NSString *)productIdVal
+	quantity:(int)quantity
+	priceInCents:(int)priceInCents
+	currency:(NSString *)currencyCode
+{
+	if((self = [super init]) != nil)
+	{
+		firstFiredTime = 0;
+		uid = [self makeUid];
+		oneTimeOnly = NO;
+		isTransaction = YES;
+		productId = productIdVal;
+
+		[self addValue:transactionId forKey:@"purchase-transaction-id" withPrefix:@""];
+		[self addValue:productId forKey:@"purchase-product-id" withPrefix:@""];
+		[self addValue:[TSUtils stringifyInteger:quantity] forKey:@"purchase-quantity" withPrefix:@""];
+		[self addValue:[TSUtils stringifyInteger:priceInCents] forKey:@"purchase-price" withPrefix:@""];
+		[self addValue:currencyCode forKey:@"purchase-currency" withPrefix:@""];
 	}
 	return self;
 }
@@ -105,6 +152,17 @@
 	return [NSString stringWithFormat:@"%u:%f", (unsigned int)(t*1000), arc4random() / (float)0x10000000];
 }
 
+- (void)setName:(NSString *)eventName
+{
+	name = [[eventName lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	encodedName = [TSUtils encodeString:name];
+}
+
+- (void)setTransactionNameWithAppName:(NSString *)appName platform:(NSString *)platformName
+{
+	[self setName:[NSString stringWithFormat:@"%@-%@-purchase-%@", platformName, [appName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]], productId]];
+}
+
 - (void)addValue:(id)value forKey:(NSString *)key withPrefix:(NSString *)prefix
 {
 	NSString *encodedPair = [TSUtils encodeEventPairWithPrefix:prefix key:key value:value];
@@ -127,6 +185,7 @@
 	RELEASE(name);
 	RELEASE(encodedName);
 	RELEASE(postData);
+	RELEASE(productId);
 	SUPER_DEALLOC;
 }
 

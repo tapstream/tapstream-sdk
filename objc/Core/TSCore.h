@@ -21,6 +21,7 @@
 	NSMutableSet *firingEvents;
 	NSMutableSet *firedEvents;
 	NSString *failingEventId;
+	NSString *appName;
 	int delay;
 }
 

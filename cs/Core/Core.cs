@@ -65,7 +65,8 @@ namespace TapstreamMetrics.Sdk
 			firedEvents = platform.LoadFiredEvents();
 		}
 
-		public void Start() {
+		public void Start()
+		{
 
             appName = platform.GetAppName();
 			if (appName == null)
@@ -177,15 +178,15 @@ namespace TapstreamMetrics.Sdk
 					if (firedEvents.Contains(e.Name))
 					{
 						Logging.Log(LogLevel.INFO, "Tapstream ignoring event named \"{0}\" because it is a one-time-only event that has already been fired", e.Name);
-						listener.ReportOperation("event-ignored-already-fired", e.Name);
-						listener.ReportOperation("job-ended", e.Name);
+						listener.ReportOperation("event-ignored-already-fired", e.EncodedName);
+						listener.ReportOperation("job-ended", e.EncodedName);
 						return;
 					}
 					else if (firingEvents.Contains(e.Name))
 					{
 						Logging.Log(LogLevel.INFO, "Tapstream ignoring event named \"{0}\" because it is a one-time-only event that is already in progress", e.Name);
-						listener.ReportOperation("event-ignored-already-in-progress", e.Name);
-						listener.ReportOperation("job-ended", e.Name);
+						listener.ReportOperation("event-ignored-already-in-progress", e.EncodedName);
+						listener.ReportOperation("job-ended", e.EncodedName);
 						return;
 					}
 
@@ -245,7 +246,7 @@ namespace TapstreamMetrics.Sdk
 								self.firedEvents.Add(e.Name);
 							
 								platform.SaveFiredEvents(self.firedEvents);
-								listener.ReportOperation("fired-list-saved", e.Name);
+								listener.ReportOperation("fired-list-saved", e.EncodedName);
 							}
 
 							// Success of any event resets the delay
@@ -277,11 +278,11 @@ namespace TapstreamMetrics.Sdk
 							Logging.Log(LogLevel.ERROR, "Tapstream Error: Failed to fire event, http code {0}.{1}", response.Status, retryMsg);
 						}
 
-						listener.ReportOperation("event-failed", e.Name);
+						listener.ReportOperation("event-failed", e.EncodedName);
 						if(shouldRetry)
 						{
-							listener.ReportOperation("retry", e.Name);
-							listener.ReportOperation("job-ended", e.Name);
+							listener.ReportOperation("retry", e.EncodedName);
+							listener.ReportOperation("job-ended", e.EncodedName);
 							if(del.IsRetryAllowed())
 							{
 								FireEvent(e);
@@ -292,10 +293,10 @@ namespace TapstreamMetrics.Sdk
 					else
 					{
 						Logging.Log(LogLevel.INFO, "Tapstream fired event named \"{0}\"", e.Name);
-						listener.ReportOperation("event-succeeded", e.Name);
+						listener.ReportOperation("event-succeeded", e.EncodedName);
 					}
 				
-					listener.ReportOperation("job-ended", e.Name);
+					listener.ReportOperation("job-ended", e.EncodedName);
 
 #if WINDOWS_PHONE
 				}), TimeSpan.FromSeconds(actualDelay));

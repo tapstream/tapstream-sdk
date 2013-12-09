@@ -65,7 +65,7 @@ namespace TapstreamMetrics.Sdk
 
         public string GetAppName()
         {
-            return "TestApp";
+            return "Test App";
         }
 
         public string GetPackageName()

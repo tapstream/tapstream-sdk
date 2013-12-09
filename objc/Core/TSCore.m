@@ -12,8 +12,8 @@
 
 @interface TSEvent(hidden)
 - (void)firing;
+- (void)setTransactionNameWithAppName:(NSString *)appName platform:(NSString *)platformName;
 @end
-
 
 
 
@@ -31,6 +31,7 @@
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableSet *firingEvents;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableSet *firedEvents;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *failingEventId;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *appName;
 
 - (NSString *)clean:(NSString *)s;
 - (void)increaseDelay;
@@ -40,7 +41,7 @@
 
 @implementation TSCore
 
-@synthesize del, platform, listener, appEventSource, config, accountName, secret, encodedAppName, postData, firingEvents, firedEvents, failingEventId;
+@synthesize del, platform, listener, appEventSource, config, accountName, secret, encodedAppName, postData, firingEvents, firedEvents, failingEventId, appName;
 
 - (id)initWithDelegate:(id<TSDelegate>)delegateVal
 	platform:(id<TSPlatform>)platformVal
@@ -62,6 +63,7 @@
 		self.encodedAppName = nil;
 		self.postData = nil;
 		self.failingEventId = nil;
+		self.appName = nil;
 
 		[self makePostArgs];
 
@@ -79,11 +81,11 @@
 	RELEASE(appEventSource);
 	RELEASE(accountName);
 	RELEASE(secret);
-	RELEASE(encodedAppName);
 	RELEASE(postData);
 	RELEASE(firingEvents);
 	RELEASE(firedEvents);
 	RELEASE(failingEventId);
+	RELEASE(appName);
 	SUPER_DEALLOC;
 }
 
@@ -95,13 +97,11 @@
 	NSString *platformName = @"mac";
 #endif
 
-	self.encodedAppName = [platform getAppName];
-	if(self.encodedAppName == nil)
+	self.appName = [platform getAppName];
+	if(self.appName == nil)
 	{
-		self.encodedAppName = @"";
+		self.appName = @"";
 	}
-	self.encodedAppName = [TSUtils encodeString:self.encodedAppName];
-
 
 	if(config.fireAutomaticInstallEvent)
 	{
@@ -111,7 +111,7 @@
 		}
 		else
 		{
-			NSString *eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, self.encodedAppName];
+			NSString *eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, self.appName];
 			[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:YES]];
 		}
 	}
@@ -127,7 +127,7 @@
 		}
 		else
 		{
-			NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, self.encodedAppName];
+			NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, self.appName];
 			[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
 		}
 	
@@ -139,7 +139,7 @@
 			}
 			else
 			{
-				NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, me.encodedAppName];
+				NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, me.appName];
 				[me fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
 			}
 		}];
@@ -148,9 +148,7 @@
 	if(config.fireAutomaticIAPEvents)
 	{
 		[appEventSource setTransactionHandler:^(NSString *transactionId, NSString *productId, int quantity, int priceInCents, NSString *currencyCode) {
-			[me fireEvent:[TSEvent
-				iapEventWithName:[NSString stringWithFormat:@"%@-%@-purchase-%@", platformName, me.encodedAppName, productId]
-				transactionId:transactionId
+			[me fireEvent:[TSEvent eventWithTransactionId:transactionId
 				productId:productId
 				quantity:quantity
 				priceInCents:priceInCents
@@ -200,6 +198,16 @@
 {
 	@synchronized(self)
 	{
+		if(e.isTransaction)
+		{
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+			NSString *platformName = @"ios";
+#else
+			NSString *platformName = @"mac";
+#endif
+			[e setTransactionNameWithAppName:appName platform:platformName];
+		}
+
 		// Notify the event that we are going to fire it so it can record the time
 		[e firing];
 
@@ -208,15 +216,15 @@
 			if([firedEvents containsObject:e.name])
 			{
 				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that has already been fired", e.name];
-				[listener reportOperation:@"event-ignored-already-fired" arg:e.name];
-				[listener reportOperation:@"job-ended" arg:e.name];
+				[listener reportOperation:@"event-ignored-already-fired" arg:e.encodedName];
+				[listener reportOperation:@"job-ended" arg:e.encodedName];
 				return;
 			}
 			else if([firingEvents containsObject:e.name])
 			{
 				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that is already in progress", e.name];
-				[listener reportOperation:@"event-ignored-already-in-progress" arg:e.name];
-				[listener reportOperation:@"job-ended" arg:e.name];
+				[listener reportOperation:@"event-ignored-already-in-progress" arg:e.encodedName];
+				[listener reportOperation:@"job-ended" arg:e.encodedName];
 				return;
 			}
 
@@ -268,7 +276,7 @@
 						[firedEvents addObject:e.name];
 
 						[platform saveFiredEvents:firedEvents];
-						[listener reportOperation:@"fired-list-saved" arg:e.name];
+						[listener reportOperation:@"fired-list-saved" arg:e.encodedName];
 					}
 
 					// Success of any event resets the delay
@@ -300,11 +308,11 @@
 					[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, http code %d.%@", response.status, retryMsg];
 				}
 
-				[listener reportOperation:@"event-failed" arg:e.name];
+				[listener reportOperation:@"event-failed" arg:e.encodedName];
 				if(shouldRetry)
 				{
-					[listener reportOperation:@"retry" arg:e.name];
-					[listener reportOperation:@"job-ended" arg:e.name];
+					[listener reportOperation:@"retry" arg:e.encodedName];
+					[listener reportOperation:@"job-ended" arg:e.encodedName];
 					if([del isRetryAllowed])
 					{
 						[self fireEvent:e];
@@ -315,10 +323,10 @@
 			else
 			{
 				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream fired event named \"%@\"", e.name];
-				[listener reportOperation:@"event-succeeded" arg:e.name];
+				[listener reportOperation:@"event-succeeded" arg:e.encodedName];
 			}
 		
-			[listener reportOperation:@"job-ended" arg:e.name];
+			[listener reportOperation:@"job-ended" arg:e.encodedName];
 		});
 	}
 }

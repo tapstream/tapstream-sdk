@@ -9,6 +9,8 @@
 	NSString *name;
 	NSString *encodedName;
 	BOOL oneTimeOnly;
+	BOOL isTransaction;
+	NSString *productId;
 	NSMutableString *postData;
 }
 
@@ -17,10 +19,13 @@
 @property(nonatomic, STRONG_OR_RETAIN, readonly) NSString *encodedName;
 @property(nonatomic, STRONG_OR_RETAIN, readonly) NSString *postData;
 @property(nonatomic, assign, readonly) BOOL oneTimeOnly;
+@property(nonatomic, assign, readonly) BOOL isTransaction;
 
 + (id)eventWithName:(NSString *)name oneTimeOnly:(BOOL)oneTimeOnly;
-+ (id)iapEventWithName:(NSString *)name
-	transactionId:(NSString *)transactionId
++ (id)eventWithTransactionId:(NSString *)transactionId
+	productId:(NSString *)productId
+	quantity:(int)quantity;
++ (id)eventWithTransactionId:(NSString *)transactionId
 	productId:(NSString *)productId
 	quantity:(int)quantity
 	priceInCents:(int)priceInCents

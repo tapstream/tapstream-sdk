@@ -23,7 +23,7 @@ public class Event {
 		setName(name);
 	}
 
-	// Only to be used for creating IAB purchase events
+	// Only to be used for creating custom purchase events
 	public Event(String orderId, String productSku, int quantity) {
 		this("", false);
 		isTransaction = true;
@@ -31,7 +31,7 @@ public class Event {
 		initialize(orderId, productSku, quantity);
 	}
 
-	// Only to be used for creating IAB purchase events
+	// Only to be used for creating custom purchase events
 	public Event(String orderId, String productSku, int quantity, int priceInCents, String currencyCode) {
 		this("", false);
 		isTransaction = true;
