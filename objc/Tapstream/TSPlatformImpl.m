@@ -195,7 +195,7 @@
 		}
 		return AUTORELEASE([[TSResponse alloc] initWithStatus:-1 message:@"Unknown" data:nil]);
 	}
-	return AUTORELEASE([[TSResponse alloc] initWithStatus:response.statusCode message:[NSHTTPURLResponse localizedStringForStatusCode:response.statusCode] data:responseData]);
+	return AUTORELEASE([[TSResponse alloc] initWithStatus:(int)response.statusCode message:[NSHTTPURLResponse localizedStringForStatusCode:response.statusCode] data:responseData]);
 }
 
 - (NSString *)systemInfoByName:(NSString *)name

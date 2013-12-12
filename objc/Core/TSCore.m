@@ -453,7 +453,7 @@
 	[self appendPostPairWithPrefix:@"" key:@"locale" value:[platform getLocale]];
 	[self appendPostPairWithPrefix:@"" key:@"app-name" value:[platform getAppName]];
 	[self appendPostPairWithPrefix:@"" key:@"package-name" value:[platform getPackageName]];
-	[self appendPostPairWithPrefix:@"" key:@"gmtoffset" value:[TSUtils stringifyInteger:[[NSTimeZone systemTimeZone] secondsFromGMT]]];
+	[self appendPostPairWithPrefix:@"" key:@"gmtoffset" value:[TSUtils stringifyInteger:(int)[[NSTimeZone systemTimeZone] secondsFromGMT]]];
 
 }
 

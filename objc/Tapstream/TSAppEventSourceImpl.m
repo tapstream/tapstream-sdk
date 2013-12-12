@@ -157,7 +157,7 @@ void TSLoadStoreKitClasses()
 			{
 				onTransaction(transaction.transactionIdentifier,
 					product.productIdentifier,
-					transaction.payment.quantity,
+					(int)transaction.payment.quantity,
 					(int)([product.price doubleValue] * 100),
 					[product.priceLocale objectForKey:NSLocaleCurrencyCode]
 					);
