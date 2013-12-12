@@ -67,11 +67,11 @@
 		self.failingEventId = nil;
 		self.appName = nil;
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-        self.platformName = @"ios";
+		self.platformName = @"ios";
 #else
-        self.platformName = @"mac";
+		self.platformName = @"mac";
 #endif
-        
+		
 		[self makePostArgs];
 
 		self.firingEvents = [[NSMutableSet alloc] initWithCapacity:32];
@@ -93,13 +93,13 @@
 	RELEASE(firedEvents);
 	RELEASE(failingEventId);
 	RELEASE(appName);
-   	RELEASE(platformName);
+	RELEASE(platformName);
 	SUPER_DEALLOC;
 }
 
 - (void)start
 {
-    self.appName = [platform getAppName];
+	self.appName = [platform getAppName];
 	if(self.appName == nil)
 	{
 		self.appName = @"";
@@ -168,21 +168,21 @@
 			[e setTransactionNameWithAppName:appName platform:platformName];
 		}
 
-        // Add global event params if they have not yet been added
-        if(!e.prepared)
-        {
-            for(NSString *key in config.globalEventParams)
-            {
-                if([e.customFields objectForKey:key] == nil)
-                {
-                    [e addValue:[config.globalEventParams valueForKey:key] forKey:key];
-                }
-            }
-            
-            // Notify the event that we are going to fire it so it can record the time and bake its post data
-            [e prepare];
-        }
-        
+		// Add global event params if they have not yet been added
+		if(!e.prepared)
+		{
+			for(NSString *key in config.globalEventParams)
+			{
+				if([e.customFields objectForKey:key] == nil)
+				{
+					[e addValue:[config.globalEventParams valueForKey:key] forKey:key];
+				}
+			}
+			
+			// Notify the event that we are going to fire it so it can record the time and bake its post data
+			[e prepare];
+		}
+		
 		if(e.isOneTimeOnly)
 		{
 			if([firedEvents containsObject:e.name])
@@ -204,7 +204,7 @@
 		}
 
 		NSString *url = [NSString stringWithFormat:kTSEventUrlTemplate, accountName, e.encodedName];
-        NSString *data = [postData stringByAppendingString:e.postData];
+		NSString *data = [postData stringByAppendingString:e.postData];
 
 
 		int actualDelay = [del getDelay];
@@ -330,18 +330,18 @@
 
 - (void)getConversionData:(void(^)(NSData *))completion
 {
-    if(completion != nil)
+	if(completion != nil)
 	{
 		__block int tries = 0;
 		
 		NSString *url = [NSString stringWithFormat:kTSConversionUrlTemplate, secret, [platform loadUuid]];
-        
+		
 		__block void (^conversionCheck)();
 		__block void (^ __unsafe_unretained weakConversionCheck)();
 		
 		weakConversionCheck = conversionCheck = ^{
 			tries++;
-            
+			
 			TSResponse *response = [platform request:url data:nil method:@"GET"];
 			if(response.status >= 200 && response.status < 300)
 			{
@@ -353,19 +353,19 @@
 				if(error == nil && [regex numberOfMatchesInString:jsonString options:NSMatchingAnchored range:NSMakeRange(0, [jsonString length])] == 0)
 				{
 					completion(response.data);
-                    return;
+					return;
 				}
 			}
 			
-            if(tries >= kTSConversionPollCount)
-            {
-                completion(nil);
-                return;
-            }
-            
+			if(tries >= kTSConversionPollCount)
+			{
+				completion(nil);
+				return;
+			}
+			
 			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * kTSConversionPollInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), weakConversionCheck);
 		};
-        
+		
 		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * kTSConversionPollInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), conversionCheck);
 	}
 }

@@ -42,10 +42,10 @@
 		firstFiredTime = 0;
 		uid = RETAIN([self makeUid]);
 		name = RETAIN([[eventName lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]);
-        encodedName = RETAIN([TSUtils encodeString:name]);
+		encodedName = RETAIN([TSUtils encodeString:name]);
 		isOneTimeOnly = oneTimeOnlyArg;
 		isTransaction = NO;
-        customFields = RETAIN([NSMutableDictionary dictionaryWithCapacity:16]);
+		customFields = RETAIN([NSMutableDictionary dictionaryWithCapacity:16]);
 	}
 	return self;
 }
@@ -61,7 +61,7 @@
 		productId = RETAIN(productIdVal);
 		isOneTimeOnly = NO;
 		isTransaction = YES;
-        customFields = RETAIN([NSMutableDictionary dictionaryWithCapacity:16]);
+		customFields = RETAIN([NSMutableDictionary dictionaryWithCapacity:16]);
 
 		[self addValue:transactionId forKey:@"purchase-transaction-id"];
 		[self addValue:productId forKey:@"purchase-product-id"];
@@ -80,10 +80,10 @@
 	{
 		firstFiredTime = 0;
 		uid = RETAIN([self makeUid]);
-        productId = RETAIN(productIdVal);
+		productId = RETAIN(productIdVal);
 		isOneTimeOnly = NO;
 		isTransaction = YES;
-        customFields = RETAIN([NSMutableDictionary dictionaryWithCapacity:16]);
+		customFields = RETAIN([NSMutableDictionary dictionaryWithCapacity:16]);
 
 		[self addValue:transactionId forKey:@"purchase-transaction-id"];
 		[self addValue:productId forKey:@"purchase-product-id"];
@@ -102,11 +102,11 @@
 
 - (void)setTransactionNameWithAppName:(NSString *)appName platform:(NSString *)platformName
 {
-    NSString *eventName = [NSString stringWithFormat:@"%@-%@-purchase-%@", platformName, [appName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]], productId];
-    RELEASE(name);
-    name = RETAIN([[eventName lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]);
-    RELEASE(encodedName);
-    encodedName = RETAIN([TSUtils encodeString:name]);
+	NSString *eventName = [NSString stringWithFormat:@"%@-%@-purchase-%@", platformName, [appName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]], productId];
+	RELEASE(name);
+	name = RETAIN([[eventName lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]);
+	RELEASE(encodedName);
+	encodedName = RETAIN([TSUtils encodeString:name]);
 }
 
 - (void)addValue:(NSObject *)obj forKey:(NSString *)key
@@ -116,41 +116,41 @@
 
 - (BOOL)prepared
 {
-    return firstFiredTime != 0;
+	return firstFiredTime != 0;
 }
 
 - (void)prepare
 {
-    // Only record the time of the first fire attempt
-    if(firstFiredTime == 0)
-    {
-        firstFiredTime = [[NSDate date] timeIntervalSince1970];
-        
-        postData = RETAIN([NSMutableString stringWithCapacity:64]);
-        [postData appendString:@"&"];
-        [postData appendString:[TSUtils encodeEventPairWithPrefix:@"" key:@"created-ms" value:[NSString stringWithFormat:@"%.0f", firstFiredTime*1000]]];
-        
-        for(NSString *key in self.customFields)
-        {
-            NSString *encodedPair = [TSUtils encodeEventPairWithPrefix:@"custom-" key:key value:[customFields valueForKey:key]];
-            if(encodedPair != nil)
-            {
-                [postData appendString:@"&"];
-                [postData appendString:encodedPair];
-            }
-        }
-    }
+	// Only record the time of the first fire attempt
+	if(firstFiredTime == 0)
+	{
+		firstFiredTime = [[NSDate date] timeIntervalSince1970];
+		
+		postData = RETAIN([NSMutableString stringWithCapacity:64]);
+		[postData appendString:@"&"];
+		[postData appendString:[TSUtils encodeEventPairWithPrefix:@"" key:@"created-ms" value:[NSString stringWithFormat:@"%.0f", firstFiredTime*1000]]];
+		
+		for(NSString *key in self.customFields)
+		{
+			NSString *encodedPair = [TSUtils encodeEventPairWithPrefix:@"custom-" key:key value:[customFields valueForKey:key]];
+			if(encodedPair != nil)
+			{
+				[postData appendString:@"&"];
+				[postData appendString:encodedPair];
+			}
+		}
+	}
 }
 
 - (void)dealloc
 {
-    RELEASE(uid);
-    RELEASE(name);
-    RELEASE(encodedName);
-    RELEASE(productId);
-    RELEASE(customFields);
-    RELEASE(postData);
-    SUPER_DEALLOC;
+	RELEASE(uid);
+	RELEASE(name);
+	RELEASE(encodedName);
+	RELEASE(productId);
+	RELEASE(customFields);
+	RELEASE(postData);
+	SUPER_DEALLOC;
 }
 
 /*
