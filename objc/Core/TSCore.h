@@ -29,6 +29,7 @@
 - (void)start;
 - (void)fireEvent:(TSEvent *)event;
 - (void)fireHit:(TSHit *)hit completion:(void(^)(TSResponse *))completion;
+- (void)getConversionData:(void(^)(NSData *))completion;
 - (int)getDelay;
 - (NSMutableString *)postData;
 

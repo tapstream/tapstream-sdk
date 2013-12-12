@@ -25,8 +25,6 @@
 
 @synthesize globalEventParams = globalEventParams;
 
-@synthesize conversionListener = conversionListener;
-
 + (id)configWithDefaults
 {
 	return AUTORELEASE([[self alloc] init]);
@@ -40,7 +38,7 @@
 		fireAutomaticInstallEvent = YES;
 		fireAutomaticOpenEvent = YES;
 		fireAutomaticIAPEvents = YES;
-		globalEventParams = [NSMutableDictionary dictionaryWithCapacity:16];
+		self.globalEventParams = [NSMutableDictionary dictionaryWithCapacity:16];
 	}
 	return self;
 }
@@ -59,7 +57,7 @@
 #endif
 	RELEASE(installEventName);
 	RELEASE(openEventName);
-
+    RELEASE(globalEventParams);
 	SUPER_DEALLOC;
 }
 

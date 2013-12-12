@@ -11,16 +11,9 @@
 #define kTSConversionPollCount 10
 
 @interface TSEvent(hidden)
-- (BOOL)hasCustomField:(NSString *)key;
 - (BOOL)prepared;
 - (void)prepare;
 - (void)setTransactionNameWithAppName:(NSString *)appName platform:(NSString *)platformName;
-- (BOOL)oneTimeOnly;
-- (BOOL)isTransaction;
-- (NSString *)uid;
-- (NSString *)name;
-- (NSString *)encodedName;
-- (NSMutableString *)postData;
 @end
 
 
@@ -164,43 +157,6 @@
 				currency:currencyCode]];
 		}];
 	}
-
-	if(config.conversionListener != nil)
-	{
-		__block int tries = 0;
-		
-		NSString *url = [NSString stringWithFormat:kTSConversionUrlTemplate, secret, [platform loadUuid]];
-
-		__block void (^conversionCheck)();
-		__block void (^ __unsafe_unretained weakConversionCheck)();
-		
-		weakConversionCheck = conversionCheck = ^{
-			tries++;
-			bool retry = true;
-
-			TSResponse *response = [platform request:url data:nil method:@"GET"];
-			if(response.status >= 200 && response.status < 300)
-			{
-				NSString *jsonString = AUTORELEASE([[NSString alloc] initWithData:response.data encoding:NSUTF8StringEncoding]);
-				
-				// If it is not an empty json array, then make the callback
-				NSError *error = nil;
-				NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^\\s*\\[\\s*\\]\\s*$" options:0 error:&error];
-				if(error == nil && [regex numberOfMatchesInString:jsonString options:NSMatchingAnchored range:NSMakeRange(0, [jsonString length])] == 0)
-				{
-					retry = false;
-					config.conversionListener(response.data);
-				}
-			}
-			
-			if(retry && tries <= kTSConversionPollCount)
-			{
-				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * kTSConversionPollInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), weakConversionCheck);	
-			}
-		};
-
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * kTSConversionPollInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), conversionCheck);
-	}
 }
 
 - (void)fireEvent:(TSEvent *)e
@@ -217,9 +173,9 @@
         {
             for(NSString *key in config.globalEventParams)
             {
-                if(![e hasCustomField:key])
+                if([e.customFields objectForKey:key] == nil)
                 {
-                    [e setValue:[config.globalEventParams valueForKey:key] forKey:key];
+                    [e addValue:[config.globalEventParams valueForKey:key] forKey:key];
                 }
             }
             
@@ -338,7 +294,7 @@
 			}
 			else
 			{
-				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream fired event named \"%@\"", e.name];
+				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream fired event named \"%@\", %@", e.name, data];
 				[listener reportOperation:@"event-succeeded" arg:e.encodedName];
 			}
 		
@@ -370,6 +326,48 @@
 			completion(response);
 		}
 	});
+}
+
+- (void)getConversionData:(void(^)(NSData *))completion
+{
+    if(completion != nil)
+	{
+		__block int tries = 0;
+		
+		NSString *url = [NSString stringWithFormat:kTSConversionUrlTemplate, secret, [platform loadUuid]];
+        
+		__block void (^conversionCheck)();
+		__block void (^ __unsafe_unretained weakConversionCheck)();
+		
+		weakConversionCheck = conversionCheck = ^{
+			tries++;
+            
+			TSResponse *response = [platform request:url data:nil method:@"GET"];
+			if(response.status >= 200 && response.status < 300)
+			{
+				NSString *jsonString = AUTORELEASE([[NSString alloc] initWithData:response.data encoding:NSUTF8StringEncoding]);
+				
+				// If it is not an empty json array, then make the callback
+				NSError *error = nil;
+				NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^\\s*\\[\\s*\\]\\s*$" options:0 error:&error];
+				if(error == nil && [regex numberOfMatchesInString:jsonString options:NSMatchingAnchored range:NSMakeRange(0, [jsonString length])] == 0)
+				{
+					completion(response.data);
+                    return;
+				}
+			}
+			
+            if(tries >= kTSConversionPollCount)
+            {
+                completion(nil);
+                return;
+            }
+            
+			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * kTSConversionPollInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), weakConversionCheck);
+		};
+        
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * kTSConversionPollInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), conversionCheck);
+	}
 }
 
 - (int)getDelay
@@ -457,11 +455,6 @@
 	[self appendPostPairWithPrefix:@"" key:@"package-name" value:[platform getPackageName]];
 	[self appendPostPairWithPrefix:@"" key:@"gmtoffset" value:[TSUtils stringifyInteger:[[NSTimeZone systemTimeZone] secondsFromGMT]]];
 
-	// Add global custom params
-	for (NSString *key in config.globalEventParams) {
-		id value = [config.globalEventParams objectForKey:key];
-		[self appendPostPairWithPrefix:@"custom-" key:key value:value];
-	}
 }
 
 

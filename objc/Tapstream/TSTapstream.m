@@ -102,6 +102,11 @@ static TSTapstream *instance = nil;
 	[core fireHit:hit completion:completion];
 }
 
+- (void)getConversionData:(void(^)(NSData *))completion
+{
+    [core getConversionData:completion];
+}
+
 @end
 
 

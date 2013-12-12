@@ -35,7 +35,7 @@
 	priceInCents:(int)priceInCents
 	currency:(NSString *)currencyCode;
 
-- (void)addValue:(id)value forKey:(NSString *)key;
+- (void)addValue:(NSObject *)obj forKey:(NSString *)key;
 
 /*
 - (void)addIntegerValue:(int)value forKey:(NSString *)key;

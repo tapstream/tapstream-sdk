@@ -41,9 +41,11 @@
 	{
 		firstFiredTime = 0;
 		uid = RETAIN([self makeUid]);
-		[self setName:eventName];
+		name = RETAIN([[eventName lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]);
+        encodedName = RETAIN([TSUtils encodeString:name]);
 		isOneTimeOnly = oneTimeOnlyArg;
 		isTransaction = NO;
+        customFields = RETAIN([NSMutableDictionary dictionaryWithCapacity:16]);
 	}
 	return self;
 }
@@ -59,7 +61,7 @@
 		productId = RETAIN(productIdVal);
 		isOneTimeOnly = NO;
 		isTransaction = YES;
-
+        customFields = RETAIN([NSMutableDictionary dictionaryWithCapacity:16]);
 
 		[self addValue:transactionId forKey:@"purchase-transaction-id"];
 		[self addValue:productId forKey:@"purchase-product-id"];
@@ -81,6 +83,7 @@
         productId = RETAIN(productIdVal);
 		isOneTimeOnly = NO;
 		isTransaction = YES;
+        customFields = RETAIN([NSMutableDictionary dictionaryWithCapacity:16]);
 
 		[self addValue:transactionId forKey:@"purchase-transaction-id"];
 		[self addValue:productId forKey:@"purchase-product-id"];
@@ -97,26 +100,18 @@
 	return [NSString stringWithFormat:@"%.0f:%f", t*1000, arc4random() / (float)0x10000000];
 }
 
-- (void)setName:(NSString *)eventName
-{
-	name = [[eventName lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	encodedName = [TSUtils encodeString:name];
-}
-
 - (void)setTransactionNameWithAppName:(NSString *)appName platform:(NSString *)platformName
 {
-	[self setName:[NSString stringWithFormat:@"%@-%@-purchase-%@", platformName, [appName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]], productId]];
+    NSString *eventName = [NSString stringWithFormat:@"%@-%@-purchase-%@", platformName, [appName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]], productId];
+    RELEASE(name);
+    name = RETAIN([[eventName lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]);
+    RELEASE(encodedName);
+    encodedName = RETAIN([TSUtils encodeString:name]);
 }
 
-- (void)addValue:(id)value forKey:(NSString *)key
+- (void)addValue:(NSObject *)obj forKey:(NSString *)key
 {
-	[self.customFields setValue:value forKey:key];
-}
-
-- (BOOL)hasCustomField:(NSString *)key
-{
-    NSString *prefixedKey = [@"custom-" stringByAppendingString:key];
-    return [customFields valueForKey:prefixedKey] != nil;
+	[self.customFields setObject:obj forKey:key];
 }
 
 - (BOOL)prepared
@@ -132,10 +127,10 @@
         firstFiredTime = [[NSDate date] timeIntervalSince1970];
         
         postData = RETAIN([NSMutableString stringWithCapacity:64]);
-        [postData stringByAppendingString:@"&"];
-        [postData stringByAppendingString:[TSUtils encodeEventPairWithPrefix:@"" key:@"created-ms" value:[NSString stringWithFormat:@"%.0f", firstFiredTime*1000]]];
+        [postData appendString:@"&"];
+        [postData appendString:[TSUtils encodeEventPairWithPrefix:@"" key:@"created-ms" value:[NSString stringWithFormat:@"%.0f", firstFiredTime*1000]]];
         
-        for(NSString *key in customFields)
+        for(NSString *key in self.customFields)
         {
             NSString *encodedPair = [TSUtils encodeEventPairWithPrefix:@"custom-" key:key value:[customFields valueForKey:key]];
             if(encodedPair != nil)
