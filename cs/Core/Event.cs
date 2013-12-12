@@ -9,7 +9,7 @@ namespace TapstreamMetrics.Sdk
     {
         private static Random rng = new Random();
 
-        private uint firstFiredTime = 0;
+        private double firstFiredTime = 0;
         private string uid;
         private string name;
         private string encodedName;
@@ -93,7 +93,7 @@ namespace TapstreamMetrics.Sdk
             get
             {
                 string result = postData != null ? postData.ToString() : "";
-                return String.Format("&created-ms={0}", firstFiredTime) + result;
+                return String.Format("&created-ms={0:0.}", firstFiredTime) + result;
             }
         }
 
@@ -111,7 +111,7 @@ namespace TapstreamMetrics.Sdk
             if(firstFiredTime == 0)
             {
                 TimeSpan t = (DateTime.UtcNow - new DateTime(1970, 1, 1));
-                firstFiredTime = (uint)t.TotalMilliseconds;
+                firstFiredTime = t.TotalMilliseconds;
             }
         }
 

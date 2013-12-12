@@ -134,7 +134,7 @@
 - (NSString *)postData
 {
 	NSString *data = postData != nil ? (NSString *)postData : @"";
-	return [[NSString stringWithFormat:@"&created-ms=%u", (unsigned int)(firstFiredTime*1000)] stringByAppendingString:data];
+	return [[NSString stringWithFormat:@"&created-ms=%.0f", firstFiredTime*1000] stringByAppendingString:data];
 }
 
 - (void)firing

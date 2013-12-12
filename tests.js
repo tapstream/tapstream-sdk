@@ -403,7 +403,7 @@ test('succeeded-event-has-created-time', function() {
 	var pd = callGetter(e, 'postData');
 	util.log(pd);
 	util.assertTrue(pd.search('&created-ms=') == 0);
-	util.assertTrue(parseInt(pd.substring(12)) > 3200000000);
+	util.assertTrue(parseInt(pd.substring(12)) > 1386800000000);
 });
 test('failed', function() {
 	var q = util.newOperationQueue(),
@@ -427,7 +427,7 @@ test('failed-event-has-created-time', function() {
 	var pd = callGetter(e, 'postData');
 	util.log(pd);
 	util.assertTrue(pd.search('&created-ms=') == 0);
-	util.assertTrue(parseInt(pd.substring(12)) > 3200000000);
+	util.assertTrue(parseInt(pd.substring(12)) > 1386800000000);
 });
 test('failed-non-500-range-doesnt-retry', function() {
 	var q = util.newOperationQueue(),
