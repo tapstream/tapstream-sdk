@@ -324,22 +324,22 @@ Handle<Value> Event_addPair(const Arguments &args)
 	}
 	else if(args[1]->IsInt32())
 	{
-		[event addIntegerValue:args[1]->Int32Value() forKey:[NSString stringWithUTF8String:*key]];
+		[event addValue:[NSNumber numberWithInt:args[1]->Int32Value()]	 forKey:[NSString stringWithUTF8String:*key]];
 		return Undefined();
 	}
 	else if(args[1]->IsUint32())
 	{
-		[event addUnsignedIntegerValue:args[1]->Uint32Value() forKey:[NSString stringWithUTF8String:*key]];
+		[event addValue:[NSNumber numberWithUnsignedInt:args[1]->Uint32Value()] forKey:[NSString stringWithUTF8String:*key]];
 		return Undefined();
 	}
 	else if(args[1]->IsNumber())
 	{
-		[event addDoubleValue:args[1]->NumberValue() forKey:[NSString stringWithUTF8String:*key]];
+		[event addValue:[NSNumber numberWithDouble:args[1]->NumberValue()] forKey:[NSString stringWithUTF8String:*key]];
 		return Undefined();
 	}
 	else if(args[1]->IsBoolean())
 	{
-		[event addBooleanValue:args[1]->BooleanValue() forKey:[NSString stringWithUTF8String:*key]];
+		[event addValue:[NSNumber numberWithBool:(BOOL)args[1]->BooleanValue()] forKey:[NSString stringWithUTF8String:*key]];
 		return Undefined();
 	}
 	else if(args[1]->IsNull())
@@ -379,7 +379,7 @@ static Handle<Value> Event_accessor(Local<String> name, const AccessorInfo &info
 	}
 	else if(strcmp(*s, "oneTimeOnly") == 0)
 	{
-		return v8::Boolean::New(event.oneTimeOnly);
+		return v8::Boolean::New(event.isOneTimeOnly);
 	}
 	return Null();
 }

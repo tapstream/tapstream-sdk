@@ -11,8 +11,16 @@
 #define kTSConversionPollCount 10
 
 @interface TSEvent(hidden)
-- (void)firing;
+- (BOOL)hasCustomField:(NSString *)key;
+- (BOOL)prepared;
+- (void)prepare;
 - (void)setTransactionNameWithAppName:(NSString *)appName platform:(NSString *)platformName;
+- (BOOL)oneTimeOnly;
+- (BOOL)isTransaction;
+- (NSString *)uid;
+- (NSString *)name;
+- (NSString *)encodedName;
+- (NSMutableString *)postData;
 @end
 
 
@@ -32,6 +40,7 @@
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableSet *firedEvents;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *failingEventId;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *appName;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *platformName;
 
 - (NSString *)clean:(NSString *)s;
 - (void)increaseDelay;
@@ -41,7 +50,7 @@
 
 @implementation TSCore
 
-@synthesize del, platform, listener, appEventSource, config, accountName, secret, encodedAppName, postData, firingEvents, firedEvents, failingEventId, appName;
+@synthesize del, platform, listener, appEventSource, config, accountName, secret, encodedAppName, postData, firingEvents, firedEvents, failingEventId, appName, platformName;
 
 - (id)initWithDelegate:(id<TSDelegate>)delegateVal
 	platform:(id<TSPlatform>)platformVal
@@ -64,7 +73,12 @@
 		self.postData = nil;
 		self.failingEventId = nil;
 		self.appName = nil;
-
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+        self.platformName = @"ios";
+#else
+        self.platformName = @"mac";
+#endif
+        
 		[self makePostArgs];
 
 		self.firingEvents = [[NSMutableSet alloc] initWithCapacity:32];
@@ -86,18 +100,13 @@
 	RELEASE(firedEvents);
 	RELEASE(failingEventId);
 	RELEASE(appName);
+   	RELEASE(platformName);
 	SUPER_DEALLOC;
 }
 
 - (void)start
 {
-#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-	NSString *platformName = @"ios";
-#else
-	NSString *platformName = @"mac";
-#endif
-
-	self.appName = [platform getAppName];
+    self.appName = [platform getAppName];
 	if(self.appName == nil)
 	{
 		self.appName = @"";
@@ -139,7 +148,7 @@
 			}
 			else
 			{
-				NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, me.appName];
+				NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", me.platformName, me.appName];
 				[me fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
 			}
 		}];
@@ -200,18 +209,25 @@
 	{
 		if(e.isTransaction)
 		{
-#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-			NSString *platformName = @"ios";
-#else
-			NSString *platformName = @"mac";
-#endif
 			[e setTransactionNameWithAppName:appName platform:platformName];
 		}
 
-		// Notify the event that we are going to fire it so it can record the time
-		[e firing];
-
-		if(e.oneTimeOnly)
+        // Add global event params if they have not yet been added
+        if(!e.prepared)
+        {
+            for(NSString *key in config.globalEventParams)
+            {
+                if(![e hasCustomField:key])
+                {
+                    [e setValue:[config.globalEventParams valueForKey:key] forKey:key];
+                }
+            }
+            
+            // Notify the event that we are going to fire it so it can record the time and bake its post data
+            [e prepare];
+        }
+        
+		if(e.isOneTimeOnly)
 		{
 			if([firedEvents containsObject:e.name])
 			{
@@ -232,7 +248,7 @@
 		}
 
 		NSString *url = [NSString stringWithFormat:kTSEventUrlTemplate, accountName, e.encodedName];
-		NSString *data = [postData stringByAppendingString:e.postData];
+        NSString *data = [postData stringByAppendingString:e.postData];
 
 
 		int actualDelay = [del getDelay];
@@ -245,7 +261,7 @@
 
 			@synchronized(self)
 			{
-				if(e.oneTimeOnly)
+				if(e.isOneTimeOnly)
 				{
 					[firingEvents removeObject:e.name];
 				}
@@ -271,7 +287,7 @@
 				}
 				else
 				{
-					if(e.oneTimeOnly)
+					if(e.isOneTimeOnly)
 					{
 						[firedEvents addObject:e.name];
 

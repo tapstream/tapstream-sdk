@@ -6,23 +6,12 @@
 #import "TSUtils.h"
 
 @interface TSEvent()
-
-- (id)initWithName:(NSString *)name oneTimeOnly:(BOOL)oneTimeOnly;
-- (void)addValue:(NSString *)value forKey:(NSString *)key withPrefix:(NSString *)prefix;
-- (void)firing;
-- (NSString *)makeUid;
-- (void)setName:(NSString *)name;
-- (void)setTransactionNameWithAppName:(NSString *)appName platform:(NSString *)platformName;
-
-@property(nonatomic, STRONG_OR_RETAIN) NSString *productId;
-
 @end
-
 
 
 @implementation TSEvent
 
-@synthesize uid, name, encodedName, oneTimeOnly, postData, productId, isTransaction;
+@synthesize uid, name, encodedName, productId, customFields, postData, isOneTimeOnly, isTransaction;
 
 + (id)eventWithName:(NSString *)eventName oneTimeOnly:(BOOL)oneTimeOnlyArg
 {
@@ -45,15 +34,15 @@
 	return AUTORELEASE([[self alloc] initWithTransactionId:transactionId productId:productId quantity:quantity priceInCents:priceInCents currency:currencyCode]);
 }
 
-- (id)initWithName:(NSString *)eventName oneTimeOnly:(BOOL)oneTimeOnlyArg
+- (id)initWithName:(NSString *)eventName
+	oneTimeOnly:(BOOL)oneTimeOnlyArg
 {
 	if((self = [super init]) != nil)
 	{
 		firstFiredTime = 0;
-		uid = [self makeUid];
-		name = [[eventName lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-		encodedName = [TSUtils encodeString:name];
-		oneTimeOnly = oneTimeOnlyArg;
+		uid = RETAIN([self makeUid]);
+		[self setName:eventName];
+		isOneTimeOnly = oneTimeOnlyArg;
 		isTransaction = NO;
 	}
 	return self;
@@ -66,14 +55,15 @@
 	if((self = [super init]) != nil)
 	{
 		firstFiredTime = 0;
-		uid = [self makeUid];
-		oneTimeOnly = NO;
+		uid = RETAIN([self makeUid]);
+		productId = RETAIN(productIdVal);
+		isOneTimeOnly = NO;
 		isTransaction = YES;
-		productId = productIdVal;
 
-		[self addValue:transactionId forKey:@"purchase-transaction-id" withPrefix:@""];
-		[self addValue:productId forKey:@"purchase-product-id" withPrefix:@""];
-		[self addValue:[TSUtils stringifyInteger:quantity] forKey:@"purchase-quantity" withPrefix:@""];
+
+		[self addValue:transactionId forKey:@"purchase-transaction-id"];
+		[self addValue:productId forKey:@"purchase-product-id"];
+		[self addValue:[NSNumber numberWithInt:quantity] forKey:@"purchase-quantity"];
 	}
 	return self;
 }
@@ -87,25 +77,88 @@
 	if((self = [super init]) != nil)
 	{
 		firstFiredTime = 0;
-		uid = [self makeUid];
-		oneTimeOnly = NO;
+		uid = RETAIN([self makeUid]);
+        productId = RETAIN(productIdVal);
+		isOneTimeOnly = NO;
 		isTransaction = YES;
-		productId = productIdVal;
 
-		[self addValue:transactionId forKey:@"purchase-transaction-id" withPrefix:@""];
-		[self addValue:productId forKey:@"purchase-product-id" withPrefix:@""];
-		[self addValue:[TSUtils stringifyInteger:quantity] forKey:@"purchase-quantity" withPrefix:@""];
-		[self addValue:[TSUtils stringifyInteger:priceInCents] forKey:@"purchase-price" withPrefix:@""];
-		[self addValue:currencyCode forKey:@"purchase-currency" withPrefix:@""];
+		[self addValue:transactionId forKey:@"purchase-transaction-id"];
+		[self addValue:productId forKey:@"purchase-product-id"];
+		[self addValue:[NSNumber numberWithInt:quantity] forKey:@"purchase-quantity"];
+		[self addValue:[NSNumber numberWithInt:priceInCents] forKey:@"purchase-price"];
+		[self addValue:currencyCode forKey:@"purchase-currency"];
 	}
 	return self;
 }
 
-- (void)addValue:(id)value forKey:(NSString *)key
+- (NSString *)makeUid
 {
-	[self addValue:value forKey:key withPrefix:@"custom-"];
+	NSTimeInterval t = [[NSDate date] timeIntervalSince1970];
+	return [NSString stringWithFormat:@"%.0f:%f", t*1000, arc4random() / (float)0x10000000];
 }
 
+- (void)setName:(NSString *)eventName
+{
+	name = [[eventName lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	encodedName = [TSUtils encodeString:name];
+}
+
+- (void)setTransactionNameWithAppName:(NSString *)appName platform:(NSString *)platformName
+{
+	[self setName:[NSString stringWithFormat:@"%@-%@-purchase-%@", platformName, [appName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]], productId]];
+}
+
+- (void)addValue:(id)value forKey:(NSString *)key
+{
+	[self.customFields setValue:value forKey:key];
+}
+
+- (BOOL)hasCustomField:(NSString *)key
+{
+    NSString *prefixedKey = [@"custom-" stringByAppendingString:key];
+    return [customFields valueForKey:prefixedKey] != nil;
+}
+
+- (BOOL)prepared
+{
+    return firstFiredTime != 0;
+}
+
+- (void)prepare
+{
+    // Only record the time of the first fire attempt
+    if(firstFiredTime == 0)
+    {
+        firstFiredTime = [[NSDate date] timeIntervalSince1970];
+        
+        postData = RETAIN([NSMutableString stringWithCapacity:64]);
+        [postData stringByAppendingString:@"&"];
+        [postData stringByAppendingString:[TSUtils encodeEventPairWithPrefix:@"" key:@"created-ms" value:[NSString stringWithFormat:@"%.0f", firstFiredTime*1000]]];
+        
+        for(NSString *key in customFields)
+        {
+            NSString *encodedPair = [TSUtils encodeEventPairWithPrefix:@"custom-" key:key value:[customFields valueForKey:key]];
+            if(encodedPair != nil)
+            {
+                [postData appendString:@"&"];
+                [postData appendString:encodedPair];
+            }
+        }
+    }
+}
+
+- (void)dealloc
+{
+    RELEASE(uid);
+    RELEASE(name);
+    RELEASE(encodedName);
+    RELEASE(productId);
+    RELEASE(customFields);
+    RELEASE(postData);
+    SUPER_DEALLOC;
+}
+
+/*
 - (void)addIntegerValue:(int)value forKey:(NSString *)key
 {
 	[self addValue:[TSUtils stringifyInteger:value] forKey:key];
@@ -130,63 +183,6 @@
 {
 	[self addValue:[TSUtils stringifyBOOL:value] forKey:key];
 }
-
-- (NSString *)postData
-{
-	NSString *data = postData != nil ? (NSString *)postData : @"";
-	return [[NSString stringWithFormat:@"&created-ms=%.0f", firstFiredTime*1000] stringByAppendingString:data];
-}
-
-- (void)firing
-{
-	// Only record the time of the first fire attempt
-	if(firstFiredTime == 0)
-	{
-		firstFiredTime = [[NSDate date] timeIntervalSince1970];
-	}
-}
-
-- (NSString *)makeUid
-{
-	NSTimeInterval t = [[NSDate date] timeIntervalSince1970];
-	return [NSString stringWithFormat:@"%u:%f", (unsigned int)(t*1000), arc4random() / (float)0x10000000];
-}
-
-- (void)setName:(NSString *)eventName
-{
-	name = [[eventName lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	encodedName = [TSUtils encodeString:name];
-}
-
-- (void)setTransactionNameWithAppName:(NSString *)appName platform:(NSString *)platformName
-{
-	[self setName:[NSString stringWithFormat:@"%@-%@-purchase-%@", platformName, [appName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]], productId]];
-}
-
-- (void)addValue:(id)value forKey:(NSString *)key withPrefix:(NSString *)prefix
-{
-	NSString *encodedPair = [TSUtils encodeEventPairWithPrefix:prefix key:key value:value];
-	if(encodedPair == nil)
-	{
-		return;
-	}
-
-	if(postData == nil)
-	{
-		postData = RETAIN([NSMutableString stringWithCapacity:64]);
-	}
-	[postData appendString:@"&"];
-	[postData appendString:encodedPair];
-}
-
-- (void)dealloc
-{
-	RELEASE(uid);
-	RELEASE(name);
-	RELEASE(encodedName);
-	RELEASE(postData);
-	RELEASE(productId);
-	SUPER_DEALLOC;
-}
+*/
 
 @end

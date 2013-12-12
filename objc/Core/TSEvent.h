@@ -8,18 +8,22 @@
 	NSString *uid;
 	NSString *name;
 	NSString *encodedName;
-	BOOL oneTimeOnly;
+	BOOL isOneTimeOnly;
 	BOOL isTransaction;
 	NSString *productId;
+	NSMutableDictionary *customFields;
 	NSMutableString *postData;
 }
 
 @property(nonatomic, STRONG_OR_RETAIN, readonly) NSString *uid;
 @property(nonatomic, STRONG_OR_RETAIN, readonly) NSString *name;
 @property(nonatomic, STRONG_OR_RETAIN, readonly) NSString *encodedName;
+@property(nonatomic, STRONG_OR_RETAIN, readonly) NSString *productId;
+@property(nonatomic, STRONG_OR_RETAIN, readonly) NSMutableDictionary *customFields;
 @property(nonatomic, STRONG_OR_RETAIN, readonly) NSString *postData;
-@property(nonatomic, assign, readonly) BOOL oneTimeOnly;
-@property(nonatomic, assign, readonly) BOOL isTransaction;
+@property (nonatomic, assign, readonly) BOOL isOneTimeOnly;
+@property (nonatomic, assign, readonly) BOOL isTransaction;
+
 
 + (id)eventWithName:(NSString *)name oneTimeOnly:(BOOL)oneTimeOnly;
 + (id)eventWithTransactionId:(NSString *)transactionId
@@ -32,10 +36,13 @@
 	currency:(NSString *)currencyCode;
 
 - (void)addValue:(id)value forKey:(NSString *)key;
+
+/*
 - (void)addIntegerValue:(int)value forKey:(NSString *)key;
 - (void)addUnsignedIntegerValue:(uint)value forKey:(NSString *)key;
 - (void)addDoubleValue:(double)value forKey:(NSString *)key;
 - (void)addFloatValue:(double)value forKey:(NSString *)key;
 - (void)addBooleanValue:(BOOL)value forKey:(NSString *)key;
+*/
 
 @end
