@@ -104,7 +104,7 @@ static TSTapstream *instance = nil;
 
 - (void)getConversionData:(void(^)(NSData *))completion
 {
-    [core getConversionData:completion];
+	[core getConversionData:completion];
 }
 
 @end

@@ -128,6 +128,7 @@
 	if(firstFiredTime == 0)
 	{
 		firstFiredTime = [[NSDate date] timeIntervalSince1970];
+
 		[postData appendString:[NSString stringWithFormat:@"&created-ms=%.0f", firstFiredTime*1000]];
 		
 		for(NSString *key in self.customFields)
@@ -140,12 +141,11 @@
 - (void)addValue:(id)value forKey:(NSString *)key withPrefix:(NSString *)prefix
 {
 	NSString *encodedPair = [TSUtils encodeEventPairWithPrefix:prefix key:key value:value];
-	if(encodedPair == nil)
+	if(encodedPair != nil)
 	{
-		return;
+		[postData appendString:@"&"];
+		[postData appendString:encodedPair];
 	}
-	[postData appendString:@"&"];
-	[postData appendString:encodedPair];
 }
 
 - (void)dealloc
