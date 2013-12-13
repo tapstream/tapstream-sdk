@@ -100,10 +100,6 @@ public class Event {
 		return postData != null ? postData.toString() : "";
 	}
 
-	boolean isPrepared() {
-		return firstFiredTime != 0;
-	}
-	
 	void prepare(final Map<String, Object> globalEventParams) {
 		// Only record the time of the first fire attempt
 		if (firstFiredTime == 0) {

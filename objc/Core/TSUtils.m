@@ -39,6 +39,14 @@
 		{
 			return [TSUtils stringifyUnsignedInteger:[number unsignedIntValue]];
 		}
+		else if(strcmp([number objCType], @encode(long)) == 0)
+		{
+			return [TSUtils stringifyLong:[number longValue]];
+		}
+		else if(strcmp([number objCType], @encode(unsigned long)) == 0)
+		{
+			return [TSUtils stringifyUnsignedLong:[number unsignedLongValue]];
+		}
 		else if(strcmp([number objCType], @encode(double)) == 0)
 		{
 			return [TSUtils stringifyDouble:[number doubleValue]];
@@ -72,6 +80,16 @@
 + (NSString *)stringifyUnsignedInteger:(uint)value
 {
 	return [NSString stringWithFormat:@"%u", value];
+}
+
++ (NSString *)stringifyLong:(long)value
+{
+	return [NSString stringWithFormat:@"%ld", value];
+}
+
++ (NSString *)stringifyUnsignedLong:(unsigned long)value
+{
+	return [NSString stringWithFormat:@"%lu", value];
 }
 
 + (NSString *)stringifyDouble:(double)value

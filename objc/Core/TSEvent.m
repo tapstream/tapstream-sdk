@@ -114,26 +114,31 @@
 
 - (void)addValue:(NSObject *)obj forKey:(NSString *)key
 {
-	[self.customFields setObject:obj forKey:key];
+	if(key != nil && obj != nil) {
+		[self.customFields setObject:obj forKey:key];
+	}
 }
 
-- (BOOL)prepared
-{
-	return firstFiredTime != 0;
-}
-
-- (void)prepare
+- (void)prepare:(NSDictionary *)globalEventParams
 {
 	// Only record the time of the first fire attempt
 	if(firstFiredTime == 0)
 	{
 		firstFiredTime = [[NSDate date] timeIntervalSince1970];
 
+		for(NSString *key in globalEventParams)
+		{
+			if([self.customFields objectForKey:key] == nil)
+			{
+				[self addValue:[globalEventParams valueForKey:key] forKey:key];
+			}
+		}
+
 		[postData appendString:[NSString stringWithFormat:@"&created-ms=%.0f", firstFiredTime*1000]];
 		
 		for(NSString *key in self.customFields)
 		{
-			[self addValue:[self.customFields objectForkey:key] forKey:key withPrefix:@"custom-"];
+			[self addValue:[self.customFields objectForKey:key] forKey:key withPrefix:@"custom-"];
 		}
 	}
 }

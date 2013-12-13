@@ -105,14 +105,6 @@ namespace TapstreamMetrics.Sdk
             }
         }
 
-        internal bool IsPrepared
-        {
-            get
-            {
-                return firstFiredTime != 0;
-            }
-        }
-
         internal void Prepare(IDictionary<string, object> globalEventParams)
         {
             // Only record the time of the first fire attempt

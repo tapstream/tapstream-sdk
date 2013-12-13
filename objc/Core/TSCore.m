@@ -11,8 +11,7 @@
 #define kTSConversionPollCount 10
 
 @interface TSEvent(hidden)
-- (BOOL)prepared;
-- (void)prepare;
+- (void)prepare:(NSDictionary *)globalEventParams;
 - (void)setTransactionNameWithAppName:(NSString *)appName platform:(NSString *)platformName;
 @end
 
@@ -169,20 +168,9 @@
 		}
 
 		// Add global event params if they have not yet been added
-		if(!e.prepared)
-		{
-			for(NSString *key in config.globalEventParams)
-			{
-				if([e.customFields objectForKey:key] == nil)
-				{
-					[e addValue:[config.globalEventParams valueForKey:key] forKey:key];
-				}
-			}
-			
-			// Notify the event that we are going to fire it so it can record the time and bake its post data
-			[e prepare];
-		}
-		
+		// Notify the event that we are going to fire it so it can record the time and bake its post data
+		[e prepare:config.globalEventParams];
+				
 		if(e.isOneTimeOnly)
 		{
 			if([firedEvents containsObject:e.name])

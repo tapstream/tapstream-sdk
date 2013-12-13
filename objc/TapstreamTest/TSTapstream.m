@@ -32,27 +32,19 @@
 
 
 
-@interface TSTapstream()
-
-@property(nonatomic, STRONG_OR_RETAIN) id<TSDelegate> del;
-@property(nonatomic, STRONG_OR_RETAIN) id<TSPlatform> platform;
-@property(nonatomic, STRONG_OR_RETAIN) id<TSCoreListener> listener;
-@property(nonatomic, STRONG_OR_RETAIN) TSCore *core;
-
-@end
-
 
 @implementation TSTapstream
 
-@synthesize del, platform, listener, core;
+@synthesize del, platform, listener, core, config;
 
-- (id)initWithOperationQueue:(TSOperationQueue *)q accountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)config
+- (id)initWithOperationQueue:(TSOperationQueue *)q accountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)configVal
 {
 	if((self = [super init]) != nil)
 	{
 		del = [[TSDelegateImpl alloc] init];
 		platform = [[TSPlatformImpl alloc] init];
-		listener = [[TSCoreListenerImpl alloc] initWithQueue:q];
+		listener = RETAIN([[TSCoreListenerImpl alloc] initWithQueue:q]);
+		config = RETAIN(configVal);
 		core = [[TSCore alloc] initWithDelegate:del
 			platform:platform
 			listener:listener
@@ -71,6 +63,7 @@
 	RELEASE(platform);
 	RELEASE(listener);
 	RELEASE(core);
+	RELEASE(config);
 	SUPER_DEALLOC;
 }
 

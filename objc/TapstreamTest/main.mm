@@ -758,6 +758,29 @@ Handle<Value> Util_newEvent(const Arguments &args)
 	return scope.Close(obj);
 }
 
+// Expose the prepare method so we can call it
+@interface TSEvent(hidden)
+- (void)prepare:(NSDictionary *)globalEventParams;
+@end
+
+Handle<Value> Util_prepareEvent(const Arguments &args)
+{
+	Locker locker;
+	HandleScope scope;
+
+	if(args.Length() < 2) return ThrowException(String::New("Expected 2 arguments"));
+
+	if(!args[0]->IsObject()) return ThrowException(String::New("Arg 0 must be an object"));
+	TSTapstream *ts = (BRIDGE TSTapstream *)(Handle<External>::Cast(args[0]->ToObject()->GetInternalField(0))->Value());
+
+	if(!args[1]->IsObject()) return ThrowException(String::New("Arg 1 must be an object"));
+	TSEvent *e = (BRIDGE TSEvent *)(Handle<External>::Cast(args[1]->ToObject()->GetInternalField(0))->Value());
+	
+	[e prepare:ts.config.globalEventParams];
+
+	return Undefined();
+}
+
 Handle<Value> Util_newHit(const Arguments &args)
 {
 	Locker locker;
@@ -871,6 +894,7 @@ int main(int argc, char *argv[])
 		templ->Set(String::New("newConfig"), FunctionTemplate::New(InvocationCallback(Util_newConfig))->GetFunction(), ReadOnly);
 		templ->Set(String::New("newTapstream"), FunctionTemplate::New(InvocationCallback(Util_newTapstream))->GetFunction(), ReadOnly);
 		templ->Set(String::New("newEvent"), FunctionTemplate::New(InvocationCallback(Util_newEvent))->GetFunction(), ReadOnly);
+		templ->Set(String::New("prepareEvent"), FunctionTemplate::New(InvocationCallback(Util_prepareEvent))->GetFunction(), ReadOnly);
 		templ->Set(String::New("newHit"), FunctionTemplate::New(InvocationCallback(Util_newHit))->GetFunction(), ReadOnly);
 		templ->Set(String::New("setSetGlobalParam"), FunctionTemplate::New(InvocationCallback(Util_objcSetSetGlobalParam))->GetFunction(), ReadOnly);
 		Handle<Object> util = templ->NewInstance();

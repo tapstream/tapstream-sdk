@@ -140,7 +140,7 @@ test('event-null-param', function() {
 	callMethod(e, 'addPair', 'key', null);
 	util.prepareEvent(ts, e);
 	var pd = callGetter(e, 'postData');
-	util.assertTrue(pd.indexOf('&created-ms=') != -1);
+	util.assertTrue(pd.indexOf('&custom-key=') == -1);
 });
 test('event-param-int', function() {
 	var q = util.newOperationQueue(),

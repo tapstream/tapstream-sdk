@@ -16,7 +16,15 @@
 	id<TSPlatform> platform;
 	id<TSCoreListener> listener;
 	TSCore *core;
+	TSConfig *config;
 }
+
+@property(nonatomic, STRONG_OR_RETAIN) id<TSDelegate> del;
+@property(nonatomic, STRONG_OR_RETAIN) id<TSPlatform> platform;
+@property(nonatomic, STRONG_OR_RETAIN) id<TSCoreListener> listener;
+@property(nonatomic, STRONG_OR_RETAIN) TSCore *core;
+@property(nonatomic, STRONG_OR_RETAIN) TSConfig *config;
+
 
 - (id)initWithOperationQueue:(TSOperationQueue *)q accountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)config;
 - (void)fireEvent:(TSEvent *)event;
