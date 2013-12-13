@@ -21,6 +21,7 @@ namespace TapstreamMetrics.Sdk
         string GetAppSpecificHardwareId();
 #endif
         string GetAppName();
+        string GetAppVersion();
         string GetPackageName();
         Response Request(string url, string data, string method);
     }

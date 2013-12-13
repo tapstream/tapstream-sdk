@@ -256,6 +256,7 @@ test('required-post-data', function() {
 	util.assertTrue(pd.search('resolution=') != -1);
 	util.assertTrue(pd.search('locale=') != -1);
 	util.assertTrue(pd.search('app-name=') != -1);
+	util.assertTrue(pd.search('app-version=') != -1);
 	util.assertTrue(pd.search('package-name=') != -1);
 	util.assertTrue(pd.search('gmtoffset=') != -1);
 });

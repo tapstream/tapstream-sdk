@@ -68,6 +68,11 @@ namespace TapstreamMetrics.Sdk
             return "Test App";
         }
 
+        public string GetAppVersion()
+        {
+            return "1.0.0.0";
+        }
+
         public string GetPackageName()
         {
             return "com.test.TestApp";

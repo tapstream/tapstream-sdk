@@ -212,6 +212,16 @@ namespace TapstreamMetrics.Sdk
 #endif
         }
 
+        public string GetAppVersion()
+        {
+#if TEST_WINPHONE || WINDOWS_PHONE
+            AssemblyName nameHelper = new AssemblyName(Application.Current.GetType().Assembly.FullName);
+            return nameHelper.Version.ToString();
+#else
+            return Package.Current.Id.Version.ToString();
+#endif
+        }
+
         public string GetPackageName()
         {
 #if TEST_WINPHONE || WINDOWS_PHONE

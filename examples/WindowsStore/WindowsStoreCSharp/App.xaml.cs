@@ -23,19 +23,6 @@ using System.Threading.Tasks;
 
 namespace WindowsStoreCSharp
 {
-    class ConversionListener : TapstreamMetrics.Sdk.ConversionListener
-    {
-        public void ConversionInfo(string jsonInfo)
-        {
-            JsonArray obj;
-            if (JsonArray.TryParse(jsonInfo, out obj))
-            {
-                // Read some data from this json object, and modify your application's behaviour accordingly
-                // ...
-            }
-        }
-    };
-
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
     /// </summary>
@@ -55,12 +42,26 @@ namespace WindowsStoreCSharp
             config.GlobalEventParams["locale"] = "ENU";
             config.GlobalEventParams["user_id"] = "92429d82a41e";
 
-            config.ConversionListener = new ConversionListener();
-
             Tapstream.Create("sdktest", "YGP2pezGTI6ec48uti4o1w", config);
 
             Tapstream tracker = Tapstream.Instance;
-
+            var op = tracker.GetConversionDataAsync().AsTask<string>().ContinueWith((task) => {
+                string jsonData = task.Result;
+                if (jsonData == null)
+                {
+                    // No conversion data available
+                }
+                else
+                {
+                    JsonObject json = null;
+                    if (JsonObject.TryParse(jsonData, out json))
+                    {
+                        // Read some data from this json object, and modify your application's behaviour accordingly
+                        // ...
+                    }
+                }
+            });
+            
             Event e = new Event("test-event", false);
             e.AddPair("player", "John Doe");
             e.AddPair("score", 5);

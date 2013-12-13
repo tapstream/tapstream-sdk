@@ -105,5 +105,18 @@ namespace TapstreamMetrics.Sdk
             return core.FireHitAsync(h);
         }
 #endif
+
+#if TEST_WINPHONE || WINDOWS_PHONE
+        public void GetConversionData(ConversionListener listener)
+        {
+            core.GetConversionData(listener);
+        }
+#else
+        public IAsyncOperation<string> GetConversionDataAsync()
+        {
+            return core.GetConversionDataAsync();
+        }
+#endif
+
     }
 }

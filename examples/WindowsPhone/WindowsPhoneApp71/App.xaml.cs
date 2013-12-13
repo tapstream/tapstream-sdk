@@ -28,15 +28,22 @@ namespace WindowsPhoneApp71
 
     class MyConversionListener : ConversionListener
     {
-        public void ConversionInfo(string jsonInfo)
+        public void ConversionData(string jsonData)
         {
-            try
+            if (jsonData == null)
             {
-                JArray obj = JArray.Parse(jsonInfo);
-                // Read some data from this json object, and modify your application's behaviour accordingly
-                // ...
+                // No conversion data available
             }
-            catch (Exception) {}
+            else
+            {
+                try
+                {
+                    JObject obj = JObject.Parse(jsonData);
+                    // Read some data from this json object, and modify your application's behaviour accordingly
+                    // ...
+                }
+                catch (Exception) { }
+            }
         }
     };
 
@@ -65,11 +72,12 @@ namespace WindowsPhoneApp71
 
             Config config = new Config();
             config.InstallEventName = "my-custom-install";
-            config.ConversionListener = new MyConversionListener();
             
             Tapstream.Create("sdktest", "YGP2pezGTI6ec48uti4o1w", config);
 
             Tapstream tracker = Tapstream.Instance;
+
+            tracker.GetConversionData(new MyConversionListener());
 
             Event e = new Event("test-event", false);
             e.AddPair("player", "John Doe");

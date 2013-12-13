@@ -62,6 +62,10 @@ class PlatformImpl implements Platform {
 	public String getAppName() {
 		return "Test App";
 	}
+	
+	public String getAppVersion() {
+		return "1.0.0.0";
+	}
 
 	public String getPackageName() {
 		return "com.test.TestApp";

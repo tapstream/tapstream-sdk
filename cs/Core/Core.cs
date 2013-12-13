@@ -115,49 +115,6 @@ namespace TapstreamMetrics.Sdk
                     }
                 };
             }
-
-            if(config.ConversionListener != null)
-            {
-                string url = String.Format(CONVERSION_URL_TEMPLATE, secret, platform.LoadUuid());
-                int tries = 0;
-
-#if WINDOWS_PHONE
-                Action conversionCheck = null;
-                conversionCheck = new Action(() =>
-#else
-                Action<Task> conversionCheck = null;
-                conversionCheck = new Action<Task>((prevResult) =>
-#endif
-                {
-                    tries++;
-                    bool retry = true;
-
-                    Response res = platform.Request(url, null, "GET");
-                    if (res.Status >= 200 && res.Status < 300)
-                    {
-                        if (!new Regex("^\\s*\\[\\s*\\]\\s*$").IsMatch(res.Data))
-                        {
-                            retry = false;
-                            config.ConversionListener.ConversionInfo(res.Data);
-                        }
-                    }
-
-                    if (retry && tries <= CONVERSION_POLL_COUNT)
-                    {
-#if WINDOWS_PHONE
-                        scheduler.Schedule(conversionCheck, TimeSpan.FromSeconds(CONVERSION_POLL_INTERVAL));
-#else
-                        Task.Delay(TimeSpan.FromSeconds(CONVERSION_POLL_INTERVAL)).ContinueWith(conversionCheck);
-#endif
-                    }
-                });
-
-#if WINDOWS_PHONE
-				scheduler.Schedule(conversionCheck, TimeSpan.FromSeconds(CONVERSION_POLL_INTERVAL));
-#else
-                Task.Delay(TimeSpan.FromSeconds(CONVERSION_POLL_INTERVAL)).ContinueWith(conversionCheck);
-#endif
-            }
 		}
 
 		public void FireEvent(Event e)
@@ -346,6 +303,71 @@ namespace TapstreamMetrics.Sdk
 #endif
 		}
 
+
+#if WINDOWS_PHONE
+        public void GetConversionData(ConversionListener listener)
+        {
+            string url = String.Format(CONVERSION_URL_TEMPLATE, secret, platform.LoadUuid());
+            int tries = 0;
+
+            Action action = null;
+            action = new Action(() =>
+            {
+                tries++;
+
+                Response res = platform.Request(url, null, "GET");
+                if (res.Status >= 200 && res.Status < 300)
+                {
+                    if (!new Regex("^\\s*\\[\\s*\\]\\s*$").IsMatch(res.Data))
+                    {
+                        listener.ConversionData(res.Data);
+                        return;
+                    }
+                }
+
+                if (tries >= CONVERSION_POLL_COUNT)
+                {
+                    listener.ConversionData(null);
+                    return;
+                }                
+
+                scheduler.Schedule(action, TimeSpan.FromSeconds(CONVERSION_POLL_INTERVAL));
+            });
+            scheduler.Schedule(action);
+        }
+#else
+        public IAsyncOperation<string> GetConversionDataAsync()
+        {
+            string url = String.Format(CONVERSION_URL_TEMPLATE, secret, platform.LoadUuid());
+            int tries = 0;
+
+            Func<string> t = null;
+            t = new Func<string>(() =>
+            {
+                tries++;
+
+                Response res = platform.Request(url, null, "GET");
+                if (res.Status >= 200 && res.Status < 300)
+                {
+                    if (!new Regex("^\\s*\\[\\s*\\]\\s*$").IsMatch(res.Data))
+                    {
+                        return res.Data;
+                    }
+                }
+
+                if (tries >= CONVERSION_POLL_COUNT)
+                {
+                    return null;
+                }
+
+                Task.Delay(TimeSpan.FromSeconds(CONVERSION_POLL_INTERVAL)).RunSynchronously();
+                return Task<string>.Run(t).Result;
+            });
+
+            return Task<string>.Run(t).AsAsyncOperation<string>();
+        }
+#endif
+
 		public string GetPostData()
 		{
 			return postData.ToString();
@@ -427,6 +449,7 @@ namespace TapstreamMetrics.Sdk
             AppendPostPair("", "resolution", platform.GetResolution());
             AppendPostPair("", "locale", platform.GetLocale());
             AppendPostPair("", "app-name", platform.GetAppName());
+            AppendPostPair("", "app-version", platform.GetAppVersion());
             AppendPostPair("", "package-name", platform.GetPackageName());
             AppendPostPair("", "gmtoffset", DateTimeOffset.Now.Offset.TotalSeconds);
 		}

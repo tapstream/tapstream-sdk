@@ -29,6 +29,8 @@ interface Platform {
 	public String getAndroidId();
 
 	public String getAppName();
+	
+	public String getAppVersion();
 
 	public String getPackageName();
 

@@ -5,7 +5,6 @@ import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -337,6 +336,7 @@ class Core {
 		appendPostPair("", "resolution", platform.getResolution());
 		appendPostPair("", "locale", platform.getLocale());
 		appendPostPair("", "app-name", platform.getAppName());
+		appendPostPair("", "app-version", platform.getAppVersion());
 		appendPostPair("", "package-name", platform.getPackageName());
 
 		int offsetFromUtc = TimeZone.getDefault().getOffset((new Date()).getTime()) / 1000;
