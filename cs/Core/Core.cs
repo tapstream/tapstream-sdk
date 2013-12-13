@@ -170,9 +170,10 @@ namespace TapstreamMetrics.Sdk
 		        }
 
 
-				// Notify the event that we are going to fire it so it can record the time
-				e.Firing();
-
+                // Add global event params if they have not yet been added
+                // Notify the event that we are going to fire it so it can record the time and bake its post data
+                e.Prepare(config.GlobalEventParams);
+                
 				if (e.OneTimeOnly)
 				{
 					if (firedEvents.Contains(e.Name))
@@ -428,12 +429,6 @@ namespace TapstreamMetrics.Sdk
             AppendPostPair("", "app-name", platform.GetAppName());
             AppendPostPair("", "package-name", platform.GetPackageName());
             AppendPostPair("", "gmtoffset", DateTimeOffset.Now.Offset.TotalSeconds);
-
-            // Add global custom params
-            foreach (string key in config.GlobalEventParams.Keys)
-            {
-                AppendPostPair("custom-", key, config.GlobalEventParams[key]);
-            }
 		}
 
 	}

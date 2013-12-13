@@ -2,7 +2,10 @@ package com.tapstream.sdk;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,10 +15,10 @@ public class Event {
 	private String name;
 	private String encodedName;
 	private boolean oneTimeOnly;
-	private StringBuilder postData = null;
-
+	private StringBuilder postData = new StringBuilder();
 	private boolean isTransaction = false;
 	private String productSku;
+	Map<String, Object> customFields = new HashMap<String, Object>();
 
 	public Event(String name, boolean oneTimeOnly) {
 		uid = makeUid();
@@ -28,7 +31,10 @@ public class Event {
 		this("", false);
 		isTransaction = true;
 		this.productSku = productSku;
-		initialize(orderId, productSku, quantity);
+
+		addPair("", "purchase-transaction-id", orderId);
+		addPair("", "purchase-product-id", productSku);
+		addPair("", "purchase-quantity", quantity);
 	}
 
 	// Only to be used for creating custom purchase events
@@ -36,7 +42,12 @@ public class Event {
 		this("", false);
 		isTransaction = true;
 		this.productSku = productSku; 
-		initialize(orderId, productSku, quantity, priceInCents, currencyCode);
+
+		addPair("", "purchase-transaction-id", orderId);
+		addPair("", "purchase-product-id", productSku);
+		addPair("", "purchase-quantity", quantity);
+		addPair("", "purchase-price", priceInCents);
+		addPair("", "purchase-currency", currencyCode);
 	}
 
 	// Only to be used for creating IAB purchase events
@@ -50,15 +61,23 @@ public class Event {
 			String currencyCode = skuDetails.getString("price_currency_code");
 			int priceMicros = skuDetails.getInt("price_amount_micros");
 			int priceCenti = (int)Math.round(priceMicros / 10000.0);
-			initialize(orderId, productSku, 1, priceCenti, currencyCode);
+
+			addPair("", "purchase-transaction-id", orderId);
+			addPair("", "purchase-product-id", productSku);
+			addPair("", "purchase-quantity", 1);
+			addPair("", "purchase-price", priceCenti);
+			addPair("", "purchase-currency", currencyCode);
+			
 		} catch (JSONException e) {
 			// Older versions of the Google Play Store app don't send the currency and amount separately
-			initialize(orderId, productSku, 1);
+			addPair("", "purchase-transaction-id", orderId);
+			addPair("", "purchase-product-id", productSku);
+			addPair("", "purchase-quantity", 1);
 		}
 	}
 
 	public void addPair(String key, Object value) {
-		addPair("custom-", key, value);
+		customFields.put(key, value);
 	}
 
 	public String getUid() {
@@ -78,14 +97,29 @@ public class Event {
 	}
 
 	public String getPostData() {
-		String data = postData != null ? postData.toString() : "";
-		return String.format(Locale.US, "&created-ms=%.0f", firstFiredTime) + data;
+		return postData != null ? postData.toString() : "";
 	}
 
-	void firing() {
+	boolean isPrepared() {
+		return firstFiredTime != 0;
+	}
+	
+	void prepare(final Map<String, Object> globalEventParams) {
 		// Only record the time of the first fire attempt
 		if (firstFiredTime == 0) {
 			firstFiredTime = System.currentTimeMillis();
+			
+			for(Map.Entry<String, Object> entry : globalEventParams.entrySet()) {
+				if(!customFields.containsKey(entry.getKey())) {
+					customFields.put(entry.getKey(), entry.getValue());
+				}
+			}
+
+			postData.append(String.format(Locale.US, "&created-ms=%.0f", firstFiredTime));
+			
+			for(Map.Entry<String, Object> entry : customFields.entrySet()) {
+				addPair("custom-", entry.getKey(), entry.getValue());
+			}
 		}
 	}
 
@@ -106,33 +140,15 @@ public class Event {
 		setName(String.format(Locale.US, "android-%s-purchase-%s", appName, productSku));
 	}
 
-	private void initialize(String orderId, String productSku, int quantity) {
-		addPair("", "purchase-transaction-id", orderId);
-		addPair("", "purchase-product-id", productSku);
-		addPair("", "purchase-quantity", quantity);
-	}
-
-	private void initialize(String orderId, String productSku, int quantity, int priceInCents, String currencyCode) {
-		addPair("", "purchase-transaction-id", orderId);
-		addPair("", "purchase-product-id", productSku);
-		addPair("", "purchase-quantity", quantity);
-		addPair("", "purchase-price", priceInCents);
-		addPair("", "purchase-currency", currencyCode);
-	}
-
 	private String makeUid() {
 		return String.format(Locale.US, "%d:%f", System.currentTimeMillis(), Math.random());
 	}
-
+	
 	protected void addPair(String prefix, String key, Object value) {
-		String encodedPair = Utils.encodeEventPair(prefix, key, value);
-		if(encodedPair == null) {
-			return;
-		}
-		if(postData == null) {
-			postData = new StringBuilder();
-		}
-		postData.append("&");
-		postData.append(encodedPair);
+        String encodedPair = Utils.encodeEventPair(prefix, key, value);
+        if(encodedPair != null) {
+	        postData.append("&");
+	        postData.append(encodedPair);
+        }
 	}
 };

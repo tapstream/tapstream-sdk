@@ -99,6 +99,10 @@ public class TestRunner {
 			return new Event(purchase, skuDetails);
 		}
 
+		public void prepareEvent(Tapstream ts, Event e) {
+			e.prepare(ts.config.globalEventParams);
+		}
+
 		public Hit newHit(String trackerName) {
 			return new Hit(trackerName);
 		}

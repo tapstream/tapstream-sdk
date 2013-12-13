@@ -93,34 +93,6 @@ class Core {
 				}
 			}
 		});
-
-		if(config.getConversionListener() != null) {
-			final String url = String.format(Locale.US, CONVERSION_URL_TEMPLATE, secret, platform.loadUuid());
-			Runnable task = new Runnable() {
-				private int tries = 0;
-				
-				@Override
-				public void run() {
-					tries++;
-					boolean retry = true;
-					
-					Response res = platform.request(url, null, "GET");
-					if(res.status >= 200 && res.status < 300) {
-						Matcher m = Pattern.compile("^\\s*\\[\\s*\\]\\s*$").matcher(res.data);
-						if(!m.matches())
-						{
-							retry = false;
-							config.getConversionListener().conversionInfo(res.data);
-						}
-					}
-					
-					if(retry && tries <= CONVERSION_POLL_COUNT) {
-						executor.schedule(this, CONVERSION_POLL_INTERVAL, TimeUnit.SECONDS);
-					}
-				}
-			};
-			executor.schedule(task, CONVERSION_POLL_INTERVAL, TimeUnit.SECONDS);
-		}
 	}
 
 	public synchronized void fireEvent(final Event e) {
@@ -130,9 +102,10 @@ class Core {
 			e.setNamePrefix(appName);
 		}
 
-		// Notify the event that we are going to fire it so it can record the time
-		e.firing();
-
+		// Add global event params if they have not yet been added
+		// Notify the event that we are going to fire it so it can record the time and bake its post data
+		e.prepare(config.globalEventParams);
+		
 		if (e.isOneTimeOnly()) {
 			if (firedEvents.contains(e.getName())) {
 				Logging.log(Logging.INFO, "Tapstream ignoring event named \"%s\" because it is a one-time-only event that has already been fired", e.getName());
@@ -261,7 +234,40 @@ class Core {
 		};
 		executor.schedule(task, 0, TimeUnit.SECONDS);
 	}
-
+	
+	public void getConversionData(final ConversionListener completion)
+	{
+		if(config.getConversionListener() != null) {
+			final String url = String.format(Locale.US, CONVERSION_URL_TEMPLATE, secret, platform.loadUuid());
+			Runnable task = new Runnable() {
+				private int tries = 0;
+				
+				@Override
+				public void run() {
+					tries++;
+					
+					Response res = platform.request(url, null, "GET");
+					if(res.status >= 200 && res.status < 300) {
+						Matcher m = Pattern.compile("^\\s*\\[\\s*\\]\\s*$").matcher(res.data);
+						if(!m.matches())
+						{
+							completion.conversionData(res.data);
+							return;
+						}
+					}
+					
+					if(tries >= CONVERSION_POLL_COUNT) {
+						completion.conversionData(null);
+						return;
+					}
+					
+					executor.schedule(this, CONVERSION_POLL_INTERVAL, TimeUnit.SECONDS);
+				}
+			};
+			executor.schedule(task, CONVERSION_POLL_INTERVAL, TimeUnit.SECONDS);
+		}
+	}
+	
 	public String getPostData() {
 		return postData.toString();
 	}
@@ -335,10 +341,5 @@ class Core {
 
 		int offsetFromUtc = TimeZone.getDefault().getOffset((new Date()).getTime()) / 1000;
 		appendPostPair("", "gmtoffset", offsetFromUtc);
-		
-		// Add global custom params
-		for(Map.Entry<String, Object> entry : config.globalEventParams.entrySet()) {
-			appendPostPair("custom-", entry.getKey(), entry.getValue());
-		}
 	}
 }

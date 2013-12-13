@@ -294,7 +294,7 @@
 			}
 			else
 			{
-				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream fired event named \"%@\", %@", e.name, data];
+				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream fired event named \"%@\"", e.name];
 				[listener reportOperation:@"event-succeeded" arg:e.encodedName];
 			}
 		

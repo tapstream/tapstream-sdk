@@ -100,6 +100,11 @@ namespace TapstreamMetrics.Sdk
             return new Event(transactionId, productId, quantity, priceInCents, currencyCode);
         }
 
+        public void prepareEvent(Tapstream ts, Event e)
+        {
+            e.Prepare(ts.config.GlobalEventParams);
+        }
+
         public Hit newHit(string trackerName)
         {
             return new Hit(trackerName);

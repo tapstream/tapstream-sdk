@@ -24,11 +24,13 @@ class Tapstream implements Api {
 	public Platform platform;
 	private CoreListener listener;
 	public Core core;
+	public Config config;
 
 	public Tapstream(OperationQueue queue, String accountName, String developerSecret, Config config) {
 		delegate = new DelegateImpl();
 		platform = new PlatformImpl();
 		listener = new CoreListenerImpl(queue);
+		this.config = config;
 		core = new Core(delegate, platform, listener, new ActivityEventSource(), accountName, developerSecret, config);
 		core.start();
 	}

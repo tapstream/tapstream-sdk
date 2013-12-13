@@ -34,12 +34,14 @@ namespace TapstreamMetrics.Sdk
         private Platform platform;
         private CoreListener listener;
         private Core core;
+        public Config config;
 
         public Tapstream(OperationQueue queue, string accountName, string developerSecret, Config config)
         {
             del = new DelegateImpl();
             platform = new PlatformImpl();
             listener = new CoreListenerImpl(queue);
+            this.config = config;
             core = new Core(del, platform, listener, null, accountName, developerSecret, config);
             core.Start();
         }

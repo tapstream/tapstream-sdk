@@ -74,4 +74,8 @@ public class Tapstream implements Api {
 	public void fireHit(Hit h, CompletionHandler completion) {
 		core.fireHit(h, completion);
 	}
+	
+	public void getConversionData(ConversionListener completion) {
+		core.getConversionData(completion);
+	}
 }

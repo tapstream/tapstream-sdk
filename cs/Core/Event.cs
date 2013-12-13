@@ -14,7 +14,8 @@ namespace TapstreamMetrics.Sdk
         private string name;
         private string encodedName;
         private bool oneTimeOnly;
-        private StringBuilder postData = null;
+        private StringBuilder postData = new StringBuilder();
+        internal IDictionary<string, object> customFields = new Dictionary<string, object>();
 
         private bool isTransaction = false;
         private string productId;
@@ -53,7 +54,7 @@ namespace TapstreamMetrics.Sdk
 
         public void AddPair(string key, Object value)
         {
-            AddPair("custom-", key, value);
+            customFields.Add(key, value);
         }
 
         public string Uid
@@ -92,8 +93,7 @@ namespace TapstreamMetrics.Sdk
         {
             get
             {
-                string result = postData != null ? postData.ToString() : "";
-                return String.Format("&created-ms={0:0.}", firstFiredTime) + result;
+                return postData != null ? postData.ToString() : "";
             }
         }
 
@@ -105,13 +105,36 @@ namespace TapstreamMetrics.Sdk
             }
         }
 
-        internal void Firing()
+        internal bool IsPrepared
+        {
+            get
+            {
+                return firstFiredTime != 0;
+            }
+        }
+
+        internal void Prepare(IDictionary<string, object> globalEventParams)
         {
             // Only record the time of the first fire attempt
             if(firstFiredTime == 0)
             {
                 TimeSpan t = (DateTime.UtcNow - new DateTime(1970, 1, 1));
                 firstFiredTime = t.TotalMilliseconds;
+
+                foreach (string key in globalEventParams.Keys)
+                {
+                    if (!customFields.ContainsKey(key))
+                    {
+                        customFields.Add(key, globalEventParams[key]);
+                    }
+                }
+
+                postData.Append(String.Format("&created-ms={0:0.}", firstFiredTime));
+
+                foreach (string key in customFields.Keys)
+                {
+                    AddPair("custom-", key, customFields[key]);
+                }
             }
         }
 
@@ -128,18 +151,12 @@ namespace TapstreamMetrics.Sdk
 
         private void AddPair(string prefix, string key, Object value)
         {
-            string encodedPair = Utils.EncodeEventPair("custom-", key, value);
-            if (encodedPair == null)
+            string encodedPair = Utils.EncodeEventPair(prefix, key, value);
+            if (encodedPair != null)
             {
-                return;
+                postData.Append("&");
+                postData.Append(encodedPair);
             }
-
-            if (postData == null)
-            {
-                postData = new StringBuilder();
-            }
-            postData.Append("&");
-            postData.Append(encodedPair);
         }
     }
 }

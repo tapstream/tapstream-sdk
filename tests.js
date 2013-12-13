@@ -110,6 +110,9 @@ util.log('Running ' + language + ' tests');
 
 // Event tests
 test('event', function() {
+	var q = util.newOperationQueue(),
+		conf = util.newConfig(),
+		ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
 	var e = util.newEvent('test1', false);
 	util.assertEqual('test1', callGetter(e, 'name'));
 	util.assertEqual(false, callGetter(e, 'oneTimeOnly'));
@@ -118,59 +121,101 @@ test('event', function() {
 	util.assertEqual(true, callGetter(e, 'oneTimeOnly'));
 });
 test('event-params', function() {
+	var q = util.newOperationQueue(),
+		conf = util.newConfig(),
+		ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
 	var e = util.newEvent('test', false);
 	callMethod(e, 'addPair', 'key1', 'val1');
 	callMethod(e, 'addPair', 'key2', 'val2');
-	util.assertEqual(
-		'&created-ms=0&custom-key1=val1&custom-key2=val2',
-		callGetter(e, 'postData')
-	);
+	util.prepareEvent(ts, e);
+	var pd = callGetter(e, 'postData');
+	util.assertTrue(pd.indexOf('&custom-key1=val1') != -1);
+	util.assertTrue(pd.indexOf('&custom-key2=val2') != -1);
 });
 test('event-null-param', function() {
+	var q = util.newOperationQueue(),
+		conf = util.newConfig(),
+		ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
 	var e = util.newEvent('test', false);
 	callMethod(e, 'addPair', 'key', null);
-	util.assertEqual('&created-ms=0', callGetter(e, 'postData'));
+	util.prepareEvent(ts, e);
+	var pd = callGetter(e, 'postData');
+	util.assertTrue(pd.indexOf('&created-ms=') != -1);
 });
 test('event-param-int', function() {
+	var q = util.newOperationQueue(),
+		conf = util.newConfig(),
+		ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
 	var e = util.newEvent('test', false);
 	callMethod(e, 'addPair', 'key', -13);
-	util.assertEqual('&created-ms=0&custom-key=-13', callGetter(e, 'postData'));
+	util.prepareEvent(ts, e);
+	var pd = callGetter(e, 'postData');
+	util.assertTrue(pd.indexOf('&created-ms=') != -1);
+	util.assertTrue(pd.indexOf('&custom-key=-13') != -1);
 });
 test('event-param-uint', function() {
+	var q = util.newOperationQueue(),
+		conf = util.newConfig(),
+		ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
 	var e = util.newEvent('test', false);
 	callMethod(e, 'addPair', 'key', 4294967295);
-	util.assertEqual('&created-ms=0&custom-key=4294967295', callGetter(e, 'postData'));
+	util.prepareEvent(ts, e);
+	var pd = callGetter(e, 'postData');
+	util.assertTrue(pd.indexOf('&created-ms=') != -1);
+	util.assertTrue(pd.indexOf('&custom-key=4294967295') != -1);
 });
 test('event-param-double', function() {
+	var q = util.newOperationQueue(),
+		conf = util.newConfig(),
+		ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
 	var e = util.newEvent('test', false);
 	callMethod(e, 'addPair', 'key', 4.8);
-	util.assertEqual('&created-ms=0&custom-key=4.8', callGetter(e, 'postData'));
+	util.prepareEvent(ts, e);
+	var pd = callGetter(e, 'postData');
+	util.assertTrue(pd.indexOf('&created-ms=') != -1);
+	util.assertTrue(pd.indexOf('&custom-key=4.8') != -1);
 });
 test('event-param-encoding', function() {
+	var q = util.newOperationQueue(),
+		conf = util.newConfig(),
+		ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
 	var e = util.newEvent('test', false);
 	callMethod(e, 'addPair', " !#$&'()+,/:;=?@[]", " !#$&'()+,/:;=?@[]-_.");
-	util.assertEqual(
-		'&created-ms=0&custom-%20%21%23%24%26%27%28%29%2B%2C%2F%3A%3B%3D%3F%40%5B%5D=%20%21%23%24%26%27%28%29%2B%2C%2F%3A%3B%3D%3F%40%5B%5D-_.',
-		callGetter(e, 'postData')
-	);
+	util.prepareEvent(ts, e);
+	var pd = callGetter(e, 'postData');
+	util.assertTrue(pd.indexOf('&created-ms=') != -1);
+	util.assertTrue(pd.indexOf('&custom-%20%21%23%24%26%27%28%29%2B%2C%2F%3A%3B%3D%3F%40%5B%5D=%20%21%23%24%26%27%28%29%2B%2C%2F%3A%3B%3D%3F%40%5B%5D-_.') != -1);
 });
 test('event-param-encoding-unicode', function() {
+	var q = util.newOperationQueue(),
+		conf = util.newConfig(),
+		ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
 	var e = util.newEvent('test', false);
 	callMethod(e, 'addPair', 'key\u01c5\u1667', 'value\u1511\u167b');
-	util.assertEqual(
-		'&created-ms=0&custom-key%C7%85%E1%99%A7=value%E1%94%91%E1%99%BB',
-		callGetter(e, 'postData')
-	);
+	util.prepareEvent(ts, e);
+	var pd = callGetter(e, 'postData');
+	util.assertTrue(pd.indexOf('&created-ms=') != -1);
+	util.assertTrue(pd.indexOf('&custom-key%C7%85%E1%99%A7=value%E1%94%91%E1%99%BB') != -1);
 });
 test('event-long-key', function() {
+	var q = util.newOperationQueue(),
+		conf = util.newConfig(),
+		ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
 	var e = util.newEvent('test', false);
 	callMethod(e, 'addPair', string256, 'val');
-	util.assertEqual('&created-ms=0', callGetter(e, 'postData'));
+	util.prepareEvent(ts, e);
+	var pd = callGetter(e, 'postData');
+	util.assertTrue(pd.indexOf('&aaaaaaaaaaaaa') == -1);
 });
 test('event-long-value', function() {
+	var q = util.newOperationQueue(),
+		conf = util.newConfig(),
+		ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
 	var e = util.newEvent('test', false);
 	callMethod(e, 'addPair', 'key', string256);
-	util.assertEqual('&created-ms=0', callGetter(e, 'postData'));
+	util.prepareEvent(ts, e);
+	var pd = callGetter(e, 'postData');
+	util.assertTrue(pd.indexOf('=aaaaaaaaaaaaa') == -1);
 });
 
 
@@ -651,13 +696,27 @@ test('global-params', function() {
 	util.setSetGlobalParam(conf, 'global-test-1', 'hello world');
 	util.setSetGlobalParam(conf, 'global-test-2', 'test');
 	var ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
-		pd = util.getPostData(ts);
-	util.log(pd);
-	util.assertTrue(pd.search('custom-global-test-1=hello%20world') != -1);
-	util.assertTrue(pd.search('custom-global-test-2=test') != -1);
+		pd = util.getPostData(ts),
+		e1 = util.newEvent('test1', false),
+		e2 = util.newEvent('test2', false);
+	callMethod(e1, 'addPair', 'global-test-2', 'overridden');
+	util.prepareEvent(ts, e1);
+	util.prepareEvent(ts, e2);
+	var epd1 = callGetter(e1, 'postData'),
+		epd2 = callGetter(e2, 'postData');
+
+	util.assertTrue(pd.search('&custom-global-test-1=hello%20world') == -1);
+	util.assertTrue(pd.search('&custom-global-test-2=overridden') == -1);
+	util.assertTrue(pd.search('&custom-global-test-2=test') == -1);
+
+	util.assertTrue(epd1.search('&custom-global-test-1=hello%20world') != -1);
+	util.assertTrue(epd1.search('&custom-global-test-2=overridden') != -1);
+	util.assertTrue(epd1.search('&custom-global-test-2=test') == -1);
+
+	util.assertTrue(epd2.search('&custom-global-test-1=hello%20world') != -1);
+	util.assertTrue(epd2.search('&custom-global-test-2=overridden') == -1);
+	util.assertTrue(epd2.search('&custom-global-test-2=test') != -1);
 });
-
-
 
 // Purchase events
 test('purchase-no-price', function() {
@@ -666,10 +725,10 @@ test('purchase-no-price', function() {
 		ts = util.newTapstream(q, 'test-account', 'test-secret', conf),
 		e = util.newEvent('order123abc', 'com.product.sku', 2),
 		pd = callGetter(e, 'postData');
-	util.log(pd);
-	util.assertTrue(pd.search('purchase-transaction-id=order123abc') != -1);
-	util.assertTrue(pd.search('purchase-product-id=com.product.sku') != -1);
-	util.assertTrue(pd.search('purchase-quantity=2') != -1);
+	util.log('Event post data: ' + pd);
+	util.assertTrue(pd.search('&purchase-transaction-id=order123abc') != -1);
+	util.assertTrue(pd.search('&purchase-product-id=com.product.sku') != -1);
+	util.assertTrue(pd.search('&purchase-quantity=2') != -1);
 	consumeAutomaticEvents(q);
 	callMethod(ts, 'fireEvent', e);
 	consumeEvent(q, platform+'-test%20app-purchase-com.product.sku');
@@ -681,11 +740,11 @@ test('purchase-with-price', function() {
 		e = util.newEvent('order123abc', 'com.product.sku', 2, 299, 'USD'),
 		pd = callGetter(e, 'postData');
 	util.log(pd);
-	util.assertTrue(pd.search('purchase-transaction-id=order123abc') != -1);
-	util.assertTrue(pd.search('purchase-product-id=com.product.sku') != -1);
-	util.assertTrue(pd.search('purchase-quantity=2') != -1);
-	util.assertTrue(pd.search('purchase-price=299') != -1);
-	util.assertTrue(pd.search('purchase-currency=USD') != -1);
+	util.assertTrue(pd.search('&purchase-transaction-id=order123abc') != -1);
+	util.assertTrue(pd.search('&purchase-product-id=com.product.sku') != -1);
+	util.assertTrue(pd.search('&purchase-quantity=2') != -1);
+	util.assertTrue(pd.search('&purchase-price=299') != -1);
+	util.assertTrue(pd.search('&purchase-currency=USD') != -1);
 	consumeAutomaticEvents(q);
 	callMethod(ts, 'fireEvent', e);
 	consumeEvent(q, platform+'-test%20app-purchase-com.product.sku');
@@ -703,11 +762,11 @@ if(language == 'java') {
 				'{"productId": "com.product.sku", "type": "inapp", "price": "$2.99", "title": "Gold Coins", "Description": "Coins to buy stuff with", "price_amount_micros": 2990000, "price_currency_code": "USD"}'),
 			pd = callGetter(e, 'postData');
 		util.log(pd);
-		util.assertTrue(pd.search('purchase-transaction-id=order123abc') != -1);
-		util.assertTrue(pd.search('purchase-product-id=com.product.sku') != -1);
-		util.assertTrue(pd.search('purchase-quantity=1') != -1);
-		util.assertTrue(pd.search('purchase-price=299') != -1);
-		util.assertTrue(pd.search('purchase-currency=USD') != -1);
+		util.assertTrue(pd.search('&purchase-transaction-id=order123abc') != -1);
+		util.assertTrue(pd.search('&purchase-product-id=com.product.sku') != -1);
+		util.assertTrue(pd.search('&purchase-quantity=1') != -1);
+		util.assertTrue(pd.search('&purchase-price=299') != -1);
+		util.assertTrue(pd.search('&purchase-currency=USD') != -1);
 		consumeAutomaticEvents(q);
 		callMethod(ts, 'fireEvent', e);
 		consumeEvent(q, platform+'-test%20app-purchase-com.product.sku');

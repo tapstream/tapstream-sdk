@@ -17,7 +17,6 @@ import android.view.Menu;
 import com.tapstream.sdk.Config;
 import com.tapstream.sdk.ConversionListener;
 import com.tapstream.sdk.Event;
-import com.tapstream.sdk.PurchaseEvent;
 import com.tapstream.sdk.Tapstream;
 
 public class MainActivity extends Activity {
@@ -38,35 +37,38 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		Config config = new Config();
-		
-		config.globalEventParams.put("locale", "ENU");
-		config.globalEventParams.put("user_id", "92429d82a41e");
-		
+		config.globalEventParams.put("degrees", 24.5);
 		config.setOdin1("TestODINValue");
-		config.setConversionListener(new ConversionListener() {
-			@Override
-			public void conversionInfo(String jsonInfo) {
-				try {
-					JSONArray obj = new JSONArray(jsonInfo);
-					// Read some data from this json object, and modify your application's behaviour accordingly
-					// ...
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-		});
 		
 		Tapstream.create(getApplication(), "sdktest", "YGP2pezGTI6ec48uti4o1w", config);
 				
 		final Tapstream tracker = Tapstream.getInstance();
 
+		tracker.getConversionData(new ConversionListener() {
+			@Override
+			public void conversionData(String jsonData) {
+				if(jsonData == null) {
+					// No conversion data available
+					Log.d(TAG, "No conversion data");
+				} else {
+					Log.d(TAG, "Conversion data: " + jsonData);
+					try {
+						JSONArray obj = new JSONArray(jsonData);
+						// Read some data from this json object, and modify your application's behaviour accordingly
+						// ...
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+				
 		Event e = new Event("test-event", false);
 		e.addPair("player", "John Doe");
+		e.addPair("degrees", 10.1);
 		e.addPair("score", 5);
 		tracker.fireEvent(e);
 
-		e = new Event("test-event-oto", true);
-		tracker.fireEvent(e);
 		
 		final Activity self = this;
 		
@@ -111,7 +113,7 @@ public class MainActivity extends Activity {
 					try {
 						JSONObject purchaseJson = new JSONObject(purchase.mOriginalJson);
 						JSONObject skuDetailsJson = new JSONObject(skuDetails.mJson);			
-						PurchaseEvent event = new PurchaseEvent(purchaseJson, skuDetailsJson);
+						Event event = new Event(purchaseJson, skuDetailsJson);
 						Tapstream.getInstance().fireEvent(event);
 					} catch (JSONException e) {
 						e.printStackTrace();
