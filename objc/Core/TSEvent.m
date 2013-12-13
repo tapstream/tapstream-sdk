@@ -164,31 +164,31 @@
 	SUPER_DEALLOC;
 }
 
-/*
+
 - (void)addIntegerValue:(int)value forKey:(NSString *)key
 {
-	[self addValue:[TSUtils stringifyInteger:value] forKey:key];
+	[self addValue:[NSNumber numberWithInt:value] forKey:key];
 }
 
 - (void)addUnsignedIntegerValue:(uint)value forKey:(NSString *)key
 {
-	[self addValue:[TSUtils stringifyUnsignedInteger:value] forKey:key];
+	[self addValue:[NSNumber numberWithUnsignedInt:value] forKey:key];
 }
 
 - (void)addDoubleValue:(double)value forKey:(NSString *)key
 {
-	[self addValue:[TSUtils stringifyDouble:value] forKey:key];
+	[self addValue:[NSNumber numberWithDouble:value] forKey:key];
 }
 
 - (void)addFloatValue:(double)value forKey:(NSString *)key
 {
-	[self addValue:[TSUtils stringifyFloat:value] forKey:key];
+	[self addValue:[NSNumber numberWithFloat:value] forKey:key];
 }
 
 - (void)addBooleanValue:(BOOL)value forKey:(NSString *)key
 {
-	[self addValue:[TSUtils stringifyBOOL:value] forKey:key];
+	[self addValue:[NSNumber numberWithBool:value] forKey:key];
 }
-*/
+
 
 @end
