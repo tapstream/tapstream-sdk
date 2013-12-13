@@ -59,8 +59,7 @@
     <Reference Include="System.Net" />
     <Reference Include="System.Xml" />
     <Reference Include="mscorlib.extensions" />
-    <Reference Include="TapstreamMetrics, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="TapstreamMetrics">
       <HintPath>..\..\..\builds\winphone\TapstreamMetrics.dll</HintPath>
     </Reference>
   </ItemGroup>
