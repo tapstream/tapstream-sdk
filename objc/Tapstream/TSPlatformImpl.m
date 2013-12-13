@@ -169,6 +169,11 @@
 	return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
 }
 
+- (NSString *)getAppVersion
+{
+	return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+}
+
 - (NSString *)getPackageName
 {
 	return [[NSBundle mainBundle] bundleIdentifier];

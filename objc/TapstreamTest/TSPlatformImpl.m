@@ -72,6 +72,11 @@
 	return @"Test App";
 }
 
+- (NSString *)getAppVersion
+{
+	return @"1.0.0.0";
+}
+
 - (NSString *)getPackageName
 {
 	return @"com.test.TestApp";

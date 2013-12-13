@@ -22,6 +22,7 @@
 - (NSString *)getLocale;
 - (NSString *)getWifiMac;
 - (NSString *)getAppName;
+- (NSString *)getAppVersion;
 - (NSString *)getPackageName;
 - (TSResponse *)request:(NSString *)url data:(NSString *)data method:(NSString *)method;
 
