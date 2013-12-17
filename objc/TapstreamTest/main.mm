@@ -377,6 +377,10 @@ static Handle<Value> Event_accessor(Local<String> name, const AccessorInfo &info
 	{
 		return String::New([event.name UTF8String]);
 	}
+	else if(strcmp(*s, "encodedName") == 0)
+	{
+		return String::New([event.encodedName UTF8String]);
+	}
 	else if(strcmp(*s, "oneTimeOnly") == 0)
 	{
 		return v8::Boolean::New(event.isOneTimeOnly);
@@ -746,6 +750,7 @@ Handle<Value> Util_newEvent(const Arguments &args)
 	templ->SetInternalFieldCount(1);
 	templ->SetAccessor(String::New("postData"), Event_accessor);
 	templ->SetAccessor(String::New("name"), Event_accessor);
+	templ->SetAccessor(String::New("encodedName"), Event_accessor);
 	templ->SetAccessor(String::New("oneTimeOnly"), Event_accessor);
 	templ->Set(String::New("addPair"), FunctionTemplate::New(InvocationCallback(Event_addPair))->GetFunction(), ReadOnly);
 
