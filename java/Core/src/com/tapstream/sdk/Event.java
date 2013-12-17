@@ -124,7 +124,7 @@ public class Event {
 	}
 
 	void setName(String name) {
-		this.name = name.toLowerCase().trim();
+		this.name = name.toLowerCase().trim().replace(".", "_");
 		try {
 			encodedName = URLEncoder.encode(this.name, "UTF-8").replace("+", "%20");
 		} catch (UnsupportedEncodingException e) {

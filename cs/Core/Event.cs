@@ -23,9 +23,8 @@ namespace TapstreamMetrics.Sdk
         public Event(string name, bool oneTimeOnly)
         {
             uid = MakeUid();
-            this.name = name.ToLower().Trim();
+            SetName(name);
             this.oneTimeOnly = oneTimeOnly;
-            encodedName = Utils.EncodeString(this.name);
         }
 
         // This constructor is only to be used for creating custom IAP events.
@@ -130,10 +129,15 @@ namespace TapstreamMetrics.Sdk
             }
         }
 
+        internal void SetName(string eventName)
+        {
+            name = eventName.ToLower().Trim().Replace(".", "_");
+            encodedName = Utils.EncodeString(name);
+        }
+
         internal void SetNamePrefix(string platform, string appName)
         {
-            name = String.Format("{0}-{1}-purchase-{2}", platform, appName.ToLower().Trim(), productId);
-            encodedName = Utils.EncodeString(name);
+            SetName(String.Format("{0}-{1}-purchase-{2}", platform, appName.ToLower().Trim(), productId));
         }
 
         private string MakeUid()

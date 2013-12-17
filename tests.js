@@ -120,6 +120,13 @@ test('event', function() {
 	util.assertEqual('test2', callGetter(e, 'name'));
 	util.assertEqual(true, callGetter(e, 'oneTimeOnly'));
 });
+test('event-name-no-dots', function() {
+	var q = util.newOperationQueue(),
+		conf = util.newConfig(),
+		ts = util.newTapstream(q, 'test-account', 'test-secret', conf);
+	var e = util.newEvent('hello com.test.event', false);
+	util.assertEqual('hello%20com_test_event', callGetter(e, 'encodedName'));
+});
 test('event-params', function() {
 	var q = util.newOperationQueue(),
 		conf = util.newConfig(),
@@ -732,7 +739,7 @@ test('purchase-no-price', function() {
 	util.assertTrue(pd.search('&purchase-quantity=2') != -1);
 	consumeAutomaticEvents(q);
 	callMethod(ts, 'fireEvent', e);
-	consumeEvent(q, platform+'-test%20app-purchase-com.product.sku');
+	consumeEvent(q, platform+'-test%20app-purchase-com_product_sku');
 });
 test('purchase-with-price', function() {
 	var q = util.newOperationQueue(),
@@ -748,7 +755,7 @@ test('purchase-with-price', function() {
 	util.assertTrue(pd.search('&purchase-currency=USD') != -1);
 	consumeAutomaticEvents(q);
 	callMethod(ts, 'fireEvent', e);
-	consumeEvent(q, platform+'-test%20app-purchase-com.product.sku');
+	consumeEvent(q, platform+'-test%20app-purchase-com_product_sku');
 });
 
 
@@ -770,7 +777,7 @@ if(language == 'java') {
 		util.assertTrue(pd.search('&purchase-currency=USD') != -1);
 		consumeAutomaticEvents(q);
 		callMethod(ts, 'fireEvent', e);
-		consumeEvent(q, platform+'-test%20app-purchase-com.product.sku');
+		consumeEvent(q, platform+'-test%20app-purchase-com_product_sku');
 	});
 
 }

@@ -41,8 +41,7 @@
 	{
 		firstFiredTime = 0;
 		uid = RETAIN([self makeUid]);
-		name = RETAIN([[eventName lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]);
-		encodedName = RETAIN([TSUtils encodeString:name]);
+		[self setName:eventName];
 		postData = RETAIN([NSMutableString stringWithCapacity:64]);
 		isOneTimeOnly = oneTimeOnlyArg;
 		isTransaction = NO;
@@ -103,13 +102,19 @@
 	return [NSString stringWithFormat:@"%.0f:%f", t*1000, arc4random() / (float)0x10000000];
 }
 
+- (void)setName:(NSString *)eventName
+{
+	RELEASE(name);
+	name = RETAIN([[[eventName lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] stringByReplacingOccurrencesOfString:@"." withString:@"_"]);
+
+	RELEASE(encodedName);
+	encodedName = RETAIN([TSUtils encodeString:name]);
+}
+
 - (void)setTransactionNameWithAppName:(NSString *)appName platform:(NSString *)platformName
 {
 	NSString *eventName = [NSString stringWithFormat:@"%@-%@-purchase-%@", platformName, [appName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]], productId];
-	RELEASE(name);
-	name = RETAIN([[eventName lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]);
-	RELEASE(encodedName);
-	encodedName = RETAIN([TSUtils encodeString:name]);
+	[self setName:eventName];
 }
 
 - (void)addValue:(NSObject *)obj forKey:(NSString *)key
