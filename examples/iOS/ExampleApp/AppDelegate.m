@@ -11,7 +11,7 @@
 
 @implementation AppDelegate
 
-@synthesize products;
+@synthesize products, request;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -28,24 +28,24 @@
     [TSTapstream createWithAccountName:@"sdktest" developerSecret:@"YGP2pezGTI6ec48uti4o1w" config:config];
     
     TSTapstream *tracker = [TSTapstream instance];
-    [tracker getConversionData:^(NSData *jsonInfo) {
-        if(jsonInfo == nil)
-        {
-            // No conversion data available
-            NSLog(@"No conversion data");
-        }
-        else
-        {
-            NSLog(@"Conversion data: %@", [[NSString alloc] initWithData:jsonInfo encoding:NSUTF8StringEncoding]);
-            NSError *error;
-            NSArray *json = [NSJSONSerialization JSONObjectWithData:jsonInfo options:kNilOptions error:&error];
-            if(json && !error)
-            {
-                // Read some data from this json object, and modify your application's behaviour accordingly
-                // ...
-            }
-        }
-    }];
+//    [tracker getConversionData:^(NSData *jsonInfo) {
+//        if(jsonInfo == nil)
+//        {
+//            // No conversion data available
+//            NSLog(@"No conversion data");
+//        }
+//        else
+//        {
+//            NSLog(@"Conversion data: %@", [[NSString alloc] initWithData:jsonInfo encoding:NSUTF8StringEncoding]);
+//            NSError *error;
+//            NSArray *json = [NSJSONSerialization JSONObjectWithData:jsonInfo options:kNilOptions error:&error];
+//            if(json && !error)
+//            {
+//                // Read some data from this json object, and modify your application's behaviour accordingly
+//                // ...
+//            }
+//        }
+//    }];
     
     
     TSEvent *e = [TSEvent eventWithName:@"test-event" oneTimeOnly:NO];
@@ -57,11 +57,16 @@
     [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
     
     NSArray *productIds = @[@"com.tapstream.catalog.tiddlywinks"];
-    SKProductsRequest *productsRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithArray:productIds]];
-    productsRequest.delegate = self;
-    [productsRequest start];
+    request = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithArray:productIds]];
+    request.delegate = self;
+    [request start];
     
     return YES;
+}
+
+- (void)request:(SKRequest *)request didFailWithError:(NSError *)error
+{
+    NSLog(@"%@", error.description);
 }
 
 // SKProductsRequestDelegate protocol method
@@ -94,6 +99,7 @@
                 // Call the appropriate custom method.
             case SKPaymentTransactionStatePurchased:
                 NSLog(@"StatePurchased %@", transaction.payment.productIdentifier);
+                [queue finishTransaction:transaction];
                 break;
             case SKPaymentTransactionStateFailed:
                 NSLog(@"StateFailed %@", transaction.payment.productIdentifier);

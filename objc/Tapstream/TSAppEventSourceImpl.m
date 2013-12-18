@@ -113,7 +113,7 @@ void TSLoadStoreKitClasses()
 	return self;
 }
 
-- (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
+- (void)paymentQueue:(SKPaymentQueue *)queue removedTransactions:(NSArray *)transactions
 {
 	if(onTransaction != nil)
 	{

@@ -13,6 +13,7 @@
 		12043125167D4AA600F509B7 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 12043123167D4AA600F509B7 /* Credits.rtf */; };
 		12043128167D4AA600F509B7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 12043127167D4AA600F509B7 /* AppDelegate.m */; };
 		1204312B167D4AA600F509B7 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 12043129167D4AA600F509B7 /* MainMenu.xib */; };
+		127751451861735200D0F650 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 127751441861735200D0F650 /* StoreKit.framework */; };
 		12A98557185A69AE00D388CD /* TSConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A9853B185A69AD00D388CD /* TSConfig.m */; };
 		12A98558185A69AE00D388CD /* TSCore.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A9853D185A69AD00D388CD /* TSCore.m */; };
 		12A98559185A69AE00D388CD /* TSEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A98541185A69AE00D388CD /* TSEvent.m */; };
@@ -40,6 +41,7 @@
 		12043126167D4AA600F509B7 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		12043127167D4AA600F509B7 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		1204312A167D4AA600F509B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		127751441861735200D0F650 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		12A98538185A69AD00D388CD /* TSApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSApi.h; sourceTree = "<group>"; };
 		12A98539185A69AD00D388CD /* TSAppEventSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSAppEventSource.h; sourceTree = "<group>"; };
 		12A9853A185A69AD00D388CD /* TSConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSConfig.h; sourceTree = "<group>"; };
@@ -76,6 +78,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				127751451861735200D0F650 /* StoreKit.framework in Frameworks */,
 				12043115167D4AA600F509B7 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -105,6 +108,7 @@
 		12043113167D4AA600F509B7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				127751441861735200D0F650 /* StoreKit.framework */,
 				12043114167D4AA600F509B7 /* Cocoa.framework */,
 				12043116167D4AA600F509B7 /* Other Frameworks */,
 			);

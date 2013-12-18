@@ -7,9 +7,12 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <StoreKit/StoreKit.h>
 
-@interface AppDelegate : NSObject <NSApplicationDelegate>
+@interface AppDelegate : NSObject <NSApplicationDelegate, SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
 @property (assign) IBOutlet NSWindow *window;
+@property (assign) NSArray *products;
+@property (assign) SKProductsRequest *request;
 
 @end
