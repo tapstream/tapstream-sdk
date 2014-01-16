@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +22,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.params.CoreProtocolPNames;
 
 import android.content.Context;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -208,5 +211,15 @@ class PlatformImpl implements Platform {
 			return new Response(200, null, responseData);
 		}
 		return new Response(statusLine.getStatusCode(), statusLine.getReasonPhrase(), null);
+	}
+	
+	public Set<String> getProcessSet() {
+		ActivityManager actvityManager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+		List<RunningAppProcessInfo> procInfos = actvityManager.getRunningAppProcesses();
+		Set<String> set = new HashSet<String>();
+		for(RunningAppProcessInfo info : procInfos) {
+			set.add(info.processName);
+		}
+		return set;
 	}
 }

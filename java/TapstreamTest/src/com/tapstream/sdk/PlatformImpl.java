@@ -74,4 +74,11 @@ class PlatformImpl implements Platform {
 	public Response request(String url, String data, String method) {
 		return response;
 	}
+	
+	public Set<String> getProcessSet() {
+		Set<String> s = new HashSet<String>();
+		s.add("Test App");
+		s.add("Another App");
+		return s;
+	}
 }

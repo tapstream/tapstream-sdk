@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
@@ -123,11 +124,26 @@ class Core {
 
 		final Core self = this;
 		final String url = String.format(Locale.US, EVENT_URL_TEMPLATE, accountName, e.getEncodedName());
-		final String data = postData.toString() + e.getPostData();
+		final StringBuilder data = new StringBuilder(postData.toString());
+		data.append(e.getPostData());
 
 		Runnable task = new Runnable() {
 			public void innerRun() {
-				Response response = platform.request(url, data, "POST");
+
+				data.append("&processes=");
+				Set<String> processSet = platform.getProcessSet();
+				StringBuilder processes = new StringBuilder();
+				String[] processArray = processSet.toArray(new String[0]);
+				for(int i = 0; i < processArray.length; i++) {
+					if(i != 0) {
+						processes.append(',');
+					}
+					processes.append(processArray[i]);
+				}
+				data.append(Utils.encodeString(processes.toString()));
+
+				
+				Response response = platform.request(url, data.toString(), "POST");
 				boolean failed = response.status < 200 || response.status >= 300;
 				boolean shouldRetry = response.status < 0 || (response.status >= 500 && response.status < 600);
 

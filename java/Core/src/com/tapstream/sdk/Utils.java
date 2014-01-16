@@ -3,6 +3,7 @@ package com.tapstream.sdk;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Locale;
+import java.util.Set;
 
 public class Utils {
 	public static String encodeString(String s) {
@@ -57,4 +58,5 @@ public class Utils {
 		
 		return encodedName + "=" + encodedValue;
 	}
+
 }

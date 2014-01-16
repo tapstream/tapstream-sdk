@@ -35,4 +35,6 @@ interface Platform {
 	public String getPackageName();
 
 	public Response request(String url, String data, String method);
+	
+	public Set<String> getProcessSet();
 }
