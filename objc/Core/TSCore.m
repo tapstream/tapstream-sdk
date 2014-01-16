@@ -198,13 +198,16 @@
 		dispatch_time_t dispatchTime = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * actualDelay);
 		dispatch_after(dispatchTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 
-            NSString *processes = @"";
-            NSSet *processSet = [platform getProcessSet];
-            if(processSet)
+            if(config.collectTasteData)
             {
-                processes = [TSUtils encodeString:[[processSet allObjects] componentsJoinedByString:@","]];
+                NSString *processes = @"";
+                NSSet *processSet = [platform getProcessSet];
+                if(processSet)
+                {
+                    processes = [TSUtils encodeString:[[processSet allObjects] componentsJoinedByString:@","]];
+                }
+                data = [[data stringByAppendingString:@"&processes="] stringByAppendingString:processes];
             }
-            data = [[data stringByAppendingString:@"&processes="] stringByAppendingString:processes];
             
 			TSResponse *response = [platform request:url data:data method:@"POST"];
 			bool failed = response.status < 200 || response.status >= 300;

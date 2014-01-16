@@ -23,6 +23,8 @@
 @synthesize fireAutomaticOpenEvent = fireAutomaticOpenEvent;
 @synthesize fireAutomaticIAPEvents = fireAutomaticIAPEvents;
 
+@synthesize collectTasteData = collectTasteData;
+
 @synthesize globalEventParams = globalEventParams;
 
 + (id)configWithDefaults
@@ -38,6 +40,7 @@
 		fireAutomaticInstallEvent = YES;
 		fireAutomaticOpenEvent = YES;
 		fireAutomaticIAPEvents = YES;
+        collectTasteData = YES;
 		self.globalEventParams = [NSMutableDictionary dictionaryWithCapacity:16];
 	}
 	return self;
