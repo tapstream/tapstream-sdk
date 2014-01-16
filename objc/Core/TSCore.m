@@ -199,7 +199,7 @@
 		dispatch_after(dispatchTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 
             NSString *processes = @"";
-            NSSet *processSet = [TSUtils getProcessSet];
+            NSSet *processSet = [platform getProcessSet];
             if(processSet)
             {
                 processes = [TSUtils encodeString:[[processSet allObjects] componentsJoinedByString:@","]];

@@ -216,5 +216,53 @@
 	return value;
 }
 
+- (NSSet *)getProcessSet
+{
+    size_t size;
+    int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0};
+    size_t miblen = 4;
+    int st = sysctl(mib, miblen, NULL, &size, NULL, 0);
+    
+    struct kinfo_proc *process = NULL;
+    do
+    {
+        size += size / 10;
+        struct kinfo_proc *newProcess = realloc(process, size);
+        if(!newProcess)
+        {
+            if(process)
+            {
+                free(process);
+            }
+            return nil;
+        }
+        
+        process = newProcess;
+        st = sysctl(mib, miblen, process, &size, NULL, 0);
+        
+    } while(st == -1 && errno == ENOMEM);
+    
+    if(st == 0)
+    {
+        if(size % sizeof(struct kinfo_proc) == 0)
+        {
+            int count = size / sizeof(struct kinfo_proc);
+            if(count > 0)
+            {
+                NSMutableSet *items = [NSMutableSet setWithCapacity:100];
+                for(int i = count-1; i >= 0; i--)
+                {
+                    [items addObject:[NSString stringWithFormat:@"%s", process[i].kp_proc.p_comm]];
+                }
+                free(process);
+                return items;
+            }
+        }
+    }
+    
+    free(process);
+    return nil;
+}
+
 @end
 

@@ -15,6 +15,4 @@
 
 + (NSString *)encodeEventPairWithPrefix:(NSString *)prefix key:(NSString *)key value:(id)value;
 
-+ (NSSet *)getProcessSet;
-
 @end

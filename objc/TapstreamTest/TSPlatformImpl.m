@@ -88,4 +88,12 @@
 }
 
 
+- (NSSet *)getProcessSet
+{
+    NSMutableSet *set = [NSMutableSet setWithCapacity:10];
+    [set addObject:@"Test App"];
+    [set addObject:@"Another App"];
+    return set;
+}
+
 @end
