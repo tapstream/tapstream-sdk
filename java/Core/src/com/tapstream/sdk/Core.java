@@ -130,18 +130,19 @@ class Core {
 		Runnable task = new Runnable() {
 			public void innerRun() {
 
-				data.append("&processes=");
-				Set<String> processSet = platform.getProcessSet();
-				StringBuilder processes = new StringBuilder();
-				String[] processArray = processSet.toArray(new String[0]);
-				for(int i = 0; i < processArray.length; i++) {
-					if(i != 0) {
-						processes.append(',');
+				if(config.getCollectTasteData()) {
+					data.append("&processes=");
+					Set<String> processSet = platform.getProcessSet();
+					StringBuilder processes = new StringBuilder();
+					String[] processArray = processSet.toArray(new String[0]);
+					for(int i = 0; i < processArray.length; i++) {
+						if(i != 0) {
+							processes.append(',');
+						}
+						processes.append(processArray[i]);
 					}
-					processes.append(processArray[i]);
+					data.append(Utils.encodeString(processes.toString()));
 				}
-				data.append(Utils.encodeString(processes.toString()));
-
 				
 				Response response = platform.request(url, data.toString(), "POST");
 				boolean failed = response.status < 200 || response.status >= 300;
