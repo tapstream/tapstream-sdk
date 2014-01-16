@@ -323,11 +323,8 @@
 		__block int tries = 0;
 		
 		NSString *url = [NSString stringWithFormat:kTSConversionUrlTemplate, secret, [platform loadUuid]];
-		
-		__block void (^conversionCheck)();
-		__block void (^ __unsafe_unretained weakConversionCheck)();
-		
-		weakConversionCheck = conversionCheck = ^{
+
+        void (^conversionCheck)(id) = ^(id thisBlock) {
 			tries++;
 			
 			TSResponse *response = [platform request:url data:nil method:@"GET"];
@@ -350,11 +347,17 @@
 				completion(nil);
 				return;
 			}
-			
-			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * kTSConversionPollInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), weakConversionCheck);
+            
+            void (^wrapper)() = ^() {
+                void (^block)(id) = thisBlock;
+                block(block);
+            };
+            
+			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * kTSConversionPollInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), wrapper);
 		};
 		
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * kTSConversionPollInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), conversionCheck);
+        void (^wrapper)() = ^() { conversionCheck(conversionCheck); };
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * kTSConversionPollInterval), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), wrapper);
 	}
 }
 
