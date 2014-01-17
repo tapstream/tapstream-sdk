@@ -192,12 +192,13 @@
 		}
 
 		NSString *url = [NSString stringWithFormat:kTSEventUrlTemplate, accountName, e.encodedName];
-		__block NSString *data = [postData stringByAppendingString:e.postData];
+		NSString *data = [postData stringByAppendingString:e.postData];
 
 		int actualDelay = [del getDelay];
 		dispatch_time_t dispatchTime = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * actualDelay);
 		dispatch_after(dispatchTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 
+            NSString *allData = data;
             if(config.collectTasteData)
             {
                 NSString *processes = @"";
@@ -206,10 +207,10 @@
                 {
                     processes = [TSUtils encodeString:[[processSet allObjects] componentsJoinedByString:@","]];
                 }
-                data = [[data stringByAppendingString:@"&processes="] stringByAppendingString:processes];
+                allData = [[data stringByAppendingString:@"&processes="] stringByAppendingString:processes];
             }
             
-			TSResponse *response = [platform request:url data:data method:@"POST"];
+			TSResponse *response = [platform request:url data:allData method:@"POST"];
 			bool failed = response.status < 200 || response.status >= 300;
 			bool shouldRetry = response.status < 0 || (response.status >= 500 && response.status < 600);
 

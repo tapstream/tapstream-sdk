@@ -52,11 +52,11 @@
     }];
     
 
-//    TSEvent *e = [TSEvent eventWithName:@"test-event" oneTimeOnly:NO];
-//    [e addValue:@"John Doe" forKey:@"player"];
-//    [e addValue:@10.1 forKey:@"degrees"];
-//    [e addValue:@5 forKey:@"score"];
-//    [tracker fireEvent:e];
+    TSEvent *e = [TSEvent eventWithName:@"test-event" oneTimeOnly:NO];
+    [e addValue:@"John Doe" forKey:@"player"];
+    [e addValue:@10.1 forKey:@"degrees"];
+    [e addValue:@5 forKey:@"score"];
+    [tracker fireEvent:e];
 
     return YES;
 }
