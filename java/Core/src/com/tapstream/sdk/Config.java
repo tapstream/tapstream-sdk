@@ -25,6 +25,9 @@ public class Config {
 	private boolean fireAutomaticInstallEvent = true;
 	private boolean fireAutomaticOpenEvent = true;
 	
+	// Unset this if you want to disable the collection of taste data
+	private boolean collectTasteData = true;
+	
 	// If this handler is set, and if there was a conversion that lead to this application
 	// install, then the handler will be called with a string containing a json description
 	// of the the conversion details.
@@ -63,6 +66,9 @@ public class Config {
 
 	public boolean getFireAutomaticOpenEvent() { return fireAutomaticOpenEvent; }
 	public void setFireAutomaticOpenEvent(boolean fire) { fireAutomaticOpenEvent = fire; }
+	
+	public boolean getCollectTasteData() { return collectTasteData; }
+	public void setCollectTasteData(boolean collect) { collectTasteData = collect; }
 
 	public ConversionListener getConversionListener() { return conversionListener; }
 	public void setConversionListener(ConversionListener listener) { conversionListener = listener; }
