@@ -9,7 +9,7 @@
 Class TSSKPaymentQueue = nil;
 Class TSSKProductsRequest = nil;
 
-void TSLoadStoreKitClasses()
+static void TSLoadStoreKitClasses()
 {
 	if(TSSKPaymentQueue == nil)
 	{
