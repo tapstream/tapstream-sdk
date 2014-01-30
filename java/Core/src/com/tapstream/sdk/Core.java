@@ -253,7 +253,7 @@ class Core {
 	
 	public void getConversionData(final ConversionListener completion)
 	{
-		if(config.getConversionListener() != null) {
+		if(completion != null) {
 			final String url = String.format(Locale.US, CONVERSION_URL_TEMPLATE, secret, platform.loadUuid());
 			Runnable task = new Runnable() {
 				private int tries = 0;

@@ -28,11 +28,6 @@ public class Config {
 	// Unset this if you want to disable the collection of taste data
 	private boolean collectTasteData = true;
 	
-	// If this handler is set, and if there was a conversion that lead to this application
-	// install, then the handler will be called with a string containing a json description
-	// of the the conversion details.
-	private ConversionListener conversionListener = null;
-
 	// These parameters will be automatically attached to all events fired by the sdk.
 	public Map<String, Object> globalEventParams = new HashMap<String, Object>();
 
@@ -69,7 +64,4 @@ public class Config {
 	
 	public boolean getCollectTasteData() { return collectTasteData; }
 	public void setCollectTasteData(boolean collect) { collectTasteData = collect; }
-
-	public ConversionListener getConversionListener() { return conversionListener; }
-	public void setConversionListener(ConversionListener listener) { conversionListener = listener; }
 }

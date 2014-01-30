@@ -44,24 +44,24 @@ public class MainActivity extends Activity {
 				
 		final Tapstream tracker = Tapstream.getInstance();
 
-//		tracker.getConversionData(new ConversionListener() {
-//			@Override
-//			public void conversionData(String jsonData) {
-//				if(jsonData == null) {
-//					// No conversion data available
-//					Log.d(TAG, "No conversion data");
-//				} else {
-//					Log.d(TAG, "Conversion data: " + jsonData);
-//					try {
-//						JSONArray obj = new JSONArray(jsonData);
-//						// Read some data from this json object, and modify your application's behaviour accordingly
-//						// ...
-//					} catch (JSONException e) {
-//						e.printStackTrace();
-//					}
-//				}
-//			}
-//		});
+		tracker.getConversionData(new ConversionListener() {
+			@Override
+			public void conversionData(String jsonData) {
+				if(jsonData == null) {
+					// No conversion data available
+					Log.d(TAG, "No conversion data");
+				} else {
+					Log.d(TAG, "Conversion data: " + jsonData);
+					try {
+						JSONArray obj = new JSONArray(jsonData);
+						// Read some data from this json object, and modify your application's behaviour accordingly
+						// ...
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		});
 				
 		Event e = new Event("test-event", false);
 		e.addPair("player", "John Doe");
