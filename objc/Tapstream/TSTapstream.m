@@ -70,7 +70,7 @@ static TSTapstream *instance = nil;
 		appEventSource = [[TSAppEventSourceImpl alloc] init];
 #endif
 
-		core = AUTORELEASE([[TSCore alloc] initWithDelegate:del
+		self.core = AUTORELEASE([[TSCore alloc] initWithDelegate:del
 			platform:platform
 			listener:listener
 			appEventSource:appEventSource
