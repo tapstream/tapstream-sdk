@@ -16,14 +16,13 @@ public class ReferrerReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		String referrer = intent.getStringExtra("referrer");
 		if(referrer != null) {
-			Log.i("ReferrerReceiver", "referrer: " + referrer);
 			String decoded = "";
 			try {
 				decoded = URLDecoder.decode(referrer, "utf-8");
 			} catch(UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
-			Log.i("ReferrerReceiver", "decoded referrer: " + decoded);
+			
 			if(decoded.length() > 0) {
 				SharedPreferences prefs = context.getApplicationContext().getSharedPreferences(UUID_KEY, 0);
 				SharedPreferences.Editor editor = prefs.edit();
