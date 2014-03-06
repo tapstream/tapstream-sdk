@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
@@ -358,5 +357,11 @@ class Core {
 
 		int offsetFromUtc = TimeZone.getDefault().getOffset((new Date()).getTime()) / 1000;
 		appendPostPair("", "gmtoffset", offsetFromUtc);
+		
+		// Add referrer info if available
+		String referrer = platform.getReferrer();
+		if(referrer != null && referrer.length() > 0) {
+			appendPostPair("", "android-referrer", referrer);
+		}
 	}
 }

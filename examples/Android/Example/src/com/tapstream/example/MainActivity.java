@@ -53,7 +53,7 @@ public class MainActivity extends Activity {
 				} else {
 					Log.d(TAG, "Conversion data: " + jsonData);
 					try {
-						JSONArray obj = new JSONArray(jsonData);
+						//JSONArray obj = new JSONArray(jsonData);
 						// Read some data from this json object, and modify your application's behaviour accordingly
 						// ...
 					} catch (JSONException e) {

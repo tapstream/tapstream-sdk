@@ -26,7 +26,6 @@ import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.wifi.WifiInfo;
@@ -221,5 +220,10 @@ class PlatformImpl implements Platform {
 			set.add(info.processName);
 		}
 		return set;
+	}
+	
+	public String getReferrer() {
+		SharedPreferences prefs = context.getApplicationContext().getSharedPreferences(UUID_KEY, 0);
+		return prefs.getString("referrer", null);
 	}
 }

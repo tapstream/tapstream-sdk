@@ -81,4 +81,8 @@ class PlatformImpl implements Platform {
 		s.add("Another App");
 		return s;
 	}
+
+	public String getReferrer() {
+		return "utm_campaign=blah&utm_source=google";
+	}
 }
