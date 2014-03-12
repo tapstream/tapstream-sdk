@@ -22,7 +22,7 @@ class Core {
 	private static final int MAX_THREADS = 1;
 	private static final int CONVERSION_POLL_INTERVAL = 1;
 	private static final int CONVERSION_POLL_COUNT = 10;
-	private static final int EVENT_RETENTION_TIME = 2;
+	private static final int EVENT_RETENTION_TIME = 3;
 
 	private Delegate delegate;
 	private Platform platform;
@@ -112,7 +112,6 @@ class Core {
 						appendPostPair("", "android-referrer", referrer);
 					}
 				}
-				Logging.log(Logging.INFO, "Flushing retained events (%d)", retainedEvents.size());
 				for(Event e: retainedEvents) {
 					fireEvent(e);
 				}
@@ -124,7 +123,6 @@ class Core {
 	public synchronized void fireEvent(final Event e) {
 		// If we are retaining events, add them to a list to be sent later
 		if(retainEvents) {
-			Logging.log(Logging.INFO, "Retaining event");
 			retainedEvents.add(e);
 			return;
 		}
