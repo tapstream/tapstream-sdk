@@ -1,12 +1,7 @@
-package com.tapstream.example;
-
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Map;
+package com.tapstream.exampleasdf234fsad;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,6 +9,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 
+import com.google.analytics.tracking.android.EasyTracker;
+import com.tapstream.exampleasdf234fsad.R;
 import com.tapstream.sdk.Config;
 import com.tapstream.sdk.ConversionListener;
 import com.tapstream.sdk.Event;
@@ -52,13 +49,13 @@ public class MainActivity extends Activity {
 					Log.d(TAG, "No conversion data");
 				} else {
 					Log.d(TAG, "Conversion data: " + jsonData);
-					try {
-						JSONArray obj = new JSONArray(jsonData);
-						// Read some data from this json object, and modify your application's behaviour accordingly
-						// ...
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
+//					try {
+//						JSONArray obj = new JSONArray(jsonData);
+//						// Read some data from this json object, and modify your application's behaviour accordingly
+//						// ...
+//					} catch (JSONException e) {
+//						e.printStackTrace();
+//					}
 				}
 			}
 		});
@@ -160,7 +157,15 @@ public class MainActivity extends Activity {
 	protected void onStart() {
 		Log.i("Test", "onStart");
 		super.onStart();
+		EasyTracker.getInstance(this).activityStart(this);
 	}
+	
+	@Override
+	protected void onStop() {
+		Log.i("Test", "onStop");
+		super.onStop();
+		EasyTracker.getInstance(this).activityStop(this);
+	};
 	
 	@Override
 	public void onDestroy() {

@@ -2,8 +2,10 @@ package com.tapstream.sdk;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
@@ -20,6 +22,7 @@ class Core {
 	private static final int MAX_THREADS = 1;
 	private static final int CONVERSION_POLL_INTERVAL = 1;
 	private static final int CONVERSION_POLL_COUNT = 10;
+	private static final int EVENT_RETENTION_TIME = 2;
 
 	private Delegate delegate;
 	private Platform platform;
@@ -35,6 +38,8 @@ class Core {
 	private Set<String> firedEvents = new HashSet<String>(16);
 	private String failingEventId = null;
 	private int delay = 0;
+	private boolean retainEvents = true;
+	private List<Event> retainedEvents = new ArrayList<Event>();
 
 	Core(Delegate delegate, Platform platform, CoreListener listener, ActivityEventSource activityEventSource, String accountName, String developerSecret, Config config) {
 		this.delegate = delegate;
@@ -92,10 +97,38 @@ class Core {
 				}
 			}
 		});
+		
+		// Flush retained events (and disable retention) after a short delay
+		final Core self = this;
+		executor.schedule(new Runnable() {
+			@Override
+			public void run() {
+				synchronized(self) {
+					retainEvents = false;
+					
+					// Add referrer info to our common post data
+					String referrer = platform.getReferrer();
+					if(referrer != null && referrer.length() > 0) {
+						appendPostPair("", "android-referrer", referrer);
+					}
+				}
+				Logging.log(Logging.INFO, "Flushing retained events (%d)", retainedEvents.size());
+				for(Event e: retainedEvents) {
+					fireEvent(e);
+				}
+				retainedEvents = null;
+			}			
+		}, EVENT_RETENTION_TIME, TimeUnit.SECONDS);
 	}
 
 	public synchronized void fireEvent(final Event e) {
-
+		// If we are retaining events, add them to a list to be sent later
+		if(retainEvents) {
+			Logging.log(Logging.INFO, "Retaining event");
+			retainedEvents.add(e);
+			return;
+		}
+		
 		// Transaction events need their names prefixed with platform and app name
 		if(e.isTransaction()) {
 			e.setNamePrefix(appName);
@@ -357,11 +390,5 @@ class Core {
 
 		int offsetFromUtc = TimeZone.getDefault().getOffset((new Date()).getTime()) / 1000;
 		appendPostPair("", "gmtoffset", offsetFromUtc);
-		
-		// Add referrer info if available
-		String referrer = platform.getReferrer();
-		if(referrer != null && referrer.length() > 0) {
-			appendPostPair("", "android-referrer", referrer);
-		}
 	}
 }

@@ -22,7 +22,7 @@ public class ReferrerReceiver extends BroadcastReceiver {
 			} catch(UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
-			
+			Log.d("ReferrerReceiver", decoded);
 			if(decoded.length() > 0) {
 				SharedPreferences prefs = context.getApplicationContext().getSharedPreferences(UUID_KEY, 0);
 				SharedPreferences.Editor editor = prefs.edit();
