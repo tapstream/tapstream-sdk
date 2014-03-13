@@ -41,7 +41,7 @@
 - (void)addIntegerValue:(int)value forKey:(NSString *)key				__attribute__((deprecated));
 - (void)addUnsignedIntegerValue:(uint)value forKey:(NSString *)key 		__attribute__((deprecated));
 - (void)addDoubleValue:(double)value forKey:(NSString *)key 			__attribute__((deprecated));
-- (void)addFloatValue:(double)value forKey:(NSString *)key 				__attribute__((deprecated));
+- (void)addFloatValue:(float)value forKey:(NSString *)key 				__attribute__((deprecated));
 - (void)addBooleanValue:(BOOL)value forKey:(NSString *)key 				__attribute__((deprecated));
 
 

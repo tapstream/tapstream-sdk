@@ -185,7 +185,7 @@
 	[self addValue:[NSNumber numberWithDouble:value] forKey:key];
 }
 
-- (void)addFloatValue:(double)value forKey:(NSString *)key
+- (void)addFloatValue:(float)value forKey:(NSString *)key
 {
 	[self addValue:[NSNumber numberWithFloat:value] forKey:key];
 }

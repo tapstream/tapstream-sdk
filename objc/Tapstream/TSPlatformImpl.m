@@ -54,7 +54,7 @@
 {
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 	CGRect frame = [UIScreen mainScreen].bounds;
-	float scale = [UIScreen mainScreen].scale;
+	float scale = (float)[UIScreen mainScreen].scale;
 	return [NSString stringWithFormat:@"%dx%d", (int)(frame.size.width * scale), (int)(frame.size.height * scale)];
 #else
 	NSRect frame = [NSScreen mainScreen].frame;
@@ -220,8 +220,8 @@
 {
     size_t size;
     int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0};
-    size_t miblen = 4;
-    int st = sysctl(mib, miblen, NULL, &size, NULL, 0);
+    unsigned int miblen = 4;
+    size_t st = sysctl(mib, miblen, NULL, &size, NULL, 0);
     
     struct kinfo_proc *process = NULL;
     do
@@ -246,7 +246,7 @@
     {
         if(size % sizeof(struct kinfo_proc) == 0)
         {
-            int count = size / sizeof(struct kinfo_proc);
+            int count = (int)(size / sizeof(struct kinfo_proc));
             if(count > 0)
             {
                 NSMutableSet *items = [NSMutableSet setWithCapacity:100];
