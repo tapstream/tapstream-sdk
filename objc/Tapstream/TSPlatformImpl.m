@@ -218,10 +218,10 @@
 
 - (NSSet *)getProcessSet
 {
-    size_t size;
+    size_t size, st;
     int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0};
     unsigned int miblen = 4;
-    size_t st = sysctl(mib, miblen, NULL, &size, NULL, 0);
+    sysctl(mib, miblen, NULL, &size, NULL, 0);
     
     struct kinfo_proc *process = NULL;
     do
