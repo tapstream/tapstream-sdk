@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
@@ -14,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class Core {
-	public static final String VERSION = "2.6.1";
+	public static final String VERSION = "2.6.2";
 	private static final String EVENT_URL_TEMPLATE = "https://api.tapstream.com/%s/event/%s/";
 	private static final String HIT_URL_TEMPLATE = "http://api.tapstream.com/%s/hit/%s.gif";
 	private static final String CONVERSION_URL_TEMPLATE = "https://reporting.tapstream.com/v1/timelines/lookup?secret=%s&event_session=%s";
@@ -358,5 +357,11 @@ class Core {
 
 		int offsetFromUtc = TimeZone.getDefault().getOffset((new Date()).getTime()) / 1000;
 		appendPostPair("", "gmtoffset", offsetFromUtc);
+		
+		// Add referrer info if available
+		String referrer = platform.getReferrer();
+		if(referrer != null && referrer.length() > 0) {
+			appendPostPair("", "android-referrer", referrer);
+		}
 	}
 }
