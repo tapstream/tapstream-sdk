@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.tapstream.example;
+package com.tapstream.exampleasdf234fsad;
 
 /**
  * Exception thrown when something went wrong with in-app billing.

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.tapstream.example;
+package com.tapstream.exampleasdf234fsad;
 
 import android.text.TextUtils;
 import android.util.Log;
