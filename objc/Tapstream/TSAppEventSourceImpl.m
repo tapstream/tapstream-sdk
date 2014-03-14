@@ -78,6 +78,7 @@ static void TSLoadStoreKitClasses()
 @property(nonatomic, copy) TSOpenHandler onOpen;
 @property(nonatomic, copy) TSTransactionHandler onTransaction;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableDictionary *requestTransactions;
+@property(nonatomic, STRONG_OR_RETAIN) NSMutableDictionary *transactionReceiptSnapshots;
 
 - (id)init;
 - (void)dealloc;
@@ -115,6 +116,27 @@ static void TSLoadStoreKitClasses()
 
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
 {
+    for(SKPaymentTransaction *transaction in transactions)
+    {
+        switch(transaction.transactionState)
+        {
+            case SKPaymentTransactionStatePurchased:
+                // For ios 7 and up, try to get the Grand Unified Receipt
+                if(floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
+                {
+                    // Load Grand Unified Receipt data and stash it for use after the transaction is finished.
+                    // Note:  We have to grab this data now because consumable purchases get removed from
+                    // the receipt after the transaction is finished.
+                    NSURL *receiptURL = [[NSBundle mainBundle] appStoreReceiptURL];
+                    NSData *receipt = [NSData dataWithContentsOfURL:receiptURL];
+                    if(receipt)
+                    {
+                        [self.transactionReceiptSnapshots setObject:receipt forKey:transaction.transactionIdentifier];
+                    }
+                }
+                break;
+        }
+    }
 }
 
 - (void)paymentQueue:(SKPaymentQueue *)queue removedTransactions:(NSArray *)transactions

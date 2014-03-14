@@ -10,6 +10,7 @@
 	TSOpenHandler onOpen;
 	TSTransactionHandler onTransaction;
     NSMutableDictionary *requestTransactions;
+    NSMutableDictionary *transactionReceiptSnapshots;
 }
 
 - (void)setOpenHandler:(TSOpenHandler)handler;
