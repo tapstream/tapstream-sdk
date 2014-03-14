@@ -33,7 +33,8 @@
 	productId:(NSString *)productId
 	quantity:(int)quantity
 	priceInCents:(int)priceInCents
-	currency:(NSString *)currencyCode;
+	currency:(NSString *)currencyCode
+    base64Receipt:(NSString *)base64Receipt;
 
 - (void)addValue:(NSObject *)obj forKey:(NSString *)key;
 

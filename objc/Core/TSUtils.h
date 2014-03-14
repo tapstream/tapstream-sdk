@@ -13,6 +13,6 @@
 + (NSString *)stringifyBOOL:(BOOL)value;
 + (NSString *)stringifyBool:(bool)value;
 
-+ (NSString *)encodeEventPairWithPrefix:(NSString *)prefix key:(NSString *)key value:(id)value;
++ (NSString *)encodeEventPairWithPrefix:(NSString *)prefix key:(NSString *)key value:(id)value limitValueLength:(BOOL)limitValueLength;
 
 @end

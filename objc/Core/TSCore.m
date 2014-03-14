@@ -148,12 +148,13 @@
 
 	if(config.fireAutomaticIAPEvents)
 	{
-		[appEventSource setTransactionHandler:^(NSString *transactionId, NSString *productId, int quantity, int priceInCents, NSString *currencyCode) {
+		[appEventSource setTransactionHandler:^(NSString *transactionId, NSString *productId, int quantity, int priceInCents, NSString *currencyCode, NSString *base64Receipt) {
 			[me fireEvent:[TSEvent eventWithTransactionId:transactionId
 				productId:productId
 				quantity:quantity
 				priceInCents:priceInCents
-				currency:currencyCode]];
+				currency:currencyCode
+                base64Receipt:base64Receipt]];
 		}];
 	}
 }
@@ -406,7 +407,7 @@
 
 - (void)appendPostPairWithPrefix:(NSString *)prefix key:(NSString *)key value:(NSString *)value
 {
-	NSString *encodedPair = [TSUtils encodeEventPairWithPrefix:prefix key:key value:value];
+	NSString *encodedPair = [TSUtils encodeEventPairWithPrefix:prefix key:key value:value limitValueLength:YES];
 	if(encodedPair == nil)
 	{
 		return;

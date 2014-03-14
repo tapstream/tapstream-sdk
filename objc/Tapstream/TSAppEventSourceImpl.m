@@ -88,7 +88,7 @@ static void TSLoadStoreKitClasses()
 
 @implementation TSAppEventSourceImpl
 
-@synthesize foregroundedEventObserver, onOpen, onTransaction, requestTransactions;
+@synthesize foregroundedEventObserver, onOpen, onTransaction, requestTransactions, transactionReceiptSnapshots;
 
 - (id)init
 {
@@ -110,6 +110,7 @@ static void TSLoadStoreKitClasses()
 			self.requestTransactions = [NSMutableDictionary dictionary];
 			[[TSSKPaymentQueue defaultQueue] addTransactionObserver:self];
 		}
+        self.transactionReceiptSnapshots = [NSMutableDictionary dictionary];
 	}
 	return self;
 }
@@ -121,9 +122,12 @@ static void TSLoadStoreKitClasses()
         switch(transaction.transactionState)
         {
             case SKPaymentTransactionStatePurchased:
+            {
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
                 // For ios 7 and up, try to get the Grand Unified Receipt
                 if(floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
                 {
+#endif
                     // Load Grand Unified Receipt data and stash it for use after the transaction is finished.
                     // Note:  We have to grab this data now because consumable purchases get removed from
                     // the receipt after the transaction is finished.
@@ -131,10 +135,17 @@ static void TSLoadStoreKitClasses()
                     NSData *receipt = [NSData dataWithContentsOfURL:receiptURL];
                     if(receipt)
                     {
-                        [self.transactionReceiptSnapshots setObject:receipt forKey:transaction.transactionIdentifier];
+                        @synchronized(self)
+                        {
+                            [self.transactionReceiptSnapshots setObject:receipt forKey:transaction.transactionIdentifier];
+                        }
                     }
+                    
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
                 }
-                break;
+#endif
+            }
+            break;
         }
     }
 }
@@ -181,11 +192,28 @@ static void TSLoadStoreKitClasses()
 			SKPaymentTransaction *transaction = [transactions objectForKey:product.productIdentifier];
 			if(transaction)
 			{
+                NSData *receipt = nil;
+                @synchronized(self)
+                {
+                    receipt = [self.transactionReceiptSnapshots objectForKey:transaction.transactionIdentifier];
+                    [self.transactionReceiptSnapshots removeObjectForKey:transaction.transactionIdentifier];
+                }
+                
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+                // On iOS, fallback to receipt data stored on the transaction object
+                if(!receipt)
+                {
+                    receipt = transaction.transactionReceipt;
+                }
+#endif
+                NSString *b64Receipt = receipt ? [receipt base64EncodedStringWithOptions:0] : @"";
+                
 				onTransaction(transaction.transactionIdentifier,
 					product.productIdentifier,
 					(int)transaction.payment.quantity,
 					(int)([product.price doubleValue] * 100),
-					[product.priceLocale objectForKey:NSLocaleCurrencyCode]
+					[product.priceLocale objectForKey:NSLocaleCurrencyCode],
+                    b64Receipt
 					);
 			}
 		}
@@ -216,6 +244,7 @@ static void TSLoadStoreKitClasses()
 
 	RELEASE(foregroundedEventObserver);
 	RELEASE(requestTransactions);
+    RELEASE(transactionReceiptSnapshots);
 	SUPER_DEALLOC;
 }
 

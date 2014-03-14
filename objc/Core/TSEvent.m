@@ -30,8 +30,9 @@
 	quantity:(int)quantity
 	priceInCents:(int)priceInCents
 	currency:(NSString *)currencyCode
+    base64Receipt:(NSString *)base64Receipt
 {
-	return AUTORELEASE([[self alloc] initWithTransactionId:transactionId productId:productId quantity:quantity priceInCents:priceInCents currency:currencyCode]);
+	return AUTORELEASE([[self alloc] initWithTransactionId:transactionId productId:productId quantity:quantity priceInCents:priceInCents currency:currencyCode base64Receipt:base64Receipt]);
 }
 
 - (id)initWithName:(NSString *)eventName
@@ -64,9 +65,9 @@
 		isTransaction = YES;
 		customFields = RETAIN([NSMutableDictionary dictionaryWithCapacity:16]);
 
-		[self addValue:transactionId forKey:@"purchase-transaction-id" withPrefix:@""];
-		[self addValue:productId forKey:@"purchase-product-id" withPrefix:@""];
-		[self addValue:[NSNumber numberWithInt:quantity] forKey:@"purchase-quantity" withPrefix:@""];
+		[self addValue:transactionId forKey:@"purchase-transaction-id" withPrefix:@"" limitValueLength:YES];
+		[self addValue:productId forKey:@"purchase-product-id" withPrefix:@"" limitValueLength:YES];
+		[self addValue:[NSNumber numberWithInt:quantity] forKey:@"purchase-quantity" withPrefix:@"" limitValueLength:YES];
 	}
 	return self;
 }
@@ -76,6 +77,7 @@
 	quantity:(int)quantity
 	priceInCents:(int)priceInCents
 	currency:(NSString *)currencyCode
+    base64Receipt:(NSString *)base64Receipt
 {
 	if((self = [super init]) != nil)
 	{
@@ -87,11 +89,12 @@
 		isTransaction = YES;
 		customFields = RETAIN([NSMutableDictionary dictionaryWithCapacity:16]);
 
-		[self addValue:transactionId forKey:@"purchase-transaction-id" withPrefix:@""];
-		[self addValue:productId forKey:@"purchase-product-id" withPrefix:@""];
-		[self addValue:[NSNumber numberWithInt:quantity] forKey:@"purchase-quantity" withPrefix:@""];
-		[self addValue:[NSNumber numberWithInt:priceInCents] forKey:@"purchase-price" withPrefix:@""];
-		[self addValue:currencyCode forKey:@"purchase-currency" withPrefix:@""];
+		[self addValue:transactionId forKey:@"purchase-transaction-id" withPrefix:@"" limitValueLength:YES];
+		[self addValue:productId forKey:@"purchase-product-id" withPrefix:@"" limitValueLength:YES];
+		[self addValue:[NSNumber numberWithInt:quantity] forKey:@"purchase-quantity" withPrefix:@"" limitValueLength:YES];
+		[self addValue:[NSNumber numberWithInt:priceInCents] forKey:@"purchase-price" withPrefix:@"" limitValueLength:YES];
+		[self addValue:currencyCode forKey:@"purchase-currency" withPrefix:@"" limitValueLength:YES];
+        [self addValue:base64Receipt forKey:@"purchase-receipt" withPrefix:@"" limitValueLength:NO];
 	}
 	return self;
 }
@@ -143,14 +146,14 @@
 		
 		for(NSString *key in self.customFields)
 		{
-			[self addValue:[self.customFields objectForKey:key] forKey:key withPrefix:@"custom-"];
+			[self addValue:[self.customFields objectForKey:key] forKey:key withPrefix:@"custom-" limitValueLength:YES];
 		}
 	}
 }
 
-- (void)addValue:(id)value forKey:(NSString *)key withPrefix:(NSString *)prefix
+- (void)addValue:(id)value forKey:(NSString *)key withPrefix:(NSString *)prefix limitValueLength:(BOOL)limitValueLength
 {
-	NSString *encodedPair = [TSUtils encodeEventPairWithPrefix:prefix key:key value:value];
+	NSString *encodedPair = [TSUtils encodeEventPairWithPrefix:prefix key:key value:value limitValueLength:limitValueLength];
 	if(encodedPair != nil)
 	{
 		[postData appendString:@"&"];

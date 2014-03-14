@@ -3,8 +3,8 @@
 
 typedef void(^TSOpenHandler)();
 
-// Args: transactionId, productId, quantity, priceCents, currencyCode
-typedef void(^TSTransactionHandler)(NSString *, NSString *, int, int, NSString *);
+// Args: transactionId, productId, quantity, priceCents, currencyCode, base64Receipt
+typedef void(^TSTransactionHandler)(NSString *, NSString *, int, int, NSString *, NSString *);
 
 
 @protocol TSAppEventSource<NSObject>

@@ -114,7 +114,7 @@
 }
 
 
-+ (NSString *)encodeEventPairWithPrefix:(NSString *)prefix key:(NSString *)key value:(id)value;
++ (NSString *)encodeEventPairWithPrefix:(NSString *)prefix key:(NSString *)key value:(id)value limitValueLength:(BOOL)limitValueLength;
 {
 	if(key == nil || value == nil)
 	{
@@ -139,7 +139,7 @@
 		return nil;
 	}
 
-	if(encodedValue.length > 255)
+	if(limitValueLength && encodedValue.length > 255)
 	{
 		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Event value exceeds 255 characters, this field will not be included in the post (value=%@)", value];
 		return nil;
