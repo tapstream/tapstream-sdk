@@ -26,9 +26,17 @@
 
 
 + (id)eventWithName:(NSString *)name oneTimeOnly:(BOOL)oneTimeOnly;
+
 + (id)eventWithTransactionId:(NSString *)transactionId
 	productId:(NSString *)productId
 	quantity:(int)quantity;
+
++ (id)eventWithTransactionId:(NSString *)transactionId
+    productId:(NSString *)productId
+    quantity:(int)quantity
+    priceInCents:(int)priceInCents
+    currency:(NSString *)currencyCode;
+
 + (id)eventWithTransactionId:(NSString *)transactionId
 	productId:(NSString *)productId
 	quantity:(int)quantity

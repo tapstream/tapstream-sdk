@@ -73,6 +73,31 @@
 }
 
 - (id)initWithTransactionId:(NSString *)transactionId
+                  productId:(NSString *)productIdVal
+                   quantity:(int)quantity
+               priceInCents:(int)priceInCents
+                   currency:(NSString *)currencyCode
+{
+	if((self = [super init]) != nil)
+	{
+		firstFiredTime = 0;
+		uid = RETAIN([self makeUid]);
+		productId = RETAIN(productIdVal);
+		postData = RETAIN([NSMutableString stringWithCapacity:64]);
+		isOneTimeOnly = NO;
+		isTransaction = YES;
+		customFields = RETAIN([NSMutableDictionary dictionaryWithCapacity:16]);
+        
+		[self addValue:transactionId forKey:@"purchase-transaction-id" withPrefix:@"" limitValueLength:YES];
+		[self addValue:productId forKey:@"purchase-product-id" withPrefix:@"" limitValueLength:YES];
+		[self addValue:[NSNumber numberWithInt:quantity] forKey:@"purchase-quantity" withPrefix:@"" limitValueLength:YES];
+		[self addValue:[NSNumber numberWithInt:priceInCents] forKey:@"purchase-price" withPrefix:@"" limitValueLength:YES];
+		[self addValue:currencyCode forKey:@"purchase-currency" withPrefix:@"" limitValueLength:YES];
+	}
+	return self;
+}
+
+- (id)initWithTransactionId:(NSString *)transactionId
 	productId:(NSString *)productIdVal
 	quantity:(int)quantity
 	priceInCents:(int)priceInCents
