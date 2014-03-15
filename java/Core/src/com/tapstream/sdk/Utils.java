@@ -29,7 +29,7 @@ public class Utils {
 		return value.toString();
 	}
 	
-	public static String encodeEventPair(String prefix, String key, Object value) {
+	public static String encodeEventPair(String prefix, String key, Object value, boolean limitValueLength) {
 		if(key == null || value == null) {
 			return null;
 		}
@@ -45,7 +45,7 @@ public class Utils {
 		}
 
 		String stringifiedValue = Utils.stringify(value);
-		if (stringifiedValue.length() > 255) {
+		if (limitValueLength && stringifiedValue.length() > 255) {
 			Logging.log(Logging.WARN, "Tapstream Warning: Event value exceeds 255 characters, this field will not be included in the post (value=%s)", value);
 			return null;
 		}

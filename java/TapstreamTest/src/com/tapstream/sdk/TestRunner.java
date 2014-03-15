@@ -96,7 +96,7 @@ public class TestRunner {
 		public Event newEvent(String purchaseJson, String skuDetailsJson) throws JSONException {
 			JSONObject purchase = new JSONObject(purchaseJson);
 			JSONObject skuDetails = new JSONObject(skuDetailsJson);
-			return new Event(purchase, skuDetails);
+			return new Event(purchase, skuDetails, "asdfasdfsignatureasdfasdf");
 		}
 
 		public void prepareEvent(Tapstream ts, Event e) {

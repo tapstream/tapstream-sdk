@@ -32,9 +32,9 @@ public class Event {
 		isTransaction = true;
 		this.productSku = productSku;
 
-		addPair("", "purchase-transaction-id", orderId);
-		addPair("", "purchase-product-id", productSku);
-		addPair("", "purchase-quantity", quantity);
+		addPair("", "purchase-transaction-id", orderId, true);
+		addPair("", "purchase-product-id", productSku, true);
+		addPair("", "purchase-quantity", quantity, true);
 	}
 
 	// Only to be used for creating custom purchase events
@@ -43,15 +43,15 @@ public class Event {
 		isTransaction = true;
 		this.productSku = productSku; 
 
-		addPair("", "purchase-transaction-id", orderId);
-		addPair("", "purchase-product-id", productSku);
-		addPair("", "purchase-quantity", quantity);
-		addPair("", "purchase-price", priceInCents);
-		addPair("", "purchase-currency", currencyCode);
+		addPair("", "purchase-transaction-id", orderId, true);
+		addPair("", "purchase-product-id", productSku, true);
+		addPair("", "purchase-quantity", quantity, true);
+		addPair("", "purchase-price", priceInCents, true);
+		addPair("", "purchase-currency", currencyCode, true);
 	}
 
 	// Only to be used for creating IAB purchase events
-	public Event(JSONObject purchase, JSONObject skuDetails) throws JSONException {
+	public Event(JSONObject purchase, JSONObject skuDetails, String signature) throws JSONException {
 		this("", false);
 		isTransaction = true;
 		productSku = purchase.getString("productId");
@@ -62,18 +62,20 @@ public class Event {
 			int priceMicros = skuDetails.getInt("price_amount_micros");
 			int priceCenti = (int)Math.round(priceMicros / 10000.0);
 
-			addPair("", "purchase-transaction-id", orderId);
-			addPair("", "purchase-product-id", productSku);
-			addPair("", "purchase-quantity", 1);
-			addPair("", "purchase-price", priceCenti);
-			addPair("", "purchase-currency", currencyCode);
+			addPair("", "purchase-transaction-id", orderId, true);
+			addPair("", "purchase-product-id", productSku, true);
+			addPair("", "purchase-quantity", 1, true);
+			addPair("", "purchase-price", priceCenti, true);
+			addPair("", "purchase-currency", currencyCode, true);
 			
 		} catch (JSONException e) {
 			// Older versions of the Google Play Store app don't send the currency and amount separately
-			addPair("", "purchase-transaction-id", orderId);
-			addPair("", "purchase-product-id", productSku);
-			addPair("", "purchase-quantity", 1);
+			addPair("", "purchase-transaction-id", orderId, true);
+			addPair("", "purchase-product-id", productSku, true);
+			addPair("", "purchase-quantity", 1, true);
 		}
+		
+		addPair("", "purchase-receipt", signature, false);
 	}
 
 	public void addPair(String key, Object value) {
@@ -114,7 +116,7 @@ public class Event {
 			postData.append(String.format(Locale.US, "&created-ms=%.0f", firstFiredTime));
 			
 			for(Map.Entry<String, Object> entry : customFields.entrySet()) {
-				addPair("custom-", entry.getKey(), entry.getValue());
+				addPair("custom-", entry.getKey(), entry.getValue(), true);
 			}
 		}
 	}
@@ -140,8 +142,8 @@ public class Event {
 		return String.format(Locale.US, "%d:%f", System.currentTimeMillis(), Math.random());
 	}
 	
-	protected void addPair(String prefix, String key, Object value) {
-        String encodedPair = Utils.encodeEventPair(prefix, key, value);
+	protected void addPair(String prefix, String key, Object value, boolean limitValueLength) {
+        String encodedPair = Utils.encodeEventPair(prefix, key, value, limitValueLength);
         if(encodedPair != null) {
 	        postData.append("&");
 	        postData.append(encodedPair);

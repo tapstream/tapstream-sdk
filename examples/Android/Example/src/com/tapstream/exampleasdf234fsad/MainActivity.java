@@ -1,7 +1,11 @@
 package com.tapstream.exampleasdf234fsad;
 
-import org.json.JSONArray;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,7 +14,6 @@ import android.util.Log;
 import android.view.Menu;
 
 import com.google.analytics.tracking.android.EasyTracker;
-import com.tapstream.exampleasdf234fsad.R;
 import com.tapstream.sdk.Config;
 import com.tapstream.sdk.ConversionListener;
 import com.tapstream.sdk.Event;
@@ -67,67 +70,67 @@ public class MainActivity extends Activity {
 		tracker.fireEvent(e);
 
 		
-//		final Activity self = this;
-//		
-//		mHelper = new IabHelper(this, pubKey);
-//
-//		mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
-//			public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
-//				if (result.isFailure()) {
-//					Log.d(TAG, "QueryInventory failed: " + result);
-//				} else {
-//					
-//					// Important:
-//					// Store the inventory in a member variable so we will have access to this data
-//					// later when a purchase succeeds.
-//					mInventory = inventory;
-//					
-//					// Buy the first item we can find (this is just an example, of course)
-//					Iterator<Map.Entry<String, SkuDetails>> iter = inventory.mSkuMap.entrySet().iterator();
-//					if (iter.hasNext()) {
-//						Map.Entry<String, SkuDetails> entry = iter.next();
-//						String sku = entry.getKey();
-//						
-//						if (inventory.hasPurchase(sku)) {
-//				            mHelper.consumeAsync(inventory.getPurchase(sku), null);
-//				        }
-//						
-//						mHelper.launchPurchaseFlow(self, sku, 10001, mPurchaseFinishedListener, "bGoa+V7g/yqDXvKRqq+JTFn4uQZbPiQJo4pf9RzJ");
-//					}
-//				}
-//			}
-//		};
-//		
-//		mPurchaseFinishedListener = new IabHelper.OnIabPurchaseFinishedListener() {
-//			public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
-//				if (result.isFailure()) {
-//					Log.d(TAG, "IabPurchase failed: " + result);
-//				} else {
-//					// Purchase success, fire a Tapstream purchase event.
-//					// We need to provide the product details json that we got when we first queried our inventory.
-//					// Fortunately, we stored the Inventory instance in a member variable so we can still access it.
-//					SkuDetails skuDetails = mInventory.mSkuMap.get(purchase.getSku());
-//					try {
-//						JSONObject purchaseJson = new JSONObject(purchase.mOriginalJson);
-//						JSONObject skuDetailsJson = new JSONObject(skuDetails.mJson);			
-//						Event event = new Event(purchaseJson, skuDetailsJson);
-//						Tapstream.getInstance().fireEvent(event);
-//					} catch (JSONException e) {
-//						e.printStackTrace();
-//					}
-//				}
-//			}
-//		};
-//		
-//		mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
-//			public void onIabSetupFinished(IabResult result) {
-//				if (result.isFailure()) {
-//					Log.d(TAG, "IabSetup failed: " + result);
-//				} else {
-//					mHelper.queryInventoryAsync(true, Arrays.asList(new String[] {SKU}), mGotInventoryListener);
-//				}
-//			}
-//		});
+		final Activity self = this;
+		
+		mHelper = new IabHelper(this, pubKey);
+
+		mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
+			public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+				if (result.isFailure()) {
+					Log.d(TAG, "QueryInventory failed: " + result);
+				} else {
+					
+					// Important:
+					// Store the inventory in a member variable so we will have access to this data
+					// later when a purchase succeeds.
+					mInventory = inventory;
+					
+					// Buy the first item we can find (this is just an example, of course)
+					Iterator<Map.Entry<String, SkuDetails>> iter = inventory.mSkuMap.entrySet().iterator();
+					if (iter.hasNext()) {
+						Map.Entry<String, SkuDetails> entry = iter.next();
+						String sku = entry.getKey();
+						
+						if (inventory.hasPurchase(sku)) {
+				            mHelper.consumeAsync(inventory.getPurchase(sku), null);
+				        }
+						
+						mHelper.launchPurchaseFlow(self, sku, 10001, mPurchaseFinishedListener, "bGoa+V7g/yqDXvKRqq+JTFn4uQZbPiQJo4pf9RzJ");
+					}
+				}
+			}
+		};
+		
+		mPurchaseFinishedListener = new IabHelper.OnIabPurchaseFinishedListener() {
+			public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
+				if (result.isFailure()) {
+					Log.d(TAG, "IabPurchase failed: " + result);
+				} else {
+					// Purchase success, fire a Tapstream purchase event.
+					// We need to provide the product details json that we got when we first queried our inventory.
+					// Fortunately, we stored the Inventory instance in a member variable so we can still access it.
+					SkuDetails skuDetails = mInventory.mSkuMap.get(purchase.getSku());
+					try {
+						JSONObject purchaseJson = new JSONObject(purchase.mOriginalJson);
+						JSONObject skuDetailsJson = new JSONObject(skuDetails.mJson);			
+						Event event = new Event(purchaseJson, skuDetailsJson, purchase.getSignature());
+						Tapstream.getInstance().fireEvent(event);
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		
+		mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+			public void onIabSetupFinished(IabResult result) {
+				if (result.isFailure()) {
+					Log.d(TAG, "IabSetup failed: " + result);
+				} else {
+					mHelper.queryInventoryAsync(true, Arrays.asList(new String[] {SKU}), mGotInventoryListener);
+				}
+			}
+		});
 	}
 
 	@Override

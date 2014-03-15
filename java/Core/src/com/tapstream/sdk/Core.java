@@ -344,7 +344,7 @@ class Core {
 	}
 
 	private void appendPostPair(String prefix, String key, Object value) {
-		String encodedPair = Utils.encodeEventPair(prefix, key, value);
+		String encodedPair = Utils.encodeEventPair(prefix, key, value, true);
 		if(encodedPair == null) {
 			return;
 		}
