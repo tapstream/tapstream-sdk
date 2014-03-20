@@ -85,4 +85,8 @@ class PlatformImpl implements Platform {
 	public String getReferrer() {
 		return "utm_campaign=blah&utm_source=google";
 	}
+	
+	public String getAdvertisingId() {
+		return "00000000-0000-0000-0000-000000000000";
+	}
 }

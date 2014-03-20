@@ -226,4 +226,9 @@ class PlatformImpl implements Platform {
 		SharedPreferences prefs = context.getApplicationContext().getSharedPreferences(UUID_KEY, 0);
 		return prefs.getString("referrer", null);
 	}
+	
+	public String getAdvertisingId() {
+		SharedPreferences prefs = context.getApplicationContext().getSharedPreferences(UUID_KEY, 0);
+		return prefs.getString("advertisingId", null);
+	}
 }

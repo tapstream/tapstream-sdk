@@ -39,4 +39,6 @@ interface Platform {
 	public Set<String> getProcessSet();
 
 	public String getReferrer();
+	
+	public String getAdvertisingId();
 }
