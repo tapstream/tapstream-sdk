@@ -41,4 +41,6 @@ interface Platform {
 	public String getReferrer();
 	
 	public String getAdvertisingId();
+
+	public Boolean getLimitAdTracking();
 }

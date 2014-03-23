@@ -102,7 +102,7 @@ class Core {
 		
 		// If google play services is available, we'll have an AndroidAdvertisingId instance.
 		// If we do, then schedule it immediately so it can fetch the ID.
-		if(adIdFetcher != null) {
+		if(adIdFetcher != null && config.getCollectAdvertisingId()) {
 			executor.schedule(adIdFetcher, 0, TimeUnit.SECONDS);
 		}
 		
@@ -121,9 +121,15 @@ class Core {
 					}
 					
 					// Add android advertising id to our common post data
-					String aaid = platform.getAdvertisingId();
-					if(aaid != null && aaid.length() > 0) {
-						appendPostPair("", "android-advertising-id", aaid);
+					if(self.config.getCollectAdvertisingId()) {
+						String aaid = platform.getAdvertisingId();
+						if(aaid != null && aaid.length() > 0) {
+							appendPostPair("", "android-advertising-id", aaid);
+						}
+						Boolean limitAdTracking = platform.getLimitAdTracking();
+						if(limitAdTracking != null) {
+							appendPostPair("", "android-limit-ad-tracking", limitAdTracking);
+						}
 					}
 				}
 				for(Event e: retainedEvents) {

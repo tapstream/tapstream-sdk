@@ -231,4 +231,9 @@ class PlatformImpl implements Platform {
 		SharedPreferences prefs = context.getApplicationContext().getSharedPreferences(UUID_KEY, 0);
 		return prefs.getString("advertisingId", null);
 	}
+
+	public Boolean getLimitAdTracking() {
+		SharedPreferences prefs = context.getApplicationContext().getSharedPreferences(UUID_KEY, 0);
+		return prefs.contains("limitAdTracking") ? prefs.getBoolean("limitAdTracking", false) : null;
+	}
 }

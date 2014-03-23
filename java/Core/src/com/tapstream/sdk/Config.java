@@ -27,6 +27,9 @@ public class Config {
 	
 	// Unset this if you want to disable the collection of taste data
 	private boolean collectTasteData = true;
+
+	// Unset this if you want to disable automatic collection of Android Advertising Id
+	private boolean collectAdvertisingId = true;
 	
 	// These parameters will be automatically attached to all events fired by the sdk.
 	public Map<String, Object> globalEventParams = new HashMap<String, Object>();
@@ -64,4 +67,7 @@ public class Config {
 	
 	public boolean getCollectTasteData() { return collectTasteData; }
 	public void setCollectTasteData(boolean collect) { collectTasteData = collect; }
+
+	public boolean getCollectAdvertisingId() { return collectAdvertisingId; }
+	public void setCollectAdvertisingId(boolean collect) { collectAdvertisingId = collect; }
 }

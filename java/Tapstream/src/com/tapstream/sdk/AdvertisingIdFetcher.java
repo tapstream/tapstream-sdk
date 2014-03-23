@@ -24,11 +24,14 @@ public class AdvertisingIdFetcher implements Runnable {
 			Object info = getAdvertisingIdInfo.invoke(clientCls, this.app);
 			Method getId = infoCls.getMethod("getId"); 
 			String id = (String) getId.invoke(info);
+			Method isLimitAdTrackingEnabled = infoCls.getMethod("isLimitAdTrackingEnabled"); 
+			boolean limitAdTracking = (Boolean) isLimitAdTrackingEnabled.invoke(info);
 			
 			// Stash in the preferences
 			SharedPreferences prefs = this.app.getSharedPreferences(UUID_KEY, 0);
 			SharedPreferences.Editor editor = prefs.edit();
 			editor.putString("advertisingId", id);
+			editor.putBoolean("limitAdTracking", limitAdTracking);
 			editor.commit();
 		} catch(Exception e) {}
 	}

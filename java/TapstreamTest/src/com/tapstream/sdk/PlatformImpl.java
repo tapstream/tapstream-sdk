@@ -89,4 +89,8 @@ class PlatformImpl implements Platform {
 	public String getAdvertisingId() {
 		return "00000000-0000-0000-0000-000000000000";
 	}
+
+	public Boolean getLimitAdTracking() {
+		return false;
+	}
 }
