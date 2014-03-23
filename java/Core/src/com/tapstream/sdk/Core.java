@@ -28,6 +28,7 @@ class Core {
 	private Platform platform;
 	private CoreListener listener;
 	private ActivityEventSource activityEventSource;
+	private Runnable adIdFetcher;
 	private Config config;
 	private String accountName;
 	private String secret;
@@ -41,11 +42,12 @@ class Core {
 	private boolean retainEvents = true;
 	private List<Event> retainedEvents = new ArrayList<Event>();
 
-	Core(Delegate delegate, Platform platform, CoreListener listener, ActivityEventSource activityEventSource, String accountName, String developerSecret, Config config) {
+	Core(Delegate delegate, Platform platform, CoreListener listener, ActivityEventSource activityEventSource, Runnable adIdFetcher, String accountName, String developerSecret, Config config) {
 		this.delegate = delegate;
 		this.platform = platform;
 		this.listener = listener;
 		this.activityEventSource = activityEventSource;
+		this.adIdFetcher = adIdFetcher;
 		this.config = config;
 
 		this.accountName = clean(accountName);
@@ -98,6 +100,12 @@ class Core {
 			}
 		});
 		
+		// If google play services is available, we'll have an AndroidAdvertisingId instance.
+		// If we do, then schedule it immediately so it can fetch the ID.
+		if(adIdFetcher != null && config.getCollectAdvertisingId()) {
+			executor.schedule(adIdFetcher, 0, TimeUnit.SECONDS);
+		}
+		
 		// Flush retained events (and disable retention) after a short delay
 		final Core self = this;
 		executor.schedule(new Runnable() {
@@ -110,6 +118,18 @@ class Core {
 					String referrer = platform.getReferrer();
 					if(referrer != null && referrer.length() > 0) {
 						appendPostPair("", "android-referrer", referrer);
+					}
+					
+					// Add android advertising id to our common post data
+					if(self.config.getCollectAdvertisingId()) {
+						String aaid = platform.getAdvertisingId();
+						if(aaid != null && aaid.length() > 0) {
+							appendPostPair("", "android-advertising-id", aaid);
+						}
+						Boolean limitAdTracking = platform.getLimitAdTracking();
+						if(limitAdTracking != null) {
+							appendPostPair("", "android-limit-ad-tracking", limitAdTracking);
+						}
 					}
 				}
 				for(Event e: retainedEvents) {

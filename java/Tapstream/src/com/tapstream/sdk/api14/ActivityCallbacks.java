@@ -1,12 +1,8 @@
 package com.tapstream.sdk.api14;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.Application;
 import android.app.Application.ActivityLifecycleCallbacks;
-import android.content.Intent;
 import android.os.Bundle;
 
 import com.tapstream.sdk.ActivityEventSource;
