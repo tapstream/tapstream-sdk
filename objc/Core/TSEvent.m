@@ -26,6 +26,15 @@
 }
 
 + (id)eventWithTransactionId:(NSString *)transactionId
+    productId:(NSString *)productId
+    quantity:(int)quantity
+    priceInCents:(int)priceInCents
+    currency:(NSString *)currencyCode
+{
+	return AUTORELEASE([[self alloc] initWithTransactionId:transactionId productId:productId quantity:quantity priceInCents:priceInCents currency:currencyCode]);
+}
+
++ (id)eventWithTransactionId:(NSString *)transactionId
 	productId:(NSString *)productId
 	quantity:(int)quantity
 	priceInCents:(int)priceInCents
