@@ -182,7 +182,7 @@ static void TSLoadStoreKitClasses()
 	@synchronized(self)
 	{
 		TSRequestWrapper *key = [TSRequestWrapper requestWrapperWithRequest:request];
-		transactions = [self.requestTransactions objectForKey:key];
+		transactions = RETAIN([self.requestTransactions objectForKey:key]);
 		[self.requestTransactions removeObjectForKey:key];
 	}
 	if(transactions)
@@ -217,6 +217,7 @@ static void TSLoadStoreKitClasses()
 					);
 			}
 		}
+        RELEASE(transactions);
 	}
 }
 
