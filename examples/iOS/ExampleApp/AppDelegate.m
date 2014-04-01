@@ -54,12 +54,12 @@
 //    [e addValue:@5 forKey:@"score"];
 //    [tracker fireEvent:e];
 //
-//    [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
-//    
-//    NSArray *productIds = @[@"com.tapstream.catalog.tiddlywinks"];
-//    request = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithArray:productIds]];
-//    request.delegate = self;
-//    [request start];
+    [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+    
+    NSArray *productIds = @[@"com.tapstream.catalog.tiddlywinks"];
+    request = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithArray:productIds]];
+    request.delegate = self;
+    [request start];
     
     return YES;
 }
