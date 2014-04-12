@@ -218,51 +218,116 @@
 
 - (NSSet *)getProcessSet
 {
-    size_t size, st;
-    int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0};
-    unsigned int miblen = 4;
-    sysctl(mib, miblen, NULL, &size, NULL, 0);
-    
-    struct kinfo_proc *process = NULL;
-    do
-    {
-        size += size / 10;
-        struct kinfo_proc *newProcess = realloc(process, size);
-        if(!newProcess)
-        {
-            if(process)
-            {
-                free(process);
-            }
-            return nil;
-        }
-        
-        process = newProcess;
-        st = sysctl(mib, miblen, process, &size, NULL, 0);
-        
-    } while(st == -1 && errno == ENOMEM);
-    
-    if(st == 0)
-    {
-        if(size % sizeof(struct kinfo_proc) == 0)
-        {
-            int count = (int)(size / sizeof(struct kinfo_proc));
-            if(count > 0)
-            {
-                NSMutableSet *items = [NSMutableSet setWithCapacity:100];
-                for(int i = count-1; i >= 0; i--)
-                {
-                    [items addObject:[NSString stringWithFormat:@"%s", process[i].kp_proc.p_comm]];
-                }
-                free(process);
-                return items;
-            }
-        }
-    }
-    
-    free(process);
-    return nil;
+	size_t size, st;
+	int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0};
+	unsigned int miblen = 4;
+	sysctl(mib, miblen, NULL, &size, NULL, 0);
+	
+	struct kinfo_proc *process = NULL;
+	do
+	{
+		size += size / 10;
+		struct kinfo_proc *newProcess = realloc(process, size);
+		if(!newProcess)
+		{
+			if(process)
+			{
+				free(process);
+			}
+			return nil;
+		}
+		
+		process = newProcess;
+		st = sysctl(mib, miblen, process, &size, NULL, 0);
+		
+	} while(st == -1 && errno == ENOMEM);
+	
+	if(st == 0)
+	{
+		if(size % sizeof(struct kinfo_proc) == 0)
+		{
+			int count = (int)(size / sizeof(struct kinfo_proc));
+			if(count > 0)
+			{
+				NSMutableSet *items = [NSMutableSet setWithCapacity:100];
+				for(int i = count-1; i >= 0; i--)
+				{
+					[items addObject:[NSString stringWithFormat:@"%s", process[i].kp_proc.p_comm]];
+				}
+				free(process);
+				return items;
+			}
+		}
+	}
+	
+	free(process);
+	return nil;
 }
+
+- (NSString *)getComputerGUID
+{
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+	return [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+#else
+	
+	// Adapted from Listing 1-3
+	// https://developer.apple.com/library/mac/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateLocally.html
+	
+	kern_return_t kernResult;
+	mach_port_t masterPort;
+	CFMutableDictionaryRef matchingDict;
+	io_iterator_t iterator;
+	io_object_t service;
+	
+	CFDataRef macAddress = nil;
+	
+	kernResult = IOMasterPort(MACH_PORT_NULL, &masterPort);
+	if (kernResult != KERN_SUCCESS) {
+		return @"";
+	}
+	
+	matchingDict = IOBSDNameMatching(masterPort, 0, "en0");
+	if (!matchingDict) {
+		return @"";
+	}
+	
+	kernResult = IOServiceGetMatchingServices(masterPort, matchingDict, &iterator);
+	if (kernResult != KERN_SUCCESS) {
+		return @"";
+	}
+	
+	while((service = IOIteratorNext(iterator)) != 0) {
+		io_object_t parentService;
+		kernResult = IORegistryEntryGetParentEntry(service, kIOServicePlane, &parentService);
+		if (kernResult == KERN_SUCCESS) {
+			if (macAddress) CFRelease(macAddress);
+			macAddress = (CFDataRef) IORegistryEntryCreateCFProperty(parentService, CFSTR("IOMACAddress"), kCFAllocatorDefault, 0);
+			IOObjectRelease(parentService);
+		}
+		IOObjectRelease(service);
+	}
+	IOObjectRelease(iterator);
+	
+	if(macAddress) {
+		NSString *addr = [NSString stringWithUTF8String:(const char *)CFDataGetBytePtr(macAddress)];
+		CFRelease(macAddress);
+		return addr;
+	}
+	return @"";
+	
+#endif
+}
+
+- (NSString *)getBundleIdentifier
+{
+	return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
+}
+
+- (NSString *)getBundleShortVersion
+{
+	return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+}
+
 
 @end
 

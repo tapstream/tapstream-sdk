@@ -171,7 +171,7 @@
 		// Add global event params if they have not yet been added
 		// Notify the event that we are going to fire it so it can record the time and bake its post data
 		[e prepare:config.globalEventParams];
-				
+
 		if(e.isOneTimeOnly)
 		{
 			if([firedEvents containsObject:e.name])
@@ -463,6 +463,15 @@
 	[self appendPostPairWithPrefix:@"" key:@"package-name" value:[platform getPackageName]];
 	[self appendPostPairWithPrefix:@"" key:@"gmtoffset" value:[TSUtils stringifyInteger:(int)[[NSTimeZone systemTimeZone] secondsFromGMT]]];
 
+	// Fields necessary for receipt validation
+	// Use developer-provided values (if available) for stricter validation, otherwise get values from bundle
+	[self appendPostPairWithPrefix:@"" key:@"computer-guid" value:[platform getComputerGUID]];
+	
+	NSString *bundleId = config.hardcodedBundleId ? config.hardcodedBundleId : [platform getBundleIdentifier];
+	[self appendPostPairWithPrefix:@"" key:@"app-bundle-id" value:bundleId];
+
+	NSString *shortVersion = config.hardcodedBundleShortVersionString ? config.hardcodedBundleShortVersionString : [platform getBundleShortVersion];
+	[self appendPostPairWithPrefix:@"" key:@"app-short-version" value:shortVersion];
 }
 
 

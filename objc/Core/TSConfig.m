@@ -27,6 +27,9 @@
 
 @synthesize globalEventParams = globalEventParams;
 
+@synthesize hardcodedBundleId = hardcodedBundleId;
+@synthesize hardcodedBundleShortVersionString = hardcodedBundleShortVersionString;
+
 + (id)configWithDefaults
 {
 	return AUTORELEASE([[self alloc] init]);
@@ -61,6 +64,9 @@
 	RELEASE(installEventName);
 	RELEASE(openEventName);
     RELEASE(globalEventParams);
+
+    RELEASE(hardcodedBundleId);
+    RELEASE(hardcodedBundleShortVersionString);
 	SUPER_DEALLOC;
 }
 

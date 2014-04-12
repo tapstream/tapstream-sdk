@@ -96,4 +96,19 @@
     return set;
 }
 
+- (NSString *)getComputerGUID
+{
+	return @"00000000-0000-0000-0000-000000000000";
+}
+
+- (NSString *)getBundleIdentifier
+{
+	return @"bundle_identifier";
+}
+
+- (NSString *)getBundleShortVersion
+{
+	return @"1.0";
+}
+
 @end

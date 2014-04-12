@@ -35,6 +35,18 @@
 
 	// These parameters will be automatically attached to all events fired by the sdk
 	NSMutableDictionary *globalEventParams;
+
+	
+	// Receipt validation
+	// Set these if you want to make Tapstream's server-side receipt validation stricter.  You
+	// should provide hard-coded string literals here, do not dynamically retrieve the values
+	// from your plist file and set them.
+	
+	// hardcodedBundleId should match the CFBundleIdentifier value in your Info.plist
+	NSString *hardcodedBundleId;
+
+	// hardcodedBundleShortVersionString should match the CFBundleShortVersionString value in your Info.plist
+	NSString *hardcodedBundleShortVersionString;
 }
 
 @property(nonatomic, STRONG_OR_RETAIN) NSString *hardware;
@@ -60,6 +72,9 @@
 @property(nonatomic, assign) BOOL collectTasteData;
 
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableDictionary *globalEventParams;
+
+@property(nonatomic, STRONG_OR_RETAIN) NSString *hardcodedBundleId;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *hardcodedBundleShortVersionString;
 
 + (id)configWithDefaults;
 - (id)init;
