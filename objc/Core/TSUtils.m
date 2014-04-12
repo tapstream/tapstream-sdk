@@ -31,32 +31,33 @@
 	else if([value isKindOfClass:[NSNumber class]])
 	{
 		NSNumber *number = (NSNumber *)value;
+		const char *type = [number objCType];
 		
-		if(strcmp([number objCType], @encode(int)) == 0)
+		if(strcmp(type, @encode(int)) == 0)
 		{
 			return [TSUtils stringifyInteger:[number intValue]];
 		}
-		else if(strcmp([number objCType], @encode(uint)) == 0)
+		else if(strcmp(type, @encode(uint)) == 0)
 		{
 			return [TSUtils stringifyUnsignedInteger:[number unsignedIntValue]];
 		}
-		else if(strcmp([number objCType], @encode(long)) == 0)
+		else if(strcmp(type, @encode(long)) == 0)
 		{
 			return [TSUtils stringifyLong:[number longValue]];
 		}
-		else if(strcmp([number objCType], @encode(unsigned long)) == 0)
+		else if(strcmp(type, @encode(unsigned long)) == 0)
 		{
 			return [TSUtils stringifyUnsignedLong:[number unsignedLongValue]];
 		}
-		else if(strcmp([number objCType], @encode(double)) == 0)
+		else if(strcmp(type, @encode(double)) == 0)
 		{
 			return [TSUtils stringifyDouble:[number doubleValue]];
 		}
-		else if(strcmp([number objCType], @encode(float)) == 0)
+		else if(strcmp(type, @encode(float)) == 0)
 		{
 			return [TSUtils stringifyFloat:[number floatValue]];
 		}
-		else if(strcmp([number objCType], @encode(BOOL)) == 0)
+		else if(strcmp(type, @encode(BOOL)) == 0 || strcmp(type, @encode(char)) == 0)
 		{
 			return [TSUtils stringifyBOOL:[number boolValue]];
 		}
