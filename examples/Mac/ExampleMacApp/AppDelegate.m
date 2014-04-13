@@ -11,6 +11,8 @@
 
 @implementation AppDelegate
 
+@synthesize products, request;
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     // Insert code here to initialize your application
@@ -45,7 +47,65 @@
     [e addValue:@10.1 forKey:@"degrees"];
     [e addValue:@5 forKey:@"score"];
     [tracker fireEvent:e];
+    
+    [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+    
+    NSArray *productIds = @[@"com.tapstream.catalog.mac.tiddlywinks"];
+    request = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithArray:productIds]];
+    request.delegate = self;
+    [request start];
+
 
 }
+
+- (void)request:(SKRequest *)request didFailWithError:(NSError *)error
+{
+    NSLog(@"%@", error.description);
+}
+
+// SKProductsRequestDelegate protocol method
+- (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response
+{
+    self.products = response.products;
+    
+    for (NSString *ident in response.invalidProductIdentifiers) {
+        NSLog(@"Invalid product id: %@", ident);
+    }
+    
+    for (NSString *ident in response.products) {
+        NSLog(@"Product id: %@", ident);
+    }
+    
+    if(self.products.count > 0) {
+        SKProduct *product = [self.products objectAtIndex:0];
+        
+        SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
+        payment.quantity = 2;
+        
+        [[SKPaymentQueue defaultQueue] addPayment:payment];
+    }
+}
+
+- (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
+{
+    for (SKPaymentTransaction *transaction in transactions) {
+        switch (transaction.transactionState) {
+                // Call the appropriate custom method.
+            case SKPaymentTransactionStatePurchased:
+                NSLog(@"StatePurchased %@", transaction.payment.productIdentifier);
+                [queue finishTransaction:transaction];
+                break;
+            case SKPaymentTransactionStateFailed:
+                NSLog(@"StateFailed %@", transaction.payment.productIdentifier);
+                break;
+            case SKPaymentTransactionStateRestored:
+                NSLog(@"StateRestored %@", transaction.payment.productIdentifier);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 
 @end

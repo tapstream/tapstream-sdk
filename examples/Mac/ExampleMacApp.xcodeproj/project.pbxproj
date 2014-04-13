@@ -25,10 +25,11 @@
 		12A9858B185A6BC500D388CD /* TSPlatformImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A9857F185A6BC500D388CD /* TSPlatformImpl.m */; };
 		12A9858C185A6BC500D388CD /* TSTapstream.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A98581185A6BC500D388CD /* TSTapstream.m */; };
 		12D1D92518FB271400464A96 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12D1D92418FB271400464A96 /* IOKit.framework */; };
+		12D1D92718FB2E7B00464A96 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12D1D92618FB2E7B00464A96 /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		120430E4167D4A7B00F509B7 /* ExampleMacApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleMacApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		120430E4167D4A7B00F509B7 /* TapstreamMacTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TapstreamMacTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		120430E8167D4A7B00F509B7 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		120430EB167D4A7B00F509B7 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		120430EC167D4A7B00F509B7 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -71,6 +72,7 @@
 		12A98580185A6BC500D388CD /* TSTapstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSTapstream.h; sourceTree = "<group>"; };
 		12A98581185A6BC500D388CD /* TSTapstream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSTapstream.m; sourceTree = "<group>"; };
 		12D1D92418FB271400464A96 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		12D1D92618FB2E7B00464A96 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,6 +80,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				12D1D92718FB2E7B00464A96 /* StoreKit.framework in Frameworks */,
 				12D1D92518FB271400464A96 /* IOKit.framework in Frameworks */,
 				120430E9167D4A7B00F509B7 /* Cocoa.framework in Frameworks */,
 			);
@@ -100,7 +103,7 @@
 		120430E5167D4A7B00F509B7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				120430E4167D4A7B00F509B7 /* ExampleMacApp.app */,
+				120430E4167D4A7B00F509B7 /* TapstreamMacTest.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -108,6 +111,7 @@
 		120430E7167D4A7B00F509B7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				12D1D92618FB2E7B00464A96 /* StoreKit.framework */,
 				12D1D92418FB271400464A96 /* IOKit.framework */,
 				120430E8167D4A7B00F509B7 /* Cocoa.framework */,
 				120430EA167D4A7B00F509B7 /* Other Frameworks */,
@@ -218,7 +222,7 @@
 			);
 			name = ExampleMacApp;
 			productName = ExampleMacApp;
-			productReference = 120430E4167D4A7B00F509B7 /* ExampleMacApp.app */;
+			productReference = 120430E4167D4A7B00F509B7 /* TapstreamMacTest.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -369,7 +373,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ExampleMacApp/ExampleMacApp-Prefix.pch";
 				INFOPLIST_FILE = "ExampleMacApp/ExampleMacApp-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = TapstreamMacTest;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -381,7 +385,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ExampleMacApp/ExampleMacApp-Prefix.pch";
 				INFOPLIST_FILE = "ExampleMacApp/ExampleMacApp-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = TapstreamMacTest;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
