@@ -269,10 +269,11 @@
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 	return [[[[UIDevice currentDevice] identifierForVendor] UUIDString] stringByReplacingOccurrencesOfString:@"-" withString:@""];
 #else
-#pragma comment(lib, 'IOKit.framework')
-	
+
 	// Adapted from Listing 1-3
 	// https://developer.apple.com/library/mac/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateLocally.html
+    //
+    // Requires the project to link against the IOKit framework
 	
 	kern_return_t kernResult;
 	mach_port_t masterPort;

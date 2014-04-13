@@ -65,10 +65,7 @@ static TSTapstream *instance = nil;
 		del = [[TSDelegateImpl alloc] initWithTapstream:self];
 		platform = [[TSPlatformImpl alloc] init];
 		listener = [[TSCoreListenerImpl alloc] init];
-
-#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 		appEventSource = [[TSAppEventSourceImpl alloc] init];
-#endif
 
 		self.core = AUTORELEASE([[TSCore alloc] initWithDelegate:del
 			platform:platform
