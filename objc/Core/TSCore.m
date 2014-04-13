@@ -465,13 +465,13 @@
 
 	// Fields necessary for receipt validation
 	// Use developer-provided values (if available) for stricter validation, otherwise get values from bundle
-	[self appendPostPairWithPrefix:@"" key:@"computer-guid" value:[platform getComputerGUID]];
+	[self appendPostPairWithPrefix:@"" key:@"receipt-guid" value:[platform getComputerGUID]];
 	
 	NSString *bundleId = config.hardcodedBundleId ? config.hardcodedBundleId : [platform getBundleIdentifier];
-	[self appendPostPairWithPrefix:@"" key:@"app-bundle-id" value:bundleId];
+	[self appendPostPairWithPrefix:@"" key:@"receipt-bundle-id" value:bundleId];
 
 	NSString *shortVersion = config.hardcodedBundleShortVersionString ? config.hardcodedBundleShortVersionString : [platform getBundleShortVersion];
-	[self appendPostPairWithPrefix:@"" key:@"app-short-version" value:shortVersion];
+	[self appendPostPairWithPrefix:@"" key:@"receipt-short-version" value:shortVersion];
 }
 
 

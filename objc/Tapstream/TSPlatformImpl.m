@@ -267,8 +267,9 @@
 - (NSString *)getComputerGUID
 {
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-	return [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+	return [[[[UIDevice currentDevice] identifierForVendor] UUIDString] stringByReplacingOccurrencesOfString:@"-" withString:@""];
 #else
+#pragma comment(lib, 'IOKit.framework')
 	
 	// Adapted from Listing 1-3
 	// https://developer.apple.com/library/mac/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateLocally.html
@@ -309,7 +310,12 @@
 	IOObjectRelease(iterator);
 	
 	if(macAddress) {
-		NSString *addr = [NSString stringWithUTF8String:(const char *)CFDataGetBytePtr(macAddress)];
+        NSMutableString *addr = [NSMutableString stringWithCapacity:32];
+        const unsigned char *bytes = CFDataGetBytePtr(macAddress);
+        long len = CFDataGetLength(macAddress);
+        for(long i = 0; i < len; i++) {
+            [addr appendFormat:@"%02x", bytes[i]];
+        }
 		CFRelease(macAddress);
 		return addr;
 	}

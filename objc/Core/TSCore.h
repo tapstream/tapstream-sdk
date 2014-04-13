@@ -18,7 +18,6 @@
 	TSConfig *config;
 	NSString *accountName;
 	NSMutableString *postData;
-	NSMutableString *receiptExtras;
 	NSMutableSet *firingEvents;
 	NSMutableSet *firedEvents;
 	NSString *failingEventId;
