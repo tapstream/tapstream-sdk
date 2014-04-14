@@ -15,6 +15,8 @@
 
 - (void)dealloc
 {
+    [products release];
+    [request release];
     [_window release];
     [super dealloc];
 }
