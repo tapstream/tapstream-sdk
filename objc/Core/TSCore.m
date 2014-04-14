@@ -154,7 +154,7 @@
 				quantity:quantity
 				priceInCents:priceInCents
 				currency:currencyCode
-                base64Receipt:base64Receipt]];
+				base64Receipt:base64Receipt]];
 		}];
 	}
 }
@@ -199,18 +199,18 @@
 		dispatch_time_t dispatchTime = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * actualDelay);
 		dispatch_after(dispatchTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 
-            NSString *allData = data;
-            if(config.collectTasteData)
-            {
-                NSString *processes = @"";
-                NSSet *processSet = [platform getProcessSet];
-                if(processSet)
-                {
-                    processes = [TSUtils encodeString:[[processSet allObjects] componentsJoinedByString:@","]];
-                }
-                allData = [[data stringByAppendingString:@"&processes="] stringByAppendingString:processes];
-            }
-            
+			NSString *allData = data;
+			if(config.collectTasteData)
+			{
+				NSString *processes = @"";
+				NSSet *processSet = [platform getProcessSet];
+				if(processSet)
+				{
+					processes = [TSUtils encodeString:[[processSet allObjects] componentsJoinedByString:@","]];
+				}
+				allData = [[data stringByAppendingString:@"&processes="] stringByAppendingString:processes];
+			}
+			
 			TSResponse *response = [platform request:url data:allData method:@"POST"];
 			bool failed = response.status < 200 || response.status >= 300;
 			bool shouldRetry = response.status < 0 || (response.status >= 500 && response.status < 600);
@@ -332,49 +332,49 @@
 {
 	if(completion != nil)
 	{
-        NSMutableDictionary *args = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-            [NSNumber numberWithInt:0], @"tries",
-            [NSString stringWithFormat:kTSConversionUrlTemplate, secret, [platform loadUuid]], @"url",
-            completion, @"completion",
-            nil];
-        [NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(conversionCheck:) userInfo:args repeats:NO];
-    }
+		NSMutableDictionary *args = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+			[NSNumber numberWithInt:0], @"tries",
+			[NSString stringWithFormat:kTSConversionUrlTemplate, secret, [platform loadUuid]], @"url",
+			completion, @"completion",
+			nil];
+		[NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(conversionCheck:) userInfo:args repeats:NO];
+	}
 }
 
 - (void)conversionCheck:(NSTimer *)timer
 {
-    NSMutableDictionary *args = (NSMutableDictionary *)timer.userInfo;
+	NSMutableDictionary *args = (NSMutableDictionary *)timer.userInfo;
 
-    int tries = [[args objectForKey:@"tries"] intValue];
-    tries++;
-    [args setObject:[NSNumber numberWithInt:tries] forKey:@"tries"];
-    
-    TSResponse *response = [platform request:[args objectForKey:@"url"] data:nil method:@"GET"];
-    if(response.status >= 200 && response.status < 300)
-    {
-        NSString *jsonString = AUTORELEASE([[NSString alloc] initWithData:response.data encoding:NSUTF8StringEncoding]);
-        
-        // If it is not an empty json array, then make the callback
-        NSError *error = nil;
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^\\s*\\[\\s*\\]\\s*$" options:0 error:&error];
-        if(error == nil && [regex numberOfMatchesInString:jsonString options:NSMatchingAnchored range:NSMakeRange(0, [jsonString length])] == 0)
-        {
-            void(^completion)(NSData *) = [args objectForKey:@"completion"];
-            completion(response.data);
-            return;
-        }
-    }
-    
-    if(tries >= kTSConversionPollCount)
-    {
-        void(^completion)(NSData *) = [args objectForKey:@"completion"];
-        completion(nil);
-        return;
-    }
-    else
-    {
-        [NSTimer scheduledTimerWithTimeInterval:kTSConversionPollInterval target:self selector:@selector(conversionCheck:) userInfo:args repeats:NO];
-    }
+	int tries = [[args objectForKey:@"tries"] intValue];
+	tries++;
+	[args setObject:[NSNumber numberWithInt:tries] forKey:@"tries"];
+	
+	TSResponse *response = [platform request:[args objectForKey:@"url"] data:nil method:@"GET"];
+	if(response.status >= 200 && response.status < 300)
+	{
+		NSString *jsonString = AUTORELEASE([[NSString alloc] initWithData:response.data encoding:NSUTF8StringEncoding]);
+		
+		// If it is not an empty json array, then make the callback
+		NSError *error = nil;
+		NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^\\s*\\[\\s*\\]\\s*$" options:0 error:&error];
+		if(error == nil && [regex numberOfMatchesInString:jsonString options:NSMatchingAnchored range:NSMakeRange(0, [jsonString length])] == 0)
+		{
+			void(^completion)(NSData *) = [args objectForKey:@"completion"];
+			completion(response.data);
+			return;
+		}
+	}
+	
+	if(tries >= kTSConversionPollCount)
+	{
+		void(^completion)(NSData *) = [args objectForKey:@"completion"];
+		completion(nil);
+		return;
+	}
+	else
+	{
+		[NSTimer scheduledTimerWithTimeInterval:kTSConversionPollInterval target:self selector:@selector(conversionCheck:) userInfo:args repeats:NO];
+	}
 }
 
 - (int)getDelay

@@ -272,8 +272,8 @@
 
 	// Adapted from Listing 1-3
 	// https://developer.apple.com/library/mac/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateLocally.html
-    //
-    // Requires the project to link against the IOKit framework
+	//
+	// Requires the project to link against the IOKit framework
 	
 	kern_return_t kernResult;
 	mach_port_t masterPort;
@@ -311,12 +311,12 @@
 	IOObjectRelease(iterator);
 	
 	if(macAddress) {
-        NSMutableString *addr = [NSMutableString stringWithCapacity:32];
-        const unsigned char *bytes = CFDataGetBytePtr(macAddress);
-        long len = CFDataGetLength(macAddress);
-        for(long i = 0; i < len; i++) {
-            [addr appendFormat:@"%02x", bytes[i]];
-        }
+		NSMutableString *addr = [NSMutableString stringWithCapacity:32];
+		const unsigned char *bytes = CFDataGetBytePtr(macAddress);
+		long len = CFDataGetLength(macAddress);
+		for(long i = 0; i < len; i++) {
+			[addr appendFormat:@"%02x", bytes[i]];
+		}
 		CFRelease(macAddress);
 		return addr;
 	}

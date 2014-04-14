@@ -29,9 +29,9 @@
 	BOOL fireAutomaticInstallEvent;
 	BOOL fireAutomaticOpenEvent;
 	BOOL fireAutomaticIAPEvents;
-    
-    // Unset this if you want to disable the collection of taste data
-    BOOL collectTasteData;
+	
+	// Unset this if you want to disable the collection of taste data
+	BOOL collectTasteData;
 
 	// These parameters will be automatically attached to all events fired by the sdk
 	NSMutableDictionary *globalEventParams;

@@ -26,10 +26,10 @@
 }
 
 + (id)eventWithTransactionId:(NSString *)transactionId
-    productId:(NSString *)productId
-    quantity:(int)quantity
-    priceInCents:(int)priceInCents
-    currency:(NSString *)currencyCode
+	productId:(NSString *)productId
+	quantity:(int)quantity
+	priceInCents:(int)priceInCents
+	currency:(NSString *)currencyCode
 {
 	return AUTORELEASE([[self alloc] initWithTransactionId:transactionId productId:productId quantity:quantity priceInCents:priceInCents currency:currencyCode]);
 }
@@ -39,7 +39,7 @@
 	quantity:(int)quantity
 	priceInCents:(int)priceInCents
 	currency:(NSString *)currencyCode
-    base64Receipt:(NSString *)base64Receipt
+	base64Receipt:(NSString *)base64Receipt
 {
 	return AUTORELEASE([[self alloc] initWithTransactionId:transactionId productId:productId quantity:quantity priceInCents:priceInCents currency:currencyCode base64Receipt:base64Receipt]);
 }
@@ -82,10 +82,10 @@
 }
 
 - (id)initWithTransactionId:(NSString *)transactionId
-                  productId:(NSString *)productIdVal
-                   quantity:(int)quantity
-               priceInCents:(int)priceInCents
-                   currency:(NSString *)currencyCode
+				  productId:(NSString *)productIdVal
+				   quantity:(int)quantity
+			   priceInCents:(int)priceInCents
+				   currency:(NSString *)currencyCode
 {
 	if((self = [super init]) != nil)
 	{
@@ -96,7 +96,7 @@
 		isOneTimeOnly = NO;
 		isTransaction = YES;
 		customFields = RETAIN([NSMutableDictionary dictionaryWithCapacity:16]);
-        
+		
 		[self addValue:transactionId forKey:@"purchase-transaction-id" withPrefix:@"" limitValueLength:YES];
 		[self addValue:productId forKey:@"purchase-product-id" withPrefix:@"" limitValueLength:YES];
 		[self addValue:[NSNumber numberWithInt:quantity] forKey:@"purchase-quantity" withPrefix:@"" limitValueLength:YES];
@@ -111,7 +111,7 @@
 	quantity:(int)quantity
 	priceInCents:(int)priceInCents
 	currency:(NSString *)currencyCode
-    base64Receipt:(NSString *)base64Receipt
+	base64Receipt:(NSString *)base64Receipt
 {
 	if((self = [super init]) != nil)
 	{
@@ -128,7 +128,7 @@
 		[self addValue:[NSNumber numberWithInt:quantity] forKey:@"purchase-quantity" withPrefix:@"" limitValueLength:YES];
 		[self addValue:[NSNumber numberWithInt:priceInCents] forKey:@"purchase-price" withPrefix:@"" limitValueLength:YES];
 		[self addValue:currencyCode forKey:@"purchase-currency" withPrefix:@"" limitValueLength:YES];
-        [self addValue:base64Receipt forKey:@"purchase-receipt" withPrefix:@"" limitValueLength:NO];
+		[self addValue:base64Receipt forKey:@"purchase-receipt" withPrefix:@"" limitValueLength:NO];
 	}
 	return self;
 }
