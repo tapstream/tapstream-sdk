@@ -32,17 +32,17 @@
 	quantity:(int)quantity;
 
 + (id)eventWithTransactionId:(NSString *)transactionId
-    productId:(NSString *)productId
-    quantity:(int)quantity
-    priceInCents:(int)priceInCents
-    currency:(NSString *)currencyCode;
+	productId:(NSString *)productId
+	quantity:(int)quantity
+	priceInCents:(int)priceInCents
+	currency:(NSString *)currencyCode;
 
 + (id)eventWithTransactionId:(NSString *)transactionId
 	productId:(NSString *)productId
 	quantity:(int)quantity
 	priceInCents:(int)priceInCents
 	currency:(NSString *)currencyCode
-    base64Receipt:(NSString *)base64Receipt;
+	base64Receipt:(NSString *)base64Receipt;
 
 - (void)addValue:(NSObject *)obj forKey:(NSString *)key;
 
