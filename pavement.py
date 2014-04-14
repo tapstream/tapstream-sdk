@@ -201,10 +201,10 @@ def make_objc():
 		))
 		
 		# Mac With and without ARC
-		sh('clang -fno-objc-arc -shared %s %s -o ./TapstreamTest/bin/Tapstream.so -framework Foundation -framework AppKit' % (
+		sh('clang -fno-objc-arc -shared %s %s -o ./TapstreamTest/bin/Tapstream.so -framework Foundation -framework AppKit -framework IOKit' % (
 			include_dirs, tapstream_sources
 		))
-		sh('clang -fobjc-arc -shared %s %s -o ./TapstreamTest/bin/Tapstream.so -framework Foundation -framework AppKit' % (
+		sh('clang -fobjc-arc -shared %s %s -o ./TapstreamTest/bin/Tapstream.so -framework Foundation -framework AppKit -framework IOKit' % (
 			include_dirs, tapstream_sources
 		))
 
@@ -213,7 +213,7 @@ def make_objc():
 			include_dirs, tapstream_test_sources
 		))
 		# Compile test application for mac
-		sh('clang++ -fobjc-arc %s %s -o ./TapstreamTest/bin/TapstreamTestMac -DTEST_PLATFORM=mac -lv8 -framework Foundation' % (
+		sh('clang++ -fobjc-arc %s %s -o ./TapstreamTest/bin/TapstreamTestMac -DTEST_PLATFORM=mac -lv8 -framework Foundation -framework IOKit' % (
 			include_dirs, tapstream_test_sources
 		))
 		
