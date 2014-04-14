@@ -31,10 +31,11 @@
 		126B0206188871530021C123 /* TSCoreListenerImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 126B01F9188871530021C123 /* TSCoreListenerImpl.m */; };
 		126B0207188871530021C123 /* TSPlatformImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 126B01FB188871530021C123 /* TSPlatformImpl.m */; };
 		126B0208188871530021C123 /* TSTapstream.m in Sources */ = {isa = PBXBuildFile; fileRef = 126B01FD188871530021C123 /* TSTapstream.m */; };
+		12D1D92918FB48C200464A96 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12D1D92818FB48C200464A96 /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		12043064167D475800F509B7 /* ExampleAppNoARC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleAppNoARC.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		12043064167D475800F509B7 /* ExampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		12043068167D475800F509B7 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		1204306A167D475800F509B7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1204306C167D475800F509B7 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -82,6 +83,7 @@
 		126B01FB188871530021C123 /* TSPlatformImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSPlatformImpl.m; sourceTree = "<group>"; };
 		126B01FC188871530021C123 /* TSTapstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSTapstream.h; sourceTree = "<group>"; };
 		126B01FD188871530021C123 /* TSTapstream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSTapstream.m; sourceTree = "<group>"; };
+		12D1D92818FB48C200464A96 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +91,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				12D1D92918FB48C200464A96 /* StoreKit.framework in Frameworks */,
 				12043069167D475800F509B7 /* UIKit.framework in Frameworks */,
 				1204306B167D475800F509B7 /* Foundation.framework in Frameworks */,
 				1204306D167D475800F509B7 /* CoreGraphics.framework in Frameworks */,
@@ -112,7 +115,7 @@
 		12043065167D475800F509B7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				12043064167D475800F509B7 /* ExampleAppNoARC.app */,
+				12043064167D475800F509B7 /* ExampleApp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -120,6 +123,7 @@
 		12043067167D475800F509B7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				12D1D92818FB48C200464A96 /* StoreKit.framework */,
 				12043068167D475800F509B7 /* UIKit.framework */,
 				1204306A167D475800F509B7 /* Foundation.framework */,
 				1204306C167D475800F509B7 /* CoreGraphics.framework */,
@@ -227,7 +231,7 @@
 			);
 			name = ExampleAppNoARC;
 			productName = ExampleAppNoARC;
-			productReference = 12043064167D475800F509B7 /* ExampleAppNoARC.app */;
+			productReference = 12043064167D475800F509B7 /* ExampleApp.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -382,7 +386,7 @@
 				GCC_PREFIX_HEADER = "ExampleAppNoARC/ExampleAppNoARC-Prefix.pch";
 				INFOPLIST_FILE = "ExampleAppNoARC/ExampleAppNoARC-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = ExampleApp;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -394,7 +398,7 @@
 				GCC_PREFIX_HEADER = "ExampleAppNoARC/ExampleAppNoARC-Prefix.pch";
 				INFOPLIST_FILE = "ExampleAppNoARC/ExampleAppNoARC-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = ExampleApp;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

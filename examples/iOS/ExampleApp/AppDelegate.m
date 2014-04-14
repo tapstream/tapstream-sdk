@@ -103,6 +103,7 @@
                 break;
             case SKPaymentTransactionStateFailed:
                 NSLog(@"StateFailed %@", transaction.payment.productIdentifier);
+                [queue finishTransaction:transaction];
                 break;
             case SKPaymentTransactionStateRestored:
                 NSLog(@"StateRestored %@", transaction.payment.productIdentifier);

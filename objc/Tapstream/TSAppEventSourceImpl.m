@@ -123,27 +123,46 @@ static void TSLoadStoreKitClasses()
         {
             case SKPaymentTransactionStatePurchased:
             {
+                
+                // Load receipt data and stash it for use after the transaction is finished.
+                // Note:  We have to grab this data now because consumable purchases get removed from
+                // the receipt after the transaction is finished.
+                
+                NSData *receipt = nil;
+                
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
                 // For ios 7 and up, try to get the Grand Unified Receipt
+                // If we can't get that, fall back to the transactionReceipt
                 if(floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
                 {
-#endif
-                    // Load Grand Unified Receipt data and stash it for use after the transaction is finished.
-                    // Note:  We have to grab this data now because consumable purchases get removed from
-                    // the receipt after the transaction is finished.
-                    NSURL *receiptURL = [[NSBundle mainBundle] appStoreReceiptURL];
-                    NSData *receipt = [NSData dataWithContentsOfURL:receiptURL];
-                    if(receipt)
-                    {
-                        @synchronized(self)
-                        {
-                            [self.transactionReceiptSnapshots setObject:receipt forKey:transaction.transactionIdentifier];
-                        }
-                    }
-                    
-#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+                    receipt = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]];
                 }
+                if(!receipt)
+                {
+                    receipt = transaction.transactionReceipt;
+                }
+#else
+                // For mac, try to load the receipt out of the bundle.  If appStoreReceiptURL method is
+                // available, use it.
+                NSURL *receiptUrl;
+                if([[NSBundle mainBundle] respondsToSelector:@selector(appStoreReceiptURL)])
+                {
+                    receiptUrl = [[NSBundle mainBundle] appStoreReceiptURL];
+                }
+                else
+                {
+                    receiptUrl = [[[NSBundle mainBundle] bundleURL] URLByAppendingPathComponent:@"Contents/_MASReceipt/receipt"];
+                }
+                receipt = [NSData dataWithContentsOfURL:receiptUrl];
 #endif
+                
+                if(receipt)
+                {
+                    @synchronized(self)
+                    {
+                        [self.transactionReceiptSnapshots setObject:receipt forKey:transaction.transactionIdentifier];
+                    }
+                }
             }
             break;
         }
@@ -195,17 +214,10 @@ static void TSLoadStoreKitClasses()
                 NSData *receipt = nil;
                 @synchronized(self)
                 {
-                    receipt = [self.transactionReceiptSnapshots objectForKey:transaction.transactionIdentifier];
+                    receipt = RETAIN([self.transactionReceiptSnapshots objectForKey:transaction.transactionIdentifier]);
                     [self.transactionReceiptSnapshots removeObjectForKey:transaction.transactionIdentifier];
                 }
                 
-#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-                // On iOS, fallback to receipt data stored on the transaction object
-                if(!receipt)
-                {
-                    receipt = transaction.transactionReceipt;
-                }
-#endif
                 NSString *b64Receipt = receipt ? [receipt base64EncodedStringWithOptions:0] : @"";
                 
 				onTransaction(transaction.transactionIdentifier,
