@@ -128,7 +128,7 @@
 		[self addValue:[NSNumber numberWithInt:quantity] forKey:@"purchase-quantity" withPrefix:@"" limitValueLength:YES];
 		[self addValue:[NSNumber numberWithInt:priceInCents] forKey:@"purchase-price" withPrefix:@"" limitValueLength:YES];
 		[self addValue:currencyCode forKey:@"purchase-currency" withPrefix:@"" limitValueLength:YES];
-		[self addValue:base64Receipt forKey:@"purchase-receipt" withPrefix:@"" limitValueLength:NO];
+		[self addValue:base64Receipt forKey:@"receipt-body" withPrefix:@"" limitValueLength:NO];
 	}
 	return self;
 }
