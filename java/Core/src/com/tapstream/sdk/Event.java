@@ -75,7 +75,7 @@ public class Event {
 			addPair("", "purchase-quantity", 1, true);
 		}
 		
-		addPair("", "purchase-receipt", signature, false);
+		addPair("", "receipt-body", signature, false);
 	}
 
 	public void addPair(String key, Object value) {
