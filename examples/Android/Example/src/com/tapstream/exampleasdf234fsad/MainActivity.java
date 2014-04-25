@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -15,7 +14,6 @@ import android.view.Menu;
 
 import com.google.analytics.tracking.android.EasyTracker;
 import com.tapstream.sdk.Config;
-import com.tapstream.sdk.ConversionListener;
 import com.tapstream.sdk.Event;
 import com.tapstream.sdk.Tapstream;
 
@@ -24,7 +22,7 @@ public class MainActivity extends Activity {
 	protected static final String TAG = "MainActivity";
 	
 	private static final String SKU = "android.test.purchased";
-	//private static final String SKU = "com.tapstream.catalog.tiddlywinks";
+	//private static final String SKU = "com.tapstream.catalog.tiddlywinks2";
 	
 	private IabHelper mHelper;
 	private IabHelper.QueryInventoryFinishedListener mGotInventoryListener;
@@ -111,9 +109,7 @@ public class MainActivity extends Activity {
 					// Fortunately, we stored the Inventory instance in a member variable so we can still access it.
 					SkuDetails skuDetails = mInventory.mSkuMap.get(purchase.getSku());
 					try {
-						JSONObject purchaseJson = new JSONObject(purchase.mOriginalJson);
-						JSONObject skuDetailsJson = new JSONObject(skuDetails.mJson);			
-						Event event = new Event(purchaseJson, skuDetailsJson, purchase.getSignature());
+						Event event = new Event(purchase.mOriginalJson, skuDetails.mJson, purchase.getSignature());
 						Tapstream.getInstance().fireEvent(event);
 					} catch (JSONException e) {
 						e.printStackTrace();

@@ -12,12 +12,10 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+import org.json.JSONException;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class TestRunner {
 	public class Util {
@@ -94,9 +92,7 @@ public class TestRunner {
 		}
 
 		public Event newEvent(String purchaseJson, String skuDetailsJson) throws JSONException {
-			JSONObject purchase = new JSONObject(purchaseJson);
-			JSONObject skuDetails = new JSONObject(skuDetailsJson);
-			return new Event(purchase, skuDetails, "asdfasdfsignatureasdfasdf");
+			return new Event(purchaseJson, skuDetailsJson, "asdfasdfsignatureasdfasdf");
 		}
 
 		public void prepareEvent(Tapstream ts, Event e) {

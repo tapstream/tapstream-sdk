@@ -51,9 +51,13 @@ public class Event {
 	}
 
 	// Only to be used for creating IAB purchase events
-	public Event(JSONObject purchase, JSONObject skuDetails, String signature) throws JSONException {
+	public Event(String purchaseDataJson, String skuDetailsJson, String signature) throws JSONException {
 		this("", false);
 		isTransaction = true;
+		
+		JSONObject skuDetails = new JSONObject(skuDetailsJson);
+		JSONObject purchase = new JSONObject(purchaseDataJson);
+		
 		productSku = purchase.getString("productId");
 		String orderId = purchase.getString("orderId");
 
@@ -75,7 +79,11 @@ public class Event {
 			addPair("", "purchase-quantity", 1, true);
 		}
 		
-		addPair("", "receipt-body", signature, false);
+		JSONObject receipt = new JSONObject();
+		receipt.put("purchase_data", purchaseDataJson);
+		receipt.put("signature", signature);
+		
+		addPair("", "receipt-body", receipt.toString(), false);
 	}
 
 	public void addPair(String key, Object value) {
