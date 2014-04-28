@@ -335,7 +335,7 @@
 		NSMutableDictionary *args = [NSMutableDictionary dictionaryWithObjectsAndKeys:
 			[NSNumber numberWithInt:0], @"tries",
 			[NSString stringWithFormat:kTSConversionUrlTemplate, secret, [platform loadUuid]], @"url",
-			completion, @"completion",
+			[completion copy], @"completion",
 			nil];
 		[NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(conversionCheck:) userInfo:args repeats:NO];
 	}
