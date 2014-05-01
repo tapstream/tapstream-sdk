@@ -267,7 +267,15 @@
 - (NSString *)getComputerGUID
 {
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-	return [[[[UIDevice currentDevice] identifierForVendor] UUIDString] stringByReplacingOccurrencesOfString:@"-" withString:@""];
+	// Only need this value on ios 7 and up (for grand unified receipt validation)
+	if(floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
+	{
+		return [[[[UIDevice currentDevice] identifierForVendor] UUIDString] stringByReplacingOccurrencesOfString:@"-" withString:@""];
+	}
+	else
+	{
+		return @"";
+	}
 #else
 
 	// Adapted from Listing 1-3
