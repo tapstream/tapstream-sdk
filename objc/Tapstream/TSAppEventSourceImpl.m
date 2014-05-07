@@ -227,7 +227,10 @@ static void TSLoadStoreKitClasses()
 					}
 					else
 					{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 						b64Receipt = [receipt base64Encoding];
+#pragma clang diagnostic pop
 					}
 				}
 				
