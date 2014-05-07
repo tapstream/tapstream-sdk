@@ -3,7 +3,7 @@
 #import "TSLogging.h"
 #import "TSUtils.h"
 
-#define kTSVersion @"2.7"
+#define kTSVersion @"2.7.1"
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
 #define kTSHitUrlTemplate @"http://api.tapstream.com/%@/hit/%@.gif"
 #define kTSConversionUrlTemplate @"https://reporting.tapstream.com/v1/timelines/lookup?secret=%@&event_session=%@"
@@ -335,7 +335,7 @@
 		NSMutableDictionary *args = [NSMutableDictionary dictionaryWithObjectsAndKeys:
 			[NSNumber numberWithInt:0], @"tries",
 			[NSString stringWithFormat:kTSConversionUrlTemplate, secret, [platform loadUuid]], @"url",
-			completion, @"completion",
+			AUTORELEASE([completion copy]), @"completion",
 			nil];
 		[NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(conversionCheck:) userInfo:args repeats:NO];
 	}
