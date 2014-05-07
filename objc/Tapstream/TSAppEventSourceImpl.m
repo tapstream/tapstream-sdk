@@ -218,7 +218,18 @@ static void TSLoadStoreKitClasses()
                     [self.transactionReceiptSnapshots removeObjectForKey:transaction.transactionIdentifier];
                 }
                 
-                NSString *b64Receipt = receipt ? [receipt base64EncodedStringWithOptions:0] : @"";
+                NSString *b64Receipt = @"";
+                if(receipt)
+                {
+					if([receipt respondsToSelector:@selector(base64EncodedStringWithOptions:)])
+					{
+						b64Receipt = [receipt base64EncodedStringWithOptions:0];
+					}
+					else
+					{
+						b64Receipt = [receipt base64Encoding];
+					}
+				}
                 
 				onTransaction(transaction.transactionIdentifier,
 					product.productIdentifier,
