@@ -110,63 +110,63 @@ static void TSLoadStoreKitClasses()
 			self.requestTransactions = [NSMutableDictionary dictionary];
 			[[TSSKPaymentQueue defaultQueue] addTransactionObserver:self];
 		}
-        self.transactionReceiptSnapshots = [NSMutableDictionary dictionary];
+		self.transactionReceiptSnapshots = [NSMutableDictionary dictionary];
 	}
 	return self;
 }
 
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
 {
-    for(SKPaymentTransaction *transaction in transactions)
-    {
-        switch(transaction.transactionState)
-        {
-            case SKPaymentTransactionStatePurchased:
-            {
-                
-                // Load receipt data and stash it for use after the transaction is finished.
-                // Note:  We have to grab this data now because consumable purchases get removed from
-                // the receipt after the transaction is finished.
-                
-                NSData *receipt = nil;
-                
+	for(SKPaymentTransaction *transaction in transactions)
+	{
+		switch(transaction.transactionState)
+		{
+			case SKPaymentTransactionStatePurchased:
+			{
+				
+				// Load receipt data and stash it for use after the transaction is finished.
+				// Note:  We have to grab this data now because consumable purchases get removed from
+				// the receipt after the transaction is finished.
+				
+				NSData *receipt = nil;
+				
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-                // For ios 7 and up, try to get the Grand Unified Receipt
-                // If we can't get that, fall back to the transactionReceipt
-                if(floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
-                {
-                    receipt = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]];
-                }
-                if(!receipt)
-                {
-                    receipt = transaction.transactionReceipt;
-                }
+				// For ios 7 and up, try to get the Grand Unified Receipt
+				// If we can't get that, fall back to the transactionReceipt
+				if(floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
+				{
+					receipt = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]];
+				}
+				if(!receipt)
+				{
+					receipt = transaction.transactionReceipt;
+				}
 #else
-                // For mac, try to load the receipt out of the bundle.  If appStoreReceiptURL method is
-                // available, use it.
-                NSURL *receiptUrl;
-                if([[NSBundle mainBundle] respondsToSelector:@selector(appStoreReceiptURL)])
-                {
-                    receiptUrl = [[NSBundle mainBundle] appStoreReceiptURL];
-                }
-                else
-                {
-                    receiptUrl = [[[NSBundle mainBundle] bundleURL] URLByAppendingPathComponent:@"Contents/_MASReceipt/receipt"];
-                }
-                receipt = [NSData dataWithContentsOfURL:receiptUrl];
+				// For mac, try to load the receipt out of the bundle.  If appStoreReceiptURL method is
+				// available, use it.
+				NSURL *receiptUrl;
+				if([[NSBundle mainBundle] respondsToSelector:@selector(appStoreReceiptURL)])
+				{
+					receiptUrl = [[NSBundle mainBundle] appStoreReceiptURL];
+				}
+				else
+				{
+					receiptUrl = [[[NSBundle mainBundle] bundleURL] URLByAppendingPathComponent:@"Contents/_MASReceipt/receipt"];
+				}
+				receipt = [NSData dataWithContentsOfURL:receiptUrl];
 #endif
-                
-                if(receipt)
-                {
-                    @synchronized(self)
-                    {
-                        [self.transactionReceiptSnapshots setObject:receipt forKey:transaction.transactionIdentifier];
-                    }
-                }
-            }
-            break;
-        }
-    }
+				
+				if(receipt)
+				{
+					@synchronized(self)
+					{
+						[self.transactionReceiptSnapshots setObject:receipt forKey:transaction.transactionIdentifier];
+					}
+				}
+			}
+			break;
+		}
+	}
 }
 
 - (void)paymentQueue:(SKPaymentQueue *)queue removedTransactions:(NSArray *)transactions
@@ -211,16 +211,16 @@ static void TSLoadStoreKitClasses()
 			SKPaymentTransaction *transaction = [transactions objectForKey:product.productIdentifier];
 			if(transaction)
 			{
-                NSData *receipt = nil;
-                @synchronized(self)
-                {
-                    receipt = RETAIN([self.transactionReceiptSnapshots objectForKey:transaction.transactionIdentifier]);
-                    [self.transactionReceiptSnapshots removeObjectForKey:transaction.transactionIdentifier];
-                }
-                
-                NSString *b64Receipt = @"";
-                if(receipt)
-                {
+				NSData *receipt = nil;
+				@synchronized(self)
+				{
+					receipt = RETAIN([self.transactionReceiptSnapshots objectForKey:transaction.transactionIdentifier]);
+					[self.transactionReceiptSnapshots removeObjectForKey:transaction.transactionIdentifier];
+				}
+				
+				NSString *b64Receipt = @"";
+				if(receipt)
+				{
 					if([receipt respondsToSelector:@selector(base64EncodedStringWithOptions:)])
 					{
 						b64Receipt = [receipt base64EncodedStringWithOptions:0];
@@ -230,17 +230,17 @@ static void TSLoadStoreKitClasses()
 						b64Receipt = [receipt base64Encoding];
 					}
 				}
-                
+				
 				onTransaction(transaction.transactionIdentifier,
 					product.productIdentifier,
 					(int)transaction.payment.quantity,
 					(int)([product.price doubleValue] * 100),
 					[product.priceLocale objectForKey:NSLocaleCurrencyCode],
-                    b64Receipt
+					b64Receipt
 					);
 			}
 		}
-        RELEASE(transactions);
+		RELEASE(transactions);
 	}
 }
 
@@ -268,7 +268,7 @@ static void TSLoadStoreKitClasses()
 
 	RELEASE(foregroundedEventObserver);
 	RELEASE(requestTransactions);
-    RELEASE(transactionReceiptSnapshots);
+	RELEASE(transactionReceiptSnapshots);
 	SUPER_DEALLOC;
 }
 
