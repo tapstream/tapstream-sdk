@@ -7,12 +7,31 @@
 //
 
 #import "AppDelegate.h"
+#import "TSUserToUserController.h"
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    
+    TSUserToUserController *controller = [[TSUserToUserController alloc]
+                                          initWithSecret:@"YGP2pezGTI6ec48uti4o1w"
+                                          andUuid:@"f47ac10b-58cc-4372-a567-0e02b2c3d479"];
+    NSLog(@"Requesting offers");
+    NSCondition *offersReady = [[NSCondition alloc] init];
+    [offersReady lock];
+    [controller offersForCodeLocation:@"launch_offer" results:^(NSArray *offers) {
+        NSLog(@"Eligible offers: %@", offers);
+        [offersReady lock];
+        [offersReady signal];
+        [offersReady unlock];
+    }];
+    
+    // Not willing to wait more than 10 seconds
+    [offersReady waitUntilDate:[NSDate dateWithTimeIntervalSinceNow:10]];
+    [offersReady unlock];
+    
     return YES;
 }
 							

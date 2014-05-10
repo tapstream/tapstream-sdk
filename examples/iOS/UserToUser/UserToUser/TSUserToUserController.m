@@ -32,10 +32,10 @@
     {
         self.uuid = uuidVal;
         self.offersReady = AUTORELEASE([[NSCondition alloc] init]);
-        self.offersRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:@""]];
-        self.rewardsRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:@""]];
+        self.offersRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://app.tapstream.com/api/v1/user-to-user/offers/?secret=%@", secret]]];
+        self.rewardsRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://app.tapstream.com/api/v1/user-to-user/rewards/?secret=%@&event_session=%@", secret, uuid]]];
         self.retries = 0;
-        self.requestingOffers = NO;
+        self.requestingOffers = YES;
         [self requestOffers];
     }
     return self;
@@ -53,19 +53,16 @@
 {
     if(handler) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^ {
-            @synchronized(self) {
-                if(!self.offers && !self.requestingOffers) {
-                    self.requestingOffers = YES;
-                    [self requestOffers];
-                }
+            [self.offersReady lock];
+            if(!self.offers && !self.requestingOffers) {
+                self.requestingOffers = YES;
+                [self requestOffers];
             }
-            
-            [self.offersReady wait];
-            
-            NSArray *results;
-            @synchronized(self) {
-                results = AUTORELEASE(self.offers);
+            while(!self.offers) {
+                [self.offersReady wait];
             }
+            NSArray *results = AUTORELEASE(self.offers);
+            [self.offersReady unlock];
             handler(results);
         });
     }
@@ -104,50 +101,64 @@
 - (void)requestOffers
 {
     [NSURLConnection sendAsynchronousRequest:self.offersRequest queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
-        if(!connectionError && data) {
+        NSInteger status = response ? ((NSHTTPURLResponse *)response).statusCode : -1;
+        BOOL success = data && !connectionError && status >= 200 && status < 300;
+        BOOL retry = status < 0 || (status >= 500 && status < 600);
+        
+        if(success) {
             NSArray *results = [TSUserToUserController parseOffers:data];
-            @synchronized(self) {
+            [self.offersReady lock];
+            self.retries = 0;
+            self.requestingOffers = NO;
+            self.offers = results ? results : [NSArray array];
+            [self.offersReady broadcast];
+            [self.offersReady unlock];
+        } else {
+            [self.offersReady lock];
+            if(retry && self.retries < 3) {
+                self.retries += 1;
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^ {
+                    [self requestOffers];
+                });
+            } else {
                 self.retries = 0;
                 self.requestingOffers = NO;
-                self.offers = results ? results : [NSArray array];
-                [self.offersReady signal];
+                self.offers = [NSArray array];
+                [self.offersReady broadcast];
             }
-        } else {
-            @synchronized(self) {
-                if(self.retries < 3) {
-                    self.retries += 1;
-                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^ {
-                        [self requestOffers];
-                    });
-                } else {
-                    self.retries = 0;
-                    self.requestingOffers = NO;
-                    self.offers = [NSArray array];
-                    [self.offersReady signal];
-                }
-            }
+            [self.offersReady unlock];
         }
     }];
 }
 
 + (NSArray *)parseOffers:(NSData *)offersJson
 {
-    id json = [NSJSONSerialization JSONObjectWithData:offersJson options:0 error:nil];
+    NSArray *json = [NSJSONSerialization JSONObjectWithData:offersJson options:0 error:nil];
     if(json) {
         NSMutableArray *results = [NSMutableArray arrayWithCapacity:32];
-        
-        return AUTORELEASE(results);
+        [json enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            NSDictionary *offerObj = obj;
+            TSOffer *offer = AUTORELEASE([[TSOffer alloc] init]);
+            
+            [results addObject:offer];
+        }];
+        return results;
     }
     return nil;
 }
 
 + (NSArray *)parseRewards:(NSData *)rewardsJson
 {
-    id json = [NSJSONSerialization JSONObjectWithData:rewardsJson options:0 error:nil];
+    NSArray *json = [NSJSONSerialization JSONObjectWithData:rewardsJson options:0 error:nil];
     if(json) {
         NSMutableArray *results = [NSMutableArray arrayWithCapacity:32];
-        
-        return AUTORELEASE(results);
+        [json enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            NSDictionary *rewardObj = obj;
+            TSReward *reward = AUTORELEASE([[TSReward alloc] init]);
+            
+            [results addObject:reward];
+        }];
+        return results;
     }
     return nil;
 }
