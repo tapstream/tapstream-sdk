@@ -16,10 +16,10 @@ typedef void (^TSUserToUserResultHandler)(NSArray *);
 @interface TSUserToUserController : NSObject
 
 - (id)initWithSecret:(NSString *)secret andUuid:(NSString *)uuid;
-- (void)offersForCodeLocation:(NSString *)locationTag results:(TSUserToUserResultHandler)handler;
+- (TSOffer *)offerForCodeLocation:(NSString *)locationTag timeout:(NSTimeInterval)timeoutSeconds;
 - (void)showOffer:(TSOffer *)offer;
 
-- (void)availableRewards:(TSUserToUserResultHandler)handler;
+- (NSArray *)availableRewards;
 - (void)consumeReward:(TSReward *)reward;
 
 @end
