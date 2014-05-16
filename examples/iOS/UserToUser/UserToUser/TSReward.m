@@ -25,8 +25,7 @@
 
 - (id)initWithDescription:(NSDictionary *)descriptionVal
 {
-    if(self = [super init])
-    {
+    if(self = [super init]) {
         self.description = descriptionVal;
         self.ident = [[descriptionVal objectForKey:@"id"] integerValue];
         self.name = [descriptionVal objectForKey:@"name"];

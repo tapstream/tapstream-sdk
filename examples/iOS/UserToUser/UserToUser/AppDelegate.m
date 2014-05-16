@@ -15,12 +15,12 @@
 {
     // Override point for customization after application launch.
     
-    TSUserToUserController *controller = [[TSUserToUserController alloc]
+    TSUserToUserController *controller = AUTORELEASE([[TSUserToUserController alloc]
                                           initWithSecret:@"YGP2pezGTI6ec48uti4o1w"
-                                          andUuid:@"f47ac10b-58cc-4372-a567-0e02b2c3d479"];
-    NSLog(@"Requesting offers");
-    TSOffer *offer = [controller offerForCodeLocation:@"launch_offer" timeout:10];
-    NSLog(@"Eligible offers: %@", offer);
+                                          andUuid:@"f47ac10b-58cc-4372-a567-0e02b2c3d479"]);
+    NSLog(@"Requesting offer");
+    TSOffer *offer = [controller offerForCodeLocation:@"first level complete" timeout:20];
+    NSLog(@"Eligible offer: %@", offer);
     
     return YES;
 }

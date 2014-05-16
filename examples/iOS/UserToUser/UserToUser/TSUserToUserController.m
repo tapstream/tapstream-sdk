@@ -13,7 +13,6 @@
 
 @interface TSUserToUserController()
 @property(strong, nonatomic) NSConditionLock *offersReady;
-@property(strong, nonatomic) NSString *uuid;
 @property(strong, nonatomic) NSArray *offers;
 @property(strong, nonatomic) NSMutableSet *consumedRewards;
 @property(strong, nonatomic) NSURLRequest *offersRequest;
@@ -28,13 +27,11 @@
 
 @implementation TSUserToUserController
 
-@synthesize offersReady, uuid, offers, consumedRewards, offersRequest, rewardsRequest, retries;
+@synthesize offersReady, offers, consumedRewards, offersRequest, rewardsRequest, retries;
 
-- (id)initWithSecret:(NSString *)secret andUuid:(NSString *)uuidVal
+- (id)initWithSecret:(NSString *)secret andUuid:(NSString *)uuid
 {
-    if(self = [super init])
-    {
-        self.uuid = uuidVal;
+    if(self = [super init]) {
         self.offersReady = AUTORELEASE([[NSConditionLock alloc] initWithCondition:NO]);
         self.offersRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://app.tapstream.com/api/v1/user-to-user/offers/?secret=%@", secret]]];
         self.rewardsRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://app.tapstream.com/api/v1/user-to-user/rewards/?secret=%@&event_session=%@", secret, uuid]]];
@@ -50,8 +47,8 @@
 
 - (void)dealloc
 {
-    RELEASE(self->uuid);
     RELEASE(self->offersReady);
+    RELEASE(self->consumedRewards);
     RELEASE(self->offersRequest);
     RELEASE(self->rewardsRequest);
 }
@@ -68,6 +65,8 @@
             }
         }];
         [self.offersReady unlock];
+    } else {
+        NSLog(@"Timed out waiting for eligible offer");
     }
     return match;
 }
@@ -112,10 +111,16 @@
 
 - (void)requestOffers
 {
-    [NSURLConnection sendAsynchronousRequest:self.offersRequest queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        NSHTTPURLResponse *response;
+        NSError *error;
+        NSData *data = [NSURLConnection sendSynchronousRequest:self.offersRequest returningResponse:&response error:&error];
+        
         NSInteger status = response ? ((NSHTTPURLResponse *)response).statusCode : -1;
-        BOOL success = data && !connectionError && status >= 200 && status < 300;
+        BOOL success = data && !error && status >= 200 && status < 300;
         BOOL retry = status < 0 || (status >= 500 && status < 600);
+        
+        NSLog(@"Offers request complete (status %d)", status);
         
         if(success) {
             NSArray *results = [TSUserToUserController parseOffers:data];
@@ -123,21 +128,23 @@
             self.retries = 0;
             self.offers = results ? results : [NSArray array];
             [self.offersReady unlockWithCondition:YES];
+            
+        } else if(retry && self.retries < kTSMaxOfferRetries) {
+            [self.offersReady lock];
+            self.retries += 1;
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, MIN(128, pow(2, self.retries)) * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^ {
+                [self requestOffers];
+            });
+            [self.offersReady unlock];
+            
         } else {
             [self.offersReady lock];
-            if(retry && self.retries < kTSMaxOfferRetries) {
-                self.retries += 1;
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, MIN(128, pow(2, self.retries)) * NSEC_PER_SEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^ {
-                    [self requestOffers];
-                });
-                [self.offersReady unlock];
-            } else {
-                self.retries = 0;
-                self.offers = [NSArray array];
-                [self.offersReady unlockWithCondition:YES];
-            }
+            self.retries = 0;
+            self.offers = [NSArray array];
+            [self.offersReady unlockWithCondition:YES];
+            
         }
-    }];
+    });
 }
 
 + (NSArray *)parseOffers:(NSData *)offersJson
