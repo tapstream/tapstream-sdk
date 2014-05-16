@@ -11,7 +11,7 @@
 @interface TSOffer : NSObject
 
 @property(strong, nonatomic, readonly) NSDictionary *description;
-@property(assign, nonatomic, readonly) NSInteger ident;
+@property(assign, nonatomic, readonly) NSUInteger ident;
 @property(strong, nonatomic, readonly) NSString *name;
 @property(assign, nonatomic, readonly) NSInteger rewardMinimumInstalls;
 @property(strong, nonatomic, readonly) NSString *rewardSku;

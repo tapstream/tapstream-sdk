@@ -19,8 +19,10 @@
                                           initWithSecret:@"YGP2pezGTI6ec48uti4o1w"
                                           andUuid:@"f47ac10b-58cc-4372-a567-0e02b2c3d479"]);
     NSLog(@"Requesting offer");
-    TSOffer *offer = [controller offerForCodeLocation:@"first level complete" timeout:20];
-    NSLog(@"Eligible offer: %@", offer);
+    TSOffer *offer = [controller offerForCodeLocation:@"launch" timeout:20];
+    if(offer) {
+        [controller showOffer:offer];
+    }
     
     return YES;
 }

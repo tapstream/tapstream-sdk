@@ -12,7 +12,7 @@
 @interface TSOffer()
 
 @property(strong, nonatomic, readwrite) NSDictionary *description;
-@property(assign, nonatomic, readwrite) NSInteger ident;
+@property(assign, nonatomic, readwrite) NSUInteger ident;
 @property(strong, nonatomic, readwrite) NSString *name;
 @property(assign, nonatomic, readwrite) NSInteger rewardMinimumInstalls;
 @property(strong, nonatomic, readwrite) NSString *rewardSku;
@@ -32,7 +32,7 @@
 {
     if(self = [super init]) {
         self.description = descriptionVal;
-        self.ident = [[descriptionVal objectForKey:@"id"] integerValue];
+        self.ident = [[descriptionVal objectForKey:@"id"] unsignedIntegerValue];
         self.name = [descriptionVal objectForKey:@"name"];
         self.rewardMinimumInstalls = [[descriptionVal objectForKey:@"reward_minimum_installs"] integerValue];
         self.rewardSku = [descriptionVal objectForKey:@"reward_sku"];

@@ -7,6 +7,7 @@
 //
 
 #import "TSUserToUserController.h"
+#import "TSOfferViewController.h"
 
 #define kTSMaxOfferRetries 8
 #define kTSConsumedRewardsKey @"__tapstream_consumed_rewards"
@@ -71,12 +72,12 @@
     return match;
 }
 
-- (void)showOffer:(TSOffer *)offer
+- (void)showOffer:(TSOffer *)offer navigationController:(UINavigationController *)navigationController
 {
-    if(!offer) {
-        return;
+    if(offer && navigationController) {
+        TSOfferViewController *offerViewController = [TSOfferViewController controllerWithOffer:offer];
+        [navigationController pushViewController:offerViewController animated:YES];
     }
-    
 }
 
 - (NSArray *)availableRewards

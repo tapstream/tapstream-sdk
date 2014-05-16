@@ -30,8 +30,9 @@ typedef void (^TSUserToUserResultHandler)(NSArray *);
 /**
  @brief Displays the specified offer to your user.
  @param offer The offer to show
+ @param navigationController The navigation controller onto which the webview will be pushed.
  */
-- (void)showOffer:(TSOffer *)offer;
+- (void)showOffer:(TSOffer *)offer navigationController:(UINavigationController *)navigationController;
 
 /**
  @brief Request an array of awards that should be delivered to this user.  This method makes a network
