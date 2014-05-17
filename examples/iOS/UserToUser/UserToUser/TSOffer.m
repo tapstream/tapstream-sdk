@@ -7,16 +7,15 @@
 //
 
 #import "TSOffer.h"
-#import "TSHelpers.h"
 
 @interface TSOffer()
 
-@property(strong, nonatomic, readwrite) NSDictionary *description;
+@property(STRONG_OR_RETAIN, nonatomic, readwrite) NSDictionary *description;
 @property(assign, nonatomic, readwrite) NSUInteger ident;
-@property(strong, nonatomic, readwrite) NSString *name;
+@property(STRONG_OR_RETAIN, nonatomic, readwrite) NSString *name;
 @property(assign, nonatomic, readwrite) NSInteger rewardMinimumInstalls;
-@property(strong, nonatomic, readwrite) NSString *rewardSku;
-@property(strong, nonatomic, readwrite) NSString *bundle;
+@property(STRONG_OR_RETAIN, nonatomic, readwrite) NSString *rewardSku;
+@property(STRONG_OR_RETAIN, nonatomic, readwrite) NSString *bundle;
 @property(assign, nonatomic, readwrite) NSInteger minimumAge;
 @property(assign, nonatomic, readwrite) NSInteger rateLimit;
 

@@ -7,15 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "TSHelpers.h"
 
 @interface TSOffer : NSObject
 
-@property(strong, nonatomic, readonly) NSDictionary *description;
+@property(STRONG_OR_RETAIN, nonatomic, readonly) NSDictionary *description;
 @property(assign, nonatomic, readonly) NSUInteger ident;
-@property(strong, nonatomic, readonly) NSString *name;
+@property(STRONG_OR_RETAIN, nonatomic, readonly) NSString *name;
 @property(assign, nonatomic, readonly) NSInteger rewardMinimumInstalls;
-@property(strong, nonatomic, readonly) NSString *rewardSku;
-@property(strong, nonatomic, readonly) NSString *bundle;
+@property(STRONG_OR_RETAIN, nonatomic, readonly) NSString *rewardSku;
+@property(STRONG_OR_RETAIN, nonatomic, readonly) NSString *bundle;
 @property(assign, nonatomic, readonly) NSInteger minimumAge;
 @property(assign, nonatomic, readonly) NSInteger rateLimit;
 

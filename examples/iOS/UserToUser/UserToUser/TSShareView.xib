@@ -7,6 +7,16 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="TSShareViewController">
             <connections>
+                <outlet property="bg" destination="31C-T6-HSN" id="cCT-SA-nI4"/>
+                <outlet property="doneButton" destination="NIO-RL-xoC" id="giL-BS-PNG"/>
+                <outlet property="emailButton" destination="VSK-Rw-bho" id="Emq-Do-ele"/>
+                <outlet property="emailButtonCheck" destination="FbS-uZ-Pas" id="3qg-yV-RfA"/>
+                <outlet property="facebookButton" destination="dXd-TY-zKJ" id="dqK-Nr-OuV"/>
+                <outlet property="facebookButtonCheck" destination="pya-Eb-lwO" id="XqF-XR-UXo"/>
+                <outlet property="messagingButton" destination="xJh-rh-Aaj" id="nIw-5f-UYU"/>
+                <outlet property="messagingButtonCheck" destination="r8A-ec-xE9" id="bwH-uy-H2C"/>
+                <outlet property="twitterButton" destination="WR6-Ag-sIQ" id="Iv8-SP-XOt"/>
+                <outlet property="twitterButtonCheck" destination="ysa-kC-g6O" id="76a-6U-8ui"/>
                 <outlet property="view" destination="iN0-l3-epB" id="8Gz-pV-8Ek"/>
             </connections>
         </placeholder>
@@ -19,7 +29,7 @@
                     <rect key="frame" x="0.0" y="117" width="320" height="333"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     <subviews>
-                        <view tag="100" contentMode="scaleToFill" id="31C-T6-HSN">
+                        <view contentMode="scaleToFill" id="31C-T6-HSN">
                             <rect key="frame" x="28" y="42" width="265" height="262"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                             <subviews>
@@ -33,10 +43,10 @@
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="NIO-RL-xoC" userLabel="BtnDone">
                                     <rect key="frame" x="174" y="214" width="71" height="38"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                    <state key="normal" image="done">
+                                    <state key="normal" backgroundImage="done">
                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                     </state>
-                                    <state key="highlighted" image="done-down"/>
+                                    <state key="highlighted" backgroundImage="done-down"/>
                                     <connections>
                                         <action selector="onBtnDone:" destination="-1" eventType="touchUpInside" id="hC1-zs-ZMn"/>
                                     </connections>
@@ -95,7 +105,7 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="9"/>
                                                     <color key="highlightedColor" red="0.25490196079999999" green="0.25098039220000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
                                                 </label>
-                                                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="check" id="ysa-kC-g6O" userLabel="CheckMessaging">
+                                                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="check" id="ysa-kC-g6O" userLabel="CheckTwitter">
                                                     <rect key="frame" x="79" y="10" width="21" height="21"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                                     <rect key="contentStretch" x="0.0" y="0.0" width="0.0" height="0.0"/>
@@ -168,8 +178,9 @@
                             <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.94901960784313721" alpha="1" colorSpace="calibratedRGB"/>
                         </view>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="M3z-RZ-279" userLabel="BtnClose">
-                            <rect key="frame" x="276" y="26" width="34" height="34"/>
+                            <rect key="frame" x="264" y="11" width="60" height="60"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
+                            <rect key="contentStretch" x="0.0" y="0.0" width="1" height="0.0"/>
                             <state key="normal" image="close">
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>

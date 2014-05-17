@@ -14,13 +14,14 @@
 #define kTSConsumedRewardsKey @"__tapstream_consumed_rewards"
 
 @interface TSUserToUserController()
-@property(strong, nonatomic) NSConditionLock *offersReady;
-@property(strong, nonatomic) NSArray *offers;
-@property(strong, nonatomic) NSMutableSet *consumedRewards;
-@property(strong, nonatomic) NSURLRequest *offersRequest;
-@property(strong, nonatomic) NSURLRequest *rewardsRequest;
+@property(STRONG_OR_RETAIN, nonatomic) NSConditionLock *offersReady;
+@property(STRONG_OR_RETAIN, nonatomic) NSArray *offers;
+@property(STRONG_OR_RETAIN, nonatomic) NSMutableSet *consumedRewards;
+@property(STRONG_OR_RETAIN, nonatomic) NSURLRequest *offersRequest;
+@property(STRONG_OR_RETAIN, nonatomic) NSURLRequest *rewardsRequest;
 @property(assign, nonatomic) int retries;
 @property(assign, nonatomic) BOOL requestingOffers;
+@property(STRONG_OR_RETAIN, nonatomic) TSShareViewController *shareViewController;
 
 + (NSArray *)parseOffers:(NSData *)offersJson;
 + (NSArray *)parseRewards:(NSData *)rewardsJson;
@@ -53,6 +54,7 @@
     RELEASE(self->consumedRewards);
     RELEASE(self->offersRequest);
     RELEASE(self->rewardsRequest);
+    RELEASE(self->shareViewController);
 }
 
 - (TSOffer *)offerForCodeLocation:(NSString *)locationTag timeout:(NSTimeInterval)timeoutSeconds
@@ -73,14 +75,19 @@
     return match;
 }
 
-- (void)showOffer:(TSOffer *)offer navigationController:(UINavigationController *)navigationController
+- (void)showOffer:(TSOffer *)offer parentViewController:(UIViewController *)parentViewController;
 {
-    if(offer && navigationController) {
+    if(offer && parentViewController) {
         //TSOfferViewController *offerViewController = [TSOfferViewController controllerWithOffer:offer];
         //[navigationController pushViewController:offerViewController animated:YES];
         
-        TSShareViewController *shareViewController = [TSShareViewController shareViewController];
-        [navigationController pushViewController:shareViewController animated:YES];
+        self.shareViewController = [TSShareViewController controllerWithParentViewController:parentViewController];
+        self.shareViewController.view.frame = parentViewController.view.bounds;
+        [UIView transitionWithView:parentViewController.view
+                          duration:0.3
+                           options:UIViewAnimationOptionTransitionCrossDissolve
+                        animations:^{ [parentViewController.view addSubview:self.shareViewController.view]; }
+                        completion:NULL];
     }
 }
 

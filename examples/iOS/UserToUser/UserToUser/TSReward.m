@@ -7,13 +7,12 @@
 //
 
 #import "TSReward.h"
-#import "TSHelpers.h"
 
 @interface TSReward()
 
-@property(strong, nonatomic, readwrite) NSDictionary *description;
+@property(STRONG_OR_RETAIN, nonatomic, readwrite) NSDictionary *description;
 @property(assign, nonatomic, readwrite) NSUInteger ident;
-@property(strong, nonatomic, readwrite) NSString *name;
+@property(STRONG_OR_RETAIN, nonatomic, readwrite) NSString *name;
 @property(assign, nonatomic, readwrite) NSInteger installs;
 
 @end

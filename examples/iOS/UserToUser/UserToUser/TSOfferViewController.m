@@ -7,7 +7,6 @@
 //
 
 #import "TSOfferViewController.h"
-#import "TSHelpers.h"
 
 @interface TSOfferViewController ()
 @end

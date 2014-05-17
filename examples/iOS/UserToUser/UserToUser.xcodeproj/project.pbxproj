@@ -26,6 +26,8 @@
 		12A244D61926CA350096DC1F /* TSShareView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 12A244D51926CA350096DC1F /* TSShareView.xib */; };
 		12A244D91926CA660096DC1F /* TSShareViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A244D81926CA660096DC1F /* TSShareViewController.m */; };
 		12A244DB1926D2210096DC1F /* TSOfferView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 12A244DA1926D2210096DC1F /* TSOfferView.xib */; };
+		12A244DD1927D9060096DC1F /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12A244DC1927D9060096DC1F /* Social.framework */; };
+		12A244DF1927DCEE0096DC1F /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12A244DE1927DCEE0096DC1F /* MessageUI.framework */; };
 		12D83BDA191D6532004196AB /* TSUserToUserController.m in Sources */ = {isa = PBXBuildFile; fileRef = 12D83BD9191D6532004196AB /* TSUserToUserController.m */; };
 		12F322E0191D6951002FCF1C /* TSOffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F322DD191D6951002FCF1C /* TSOffer.m */; };
 		12F322E1191D6951002FCF1C /* TSReward.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F322DF191D6951002FCF1C /* TSReward.m */; };
@@ -68,6 +70,8 @@
 		12A244D71926CA660096DC1F /* TSShareViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSShareViewController.h; sourceTree = "<group>"; };
 		12A244D81926CA660096DC1F /* TSShareViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSShareViewController.m; sourceTree = "<group>"; };
 		12A244DA1926D2210096DC1F /* TSOfferView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TSOfferView.xib; sourceTree = "<group>"; };
+		12A244DC1927D9060096DC1F /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
+		12A244DE1927DCEE0096DC1F /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		12D83BD8191D6532004196AB /* TSUserToUserController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSUserToUserController.h; sourceTree = "<group>"; };
 		12D83BD9191D6532004196AB /* TSUserToUserController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSUserToUserController.m; sourceTree = "<group>"; };
 		12F322DC191D6951002FCF1C /* TSOffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSOffer.h; sourceTree = "<group>"; };
@@ -82,6 +86,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				12A244DF1927DCEE0096DC1F /* MessageUI.framework in Frameworks */,
+				12A244DD1927D9060096DC1F /* Social.framework in Frameworks */,
 				1288B950191D6330005DC5B3 /* CoreGraphics.framework in Frameworks */,
 				1288B952191D6330005DC5B3 /* UIKit.framework in Frameworks */,
 				1288B94E191D6330005DC5B3 /* Foundation.framework in Frameworks */,
@@ -123,6 +129,8 @@
 		1288B94C191D6330005DC5B3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				12A244DE1927DCEE0096DC1F /* MessageUI.framework */,
+				12A244DC1927D9060096DC1F /* Social.framework */,
 				1288B94D191D6330005DC5B3 /* Foundation.framework */,
 				1288B94F191D6330005DC5B3 /* CoreGraphics.framework */,
 				1288B951191D6330005DC5B3 /* UIKit.framework */,
