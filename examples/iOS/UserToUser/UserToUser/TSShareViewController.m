@@ -12,8 +12,8 @@
 #define kTSShareViewBackgroundTag 100
 
 @interface TSShareViewController ()
-
 @end
+
 
 @implementation TSShareViewController
 
@@ -25,7 +25,7 @@
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     if(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
-        
+        shareMethodsCompleted = 0;
     }
     return self;
 }
@@ -46,6 +46,38 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+
+- (IBAction)onBtnClose:(id)sender
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (IBAction)onBtnDone:(id)sender
+{
+    
+}
+
+- (IBAction)onBtnMessaging:(id)sender
+{
+    
+}
+
+- (IBAction)onBtnTwitter:(id)sender
+{
+    
+}
+
+- (IBAction)onBtnFacebook:(id)sender
+{
+    
+}
+
+- (IBAction)onBtnEmail:(id)sender
+{
+    
+}
+
 
 /*
 #pragma mark - Navigation

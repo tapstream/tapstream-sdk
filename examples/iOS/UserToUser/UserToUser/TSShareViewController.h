@@ -8,8 +8,17 @@
 
 #import <UIKit/UIKit.h>
 
-@interface TSShareViewController : UIViewController
+@interface TSShareViewController : UIViewController {
+    @private
+    int shareMethodsCompleted;
+}
 
 + (id)shareViewController;
+- (IBAction)onBtnClose:(id)sender;
+- (IBAction)onBtnDone:(id)sender;
+- (IBAction)onBtnMessaging:(id)sender;
+- (IBAction)onBtnTwitter:(id)sender;
+- (IBAction)onBtnFacebook:(id)sender;
+- (IBAction)onBtnEmail:(id)sender;
 
 @end

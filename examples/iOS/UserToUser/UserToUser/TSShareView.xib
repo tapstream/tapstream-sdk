@@ -37,6 +37,9 @@
                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                     </state>
                                     <state key="highlighted" image="done-down"/>
+                                    <connections>
+                                        <action selector="onBtnDone:" destination="-1" eventType="touchUpInside" id="hC1-zs-ZMn"/>
+                                    </connections>
                                 </button>
                                 <view contentMode="scaleToFill" id="vfU-v7-SKt">
                                     <rect key="frame" x="0.0" y="55" width="265" height="152"/>
@@ -53,6 +56,9 @@
                                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                                     </state>
                                                     <state key="disabled" title="Messaging" image="icon-messaging-disabled"/>
+                                                    <connections>
+                                                        <action selector="onBtnMessaging:" destination="-1" eventType="touchUpInside" id="jhb-qc-DrH"/>
+                                                    </connections>
                                                 </button>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Messaging" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="lPc-yb-t0E">
                                                     <rect key="frame" x="0.0" y="53" width="132" height="21"/>
@@ -60,6 +66,11 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="9"/>
                                                     <color key="highlightedColor" red="0.25490196078431371" green="0.25098039215686274" blue="0.25882352941176467" alpha="1" colorSpace="calibratedRGB"/>
                                                 </label>
+                                                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="check" id="r8A-ec-xE9" userLabel="CheckMessaging">
+                                                    <rect key="frame" x="79" y="10" width="21" height="21"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                                    <rect key="contentStretch" x="0.0" y="0.0" width="0.0" height="0.0"/>
+                                                </imageView>
                                             </subviews>
                                             <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.94901960784313721" alpha="1" colorSpace="calibratedRGB"/>
                                         </view>
@@ -74,6 +85,9 @@
                                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                                     </state>
                                                     <state key="disabled" image="icon-twitter-disabled"/>
+                                                    <connections>
+                                                        <action selector="onBtnTwitter:" destination="-1" eventType="touchUpInside" id="aSe-b3-Mva"/>
+                                                    </connections>
                                                 </button>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Twitter" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="8qE-UI-moJ">
                                                     <rect key="frame" x="0.0" y="53" width="132" height="21"/>
@@ -81,6 +95,11 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="9"/>
                                                     <color key="highlightedColor" red="0.25490196079999999" green="0.25098039220000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
                                                 </label>
+                                                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="check" id="ysa-kC-g6O" userLabel="CheckMessaging">
+                                                    <rect key="frame" x="79" y="10" width="21" height="21"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                                    <rect key="contentStretch" x="0.0" y="0.0" width="0.0" height="0.0"/>
+                                                </imageView>
                                             </subviews>
                                             <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.94901960784313721" alpha="1" colorSpace="calibratedRGB"/>
                                         </view>
@@ -95,6 +114,9 @@
                                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                                     </state>
                                                     <state key="disabled" image="icon-facebook-disabled"/>
+                                                    <connections>
+                                                        <action selector="onBtnFacebook:" destination="-1" eventType="touchUpInside" id="8rI-RB-b3O"/>
+                                                    </connections>
                                                 </button>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Facebook" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="VW8-93-PGL">
                                                     <rect key="frame" x="0.0" y="53" width="132" height="21"/>
@@ -102,6 +124,11 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="9"/>
                                                     <color key="highlightedColor" red="0.25490196079999999" green="0.25098039220000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
                                                 </label>
+                                                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="check" id="pya-Eb-lwO" userLabel="CheckFacebook">
+                                                    <rect key="frame" x="79" y="10" width="21" height="21"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                                    <rect key="contentStretch" x="0.0" y="0.0" width="0.0" height="0.0"/>
+                                                </imageView>
                                             </subviews>
                                             <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.94901960784313721" alpha="1" colorSpace="calibratedRGB"/>
                                         </view>
@@ -116,6 +143,9 @@
                                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                                     </state>
                                                     <state key="disabled" image="icon-email-disabled"/>
+                                                    <connections>
+                                                        <action selector="onBtnEmail:" destination="-1" eventType="touchUpInside" id="Rvy-2v-bDb"/>
+                                                    </connections>
                                                 </button>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Email" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Qj6-ER-5oB">
                                                     <rect key="frame" x="0.0" y="53" width="132" height="21"/>
@@ -123,6 +153,11 @@
                                                     <fontDescription key="fontDescription" type="system" pointSize="9"/>
                                                     <color key="highlightedColor" red="0.25490196079999999" green="0.25098039220000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
                                                 </label>
+                                                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="check" id="FbS-uZ-Pas" userLabel="CheckEmail">
+                                                    <rect key="frame" x="79" y="10" width="21" height="21"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                                    <rect key="contentStretch" x="0.0" y="0.0" width="0.0" height="0.0"/>
+                                                </imageView>
                                             </subviews>
                                             <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.94901960784313721" alpha="1" colorSpace="calibratedRGB"/>
                                         </view>
@@ -139,6 +174,9 @@
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
                             <state key="highlighted" image="close-down"/>
+                            <connections>
+                                <action selector="onBtnClose:" destination="-1" eventType="touchUpInside" id="eAs-JC-Xe5"/>
+                            </connections>
                         </button>
                     </subviews>
                 </view>
@@ -149,6 +187,7 @@
         </view>
     </objects>
     <resources>
+        <image name="check" width="21" height="21"/>
         <image name="close" width="34" height="34"/>
         <image name="close-down" width="34" height="34"/>
         <image name="done" width="71" height="38"/>
