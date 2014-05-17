@@ -25,7 +25,8 @@
 {
     if(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
         self.offer = offerVal;
-        NSString *url = [NSString stringWithFormat:@"%u", (unsigned int)self.offer.ident];
+        //NSString *url = [NSString stringWithFormat:@"%u", (unsigned int)self.offer.ident];
+        NSString *url = @"http://google.ca/";
         [((UIWebView *)self.view) loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]]];
     }
     return self;

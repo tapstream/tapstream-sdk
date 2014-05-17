@@ -23,10 +23,12 @@
 		1288B97A191D6330005DC5B3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1288B978191D6330005DC5B3 /* InfoPlist.strings */; };
 		1288B97C191D6330005DC5B3 /* UserToUserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1288B97B191D6330005DC5B3 /* UserToUserTests.m */; };
 		12A244D41926BBEE0096DC1F /* TSOfferViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A244D31926BBEE0096DC1F /* TSOfferViewController.m */; };
+		12A244D61926CA350096DC1F /* TSShareView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 12A244D51926CA350096DC1F /* TSShareView.xib */; };
+		12A244D91926CA660096DC1F /* TSShareViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A244D81926CA660096DC1F /* TSShareViewController.m */; };
+		12A244DB1926D2210096DC1F /* TSOfferView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 12A244DA1926D2210096DC1F /* TSOfferView.xib */; };
 		12D83BDA191D6532004196AB /* TSUserToUserController.m in Sources */ = {isa = PBXBuildFile; fileRef = 12D83BD9191D6532004196AB /* TSUserToUserController.m */; };
 		12F322E0191D6951002FCF1C /* TSOffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F322DD191D6951002FCF1C /* TSOffer.m */; };
 		12F322E1191D6951002FCF1C /* TSReward.m in Sources */ = {isa = PBXBuildFile; fileRef = 12F322DF191D6951002FCF1C /* TSReward.m */; };
-		12F322E41926B1E8002FCF1C /* TSOfferView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 12F322E31926B1E8002FCF1C /* TSOfferView.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +64,10 @@
 		1288B97B191D6330005DC5B3 /* UserToUserTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UserToUserTests.m; sourceTree = "<group>"; };
 		12A244D21926BBEE0096DC1F /* TSOfferViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSOfferViewController.h; sourceTree = "<group>"; };
 		12A244D31926BBEE0096DC1F /* TSOfferViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSOfferViewController.m; sourceTree = "<group>"; };
+		12A244D51926CA350096DC1F /* TSShareView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TSShareView.xib; sourceTree = "<group>"; };
+		12A244D71926CA660096DC1F /* TSShareViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSShareViewController.h; sourceTree = "<group>"; };
+		12A244D81926CA660096DC1F /* TSShareViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSShareViewController.m; sourceTree = "<group>"; };
+		12A244DA1926D2210096DC1F /* TSOfferView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TSOfferView.xib; sourceTree = "<group>"; };
 		12D83BD8191D6532004196AB /* TSUserToUserController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSUserToUserController.h; sourceTree = "<group>"; };
 		12D83BD9191D6532004196AB /* TSUserToUserController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSUserToUserController.m; sourceTree = "<group>"; };
 		12F322DC191D6951002FCF1C /* TSOffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSOffer.h; sourceTree = "<group>"; };
@@ -69,7 +75,6 @@
 		12F322DE191D6951002FCF1C /* TSReward.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSReward.h; sourceTree = "<group>"; };
 		12F322DF191D6951002FCF1C /* TSReward.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSReward.m; sourceTree = "<group>"; };
 		12F322E2191D6C4B002FCF1C /* TSHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TSHelpers.h; sourceTree = "<group>"; };
-		12F322E31926B1E8002FCF1C /* TSOfferView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = TSOfferView.xib; path = ../TSOfferView.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,9 +134,12 @@
 		1288B953191D6330005DC5B3 /* UserToUser */ = {
 			isa = PBXGroup;
 			children = (
+				12A244DA1926D2210096DC1F /* TSOfferView.xib */,
 				12A244D21926BBEE0096DC1F /* TSOfferViewController.h */,
 				12A244D31926BBEE0096DC1F /* TSOfferViewController.m */,
-				12F322E31926B1E8002FCF1C /* TSOfferView.xib */,
+				12A244D71926CA660096DC1F /* TSShareViewController.h */,
+				12A244D81926CA660096DC1F /* TSShareViewController.m */,
+				12A244D51926CA350096DC1F /* TSShareView.xib */,
 				12F322DC191D6951002FCF1C /* TSOffer.h */,
 				12F322DD191D6951002FCF1C /* TSOffer.m */,
 				12F322DE191D6951002FCF1C /* TSReward.h */,
@@ -256,8 +264,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				12F322E41926B1E8002FCF1C /* TSOfferView.xib in Resources */,
+				12A244D61926CA350096DC1F /* TSShareView.xib in Resources */,
 				1288B964191D6330005DC5B3 /* Main_iPad.storyboard in Resources */,
+				12A244DB1926D2210096DC1F /* TSOfferView.xib in Resources */,
 				1288B969191D6330005DC5B3 /* Images.xcassets in Resources */,
 				1288B961191D6330005DC5B3 /* Main_iPhone.storyboard in Resources */,
 				1288B958191D6330005DC5B3 /* InfoPlist.strings in Resources */,
@@ -282,6 +291,7 @@
 				1288B967191D6330005DC5B3 /* ViewController.m in Sources */,
 				12F322E1191D6951002FCF1C /* TSReward.m in Sources */,
 				12A244D41926BBEE0096DC1F /* TSOfferViewController.m in Sources */,
+				12A244D91926CA660096DC1F /* TSShareViewController.m in Sources */,
 				1288B95E191D6330005DC5B3 /* AppDelegate.m in Sources */,
 				12D83BDA191D6532004196AB /* TSUserToUserController.m in Sources */,
 				12F322E0191D6951002FCF1C /* TSOffer.m in Sources */,

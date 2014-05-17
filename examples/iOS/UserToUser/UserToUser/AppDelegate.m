@@ -18,10 +18,23 @@
     TSUserToUserController *controller = AUTORELEASE([[TSUserToUserController alloc]
                                           initWithSecret:@"YGP2pezGTI6ec48uti4o1w"
                                           andUuid:@"f47ac10b-58cc-4372-a567-0e02b2c3d479"]);
+    
+    UIViewController *root = [[UIViewController alloc] init];
+    root.view.backgroundColor = [UIColor colorWithRed:1.0 green:0.5 blue:0.5 alpha:0.5];
+    
+    UINavigationController *navController = [[UINavigationController alloc] init];
+    navController.navigationBarHidden = YES;
+    
+    [navController pushViewController:root animated:NO];
+    
+    self.window.rootViewController = navController;
+    
+    
+    
     NSLog(@"Requesting offer");
     TSOffer *offer = [controller offerForCodeLocation:@"launch" timeout:20];
     if(offer) {
-        [controller showOffer:offer];
+        [controller showOffer:offer navigationController:navController];
     }
     
     return YES;

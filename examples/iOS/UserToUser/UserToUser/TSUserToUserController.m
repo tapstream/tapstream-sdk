@@ -8,6 +8,7 @@
 
 #import "TSUserToUserController.h"
 #import "TSOfferViewController.h"
+#import "TSShareViewController.h"
 
 #define kTSMaxOfferRetries 8
 #define kTSConsumedRewardsKey @"__tapstream_consumed_rewards"
@@ -75,8 +76,11 @@
 - (void)showOffer:(TSOffer *)offer navigationController:(UINavigationController *)navigationController
 {
     if(offer && navigationController) {
-        TSOfferViewController *offerViewController = [TSOfferViewController controllerWithOffer:offer];
-        [navigationController pushViewController:offerViewController animated:YES];
+        //TSOfferViewController *offerViewController = [TSOfferViewController controllerWithOffer:offer];
+        //[navigationController pushViewController:offerViewController animated:YES];
+        
+        TSShareViewController *shareViewController = [TSShareViewController shareViewController];
+        [navigationController pushViewController:shareViewController animated:YES];
     }
 }
 
@@ -121,7 +125,7 @@
         BOOL success = data && !error && status >= 200 && status < 300;
         BOOL retry = status < 0 || (status >= 500 && status < 600);
         
-        NSLog(@"Offers request complete (status %d)", status);
+        NSLog(@"Offers request complete (status %d)", (int)status);
         
         if(success) {
             NSArray *results = [TSUserToUserController parseOffers:data];

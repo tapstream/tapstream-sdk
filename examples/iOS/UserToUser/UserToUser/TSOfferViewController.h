@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "TSOffer.h"
 
-@interface TSOfferViewController : UIViewController
+@interface TSOfferViewController : UIViewController<UIWebViewDelegate>
 
 @property(strong, nonatomic) TSOffer *offer;
 
