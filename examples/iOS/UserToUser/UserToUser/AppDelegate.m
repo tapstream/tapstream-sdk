@@ -7,11 +7,11 @@
 //
 
 #import "AppDelegate.h"
+#import "TSTapstream.h"
 #import "TSUserToUserController.h"
 
 @implementation AppDelegate
 
-@synthesize u2uController;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -19,10 +19,20 @@
     
     self.window.rootViewController.view.layer.backgroundColor = [UIColor colorWithRed:1.0 green:0.0 blue:0.0 alpha:1.0].CGColor;
     
+    TSConfig *config = [TSConfig configWithDefaults];
+    [TSTapstream createWithAccountName:@"sdktest" developerSecret:@"YGP2pezGTI6ec48uti4o1w" config:config];
     
-    self.u2uController = AUTORELEASE([[TSUserToUserController alloc]
-                                          initWithSecret:@"YGP2pezGTI6ec48uti4o1w"
-                                          andUuid:@"f47ac10b-58cc-4372-a567-0e02b2c3d479"]);
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSLog(@"Requesting offer");
+        
+        TSUserToUserController *u2u = [TSTapstream userToUserController];
+        
+        TSOffer *offer = [u2u offerForCodeLocation:@"launch" timeout:20];
+        if(offer) {
+            [u2u showOffer:offer parentViewController:self.window.rootViewController];
+        }
+    });
     
     return YES;
 }
@@ -47,13 +57,6 @@
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        NSLog(@"Requesting offer");
-        TSOffer *offer = [self.u2uController offerForCodeLocation:@"launch" timeout:20];
-        if(offer) {
-            [self.u2uController showOffer:offer parentViewController:self.window.rootViewController];
-        }
-    });
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application

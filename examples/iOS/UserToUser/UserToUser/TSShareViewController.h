@@ -11,9 +11,11 @@
 #import "Social/SLServiceTypes.h"
 #import "MessageUI/MFMailComposeViewController.h"
 #import "MessageUI/MFMessageComposeViewController.h"
+#import "TSUserToUserDelegate.h"
+#import "TSOffer.h"
 #import "TSHelpers.h"
 
-@interface TSShareViewController : UIViewController<MFMessageComposeViewControllerDelegate>
+@interface TSShareViewController : UIViewController<MFMessageComposeViewControllerDelegate, MFMailComposeViewControllerDelegate>
 
 @property(STRONG_OR_RETAIN) IBOutlet UIView *bg;
 @property(STRONG_OR_RETAIN) IBOutlet UIButton *doneButton;
@@ -26,7 +28,7 @@
 @property(STRONG_OR_RETAIN) IBOutlet UIButton *messagingButton;
 @property(STRONG_OR_RETAIN) IBOutlet UIView *messagingButtonCheck;
 
-+ (id)controllerWithParentViewController:(UIViewController *)parentViewController;
++ (id)controllerWithOffer:(TSOffer *)offer parentViewController:(UIViewController *)parentViewController delegate:(id<TSUserToUserDelegate>)delegate;
 
 - (IBAction)onBtnClose:(id)sender;
 - (IBAction)onBtnDone:(id)sender;
@@ -36,5 +38,6 @@
 - (IBAction)onBtnEmail:(id)sender;
 
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller didFinishWithResult:(MessageComposeResult)result;
+- (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error;
 
 @end

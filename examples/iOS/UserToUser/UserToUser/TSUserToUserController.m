@@ -9,6 +9,7 @@
 #import "TSUserToUserController.h"
 #import "TSOfferViewController.h"
 #import "TSShareViewController.h"
+#import "TSTapstream.h"
 
 #define kTSMaxOfferRetries 8
 #define kTSConsumedRewardsKey @"__tapstream_consumed_rewards"
@@ -30,9 +31,9 @@
 
 @implementation TSUserToUserController
 
-@synthesize offersReady, offers, consumedRewards, offersRequest, rewardsRequest, retries;
+@synthesize delegate, offersReady, offers, consumedRewards, offersRequest, rewardsRequest, retries;
 
-- (id)initWithSecret:(NSString *)secret andUuid:(NSString *)uuid
+- (id)initWithSecret:(NSString *)secret uuid:(NSString *)uuid
 {
     if(self = [super init]) {
         self.offersReady = AUTORELEASE([[NSConditionLock alloc] initWithCondition:NO]);
@@ -78,16 +79,18 @@
 - (void)showOffer:(TSOffer *)offer parentViewController:(UIViewController *)parentViewController;
 {
     if(offer && parentViewController) {
-        //TSOfferViewController *offerViewController = [TSOfferViewController controllerWithOffer:offer];
+        //TSOfferViewController *offerViewController = [TSOfferViewController controllerWithOffer:offer parentViewController:parentViewController delegate:self.delegate];
         //[navigationController pushViewController:offerViewController animated:YES];
         
-        self.shareViewController = [TSShareViewController controllerWithParentViewController:parentViewController];
-        self.shareViewController.view.frame = parentViewController.view.bounds;
+        // THIS IS JUST FOR TESTING:
+        self.shareViewController = [TSShareViewController controllerWithOffer:offer parentViewController:parentViewController delegate:self.delegate];
         [UIView transitionWithView:parentViewController.view
                           duration:0.3
                            options:UIViewAnimationOptionTransitionCrossDissolve
                         animations:^{ [parentViewController.view addSubview:self.shareViewController.view]; }
                         completion:NULL];
+        
+        [self.delegate showedOffer:offer.ident];
     }
 }
 

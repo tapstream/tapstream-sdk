@@ -7,11 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "TSUserToUserController.h"
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
-@property (strong, nonatomic) TSUserToUserController *u2uController;
 
 @end

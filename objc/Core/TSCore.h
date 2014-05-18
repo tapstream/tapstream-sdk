@@ -9,6 +9,12 @@
 #import "TSConfig.h"
 #import "TSAppEventSource.h"
 
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#define kTSPlatform @"iOS"
+#else
+#define kTSPlatform @"Mac"
+#endif
+
 @interface TSCore : NSObject {
 @private
 	id<TSDelegate> del;

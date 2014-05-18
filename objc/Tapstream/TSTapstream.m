@@ -26,6 +26,11 @@ static TSTapstream *instance = nil;
 
 - (id)initWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)config;
 
+// User-to-user delegate
+- (void)showedOffer:(NSUInteger)offerId;
+- (void)showedSharing:(NSUInteger)offerId;
+- (void)completedShare:(NSUInteger)offerId socialMedium:(NSString *)medium;
+
 @end
 
 
@@ -57,6 +62,10 @@ static TSTapstream *instance = nil;
 	}
 }
 
++ (id)userToUserController
+{
+    return AUTORELEASE(((TSTapstream *)[TSTapstream instance])->userToUserController);
+}
 
 - (id)initWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)config
 {
@@ -75,6 +84,21 @@ static TSTapstream *instance = nil;
 			developerSecret:developerSecret
 			config:config]);
 		[core start];
+        
+        // Dynamically instantiate TSUserToUserController, if the source files have been
+        // included in the developer's project.
+        Class userToUserControllerClass = NSClassFromString(@"TSUserToUserController");
+        if(userToUserControllerClass)
+        {
+            id inst = [userToUserControllerClass alloc];
+            SEL sel = NSSelectorFromString(@"initWithSecret:uuid:");
+            IMP imp = [inst methodForSelector:sel];
+            userToUserController = ((id (*)(id, SEL, NSString *, NSString *))imp)(inst, sel, developerSecret, [platform loadUuid]);
+            
+            sel = NSSelectorFromString(@"setDelegate:");
+            imp = [userToUserController methodForSelector:sel];
+            ((void (*)(id, SEL, id))imp)(userToUserController, sel, self);
+        }
 	}
 	return self;
 }
@@ -85,6 +109,7 @@ static TSTapstream *instance = nil;
 	RELEASE(platform);
 	RELEASE(listener);
 	RELEASE(appEventSource);
+    RELEASE(userToUserController);
 	RELEASE(core);
 	SUPER_DEALLOC;
 }
@@ -102,6 +127,30 @@ static TSTapstream *instance = nil;
 - (void)getConversionData:(void(^)(NSData *))completion
 {
 	[core getConversionData:completion];
+}
+
+
+// User-to-user delegate
+- (void)showedOffer:(NSUInteger)offerId
+{
+    NSString *appName = [platform getAppName];
+    TSEvent *event = [TSEvent eventWithName:[NSString stringWithFormat:@"%@-%@-showed-offer_%u", appName ? appName : @"", [kTSPlatform lowercaseString], (unsigned int)offerId] oneTimeOnly:NO];
+    [self fireEvent:event];
+}
+
+- (void)showedSharing:(NSUInteger)offerId
+{
+    NSString *appName = [platform getAppName];
+    TSEvent *event = [TSEvent eventWithName:[NSString stringWithFormat:@"%@-%@-showed-sharing_%u", appName ? appName : @"", [kTSPlatform lowercaseString], (unsigned int)offerId] oneTimeOnly:NO];
+    [self fireEvent:event];
+}
+
+- (void)completedShare:(NSUInteger)offerId socialMedium:(NSString *)medium
+{
+    NSString *appName = [platform getAppName];
+    TSEvent *event = [TSEvent eventWithName:[NSString stringWithFormat:@"%@-%@-sharing-completed_%u", appName ? appName : @"", [kTSPlatform lowercaseString], (unsigned int)offerId] oneTimeOnly:NO];
+    [event addValue:medium forKey:@"medium"];
+    [self fireEvent:event];
 }
 
 @end

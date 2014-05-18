@@ -65,11 +65,7 @@
 		self.postData = nil;
 		self.failingEventId = nil;
 		self.appName = nil;
-#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-		self.platformName = @"ios";
-#else
-		self.platformName = @"mac";
-#endif
+		self.platformName = [kTSPlatform lowercaseString];
 		
 		[self makePostArgs];
 
@@ -446,13 +442,7 @@
 	}
 
 	[self appendPostPairWithPrefix:@"" key:@"uuid" value:[platform loadUuid]];
-
-#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-	[self appendPostPairWithPrefix:@"" key:@"platform" value:@"iOS"];
-#else
-	[self appendPostPairWithPrefix:@"" key:@"platform" value:@"Mac"];
-#endif
-
+	[self appendPostPairWithPrefix:@"" key:@"platform" value:kTSPlatform];
 	[self appendPostPairWithPrefix:@"" key:@"vendor" value:[platform getManufacturer]];
 	[self appendPostPairWithPrefix:@"" key:@"model" value:[platform getModel]];
 	[self appendPostPairWithPrefix:@"" key:@"os" value:[platform getOs]];

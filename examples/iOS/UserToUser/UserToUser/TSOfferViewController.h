@@ -9,11 +9,10 @@
 #import <UIKit/UIKit.h>
 #import "TSHelpers.h"
 #import "TSOffer.h"
+#import "TSUserToUserDelegate.h"
 
 @interface TSOfferViewController : UIViewController<UIWebViewDelegate>
 
-@property(STRONG_OR_RETAIN, nonatomic) TSOffer *offer;
-
-+ (id)controllerWithOffer:(TSOffer *)offer;
++ (id)controllerWithOffer:(TSOffer *)offer parentViewController:(UIViewController *)parentViewController delegate:(id<TSUserToUserDelegate>)delegate;
 
 @end

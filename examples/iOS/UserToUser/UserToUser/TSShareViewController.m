@@ -15,7 +15,9 @@
     BOOL hasMessaging;
 }
 
+@property(STRONG_OR_RETAIN, nonatomic) TSOffer *offer;
 @property(STRONG_OR_RETAIN, nonatomic) UIViewController *parentViewController;
+@property(assign, nonatomic) id<TSUserToUserDelegate> delegate;
 @property(STRONG_OR_RETAIN, nonatomic) SLComposeViewController *twitterComposeViewController;
 @property(STRONG_OR_RETAIN, nonatomic) SLComposeViewController *facebookComposeViewController;
 @property(STRONG_OR_RETAIN, nonatomic) MFMailComposeViewController *emailComposeViewController;
@@ -26,36 +28,60 @@
 
 @implementation TSShareViewController
 
-@synthesize twitterComposeViewController, facebookComposeViewController, emailComposeViewController, bg, doneButton,
+@synthesize offer, parentViewController, twitterComposeViewController, facebookComposeViewController, emailComposeViewController, bg, doneButton,
     twitterButton, twitterButtonCheck,
     facebookButton, facebookButtonCheck,
     emailButton, emailButtonCheck,
     messagingButton, messagingButtonCheck;
 
-+ (id)controllerWithParentViewController:(UIViewController *)parentViewController
++ (id)controllerWithOffer:(TSOffer *)offer parentViewController:(UIViewController *)parentViewController delegate:(id<TSUserToUserDelegate>)delegate
 {
-    return AUTORELEASE([[TSShareViewController alloc] initWithNibName:@"TSShareView" bundle:nil parentViewController:parentViewController]);
+    return AUTORELEASE([[TSShareViewController alloc] initWithNibName:@"TSShareView" bundle:nil offer:offer parentViewController:parentViewController delegate:delegate]);
 }
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil parentViewController:(UIViewController *)parentViewController
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil offer:(TSOffer *)offerVal parentViewController:(UIViewController *)parentViewControllerVal delegate:(id<TSUserToUserDelegate>)delegateVal
 {
     if(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
-        self.parentViewController = parentViewController;
+        self.offer = offerVal;
+        self.parentViewController = parentViewControllerVal;
+        self.delegate = delegateVal;
         
         hasTwitter = [SLComposeViewController isAvailableForServiceType:SLServiceTypeTwitter];
         hasFacebook = [SLComposeViewController isAvailableForServiceType:SLServiceTypeFacebook];
         hasEmail = [MFMailComposeViewController canSendMail];
         hasMessaging = [MFMessageComposeViewController canSendText];
         
+        __weak TSShareViewController *me = self;
+        
         if(hasTwitter) {
             self.twitterComposeViewController = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
+            self.twitterComposeViewController.completionHandler = ^(SLComposeViewControllerResult result) {
+                NSLog(@"Twitter finished: %d", result == SLComposeViewControllerResultDone);
+                if(result == SLComposeViewControllerResultDone) {
+                    me.twitterButtonCheck.hidden = NO;
+                    me.doneButton.enabled = YES;
+                }
+                [me.twitterComposeViewController dismissViewControllerAnimated:YES completion:nil];
+            };
         }
+        
         if(hasFacebook) {
             self.facebookComposeViewController = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeFacebook];
+            self.facebookComposeViewController.completionHandler = ^(SLComposeViewControllerResult result) {
+                NSLog(@"Facebook finished: %d", result == SLComposeViewControllerResultDone);
+                if(result == SLComposeViewControllerResultDone) {
+                    me.facebookButtonCheck.hidden = NO;
+                    me.doneButton.enabled = YES;
+                }
+                [me.facebookComposeViewController dismissViewControllerAnimated:YES completion:nil];
+            };
         }
-        if(hasEmail ) {
+        
+        if(hasEmail) {
             self.emailComposeViewController = AUTORELEASE([[MFMailComposeViewController alloc] init]);
+            self.emailComposeViewController.mailComposeDelegate = self;
         }
+        
         if(hasMessaging) {
             self.messageComposeViewController = AUTORELEASE([[MFMessageComposeViewController alloc] init]);
             self.messageComposeViewController.messageComposeDelegate = self;
@@ -66,6 +92,8 @@
 
 - (void)dealloc
 {
+    RELEASE(self->offer);
+    RELEASE(self->parentViewController);
     RELEASE(self->twitterComposeViewController);
     RELEASE(self->facebookComposeViewController);
     RELEASE(self->emailComposeViewController);
@@ -83,6 +111,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    self.view.frame = self.parentViewController.view.bounds;
     
     self.bg.layer.backgroundColor = [UIColor colorWithWhite:0.949 alpha:1.0].CGColor;
     self.bg.layer.cornerRadius = 10;
@@ -170,6 +200,15 @@
     [self.messageComposeViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
+- (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error
+{
+    NSLog(@"Email finished: %d", result == MFMailComposeResultSent);
+    if(result == MFMailComposeResultSent) {
+        self.emailButtonCheck.hidden = NO;
+        self.doneButton.enabled = YES;
+    }
+    [self.emailComposeViewController dismissViewControllerAnimated:YES completion:nil];
+}
 
 
 /*

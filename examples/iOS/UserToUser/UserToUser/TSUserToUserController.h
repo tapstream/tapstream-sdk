@@ -10,12 +10,13 @@
 #import "TSHelpers.h"
 #import "TSOffer.h"
 #import "TSReward.h"
+#import "TSUserToUserDelegate.h"
 
 typedef void (^TSUserToUserResultHandler)(NSArray *);
 
 @interface TSUserToUserController : NSObject
 
-- (id)initWithSecret:(NSString *)secret andUuid:(NSString *)uuid;
+@property(assign) id<TSUserToUserDelegate> delegate;
 
 /**
  @brief Checks if there is an offer than can be shown from the code location indicated by locationTag.
