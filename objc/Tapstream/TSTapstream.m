@@ -91,9 +91,9 @@ static TSTapstream *instance = nil;
         if(userToUserControllerClass)
         {
             id inst = [userToUserControllerClass alloc];
-            SEL sel = NSSelectorFromString(@"initWithSecret:uuid:");
+            SEL sel = NSSelectorFromString(@"initWithSecret:uuid:bundle:");
             IMP imp = [inst methodForSelector:sel];
-            userToUserController = ((id (*)(id, SEL, NSString *, NSString *))imp)(inst, sel, developerSecret, [platform loadUuid]);
+            userToUserController = ((id (*)(id, SEL, NSString *, NSString *, NSString *))imp)(inst, sel, developerSecret, [platform loadUuid], [platform getBundleIdentifier]);
             
             sel = NSSelectorFromString(@"setDelegate:");
             imp = [userToUserController methodForSelector:sel];

@@ -28,7 +28,7 @@
         
         TSUserToUserController *u2u = [TSTapstream userToUserController];
         
-        TSOffer *offer = [u2u offerForCodeLocation:@"launch" timeout:20];
+        TSOffer *offer = [u2u offerForInsertionPoint:@"launch" timeout:20];
         if(offer) {
             [u2u showOffer:offer parentViewController:self.window.rootViewController];
         }

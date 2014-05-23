@@ -14,19 +14,19 @@
 
 typedef void (^TSUserToUserResultHandler)(NSArray *);
 
-@interface TSUserToUserController : NSObject
+@interface TSUserToUserController : NSObject<TSUserToUserDelegate>
 
 @property(assign) id<TSUserToUserDelegate> delegate;
 
 /**
- @brief Checks if there is an offer than can be shown from the code location indicated by locationTag.
+ @brief Checks if there is an offer than can be shown from the code location indicated by insertionPoint.
  This operation @b BLOCKS until offer information is available, or the provided timeout elapses,
  whichever comes first.
- @param locationTag A string identifying a certain location within the flow of your application.
+ @param insertionPoint A string identifying a certain location within the flow of your application.
  @param timeoutSeconds The maximum time this call is allowed to block, in seconds.
  @return A TSOffer instance if available, else nil.
  */
-- (TSOffer *)offerForCodeLocation:(NSString *)locationTag timeout:(NSTimeInterval)timeoutSeconds;
+- (TSOffer *)offerForInsertionPoint:(NSString *)insertionPoint timeout:(NSTimeInterval)timeoutSeconds;
 
 /**
  @brief Displays the specified offer to your user.

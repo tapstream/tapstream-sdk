@@ -13,12 +13,13 @@
 
 @property(STRONG_OR_RETAIN, nonatomic, readonly) NSDictionary *description;
 @property(assign, nonatomic, readonly) NSUInteger ident;
-@property(STRONG_OR_RETAIN, nonatomic, readonly) NSString *name;
+@property(STRONG_OR_RETAIN, nonatomic, readonly) NSString *insertionPoint;
 @property(assign, nonatomic, readonly) NSInteger rewardMinimumInstalls;
 @property(STRONG_OR_RETAIN, nonatomic, readonly) NSString *rewardSku;
 @property(STRONG_OR_RETAIN, nonatomic, readonly) NSString *bundle;
 @property(assign, nonatomic, readonly) NSInteger minimumAge;
 @property(assign, nonatomic, readonly) NSInteger rateLimit;
+@property(STRONG_OR_RETAIN, nonatomic, readonly) NSString *markup;
 
 - (id)initWithDescription:(NSDictionary *)description;
 

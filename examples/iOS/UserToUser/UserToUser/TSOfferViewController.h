@@ -13,6 +13,10 @@
 
 @interface TSOfferViewController : UIViewController<UIWebViewDelegate>
 
+@property(STRONG_OR_RETAIN, nonatomic) TSOffer *offer;
+@property(STRONG_OR_RETAIN, nonatomic) UIViewController *parentViewController;
+@property(assign, nonatomic) id<TSUserToUserDelegate> delegate;
+
 + (id)controllerWithOffer:(TSOffer *)offer parentViewController:(UIViewController *)parentViewController delegate:(id<TSUserToUserDelegate>)delegate;
 
 @end

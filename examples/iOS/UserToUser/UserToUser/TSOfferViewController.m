@@ -8,18 +8,9 @@
 
 #import "TSOfferViewController.h"
 
-@interface TSOfferViewController ()
-
-@property(STRONG_OR_RETAIN, nonatomic) TSOffer *offer;
-@property(STRONG_OR_RETAIN, nonatomic) UIViewController *parentViewController;
-@property(assign, nonatomic) id<TSUserToUserDelegate> delegate;
-
-@end
-
 @implementation TSOfferViewController
 
-@synthesize parentViewController;
-@synthesize offer;
+@synthesize parentViewController, offer, delegate;
 
 + (id)controllerWithOffer:(TSOffer *)offer parentViewController:(UIViewController *)parentViewController delegate:(id<TSUserToUserDelegate>)delegate
 {
@@ -32,10 +23,8 @@
         self.offer = offerVal;
         self.parentViewController = parentViewControllerVal;
         self.delegate = delegateVal;
-        
-        //NSString *url = [NSString stringWithFormat:@"%u", (unsigned int)self.offer.ident];
-        NSString *url = @"http://google.ca/";
-        [((UIWebView *)self.view) loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]]];
+        ((UIWebView *)self.view).delegate = self;
+        [((UIWebView *)self.view) loadHTMLString:self.offer.markup baseURL:[NSURL URLWithString:@""]];
     }
     return self;
 }
@@ -49,7 +38,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    
+    self.view.frame = self.parentViewController.view.bounds;
 }
 
 - (void)didReceiveMemoryWarning
@@ -57,6 +47,42 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+- (void)close
+{
+    [UIView transitionWithView:self.view.superview
+                      duration:0.3
+                       options:UIViewAnimationOptionTransitionCrossDissolve
+                    animations:^{ [self.view removeFromSuperview]; }
+                    completion:NULL];
+}
+
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
+{
+}
+
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
+{
+    NSString *url = [[request URL] absoluteString];
+    if([url isEqualToString:@"close"]) {
+        [self close];
+        return NO;
+        
+    } else if([url isEqualToString:@"accept"]) {
+        [self close];
+        return NO;
+    }
+    return YES;
+}
+
+- (void)webViewDidFinishLoad:(UIWebView *)webView
+{
+}
+
+- (void)webViewDidStartLoad:(UIWebView *)webView
+{
+}
+
 
 /*
 #pragma mark - Navigation
