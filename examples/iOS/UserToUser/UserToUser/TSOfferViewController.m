@@ -40,6 +40,9 @@
     [super viewDidLoad];
     
     self.view.frame = self.parentViewController.view.bounds;
+    ((UIWebView *)self.view).scrollView.scrollEnabled = NO;
+    ((UIWebView *)self.view).backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.8];
+    ((UIWebView *)self.view).opaque = NO;
 }
 
 - (void)didReceiveMemoryWarning
@@ -64,12 +67,14 @@
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
 {
     NSString *url = [[request URL] absoluteString];
-    if([url isEqualToString:@"close"]) {
+    if([url isEqualToString:@"file:///close"]) {
         [self close];
+        [self.delegate dismissedOffer:NO];
         return NO;
         
-    } else if([url isEqualToString:@"accept"]) {
+    } else if([url isEqualToString:@"file:///accept"]) {
         [self close];
+        [self.delegate dismissedOffer:YES];
         return NO;
     }
     return YES;

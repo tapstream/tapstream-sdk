@@ -40,12 +40,13 @@
                                     <color key="textColor" red="0.42745098039215684" green="0.43137254901960786" blue="0.44313725490196076" alpha="1" colorSpace="calibratedRGB"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="NIO-RL-xoC" userLabel="BtnDone">
-                                    <rect key="frame" x="174" y="214" width="71" height="38"/>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" id="NIO-RL-xoC" userLabel="BtnDone">
+                                    <rect key="frame" x="174" y="215" width="71" height="38"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                     <state key="normal" backgroundImage="done">
                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                     </state>
+                                    <state key="disabled" backgroundImage="done-disabled"/>
                                     <state key="highlighted" backgroundImage="done-down"/>
                                     <connections>
                                         <action selector="onBtnDone:" destination="-1" eventType="touchUpInside" id="hC1-zs-ZMn"/>
@@ -192,7 +193,7 @@
                     </subviews>
                 </view>
             </subviews>
-            <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.70000000000000007" colorSpace="calibratedRGB"/>
+            <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.80000000000000004" colorSpace="calibratedRGB"/>
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
         </view>
@@ -202,6 +203,7 @@
         <image name="close" width="34" height="34"/>
         <image name="close-down" width="34" height="34"/>
         <image name="done" width="71" height="38"/>
+        <image name="done-disabled" width="71" height="38"/>
         <image name="done-down" width="71" height="38"/>
         <image name="icon-email" width="45" height="45"/>
         <image name="icon-email-disabled" width="45" height="45"/>

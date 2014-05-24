@@ -138,11 +138,19 @@ static TSTapstream *instance = nil;
     [self fireEvent:event];
 }
 
+- (void)dismissedOffer:(BOOL)accepted
+{
+}
+
 - (void)showedSharing:(NSUInteger)offerId
 {
     NSString *appName = [platform getAppName];
     TSEvent *event = [TSEvent eventWithName:[NSString stringWithFormat:@"%@-%@-showed-sharing_%u", appName ? appName : @"", [kTSPlatform lowercaseString], (unsigned int)offerId] oneTimeOnly:NO];
     [self fireEvent:event];
+}
+
+- (void)dismissedSharing
+{
 }
 
 - (void)completedShare:(NSUInteger)offerId socialMedium:(NSString *)medium
