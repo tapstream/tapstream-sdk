@@ -10,4 +10,6 @@
 
 @interface ViewController : UIViewController
 
+- (IBAction)onTestInsertionPoint:(id)sender;
+
 @end

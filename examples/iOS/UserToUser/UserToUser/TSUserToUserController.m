@@ -57,27 +57,39 @@
     RELEASE(self->shareViewController);
 }
 
-- (TSOffer *)offerForInsertionPoint:(NSString *)insertionPoint timeout:(NSTimeInterval)timeoutSeconds
+- (BOOL)isEligible:(TSOffer *)offer
 {
-    if(!insertionPoint) {
-        return nil;
-    }
-    
-    @synchronized(self.offerCache) {
-        TSOffer *offer = [self.offerCache objectForKey:insertionPoint];
-        if(offer) {
-            return offer;
-        }
-    }
-    
-    NSString *url = [NSString stringWithFormat:@"https://app.tapstream.com/api/v1/user-to-user/offers/?secret=%@&bundle=%@&insertion_point=%@",
-                     self.secret, self.bundle, [TSUtils encodeString:insertionPoint]];
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
-    
-    NSConditionLock *ready = AUTORELEASE([[NSConditionLock alloc] initWithCondition:0]);
-    NSMutableArray *offers = [NSMutableArray arrayWithCapacity:1];
-    
+    // TODO: Use eligibility criteria in offer to determine if it can be shown
+    return YES;
+}
+
+- (void)offerForInsertionPoint:(NSString *)insertionPoint result:(void (^)(TSOffer *))callback
+{
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        if(!insertionPoint) {
+            if(callback) {
+                dispatch_sync(dispatch_get_main_queue(), ^() {
+                    callback(nil);
+                });
+            }
+            return;
+        }
+        
+        TSOffer *offer;
+        @synchronized(self.offerCache) {
+            offer = [self.offerCache objectForKey:insertionPoint];
+        }
+        if(offer) {
+            if(callback) {
+                dispatch_sync(dispatch_get_main_queue(), ^() {
+                    callback([self isEligible:offer] ? offer : nil);
+                });
+            }
+            return;
+        }
+        
+        NSString *url = [NSString stringWithFormat:@"https://app.tapstream.com/api/v1/user-to-user/offers/?secret=%@&bundle=%@&insertion_point=%@", self.secret, self.bundle, [TSUtils encodeString:insertionPoint]];
+        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
         NSHTTPURLResponse *response;
         NSError *error;
         NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
@@ -85,26 +97,29 @@
         
         NSLog(@"Offers request complete (status %d)", (int)status);
         
-        [ready lock];
         if(data && !error && status >= 200 && status < 300) {
             NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
             if(json) {
-                [offers addObject:AUTORELEASE([[TSOffer alloc] initWithDescription:json])];
+                offer = AUTORELEASE([[TSOffer alloc] initWithDescription:json]);
+                @synchronized(self.offerCache) {
+                    [self.offerCache setObject:offer forKey:insertionPoint];
+                }
+                if(callback) {
+                    dispatch_sync(dispatch_get_main_queue(), ^() {
+                        callback([self isEligible:offer] ? offer : nil);
+                    });
+                }
+                return;
             }
         }
-        [ready unlockWithCondition:YES];
+        
+        if(callback) {
+            dispatch_sync(dispatch_get_main_queue(), ^() {
+                callback(nil);
+            });
+        }
+        
     });
-    
-    if([ready lockWhenCondition:YES beforeDate:[NSDate dateWithTimeIntervalSinceNow:timeoutSeconds]]) {
-        if(offers.count > 0) {
-            @synchronized(self.offerCache) {
-                [self.offerCache setObject:[offers objectAtIndex:0] forKey:insertionPoint];
-            }
-        }
-        [ready unlock];
-        return [offers objectAtIndex:0];
-    }
-    return nil;
 }
 
 - (void)showOffer:(TSOffer *)offer parentViewController:(UIViewController *)parentViewController;
@@ -186,6 +201,7 @@
                         completion:NULL];
     }
     self.offerViewController = nil;
+    [self.delegate dismissedOffer:accepted];
 }
 
 - (void)showedSharing:(NSUInteger)offerId
@@ -196,6 +212,7 @@
 - (void)dismissedSharing
 {
     self.shareViewController = nil;
+    [self.delegate dismissedSharing];
 }
 
 - (void)completedShare:(NSUInteger)offerId socialMedium:(NSString *)medium

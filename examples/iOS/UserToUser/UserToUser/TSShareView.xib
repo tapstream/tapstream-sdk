@@ -179,7 +179,7 @@
                             <color key="backgroundColor" red="0.94901960784313721" green="0.94901960784313721" blue="0.94901960784313721" alpha="1" colorSpace="calibratedRGB"/>
                         </view>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="M3z-RZ-279" userLabel="BtnClose">
-                            <rect key="frame" x="264" y="11" width="60" height="60"/>
+                            <rect key="frame" x="259" y="17" width="60" height="60"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                             <rect key="contentStretch" x="0.0" y="0.0" width="1" height="0.0"/>
                             <state key="normal" image="close">

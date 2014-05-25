@@ -8,7 +8,6 @@
 
 #import "AppDelegate.h"
 #import "TSTapstream.h"
-#import "TSUserToUserController.h"
 
 @implementation AppDelegate
 
@@ -17,22 +16,8 @@
 {
     // Override point for customization after application launch.
     
-    self.window.rootViewController.view.layer.backgroundColor = [UIColor colorWithRed:1.0 green:0.0 blue:0.0 alpha:1.0].CGColor;
-    
     TSConfig *config = [TSConfig configWithDefaults];
     [TSTapstream createWithAccountName:@"sdktest" developerSecret:@"YGP2pezGTI6ec48uti4o1w" config:config];
-    
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        NSLog(@"Requesting offer");
-        
-        TSUserToUserController *u2u = [TSTapstream userToUserController];
-        
-        TSOffer *offer = [u2u offerForInsertionPoint:@"launch" timeout:20];
-        if(offer) {
-            [u2u showOffer:offer parentViewController:self.window.rootViewController];
-        }
-    });
     
     return YES;
 }

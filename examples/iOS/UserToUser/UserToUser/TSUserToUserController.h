@@ -20,13 +20,10 @@ typedef void (^TSUserToUserResultHandler)(NSArray *);
 
 /**
  @brief Checks if there is an offer than can be shown from the code location indicated by insertionPoint.
- This operation @b BLOCKS until offer information is available, or the provided timeout elapses,
- whichever comes first.
  @param insertionPoint A string identifying a certain location within the flow of your application.
- @param timeoutSeconds The maximum time this call is allowed to block, in seconds.
- @return A TSOffer instance if available, else nil.
+ @param callback Block that receives either a TSOffer instance or nil.  This callback is main on the main thread.
  */
-- (TSOffer *)offerForInsertionPoint:(NSString *)insertionPoint timeout:(NSTimeInterval)timeoutSeconds;
+- (void)offerForInsertionPoint:(NSString *)insertionPoint result:(void (^)(TSOffer *))callback;
 
 /**
  @brief Displays the specified offer to your user.

@@ -50,42 +50,6 @@
         hasFacebook = [SLComposeViewController isAvailableForServiceType:SLServiceTypeFacebook];
         hasEmail = [MFMailComposeViewController canSendMail];
         hasMessaging = [MFMessageComposeViewController canSendText];
-        
-        __weak TSShareViewController *me = self;
-        
-        if(hasTwitter) {
-            self.twitterComposeViewController = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
-            self.twitterComposeViewController.completionHandler = ^(SLComposeViewControllerResult result) {
-                NSLog(@"Twitter finished: %d", result == SLComposeViewControllerResultDone);
-                if(result == SLComposeViewControllerResultDone) {
-                    me.twitterButtonCheck.hidden = NO;
-                    me.doneButton.enabled = YES;
-                }
-                [me.twitterComposeViewController dismissViewControllerAnimated:YES completion:nil];
-            };
-        }
-        
-        if(hasFacebook) {
-            self.facebookComposeViewController = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeFacebook];
-            self.facebookComposeViewController.completionHandler = ^(SLComposeViewControllerResult result) {
-                NSLog(@"Facebook finished: %d", result == SLComposeViewControllerResultDone);
-                if(result == SLComposeViewControllerResultDone) {
-                    me.facebookButtonCheck.hidden = NO;
-                    me.doneButton.enabled = YES;
-                }
-                [me.facebookComposeViewController dismissViewControllerAnimated:YES completion:nil];
-            };
-        }
-        
-        if(hasEmail) {
-            self.emailComposeViewController = AUTORELEASE([[MFMailComposeViewController alloc] init]);
-            self.emailComposeViewController.mailComposeDelegate = self;
-        }
-        
-        if(hasMessaging) {
-            self.messageComposeViewController = AUTORELEASE([[MFMessageComposeViewController alloc] init]);
-            self.messageComposeViewController.messageComposeDelegate = self;
-        }
     }
     return self;
 }
@@ -150,6 +114,7 @@
                        options:UIViewAnimationOptionTransitionCrossDissolve
                     animations:^{ [self.view removeFromSuperview]; }
                     completion:NULL];
+    [self.delegate dismissedSharing];
 }
 
 - (IBAction)onBtnClose:(id)sender
@@ -167,24 +132,60 @@
 - (IBAction)onBtnMessaging:(id)sender
 {
     NSLog(@"Messaging click");
+    
+    self.messageComposeViewController = AUTORELEASE([[MFMessageComposeViewController alloc] init]);
+    self.messageComposeViewController.messageComposeDelegate = self;
+
     [self.parentViewController presentViewController:self.messageComposeViewController animated:YES completion:nil];
 }
 
 - (IBAction)onBtnTwitter:(id)sender
 {
     NSLog(@"Twitter click");
+    
+    __weak TSShareViewController *me = self;
+    
+    self.twitterComposeViewController = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
+    self.twitterComposeViewController.completionHandler = ^(SLComposeViewControllerResult result) {
+        NSLog(@"Twitter finished: %d", result == SLComposeViewControllerResultDone);
+        if(result == SLComposeViewControllerResultDone) {
+            me.twitterButtonCheck.hidden = NO;
+            me.doneButton.enabled = YES;
+        }
+        [me.twitterComposeViewController dismissViewControllerAnimated:YES completion:nil];
+        [me.delegate completedShare:me.offer.ident socialMedium:@"twitter"];
+    };
+    
     [self.parentViewController presentViewController:self.twitterComposeViewController animated:YES completion:nil];
 }
 
 - (IBAction)onBtnFacebook:(id)sender
 {
     NSLog(@"Facebook click");
+    
+    __weak TSShareViewController *me = self;
+    
+    self.facebookComposeViewController = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeFacebook];
+    self.facebookComposeViewController.completionHandler = ^(SLComposeViewControllerResult result) {
+        NSLog(@"Facebook finished: %d", result == SLComposeViewControllerResultDone);
+        if(result == SLComposeViewControllerResultDone) {
+            me.facebookButtonCheck.hidden = NO;
+            me.doneButton.enabled = YES;
+        }
+        [me.facebookComposeViewController dismissViewControllerAnimated:YES completion:nil];
+        [me.delegate completedShare:me.offer.ident socialMedium:@"facebook"];
+    };
+    
     [self.parentViewController presentViewController:self.facebookComposeViewController animated:YES completion:nil];
 }
 
 - (IBAction)onBtnEmail:(id)sender
 {
     NSLog(@"Email click");
+    
+    self.emailComposeViewController = AUTORELEASE([[MFMailComposeViewController alloc] init]);
+    self.emailComposeViewController.mailComposeDelegate = self;
+    
     [self.parentViewController presentViewController:self.emailComposeViewController animated:YES completion:nil];
 }
 
@@ -198,6 +199,7 @@
         self.doneButton.enabled = YES;
     }
     [self.messageComposeViewController dismissViewControllerAnimated:YES completion:nil];
+    [self.delegate completedShare:self.offer.ident socialMedium:@"messaging"];
 }
 
 - (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error
@@ -208,6 +210,7 @@
         self.doneButton.enabled = YES;
     }
     [self.emailComposeViewController dismissViewControllerAnimated:YES completion:nil];
+    [self.delegate completedShare:self.offer.ident socialMedium:@"email"];
 }
 
 
