@@ -146,6 +146,7 @@
     __weak TSShareViewController *me = self;
     
     self.twitterComposeViewController = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
+    [self.twitterComposeViewController setInitialText:self.offer.message];
     self.twitterComposeViewController.completionHandler = ^(SLComposeViewControllerResult result) {
         NSLog(@"Twitter finished: %d", result == SLComposeViewControllerResultDone);
         if(result == SLComposeViewControllerResultDone) {
@@ -166,6 +167,7 @@
     __weak TSShareViewController *me = self;
     
     self.facebookComposeViewController = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeFacebook];
+    [self.facebookComposeViewController setInitialText:self.offer.message];
     self.facebookComposeViewController.completionHandler = ^(SLComposeViewControllerResult result) {
         NSLog(@"Facebook finished: %d", result == SLComposeViewControllerResultDone);
         if(result == SLComposeViewControllerResultDone) {

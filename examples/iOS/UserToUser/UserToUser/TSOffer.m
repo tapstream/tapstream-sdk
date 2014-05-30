@@ -13,6 +13,7 @@
 @property(STRONG_OR_RETAIN, nonatomic, readwrite) NSDictionary *description;
 @property(assign, nonatomic, readwrite) NSUInteger ident;
 @property(STRONG_OR_RETAIN, nonatomic, readwrite) NSString *insertionPoint;
+@property(STRONG_OR_RETAIN, nonatomic, readwrite) NSString *message;
 @property(assign, nonatomic, readwrite) NSInteger rewardMinimumInstalls;
 @property(STRONG_OR_RETAIN, nonatomic, readwrite) NSString *rewardSku;
 @property(STRONG_OR_RETAIN, nonatomic, readwrite) NSString *bundle;
@@ -34,6 +35,7 @@
         self.description = descriptionVal;
         self.ident = [[descriptionVal objectForKey:@"id"] unsignedIntegerValue];
         self.insertionPoint = [descriptionVal objectForKey:@"insertion_point"];
+        self.message = [descriptionVal objectForKey:@"message"];
         self.rewardMinimumInstalls = [[descriptionVal objectForKey:@"reward_minimum_installs"] integerValue];
         self.rewardSku = [descriptionVal objectForKey:@"reward_sku"];
         self.bundle = [descriptionVal objectForKey:@"bundle"];
@@ -48,6 +50,7 @@
 {
     RELEASE(self->description);
     RELEASE(self->insertionPoint);
+    RELEASE(self->message);
     RELEASE(self->rewardSku);
     RELEASE(self->bundle);
     RELEASE(self->markup);
