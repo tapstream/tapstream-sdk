@@ -14,10 +14,14 @@
 
 #define kTSMaxOfferRetries 8
 #define kTSConsumedRewardsKey @"__tapstream_consumed_rewards"
+#define kTSInstallDateKey @"__tapstream_install_date"
+#define kTSLastOfferImpressionTimesKey @"__tapstream_last_offer_impression_times"
 
 @interface TSUserToUserController()
 @property(STRONG_OR_RETAIN, nonatomic) NSString *secret;
 @property(STRONG_OR_RETAIN, nonatomic) NSString *bundle;
+@property(STRONG_OR_RETAIN, nonatomic) NSDate *installDate;
+@property(STRONG_OR_RETAIN, nonatomic) NSMutableDictionary *lastOfferImpressionTimes;
 @property(STRONG_OR_RETAIN, nonatomic) NSMutableDictionary *offerCache;
 @property(STRONG_OR_RETAIN, nonatomic) NSMutableSet *consumedRewards;
 @property(STRONG_OR_RETAIN, nonatomic) NSURLRequest *rewardsRequest;
@@ -30,13 +34,26 @@
 
 @implementation TSUserToUserController
 
-@synthesize delegate, secret, bundle, offerCache, consumedRewards, rewardsRequest, offerViewController, shareViewController;
+@synthesize delegate, secret, bundle, installDate, lastOfferImpressionTimes, offerCache, consumedRewards, rewardsRequest, offerViewController, shareViewController;
 
 - (id)initWithSecret:(NSString *)secretVal uuid:(NSString *)uuid bundle:(NSString *)bundleVal
 {
     if(self = [super init]) {
         self.secret = secretVal;
         self.bundle = [TSUtils encodeString:bundleVal];
+        
+        self.installDate = [[NSUserDefaults standardUserDefaults] objectForKey:kTSInstallDateKey];
+        if(!self.installDate) {
+            self.installDate = [NSDate date];
+            [[NSUserDefaults standardUserDefaults] setObject:self.installDate forKey:kTSInstallDateKey];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
+        
+        self.lastOfferImpressionTimes = [[NSUserDefaults standardUserDefaults] objectForKey:kTSLastOfferImpressionTimesKey];
+        if(!self.lastOfferImpressionTimes) {
+            self.lastOfferImpressionTimes = [NSMutableDictionary dictionaryWithCapacity:8];
+        }
+        
         self.offerCache = [NSMutableDictionary dictionaryWithCapacity:8];
         self.rewardsRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://app.tapstream.com/api/v1/user-to-user/rewards/?secret=%@&event_session=%@", secret, uuid]]];
         
@@ -50,6 +67,8 @@
 {
     RELEASE(self->secret);
     RELEASE(self->bundle);
+    RELEASE(self->installDate);
+    RELEASE(self->lastOfferImpressionTimes);
     RELEASE(self->offerCache);
     RELEASE(self->consumedRewards);
     RELEASE(self->rewardsRequest);
@@ -59,7 +78,20 @@
 
 - (BOOL)isEligible:(TSOffer *)offer
 {
-    // TODO: Use eligibility criteria in offer to determine if it can be shown
+    NSDate *now = [NSDate date];
+    
+    // Cannot show offers to users younger than minimumAge
+    NSTimeInterval age = [now timeIntervalSinceDate:self.installDate];
+    if(age < offer.minimumAge) {
+        return NO;
+    }
+    
+    // Cannot show offers more frequently than the rateLimit
+    NSDate *lastImpression = [self.lastOfferImpressionTimes objectForKey:[NSNumber numberWithInteger:offer.ident]];
+    if(lastImpression && [now timeIntervalSinceDate:lastImpression] < offer.rateLimit) {
+        return NO;
+    }
+    
     return YES;
 }
 
@@ -133,6 +165,11 @@
                         completion:NULL];
 
         [self.delegate showedOffer:offer.ident];
+        
+        // Update last shown time for this offer
+        [self.lastOfferImpressionTimes setObject:[NSDate dateWithTimeIntervalSinceNow:0] forKey:[NSNumber numberWithInteger:offer.ident]];
+        [[NSUserDefaults standardUserDefaults] setObject:self.lastOfferImpressionTimes forKey:kTSLastOfferImpressionTimesKey];
+        [[NSUserDefaults standardUserDefaults] synchronize];
     }
 }
 
