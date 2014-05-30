@@ -87,7 +87,7 @@
     }
     
     // Cannot show offers more frequently than the rateLimit
-    NSDate *lastImpression = [self.lastOfferImpressionTimes objectForKey:[NSNumber numberWithInteger:offer.ident]];
+    NSDate *lastImpression = [self.lastOfferImpressionTimes objectForKey:[[NSNumber numberWithInteger:offer.ident] stringValue]];
     if(lastImpression && [now timeIntervalSinceDate:lastImpression] < offer.rateLimit) {
         return NO;
     }
@@ -167,7 +167,7 @@
         [self.delegate showedOffer:offer.ident];
         
         // Update last shown time for this offer
-        [self.lastOfferImpressionTimes setObject:[NSDate dateWithTimeIntervalSinceNow:0] forKey:[NSNumber numberWithInteger:offer.ident]];
+        [self.lastOfferImpressionTimes setObject:[NSDate date] forKey:[[NSNumber numberWithInteger:offer.ident] stringValue]];
         [[NSUserDefaults standardUserDefaults] setObject:self.lastOfferImpressionTimes forKey:kTSLastOfferImpressionTimesKey];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }

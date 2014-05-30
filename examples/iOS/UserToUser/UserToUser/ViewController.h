@@ -10,6 +10,11 @@
 
 @interface ViewController : UIViewController
 
+@property(strong) IBOutlet UITextField *insertionPointText;
+
 - (IBAction)onTestInsertionPoint:(id)sender;
+- (IBAction)onMakeInstallTimeAgesAgo:(id)sender;
+- (IBAction)onEraseLastShownTimes:(id)sender;
+- (IBAction)onKill:(id)sender;
 
 @end
