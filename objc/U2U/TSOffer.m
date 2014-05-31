@@ -48,6 +48,8 @@
 
 - (void)dealloc
 {
+    SUPER_DEALLOC;
+    
     RELEASE(self->description);
     RELEASE(self->insertionPoint);
     RELEASE(self->message);

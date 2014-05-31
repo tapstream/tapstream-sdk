@@ -65,6 +65,8 @@
 
 - (void)dealloc
 {
+    SUPER_DEALLOC;
+    
     RELEASE(self->secret);
     RELEASE(self->bundle);
     RELEASE(self->installDate);
@@ -209,7 +211,7 @@
     if(json) {
         NSMutableArray *results = [NSMutableArray arrayWithCapacity:32];
         [json enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            [results addObject:[[TSReward alloc] initWithDescription:(NSDictionary *)obj]];
+            [results addObject:AUTORELEASE([[TSReward alloc] initWithDescription:(NSDictionary *)obj])];
         }];
         return results;
     }

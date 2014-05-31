@@ -56,6 +56,8 @@
 
 - (void)dealloc
 {
+    SUPER_DEALLOC;
+    
     RELEASE(self->offer);
     RELEASE(self->parentViewController);
     RELEASE(self->twitterComposeViewController);

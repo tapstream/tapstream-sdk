@@ -34,8 +34,7 @@
     
     TSUserToUserController *u2u = [TSTapstream userToUserController];
     
-    NSString *insertionPoint = self.insertionPointText.text;
-    [u2u offerForInsertionPoint:insertionPoint result:^(TSOffer *offer) {
+    [u2u offerForInsertionPoint:self.insertionPointText.text result:^(TSOffer *offer) {
         if(offer) {
             [u2u showOffer:offer parentViewController:self];
         }
