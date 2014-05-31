@@ -16,57 +16,98 @@
                         <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4iY-lE-Bl7">
-                                <rect key="frame" x="20" y="270" width="254" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SQt-Vg-F7n">
+                                <rect key="frame" x="30" y="215" width="256" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.25490196079999999" green="0.25098039220000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
                                 <color key="tintColor" red="0.89148579370000003" green="1" blue="0.46716965989999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <state key="normal" title="Trigger insertion point"/>
                                 <connections>
-                                    <action selector="onTestInsertionPoint:" destination="dkx-z0-nzr" eventType="touchUpInside" id="dfx-Nw-p1h"/>
+                                    <action selector="onTestInsertionPoint:" destination="dkx-z0-nzr" eventType="touchUpInside" id="eMl-dH-ToN"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="54u-0r-cuG">
-                                <rect key="frame" x="20" y="20" width="254" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zUt-73-ogG">
+                                <rect key="frame" x="30" y="30" width="256" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.25490196079999999" green="0.25098039220000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
                                 <color key="tintColor" red="0.89148579370000003" green="1" blue="0.46716965989999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <state key="normal" title="Make install time ages ago"/>
                                 <connections>
-                                    <action selector="onMakeInstallTimeAgesAgo:" destination="dkx-z0-nzr" eventType="touchUpInside" id="WCH-4L-hOP"/>
+                                    <action selector="onMakeInstallTimeAgesAgo:" destination="dkx-z0-nzr" eventType="touchUpInside" id="Sui-yZ-xVI"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pO3-C3-vA9">
-                                <rect key="frame" x="20" y="82" width="254" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lYT-fU-PlE">
+                                <rect key="frame" x="30" y="74" width="256" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.25490196079999999" green="0.25098039220000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
                                 <color key="tintColor" red="0.89148579370000003" green="1" blue="0.46716965989999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <state key="normal" title="Erase last shown times"/>
                                 <connections>
-                                    <action selector="onEraseLastShownTimes:" destination="dkx-z0-nzr" eventType="touchUpInside" id="AKI-U1-68u"/>
+                                    <action selector="onEraseLastShownTimes:" destination="dkx-z0-nzr" eventType="touchUpInside" id="FSx-uY-91v"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SSB-To-BqC">
-                                <rect key="frame" x="20" y="144" width="254" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tR2-nc-19v">
+                                <rect key="frame" x="30" y="118" width="256" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.25490196079999999" green="0.25098039220000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
                                 <color key="tintColor" red="0.89148579370000003" green="1" blue="0.46716965989999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <state key="normal" title="Kill app"/>
                                 <connections>
-                                    <action selector="onKill:" destination="dkx-z0-nzr" eventType="touchUpInside" id="JCl-iO-F7F"/>
+                                    <action selector="onKill:" destination="dkx-z0-nzr" eventType="touchUpInside" id="nHv-nQ-X1J"/>
                                 </connections>
                             </button>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="launch" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="niH-IB-nXo">
-                                <rect key="frame" x="20" y="237" width="254" height="30"/>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="launch" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="5pD-Fy-gS4">
+                                <rect key="frame" x="30" y="183" width="256" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
+                                <connections>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="9Ok-oy-JQg"/>
+                                </connections>
+                            </textField>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" editable="NO" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Gj-tg-8N5">
+                                <rect key="frame" x="30" y="281" width="256" height="107"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" red="0.78851052990000003" green="0.78851052990000003" blue="0.78851052990000003" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2uf-bW-BHb">
+                                <rect key="frame" x="30" y="390" width="256" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.25490196079999999" green="0.25098039220000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="tintColor" red="0.89148579370000003" green="1" blue="0.46716965989999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="Refresh rewards"/>
+                                <connections>
+                                    <action selector="onRefreshRewards:" destination="dkx-z0-nzr" eventType="touchUpInside" id="GMg-FV-rhL"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qPi-fA-xcl">
+                                <rect key="frame" x="30" y="508" width="256" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.25490196079999999" green="0.25098039220000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="tintColor" red="0.89148579370000003" green="1" blue="0.46716965989999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="Consume reward"/>
+                                <connections>
+                                    <action selector="onConsumeReward:" destination="dkx-z0-nzr" eventType="touchUpInside" id="2kw-eI-ogV"/>
+                                </connections>
+                            </button>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="reward id" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="yvB-gE-D6t">
+                                <rect key="frame" x="30" y="476" width="256" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <connections>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="JgV-9C-Feg"/>
+                                </connections>
                             </textField>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <connections>
-                        <outlet property="insertionPointText" destination="niH-IB-nXo" id="vfK-4B-qZy"/>
+                        <outlet property="insertionPointText" destination="5pD-Fy-gS4" id="cRH-L1-qzS"/>
+                        <outlet property="rewardSku" destination="yvB-gE-D6t" id="s6B-mk-zWI"/>
+                        <outlet property="rewardsList" destination="6Gj-tg-8N5" id="zwj-ge-sv7"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
