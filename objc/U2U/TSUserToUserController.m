@@ -160,6 +160,7 @@
 {
     if(offer && parentViewController) {
         self.offerViewController = [TSOfferViewController controllerWithOffer:offer parentViewController:parentViewController delegate:self];
+        self.offerViewController.view.frame = parentViewController.view.bounds;
         [UIView transitionWithView:parentViewController.view
                           duration:0.3
                            options:UIViewAnimationOptionTransitionCrossDissolve
@@ -232,6 +233,7 @@
         UIViewController *parent = self.offerViewController.parentViewController;
         
         self.shareViewController = [TSShareViewController controllerWithOffer:offer parentViewController:parent delegate:self];
+        self.shareViewController.view.frame = parent.view.bounds;
         [UIView transitionWithView:parent.view
                           duration:0.3
                            options:UIViewAnimationOptionTransitionCrossDissolve

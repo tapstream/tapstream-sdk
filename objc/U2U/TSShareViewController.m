@@ -78,8 +78,6 @@
 {
     [super viewDidLoad];
 
-    self.view.frame = self.parentViewController.view.bounds;
-    
     self.bg.layer.backgroundColor = [UIColor colorWithWhite:0.949 alpha:1.0].CGColor;
     self.bg.layer.cornerRadius = 10;
     self.bg.layer.masksToBounds = YES;
