@@ -183,13 +183,13 @@
     NSData *data = [NSURLConnection sendSynchronousRequest:self.rewardsRequest returningResponse:&response error:&error];
     
     NSArray *results = [NSArray array];
-    if(!error && response && response.statusCode >= 200 && response.statusCode < 300 && data) {
+    if(response && response.statusCode >= 200 && response.statusCode < 300 && data) {
         results = [TSUserToUserController parseRewards:data];
         
         // Filter out any rewards that have already been consumed
         @synchronized(self.consumedRewards) {
             results = [results filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id obj, NSDictionary *bindings) {
-                return ![self.consumedRewards containsObject:[NSNumber numberWithInteger:((TSReward *)obj).ident]];
+                return ![self.consumedRewards containsObject:[[NSNumber numberWithInteger:((TSReward *)obj).ident] stringValue]];
             }]];
         }
     }
@@ -200,8 +200,9 @@
 {
     if(reward) {
         @synchronized(self.consumedRewards) {
-            [self.consumedRewards addObject:[NSNumber numberWithInteger:reward.ident]];
+            [self.consumedRewards addObject:[[NSNumber numberWithInteger:reward.ident] stringValue]];
             [[NSUserDefaults standardUserDefaults] setObject:[self.consumedRewards allObjects] forKey:kTSConsumedRewardsKey];
+            [[NSUserDefaults standardUserDefaults] synchronize];
         }
     }
 }
