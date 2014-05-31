@@ -43,8 +43,8 @@
     
     self.view.frame = self.parentViewController.view.bounds;
     ((UIWebView *)self.view).scrollView.scrollEnabled = NO;
-    ((UIWebView *)self.view).backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.8];
-    ((UIWebView *)self.view).opaque = NO;
+    ((UIWebView *)self.view).scrollView.opaque = NO;
+    ((UIWebView *)self.view).scrollView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.8];
 }
 
 - (void)didReceiveMemoryWarning

@@ -228,15 +228,14 @@
 - (void)dismissedOffer:(BOOL)accepted
 {
     if(accepted) {
-        self.shareViewController = [TSShareViewController
-                                    controllerWithOffer:self.offerViewController.offer
-                                    parentViewController:self.offerViewController.parentViewController
-                                    delegate:self];
+        TSOffer *offer = self.offerViewController.offer;
+        UIViewController *parent = self.offerViewController.parentViewController;
         
-        [UIView transitionWithView:self.shareViewController.parentViewController.view
+        self.shareViewController = [TSShareViewController controllerWithOffer:offer parentViewController:parent delegate:self];
+        [UIView transitionWithView:parent.view
                           duration:0.3
                            options:UIViewAnimationOptionTransitionCrossDissolve
-                        animations:^{ [shareViewController.parentViewController.view addSubview:self.shareViewController.view]; }
+                        animations:^{ [parent.view addSubview:self.shareViewController.view]; }
                         completion:NULL];
     }
     self.offerViewController = nil;
