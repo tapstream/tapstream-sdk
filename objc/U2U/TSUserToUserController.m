@@ -131,7 +131,7 @@
         
         NSLog(@"Offers request complete (status %d)", (int)status);
         
-        if(data && !error && status >= 200 && status < 300) {
+        if(data && status >= 200 && status < 300) {
             NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
             if(json) {
                 offer = AUTORELEASE([[TSOffer alloc] initWithDescription:json]);

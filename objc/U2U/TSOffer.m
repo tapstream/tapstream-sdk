@@ -27,7 +27,7 @@
 
 @implementation TSOffer
 
-@synthesize description, ident, insertionPoint, rewardMinimumInstalls, rewardSku, bundle, minimumAge, rateLimit, markup;
+@synthesize description, ident, insertionPoint, message, rewardMinimumInstalls, rewardSku, bundle, minimumAge, rateLimit, markup;
 
 - (id)initWithDescription:(NSDictionary *)descriptionVal
 {

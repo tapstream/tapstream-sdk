@@ -28,7 +28,7 @@
 
 @implementation TSShareViewController
 
-@synthesize offer, parentViewController, twitterComposeViewController, facebookComposeViewController, emailComposeViewController, bg, doneButton,
+@synthesize offer, parentViewController, twitterComposeViewController, facebookComposeViewController, emailComposeViewController, messageComposeViewController, bg, doneButton,
     twitterButton, twitterButtonCheck,
     facebookButton, facebookButtonCheck,
     emailButton, emailButtonCheck,
@@ -143,7 +143,7 @@
 {
     NSLog(@"Twitter click");
     
-    __weak TSShareViewController *me = self;
+    __unsafe_unretained TSShareViewController *me = self;
     
     self.twitterComposeViewController = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
     [self.twitterComposeViewController setInitialText:self.offer.message];
@@ -164,7 +164,7 @@
 {
     NSLog(@"Facebook click");
     
-    __weak TSShareViewController *me = self;
+    __unsafe_unretained TSShareViewController *me = self;
     
     self.facebookComposeViewController = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeFacebook];
     [self.facebookComposeViewController setInitialText:self.offer.message];
