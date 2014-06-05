@@ -177,24 +177,31 @@
     }
 }
 
-- (NSArray *)availableRewards
+- (void)availableRewards:(void (^)(NSArray *))callback
 {
-    NSHTTPURLResponse *response;
-    NSError *error;
-    NSData *data = [NSURLConnection sendSynchronousRequest:self.rewardsRequest returningResponse:&response error:&error];
-    
-    NSArray *results = [NSArray array];
-    if(response && response.statusCode >= 200 && response.statusCode < 300 && data) {
-        results = [TSWordOfMouthController parseRewards:data];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSHTTPURLResponse *response;
+        NSError *error;
+        NSData *data = [NSURLConnection sendSynchronousRequest:self.rewardsRequest returningResponse:&response error:&error];
         
-        // Filter out any rewards that have already been consumed
-        @synchronized(self.consumedRewards) {
-            results = [results filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id obj, NSDictionary *bindings) {
-                return ![self.consumedRewards containsObject:[[NSNumber numberWithInteger:((TSReward *)obj).ident] stringValue]];
-            }]];
+        NSArray *results = [NSArray array];
+        if(response && response.statusCode >= 200 && response.statusCode < 300 && data) {
+            results = [TSWordOfMouthController parseRewards:data];
+            
+            // Filter out any rewards that have already been consumed
+            @synchronized(self.consumedRewards) {
+                results = [results filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id obj, NSDictionary *bindings) {
+                    return ![self.consumedRewards containsObject:[[NSNumber numberWithInteger:((TSReward *)obj).ident] stringValue]];
+                }]];
+            }
         }
-    }
-    return results;
+        
+        if(callback) {
+            dispatch_sync(dispatch_get_main_queue(), ^() {
+                callback(results);
+            });
+        }
+    });
 }
 
 - (void)consumeReward:(TSReward *)reward

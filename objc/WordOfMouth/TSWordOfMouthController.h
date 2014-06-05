@@ -31,13 +31,12 @@
 - (void)showOffer:(TSOffer *)offer parentViewController:(UIViewController *)parentViewController;
 
 /**
- @brief Request an array of awards that should be delivered to this user.  This method makes a network
- request and is @b BLOCKING.
+ @brief Request an array of awards that should be delivered to this user.
  For each reward in the returned array, deliver the reward, and then call consumeReward, passing
  the reward in question as an argument.
  @return An array of TSReward instances.
  */
-- (NSArray *)availableRewards;
+- (void)availableRewards:(void (^)(NSArray *))callback;
 
 /**
  @brief Consumes a reward.  Call this once you have delivered the reward to your user.  After a reward
