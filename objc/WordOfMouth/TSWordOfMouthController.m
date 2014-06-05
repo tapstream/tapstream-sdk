@@ -16,6 +16,8 @@
 #define kTSConsumedRewardsKey @"__tapstream_consumed_rewards"
 #define kTSInstallDateKey @"__tapstream_install_date"
 #define kTSLastOfferImpressionTimesKey @"__tapstream_last_offer_impression_times"
+#define kTSWordOfMouthOffersEndPoint @"https://app.tapstream.com/api/v1/word-of-mouth/offers/?secret=%@&bundle=%@&insertion_point=%@"
+#define kTSWordOfMouthRewardsEndPoint @"https://app.tapstream.com/api/v1/word-of-mouth/rewards/?secret=%@&event_session=%@"
 
 @interface TSWordOfMouthController()
 @property(STRONG_OR_RETAIN, nonatomic) NSString *secret;
@@ -55,7 +57,7 @@
         }
         
         self.offerCache = [NSMutableDictionary dictionaryWithCapacity:8];
-        self.rewardsRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://app.tapstream.com/api/v1/word-of-mouth/rewards/?secret=%@&event_session=%@", secret, uuid]]];
+        self.rewardsRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:kTSWordOfMouthRewardsEndPoint, secret, uuid]]];
         
         NSArray *rewardIds = [[NSUserDefaults standardUserDefaults] arrayForKey:kTSConsumedRewardsKey];
         self.consumedRewards = [NSMutableSet setWithArray:rewardIds ? rewardIds : [NSArray array]];
@@ -122,7 +124,7 @@
             return;
         }
         
-        NSString *url = [NSString stringWithFormat:@"https://app.tapstream.com/api/v1/word-of-mouth/offers/?secret=%@&bundle=%@&insertion_point=%@", self.secret, self.bundle, [TSUtils encodeString:insertionPoint]];
+        NSString *url = [NSString stringWithFormat:kTSWordOfMouthOffersEndPoint, self.secret, self.bundle, [TSUtils encodeString:insertionPoint]];
         NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
         NSHTTPURLResponse *response;
         NSError *error;
