@@ -242,8 +242,8 @@ def package_objc():
 			sh('cp ./objc/Tapstream/*%s ./builds/%s/Tapstream/' % (file_type, sdk))
 			sh('cp ./objc/Core/*%s ./builds/%s/Tapstream/' % (file_type, sdk))
 		if sdk == 'ios':
-			path('builds/%s/UserToUser' % sdk).makedirs()
-			sh('cp -r ./objc/U2U/* ./builds/%s/UserToUser/' % sdk)
+			path('builds/%s/WordOfMouth' % sdk).makedirs()
+			sh('cp -r ./objc/WordOfMouth/* ./builds/%s/WordOfMouth/' % sdk)
 		path('builds/tapstream-%s-%s.zip' % (VERSION, sdk)).remove()
 		with pushd('builds/%s' % sdk):
 			sh('zip -r ../tapstream-%s-%s.zip Tapstream' % (VERSION, sdk))
@@ -252,7 +252,8 @@ def package_objc():
 		path('builds/%s-whitelabel' % sdk).rmtree()
 		path('builds/%s-whitelabel' % sdk).mkdir()
 		sh('cp -r ./builds/%s/Tapstream ./builds/%s-whitelabel/' % (sdk, sdk))
-		sh('cp -r ./builds/%s/UserToUser ./builds/%s-whitelabel/' % (sdk, sdk))
+		if sdk == 'ios':
+			sh('cp -r ./builds/%s/WordOfMouth ./builds/%s-whitelabel/' % (sdk, sdk))
 		with pushd('./builds/%s-whitelabel' % sdk):
 			sh('mv Tapstream ConversionTracker')
 			sh('mv ConversionTracker/TSTapstream.h ConversionTracker/ConversionTracker.h')
