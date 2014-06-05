@@ -19,6 +19,7 @@
 - (IBAction)onTestInsertionPoint:(id)sender;
 - (IBAction)onMakeInstallTimeAgesAgo:(id)sender;
 - (IBAction)onEraseLastShownTimes:(id)sender;
+- (IBAction)onEraseConsumptionCounts:(id)sender;
 - (IBAction)onKill:(id)sender;
 - (IBAction)onRefreshRewards:(id)sender;
 - (IBAction)onConsumeReward:(id)sender;

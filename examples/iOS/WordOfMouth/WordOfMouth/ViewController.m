@@ -54,6 +54,12 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
+- (IBAction)onEraseConsumptionCounts:(id)sender
+{
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"__tapstream_reward_consumption_counts"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 - (IBAction)onKill:(id)sender
 {
     exit(0);

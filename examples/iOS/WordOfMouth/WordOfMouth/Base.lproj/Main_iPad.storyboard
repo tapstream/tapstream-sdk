@@ -17,7 +17,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SQt-Vg-F7n">
-                                <rect key="frame" x="30" y="215" width="256" height="30"/>
+                                <rect key="frame" x="30" y="138" width="256" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.25490196079999999" green="0.25098039220000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
                                 <color key="tintColor" red="0.89148579370000003" green="1" blue="0.46716965989999998" alpha="1" colorSpace="calibratedRGB"/>
@@ -27,9 +27,10 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zUt-73-ogG">
-                                <rect key="frame" x="30" y="30" width="256" height="30"/>
+                                <rect key="frame" x="30" y="30" width="122" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.25490196079999999" green="0.25098039220000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="9"/>
                                 <color key="tintColor" red="0.89148579370000003" green="1" blue="0.46716965989999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <state key="normal" title="Make install time ages ago"/>
                                 <connections>
@@ -37,9 +38,10 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lYT-fU-PlE">
-                                <rect key="frame" x="30" y="74" width="256" height="30"/>
+                                <rect key="frame" x="160" y="30" width="126" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.25490196079999999" green="0.25098039220000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                 <color key="tintColor" red="0.89148579370000003" green="1" blue="0.46716965989999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <state key="normal" title="Erase last shown times"/>
                                 <connections>
@@ -47,9 +49,10 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tR2-nc-19v">
-                                <rect key="frame" x="30" y="118" width="256" height="30"/>
+                                <rect key="frame" x="30" y="68" width="101" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.25490196079999999" green="0.25098039220000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                 <color key="tintColor" red="0.89148579370000003" green="1" blue="0.46716965989999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <state key="normal" title="Kill app"/>
                                 <connections>
@@ -57,7 +60,7 @@
                                 </connections>
                             </button>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="launch" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="5pD-Fy-gS4">
-                                <rect key="frame" x="30" y="183" width="256" height="30"/>
+                                <rect key="frame" x="30" y="106" width="256" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
@@ -66,14 +69,14 @@
                                 </connections>
                             </textField>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" editable="NO" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Gj-tg-8N5">
-                                <rect key="frame" x="30" y="281" width="256" height="107"/>
+                                <rect key="frame" x="30" y="246" width="256" height="107"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="0.78851052990000003" green="0.78851052990000003" blue="0.78851052990000003" alpha="1" colorSpace="calibratedRGB"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2uf-bW-BHb">
-                                <rect key="frame" x="30" y="390" width="256" height="30"/>
+                                <rect key="frame" x="30" y="355" width="256" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.25490196079999999" green="0.25098039220000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
                                 <color key="tintColor" red="0.89148579370000003" green="1" blue="0.46716965989999998" alpha="1" colorSpace="calibratedRGB"/>
@@ -83,7 +86,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qPi-fA-xcl">
-                                <rect key="frame" x="30" y="508" width="256" height="30"/>
+                                <rect key="frame" x="30" y="208" width="256" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.25490196079999999" green="0.25098039220000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
                                 <color key="tintColor" red="0.89148579370000003" green="1" blue="0.46716965989999998" alpha="1" colorSpace="calibratedRGB"/>
@@ -93,7 +96,7 @@
                                 </connections>
                             </button>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="reward id" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="yvB-gE-D6t">
-                                <rect key="frame" x="30" y="476" width="256" height="30"/>
+                                <rect key="frame" x="30" y="176" width="256" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
@@ -101,6 +104,17 @@
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="JgV-9C-Feg"/>
                                 </connections>
                             </textField>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="89n-Of-gms">
+                                <rect key="frame" x="139" y="68" width="147" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.25490196079999999" green="0.25098039220000001" blue="0.25882352939999997" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                <color key="tintColor" red="0.89148579370000003" green="1" blue="0.46716965989999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="Erase offer consume counts"/>
+                                <connections>
+                                    <action selector="onEraseConsumptionCounts:" destination="dkx-z0-nzr" eventType="touchUpInside" id="QN3-He-FKN"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
