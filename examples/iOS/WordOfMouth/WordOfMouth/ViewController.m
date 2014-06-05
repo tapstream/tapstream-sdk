@@ -68,8 +68,8 @@
     [wom availableRewards:^(NSArray *results) {
         NSString *rewardSkus = @"";
         [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            [rewardSkus stringByAppendingString:[NSString stringWithFormat:@"%lu, %@\n", (unsigned long)((TSReward *)obj).ident, ((TSReward *)obj).sku]];
-            [self.rewards setObject:obj forKey:[[NSNumber numberWithInteger:((TSReward *)obj).ident] stringValue]];
+            [rewardSkus stringByAppendingString:[NSString stringWithFormat:@"%lu, %@\n", (unsigned long)((TSReward *)obj).offerIdent, ((TSReward *)obj).sku]];
+            [self.rewards setObject:obj forKey:[[NSNumber numberWithInteger:((TSReward *)obj).offerIdent] stringValue]];
         }];
         [rewardsList setText:rewardSkus];
         [(UIButton *)sender setEnabled:YES];

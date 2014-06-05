@@ -14,6 +14,7 @@
 @property(assign, nonatomic, readwrite) NSUInteger ident;
 @property(STRONG_OR_RETAIN, nonatomic, readwrite) NSString *insertionPoint;
 @property(STRONG_OR_RETAIN, nonatomic, readwrite) NSString *message;
+@property(STRONG_OR_RETAIN, nonatomic, readwrite) NSString *url;
 @property(assign, nonatomic, readwrite) NSInteger rewardMinimumInstalls;
 @property(STRONG_OR_RETAIN, nonatomic, readwrite) NSString *rewardSku;
 @property(STRONG_OR_RETAIN, nonatomic, readwrite) NSString *bundle;
@@ -27,15 +28,19 @@
 
 @implementation TSOffer
 
-@synthesize description, ident, insertionPoint, message, rewardMinimumInstalls, rewardSku, bundle, minimumAge, rateLimit, markup;
+@synthesize description, ident, insertionPoint, message, url, rewardMinimumInstalls, rewardSku, bundle, minimumAge, rateLimit, markup;
 
-- (id)initWithDescription:(NSDictionary *)descriptionVal
+- (id)initWithDescription:(NSDictionary *)descriptionVal uuid:(NSString *)uuid
 {
     if(self = [super init]) {
         self.description = descriptionVal;
         self.ident = [[descriptionVal objectForKey:@"id"] unsignedIntegerValue];
         self.insertionPoint = [descriptionVal objectForKey:@"insertion_point"];
         self.message = [descriptionVal objectForKey:@"message"];
+        self.url = [descriptionVal objectForKey:@"offer_url"];
+        if(self.url) {
+            self.url = [self.url stringByReplacingOccurrencesOfString:@"{event_session}" withString:uuid];
+        }
         self.rewardMinimumInstalls = [[descriptionVal objectForKey:@"reward_minimum_installs"] integerValue];
         self.rewardSku = [descriptionVal objectForKey:@"reward_sku"];
         self.bundle = [descriptionVal objectForKey:@"bundle"];
@@ -53,6 +58,7 @@
     RELEASE(self->description);
     RELEASE(self->insertionPoint);
     RELEASE(self->message);
+    RELEASE(self->url);
     RELEASE(self->rewardSku);
     RELEASE(self->bundle);
     RELEASE(self->markup);

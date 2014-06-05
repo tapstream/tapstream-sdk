@@ -12,7 +12,7 @@
 #import "TSTapstream.h"
 #import "TSUtils.h"
 
-#define kTSConsumedRewardsKey @"__tapstream_consumed_rewards"
+#define kTSRewardConsumptionCounts @"__tapstream_reward_consumption_counts"
 #define kTSInstallDateKey @"__tapstream_install_date"
 #define kTSLastOfferImpressionTimesKey @"__tapstream_last_offer_impression_times"
 #define kTSWordOfMouthOffersEndPoint @"https://app.tapstream.com/api/v1/word-of-mouth/offers/?secret=%@&bundle=%@&insertion_point=%@"
@@ -21,10 +21,11 @@
 @interface TSWordOfMouthController()
 @property(STRONG_OR_RETAIN, nonatomic) NSString *secret;
 @property(STRONG_OR_RETAIN, nonatomic) NSString *bundle;
+@property(STRONG_OR_RETAIN, nonatomic) NSString *uuid;
 @property(STRONG_OR_RETAIN, nonatomic) NSDate *installDate;
 @property(STRONG_OR_RETAIN, nonatomic) NSMutableDictionary *lastOfferImpressionTimes;
 @property(STRONG_OR_RETAIN, nonatomic) NSMutableDictionary *offerCache;
-@property(STRONG_OR_RETAIN, nonatomic) NSMutableSet *consumedRewards;
+@property(STRONG_OR_RETAIN, nonatomic) NSMutableDictionary *rewardConsumptionCounts;
 @property(STRONG_OR_RETAIN, nonatomic) NSURLRequest *rewardsRequest;
 @property(STRONG_OR_RETAIN, nonatomic) TSOfferViewController *offerViewController;
 @property(STRONG_OR_RETAIN, nonatomic) TSShareViewController *shareViewController;
@@ -35,12 +36,13 @@
 
 @implementation TSWordOfMouthController
 
-@synthesize delegate, secret, bundle, installDate, lastOfferImpressionTimes, offerCache, consumedRewards, rewardsRequest, offerViewController, shareViewController;
+@synthesize delegate, secret, bundle, uuid, installDate, lastOfferImpressionTimes, offerCache, rewardConsumptionCounts, rewardsRequest, offerViewController, shareViewController;
 
-- (id)initWithSecret:(NSString *)secretVal uuid:(NSString *)uuid bundle:(NSString *)bundleVal
+- (id)initWithSecret:(NSString *)secretVal uuid:(NSString *)uuidVal bundle:(NSString *)bundleVal
 {
     if(self = [super init]) {
         self.secret = secretVal;
+        self.uuid = uuidVal;
         self.bundle = [TSUtils encodeString:bundleVal];
         
         self.installDate = [[NSUserDefaults standardUserDefaults] objectForKey:kTSInstallDateKey];
@@ -56,10 +58,10 @@
         }
         
         self.offerCache = [NSMutableDictionary dictionaryWithCapacity:8];
-        self.rewardsRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:kTSWordOfMouthRewardsEndPoint, secret, uuid]]];
+        self.rewardsRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:kTSWordOfMouthRewardsEndPoint, self.secret, self.uuid]]];
         
-        NSArray *rewardIds = [[NSUserDefaults standardUserDefaults] arrayForKey:kTSConsumedRewardsKey];
-        self.consumedRewards = [NSMutableSet setWithArray:rewardIds ? rewardIds : [NSArray array]];
+        NSDictionary *consumptionCounts = [[NSUserDefaults standardUserDefaults] dictionaryForKey:kTSRewardConsumptionCounts];
+        self.rewardConsumptionCounts = [NSMutableDictionary dictionaryWithDictionary:consumptionCounts ? consumptionCounts : [NSDictionary dictionary]];
     }
     return self;
 }
@@ -73,7 +75,7 @@
     RELEASE(self->installDate);
     RELEASE(self->lastOfferImpressionTimes);
     RELEASE(self->offerCache);
-    RELEASE(self->consumedRewards);
+    RELEASE(self->rewardConsumptionCounts);
     RELEASE(self->rewardsRequest);
     RELEASE(self->offerViewController);
     RELEASE(self->shareViewController);
@@ -135,7 +137,7 @@
         if(data && status >= 200 && status < 300) {
             NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
             if(json) {
-                offer = AUTORELEASE([[TSOffer alloc] initWithDescription:json]);
+                offer = AUTORELEASE([[TSOffer alloc] initWithDescription:json uuid:self.uuid]);
                 @synchronized(self.offerCache) {
                     [self.offerCache setObject:offer forKey:insertionPoint];
                 }
@@ -188,10 +190,14 @@
         if(response && response.statusCode >= 200 && response.statusCode < 300 && data) {
             results = [TSWordOfMouthController parseRewards:data];
             
-            // Filter out any rewards that have already been consumed
-            @synchronized(self.consumedRewards) {
+            // Calculate quantity for each reward, and only return those with a positive quantity
+            @synchronized(self.rewardConsumptionCounts) {
                 results = [results filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id obj, NSDictionary *bindings) {
-                    return ![self.consumedRewards containsObject:[[NSNumber numberWithInteger:((TSReward *)obj).ident] stringValue]];
+                    TSReward *reward = (TSReward *)obj;
+                    NSNumber *consumedVal = [self.rewardConsumptionCounts objectForKey:[NSNumber numberWithInteger:reward.offerIdent]];
+                    NSInteger consumed = consumedVal ? [consumedVal integerValue] : 0;
+                    [reward calculateQuantity:consumed];
+                    return reward.quantity > 0;
                 }]];
             }
         }
@@ -207,9 +213,13 @@
 - (void)consumeReward:(TSReward *)reward
 {
     if(reward) {
-        @synchronized(self.consumedRewards) {
-            [self.consumedRewards addObject:[[NSNumber numberWithInteger:reward.ident] stringValue]];
-            [[NSUserDefaults standardUserDefaults] setObject:[self.consumedRewards allObjects] forKey:kTSConsumedRewardsKey];
+        @synchronized(self.rewardConsumptionCounts) {
+            NSString *key = [[NSNumber numberWithInteger:reward.offerIdent] stringValue];
+            NSNumber *consumedVal = [self.rewardConsumptionCounts objectForKey:key];
+            NSInteger consumed = consumedVal ? [consumedVal integerValue] : 0;
+            consumed++;
+            [self.rewardConsumptionCounts setObject:[NSNumber numberWithInteger:consumed] forKey:key];
+            [[NSUserDefaults standardUserDefaults] setObject:self.rewardConsumptionCounts forKey:kTSRewardConsumptionCounts];
             [[NSUserDefaults standardUserDefaults] synchronize];
         }
     }
