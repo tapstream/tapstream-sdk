@@ -12,7 +12,6 @@
 #import "TSTapstream.h"
 #import "TSUtils.h"
 
-#define kTSMaxOfferRetries 8
 #define kTSConsumedRewardsKey @"__tapstream_consumed_rewards"
 #define kTSInstallDateKey @"__tapstream_install_date"
 #define kTSLastOfferImpressionTimesKey @"__tapstream_last_offer_impression_times"

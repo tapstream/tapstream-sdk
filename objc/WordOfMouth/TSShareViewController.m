@@ -134,6 +134,7 @@
     NSLog(@"Messaging click");
     
     self.messageComposeViewController = AUTORELEASE([[MFMessageComposeViewController alloc] init]);
+    [self.messageComposeViewController setBody:self.offer.message];
     self.messageComposeViewController.messageComposeDelegate = self;
 
     [self.parentViewController presentViewController:self.messageComposeViewController animated:YES completion:nil];
@@ -186,6 +187,7 @@
     NSLog(@"Email click");
     
     self.emailComposeViewController = AUTORELEASE([[MFMailComposeViewController alloc] init]);
+    [self.emailComposeViewController setMessageBody:self.offer.message isHTML:NO];
     self.emailComposeViewController.mailComposeDelegate = self;
     
     [self.parentViewController presentViewController:self.emailComposeViewController animated:YES completion:nil];
