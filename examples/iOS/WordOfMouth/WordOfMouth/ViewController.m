@@ -39,6 +39,7 @@
             [wom showOffer:offer parentViewController:self];
         }
         ((UIButton *)sender).enabled = YES;
+        [self.insertionPointText resignFirstResponder];
     }];
 }
 
@@ -72,9 +73,9 @@
     self.rewards = [NSMutableDictionary dictionary];
     TSWordOfMouthController *wom = [TSTapstream wordOfMouthController];
     [wom availableRewards:^(NSArray *results) {
-        NSString *rewardSkus = @"";
+        __block NSString *rewardSkus = @"";
         [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            [rewardSkus stringByAppendingString:[NSString stringWithFormat:@"%lu, %@\n", (unsigned long)((TSReward *)obj).offerIdent, ((TSReward *)obj).sku]];
+            rewardSkus = [rewardSkus stringByAppendingString:[NSString stringWithFormat:@"%lu, %@, quantity:%lu\n", (unsigned long)((TSReward *)obj).offerIdent, ((TSReward *)obj).sku, (unsigned long)((TSReward *)obj).quantity]];
             [self.rewards setObject:obj forKey:[[NSNumber numberWithInteger:((TSReward *)obj).offerIdent] stringValue]];
         }];
         [rewardsList setText:rewardSkus];
@@ -88,6 +89,8 @@
     if(reward) {
         TSWordOfMouthController *wom = [TSTapstream wordOfMouthController];
         [wom consumeReward:reward];
+        self.rewardSku.text = @"";
+        [self.rewardSku resignFirstResponder];
     } else {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Invalid reward id"
                                                         message:@"Enter the numeric id of the reward to consume"

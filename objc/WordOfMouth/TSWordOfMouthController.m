@@ -18,7 +18,15 @@
 #define kTSWordOfMouthOffersEndPoint @"https://app.tapstream.com/api/v1/word-of-mouth/offers/?secret=%@&bundle=%@&insertion_point=%@"
 #define kTSWordOfMouthRewardsEndPoint @"https://app.tapstream.com/api/v1/word-of-mouth/rewards/?secret=%@&event_session=%@"
 
+
+@interface TSReward()
+- (void)consume;
+@end
+
+
+
 @interface TSWordOfMouthController()
+
 @property(STRONG_OR_RETAIN, nonatomic) NSString *secret;
 @property(STRONG_OR_RETAIN, nonatomic) NSString *bundle;
 @property(STRONG_OR_RETAIN, nonatomic) NSString *uuid;
@@ -33,6 +41,8 @@
 + (NSArray *)parseRewards:(NSData *)rewardsJson;
 
 @end
+
+
 
 @implementation TSWordOfMouthController
 
@@ -194,7 +204,7 @@
             @synchronized(self.rewardConsumptionCounts) {
                 results = [results filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id obj, NSDictionary *bindings) {
                     TSReward *reward = (TSReward *)obj;
-                    NSNumber *consumedVal = [self.rewardConsumptionCounts objectForKey:[NSNumber numberWithInteger:reward.offerIdent]];
+                    NSNumber *consumedVal = [self.rewardConsumptionCounts objectForKey:[[NSNumber numberWithInteger:reward.offerIdent] stringValue]];
                     NSInteger consumed = consumedVal ? [consumedVal integerValue] : 0;
                     [reward calculateQuantity:consumed];
                     return reward.quantity > 0;
@@ -212,7 +222,7 @@
 
 - (void)consumeReward:(TSReward *)reward
 {
-    if(reward) {
+    if(reward && ![reward isConsumed]) {
         @synchronized(self.rewardConsumptionCounts) {
             NSString *key = [[NSNumber numberWithInteger:reward.offerIdent] stringValue];
             NSNumber *consumedVal = [self.rewardConsumptionCounts objectForKey:key];
@@ -221,6 +231,7 @@
             [self.rewardConsumptionCounts setObject:[NSNumber numberWithInteger:consumed] forKey:key];
             [[NSUserDefaults standardUserDefaults] setObject:self.rewardConsumptionCounts forKey:kTSRewardConsumptionCounts];
             [[NSUserDefaults standardUserDefaults] synchronize];
+            [reward consume];
         }
     }
 }

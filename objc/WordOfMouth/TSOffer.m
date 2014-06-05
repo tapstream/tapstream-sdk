@@ -40,7 +40,7 @@
         self.url = [descriptionVal objectForKey:@"offer_url"];
         
         if(self.url) {
-            self.url = [self.url stringByReplacingOccurrencesOfString:@"{event_session}" withString:uuid];
+            self.url = [self.url stringByReplacingOccurrencesOfString:@"SDK_SESSION_ID" withString:uuid];
             if(self.message) {
                 self.message = [self.message stringByReplacingOccurrencesOfString:@"OFFER_URL" withString:self.url];
             }

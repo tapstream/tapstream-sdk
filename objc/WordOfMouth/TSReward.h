@@ -17,6 +17,7 @@
 @property(assign, nonatomic, readonly) NSUInteger quantity;
 
 - (id)initWithDescription:(NSDictionary *)description;
-- (void)calculateQuantity:(NSInteger)alreadyConsumed;
+- (void)calculateQuantity:(NSInteger)numberAlreadyConsumed;
+- (BOOL)isConsumed;
 
 @end

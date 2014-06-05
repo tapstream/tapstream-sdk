@@ -16,12 +16,15 @@
 @property(assign, nonatomic, readwrite) NSUInteger quantity;
 @property(assign, nonatomic, readwrite) NSInteger installs;
 @property(assign, nonatomic, readwrite) NSInteger minimumInstalls;
+@property(assign, nonatomic, readwrite) BOOL consumed;
+
+- (void)consume;
 
 @end
 
 @implementation TSReward
 
-@synthesize offerIdent, insertionPoint, sku, installs, minimumInstalls, quantity;
+@synthesize offerIdent, insertionPoint, sku, installs, minimumInstalls, quantity, consumed;
 
 
 - (id)initWithDescription:(NSDictionary *)descriptionVal
@@ -33,14 +36,25 @@
         self.installs = [[descriptionVal objectForKey:@"installs"] integerValue];
         self.minimumInstalls = [[descriptionVal objectForKey:@"reward_minimum_installs"] integerValue];
         self.quantity = 0;
+        self.consumed = NO;
     }
     return self;
 }
 
-- (void)calculateQuantity:(NSInteger)alreadyConsumed
+- (void)calculateQuantity:(NSInteger)numberAlreadyConsumed
 {
     NSInteger rewardCount = self.installs / self.minimumInstalls;
-    self.quantity = (NSUInteger)MAX(0, rewardCount - alreadyConsumed);
+    self.quantity = (NSUInteger)MAX(0, rewardCount - numberAlreadyConsumed);
+}
+
+- (BOOL)isConsumed
+{
+    return self.consumed;
+}
+
+- (void)consume
+{
+    self.consumed = YES;
 }
 
 - (void)dealloc
