@@ -9,21 +9,21 @@
 #import "TSEvent.h"
 #import "TSResponse.h"
 #import "TSLogging.h"
-#import "TSUserToUserDelegate.h"
+#import "TSWordOfMouthDelegate.h"
 
-@interface TSTapstream : NSObject<TSApi, TSUserToUserDelegate> {
+@interface TSTapstream : NSObject<TSApi, TSWordOfMouthDelegate> {
 @private
 	id<TSDelegate> del;
 	id<TSPlatform> platform;
 	id<TSCoreListener> listener;
 	id<TSAppEventSource> appEventSource;
-    id userToUserController;
+    id wordOfMouthController;
 	TSCore *core;
 }
 
 + (void)createWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)config;
 + (id)instance;
-+ (id)userToUserController;
++ (id)wordOfMouthController;
 
 - (void)fireEvent:(TSEvent *)event;
 - (void)fireHit:(TSHit *)hit completion:(void(^)(TSResponse *))completion;

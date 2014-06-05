@@ -26,7 +26,7 @@ static TSTapstream *instance = nil;
 
 - (id)initWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)config;
 
-// User-to-user delegate
+// Word-of-mouth delegate
 - (void)showedOffer:(NSUInteger)offerId;
 - (void)showedSharing:(NSUInteger)offerId;
 - (void)completedShare:(NSUInteger)offerId socialMedium:(NSString *)medium;
@@ -62,9 +62,9 @@ static TSTapstream *instance = nil;
 	}
 }
 
-+ (id)userToUserController
++ (id)wordOfMouthController
 {
-    return AUTORELEASE(((TSTapstream *)[TSTapstream instance])->userToUserController);
+    return AUTORELEASE(((TSTapstream *)[TSTapstream instance])->wordOfMouthController);
 }
 
 - (id)initWithAccountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)config
@@ -85,19 +85,19 @@ static TSTapstream *instance = nil;
 			config:config]);
 		[core start];
         
-        // Dynamically instantiate TSUserToUserController, if the source files have been
+        // Dynamically instantiate TSWordOfMouthController, if the source files have been
         // included in the developer's project.
-        Class userToUserControllerClass = NSClassFromString(@"TSUserToUserController");
-        if(userToUserControllerClass)
+        Class wordOfMouthControllerClass = NSClassFromString(@"TSWordOfMouthController");
+        if(wordOfMouthControllerClass)
         {
-            id inst = [userToUserControllerClass alloc];
+            id inst = [wordOfMouthControllerClass alloc];
             SEL sel = NSSelectorFromString(@"initWithSecret:uuid:bundle:");
             IMP imp = [inst methodForSelector:sel];
-            userToUserController = ((id (*)(id, SEL, NSString *, NSString *, NSString *))imp)(inst, sel, developerSecret, [platform loadUuid], [platform getBundleIdentifier]);
+            wordOfMouthController = ((id (*)(id, SEL, NSString *, NSString *, NSString *))imp)(inst, sel, developerSecret, [platform loadUuid], [platform getBundleIdentifier]);
             
             sel = NSSelectorFromString(@"setDelegate:");
-            imp = [userToUserController methodForSelector:sel];
-            ((void (*)(id, SEL, id))imp)(userToUserController, sel, self);
+            imp = [wordOfMouthController methodForSelector:sel];
+            ((void (*)(id, SEL, id))imp)(wordOfMouthController, sel, self);
         }
 	}
 	return self;
@@ -109,7 +109,7 @@ static TSTapstream *instance = nil;
 	RELEASE(platform);
 	RELEASE(listener);
 	RELEASE(appEventSource);
-    RELEASE(userToUserController);
+    RELEASE(wordOfMouthController);
 	RELEASE(core);
 	SUPER_DEALLOC;
 }
@@ -130,7 +130,7 @@ static TSTapstream *instance = nil;
 }
 
 
-// User-to-user delegate
+// Word-of-mouth delegate
 - (void)showedOffer:(NSUInteger)offerId
 {
     NSString *appName = [platform getAppName];
