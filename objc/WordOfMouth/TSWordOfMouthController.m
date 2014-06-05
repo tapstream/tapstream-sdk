@@ -217,7 +217,7 @@
             NSString *key = [[NSNumber numberWithInteger:reward.offerIdent] stringValue];
             NSNumber *consumedVal = [self.rewardConsumptionCounts objectForKey:key];
             NSInteger consumed = consumedVal ? [consumedVal integerValue] : 0;
-            consumed++;
+            consumed += reward.quantity;
             [self.rewardConsumptionCounts setObject:[NSNumber numberWithInteger:consumed] forKey:key];
             [[NSUserDefaults standardUserDefaults] setObject:self.rewardConsumptionCounts forKey:kTSRewardConsumptionCounts];
             [[NSUserDefaults standardUserDefaults] synchronize];
