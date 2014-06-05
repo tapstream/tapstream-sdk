@@ -23,16 +23,16 @@
     
     NSLog(@"Requesting offer");
     
-    TSWordOfMouthController *u2u = [TSTapstream wordOfMouthController];
+    TSWordOfMouthController *wom = [TSTapstream wordOfMouthController];
     
-    [u2u offerForInsertionPoint:@"launch" result:^(TSOffer *offer) {
+    [wom offerForInsertionPoint:@"launch" result:^(TSOffer *offer) {
         if(offer) {
-            [u2u showOffer:offer parentViewController:self];
+            [wom showOffer:offer parentViewController:self];
         }
     }];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10 * NSEC_PER_SEC)), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSArray *rewards = [u2u availableRewards];
+        NSArray *rewards = [wom availableRewards];
         NSLog(@"Rewards: %@", rewards);
     });
 }

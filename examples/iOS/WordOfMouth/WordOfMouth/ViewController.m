@@ -32,11 +32,11 @@
 
     NSLog(@"Requesting offer");
     
-    TSWordOfMouthController *u2u = [TSTapstream wordOfMouthController];
+    TSWordOfMouthController *wom = [TSTapstream wordOfMouthController];
     
-    [u2u offerForInsertionPoint:self.insertionPointText.text result:^(TSOffer *offer) {
+    [wom offerForInsertionPoint:self.insertionPointText.text result:^(TSOffer *offer) {
         if(offer) {
-            [u2u showOffer:offer parentViewController:self];
+            [wom showOffer:offer parentViewController:self];
         }
         ((UIButton *)sender).enabled = YES;
     }];
@@ -64,27 +64,24 @@
     [(UIButton *)sender setEnabled:NO];
     [rewardsList setText:@""];
     self.rewards = [NSMutableDictionary dictionary];
-    TSWordOfMouthController *u2u = [TSTapstream wordOfMouthController];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSArray *results = [u2u availableRewards];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSString *rewardSkus = @"";
-            [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-                [rewardSkus stringByAppendingString:[NSString stringWithFormat:@"%lu, %@\n", (unsigned long)((TSReward *)obj).ident, ((TSReward *)obj).name]];
-                [self.rewards setObject:obj forKey:[[NSNumber numberWithInteger:((TSReward *)obj).ident] stringValue]];
-            }];
-            [rewardsList setText:rewardSkus];
-            [(UIButton *)sender setEnabled:YES];
-        });
-    });
+    TSWordOfMouthController *wom = [TSTapstream wordOfMouthController];
+    [wom availableRewards:^(NSArray *results) {
+        NSString *rewardSkus = @"";
+        [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            [rewardSkus stringByAppendingString:[NSString stringWithFormat:@"%lu, %@\n", (unsigned long)((TSReward *)obj).ident, ((TSReward *)obj).sku]];
+            [self.rewards setObject:obj forKey:[[NSNumber numberWithInteger:((TSReward *)obj).ident] stringValue]];
+        }];
+        [rewardsList setText:rewardSkus];
+        [(UIButton *)sender setEnabled:YES];
+    }];
 }
 
 - (IBAction)onConsumeReward:(id)sender
 {
     TSReward *reward = [self.rewards objectForKey:self.rewardSku.text];
     if(reward) {
-        TSWordOfMouthController *u2u = [TSTapstream wordOfMouthController];
-        [u2u consumeReward:reward];
+        TSWordOfMouthController *wom = [TSTapstream wordOfMouthController];
+        [wom consumeReward:reward];
     } else {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Invalid reward id"
                                                         message:@"Enter the numeric id of the reward to consume"
