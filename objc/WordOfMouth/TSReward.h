@@ -13,7 +13,8 @@
 
 @property(STRONG_OR_RETAIN, nonatomic, readonly) NSDictionary *description;
 @property(assign, nonatomic, readonly) NSUInteger ident;
-@property(STRONG_OR_RETAIN, nonatomic, readonly) NSString *name;
+@property(STRONG_OR_RETAIN, nonatomic, readonly) NSString *insertionPoint;
+@property(STRONG_OR_RETAIN, nonatomic, readonly) NSString *sku;
 @property(assign, nonatomic, readonly) NSInteger installs;
 
 - (id)initWithDescription:(NSDictionary *)description;

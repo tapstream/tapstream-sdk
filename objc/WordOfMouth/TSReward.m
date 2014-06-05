@@ -12,14 +12,15 @@
 
 @property(STRONG_OR_RETAIN, nonatomic, readwrite) NSDictionary *description;
 @property(assign, nonatomic, readwrite) NSUInteger ident;
-@property(STRONG_OR_RETAIN, nonatomic, readwrite) NSString *name;
+@property(STRONG_OR_RETAIN, nonatomic, readwrite) NSString *insertionPoint;
+@property(STRONG_OR_RETAIN, nonatomic, readwrite) NSString *sku;
 @property(assign, nonatomic, readwrite) NSInteger installs;
 
 @end
 
 @implementation TSReward
 
-@synthesize description, ident, name, installs;
+@synthesize description, ident, insertionPoint, sku, installs;
 
 
 - (id)initWithDescription:(NSDictionary *)descriptionVal
@@ -27,7 +28,8 @@
     if(self = [super init]) {
         self.description = descriptionVal;
         self.ident = [[descriptionVal objectForKey:@"id"] unsignedIntegerValue];
-        self.name = [descriptionVal objectForKey:@"name"];
+        self.insertionPoint = [descriptionVal objectForKey:@"insertion_point"];
+        self.sku = [descriptionVal objectForKey:@"sku"];
         self.installs = [[descriptionVal objectForKey:@"installs"] integerValue];
     }
     return self;
@@ -38,7 +40,8 @@
     SUPER_DEALLOC;
     
     RELEASE(self->description);
-    RELEASE(self->name);
+    RELEASE(self->insertionPoint);
+    RELEASE(self->sku);
 }
 
 @end
