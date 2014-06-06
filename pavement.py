@@ -246,7 +246,8 @@ def package_objc():
 			sh('cp -r ./objc/WordOfMouth/* ./builds/%s/WordOfMouth/' % sdk)
 		path('builds/tapstream-%s-%s.zip' % (VERSION, sdk)).remove()
 		with pushd('builds/%s' % sdk):
-			sh('zip -r ../tapstream-%s-%s.zip Tapstream' % (VERSION, sdk))
+			folders = 'Tapstream ' + ('WordOfMouth' if sdk == 'ios' else '')
+			sh('zip -r ../tapstream-%s-%s.zip %s' % (VERSION, sdk, folders))
 
 		# Generate whitelabel
 		path('builds/%s-whitelabel' % sdk).rmtree()
@@ -270,7 +271,8 @@ def package_objc():
 
 		path('builds/tapstream-%s-%s-whitelabel.zip' % (VERSION, sdk)).remove()
 		with pushd('builds/%s-whitelabel' % sdk):
-			sh('zip -r ../tapstream-%s-%s-whitelabel.zip ConversionTracker' % (VERSION, sdk))
+			folders = 'ConversionTracker ' + ('WordOfMouth' if sdk == 'ios' else '')
+			sh('zip -r ../tapstream-%s-%s-whitelabel.zip %s' % (VERSION, sdk, folders))
 
 
 @needs('make_java', 'make_objc')
