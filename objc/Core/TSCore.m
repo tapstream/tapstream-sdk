@@ -66,7 +66,7 @@
 		self.failingEventId = nil;
 		self.appName = nil;
 		self.platformName = [kTSPlatform lowercaseString];
-		
+
 		[self makePostArgs];
 
 		self.firingEvents = [[NSMutableSet alloc] initWithCapacity:32];
@@ -114,7 +114,7 @@
 	}
 
 	__unsafe_unretained TSCore *me = self;
-		
+
 	if(config.fireAutomaticOpenEvent)
 	{
 		// Fire the initial open event
@@ -127,7 +127,7 @@
 			NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, self.appName];
 			[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
 		}
-	
+
 		// Subscribe to be notified whenever the app enters the foreground
 		[appEventSource setOpenHandler:^() {
 			if(me.config.openEventName != nil)
@@ -206,7 +206,7 @@
 				}
 				allData = [[data stringByAppendingString:@"&processes="] stringByAppendingString:processes];
 			}
-			
+
 			TSResponse *response = [platform request:url data:allData method:@"POST"];
 			bool failed = response.status < 200 || response.status >= 300;
 			bool shouldRetry = response.status < 0 || (response.status >= 500 && response.status < 600);
@@ -293,7 +293,7 @@
 				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream fired event named \"%@\"", e.name];
 				[listener reportOperation:@"event-succeeded" arg:e.encodedName];
 			}
-		
+
 			[listener reportOperation:@"job-ended" arg:e.encodedName];
 		});
 	}
@@ -326,50 +326,75 @@
 
 - (void)getConversionData:(void(^)(NSData *))completion
 {
-	if(completion != nil)
+	if(completion == nil)
 	{
-		NSMutableDictionary *args = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-			[NSNumber numberWithInt:0], @"tries",
-			[NSString stringWithFormat:kTSConversionUrlTemplate, secret, [platform loadUuid]], @"url",
-			AUTORELEASE([completion copy]), @"completion",
-			nil];
-		[NSTimer scheduledTimerWithTimeInterval:0 target:self selector:@selector(conversionCheck:) userInfo:args repeats:NO];
+		return;
 	}
+
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+    	[self getConversionData:[completion copy] tries:0];
+    });
 }
 
-- (void)conversionCheck:(NSTimer *)timer
-{
-	NSMutableDictionary *args = (NSMutableDictionary *)timer.userInfo;
-
-	int tries = [[args objectForKey:@"tries"] intValue];
+- (void)getConversionData:(void(^)(NSData *))completion tries:(int)tries {
 	tries++;
-	[args setObject:[NSNumber numberWithInt:tries] forKey:@"tries"];
-	
-	TSResponse *response = [platform request:[args objectForKey:@"url"] data:nil method:@"GET"];
+
+	NSString *url = [NSString stringWithFormat:kTSConversionUrlTemplate, secret, [platform loadUuid]];
+	TSResponse *response = [platform request:url data:nil method:@"GET"];
+
 	if(response.status >= 200 && response.status < 300)
 	{
-		NSString *jsonString = AUTORELEASE([[NSString alloc] initWithData:response.data encoding:NSUTF8StringEncoding]);
-		
+		NSData *jsonData = RETAIN(response.data);
+		NSString *jsonString = AUTORELEASE([[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]);
+
 		// If it is not an empty json array, then make the callback
 		NSError *error = nil;
 		NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^\\s*\\[\\s*\\]\\s*$" options:0 error:&error];
 		if(error == nil && [regex numberOfMatchesInString:jsonString options:NSMatchingAnchored range:NSMakeRange(0, [jsonString length])] == 0)
 		{
-			void(^completion)(NSData *) = [args objectForKey:@"completion"];
-			completion(response.data);
+			// Call the user's completion handler in the main thread
+			dispatch_async(dispatch_get_main_queue(), ^{
+				completion(jsonData);
+				RELEASE(jsonData);
+				RELEASE(completion);
+			});
 			return;
+		} else {
+			// Cleanup for the next round of polling
+			RELEASE(jsonData);
 		}
 	}
-	
-	if(tries >= kTSConversionPollCount)
+
+	BOOL serverError = NO;
+	if (response.status >= 400 && response.status <= 499){
+		[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: 4XX while getting conversion data"];
+		serverError = YES;
+	}
+
+	BOOL triesExhausted = NO;
+	if (tries >= kTSConversionPollCount){
+		[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Tries exhausted while getting conversion data"];
+		triesExhausted = YES;
+	}
+
+	if(serverError || triesExhausted)
 	{
-		void(^completion)(NSData *) = [args objectForKey:@"completion"];
-		completion(nil);
+		// Don't try any more
+		dispatch_async(dispatch_get_main_queue(), ^{
+			completion(nil);
+			RELEASE(completion);
+		});
 		return;
 	}
 	else
 	{
-		[NSTimer scheduledTimerWithTimeInterval:kTSConversionPollInterval target:self selector:@selector(conversionCheck:) userInfo:args repeats:NO];
+		// Schedule a retry after kTSConversionPollInterval seconds
+		dispatch_after(
+			dispatch_time(DISPATCH_TIME_NOW, kTSConversionPollInterval * NSEC_PER_SEC),
+			dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+				[self getConversionData:completion tries:tries];
+		});
+		return;
 	}
 }
 
@@ -456,7 +481,7 @@
 	// Fields necessary for receipt validation
 	// Use developer-provided values (if available) for stricter validation, otherwise get values from bundle
 	[self appendPostPairWithPrefix:@"" key:@"receipt-guid" value:[platform getComputerGUID]];
-	
+
 	NSString *bundleId = config.hardcodedBundleId ? config.hardcodedBundleId : [platform getBundleIdentifier];
 	[self appendPostPairWithPrefix:@"" key:@"receipt-bundle-id" value:bundleId];
 
