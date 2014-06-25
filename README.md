@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/tapstream/tapstream-sdk.svg?branch=master)](https://travis-ci.org/tapstream/tapstream-sdk)
 # Tapstream marketing analytics SDK
 
 Tapstream is an app marketing analytics platform that supports iOS, Android, Mac OS X, and Windows 8.
