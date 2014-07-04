@@ -14,10 +14,20 @@ C# tasks require Visual Studio and might need to be run using the
 vcpaver.cmd script which sets up the VC environment variables. (You may
 need to adjust the path to vcvarsall.bat in the vcpaver.cmd script)
 
-ObjC tasks require clang.  To build the test application, you also need v8:
-To get v8 libraries on OSX:
-	get brew
-	sudo brew install v8
+ObjC tasks require clang.  To build the test application, you also need v8.
+Version 3.9.24 is required. To install:
+	
+        First, go to the homebrew base directory
+        $ cd $( brew --prefix )
+        
+        Then, check for homebrew versions for v8
+        $ brew versions v8
+
+        Find the git command for 3.9.24
+        $ git checkout bb7fcab Library/Formula/v8.rb
+
+        Then install v8
+        $ brew install v8
 
 For packaging sdks on windows, make sure 7zip is on your path.
 
