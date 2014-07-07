@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'Tapstream'
-  s.version      = '2.7.3'
+  s.version      = '2.7.4'
   s.summary      = 'Tapstream marketing analytics.'
   s.homepage     = 'https://tapstream.com/'
   s.license      = 'MIT'
