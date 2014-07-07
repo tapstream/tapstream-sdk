@@ -69,7 +69,7 @@
 
 		[self makePostArgs];
 
-		self.firingEvents = [[NSMutableSet alloc] initWithCapacity:32];
+        firingEvents = [[NSMutableSet alloc] initWithCapacity:32];
 		self.firedEvents = [platform loadFiredEvents];
 	}
 	return self;
@@ -436,11 +436,13 @@
 
 	if(postData == nil)
 	{
-		self.postData = [[NSMutableString alloc] initWithCapacity:256];
+		NSMutableString *newPostDataString = [[NSMutableString alloc] initWithCapacity:256];
+        self.postData = newPostDataString;
+        RELEASE(newPostDataString);
 	}
 	else
 	{
-		[postData appendString:@"&"];
+        [postData appendString:@"&"];
 	}
 	[postData appendString:encodedPair];
 }

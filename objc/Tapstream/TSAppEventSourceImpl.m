@@ -241,7 +241,9 @@ static void TSLoadStoreKitClasses()
 					[product.priceLocale objectForKey:NSLocaleCurrencyCode],
 					b64Receipt
 					);
-			}
+
+                RELEASE(receipt);
+            }
 		}
 		RELEASE(transactions);
 	}
