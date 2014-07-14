@@ -98,24 +98,32 @@
     // Cannot show offers to users younger than minimumAge
     NSTimeInterval age = [now timeIntervalSinceDate:self.installDate];
     if(age < offer.minimumAge) {
-        NSLog(@"Offer '%@' ineligible (minimum age not met)", [offer insertionPoint]);
+        [TSLogging logAtLevel:kTSLoggingInfo
+            format:@"Offer '%@' ineligible (minimum age not met)",
+            [offer insertionPoint]];
         return NO;
     }
     
     // Cannot show offers more frequently than the rateLimit
     NSDate *lastImpression = [self.lastOfferImpressionTimes objectForKey:[[NSNumber numberWithInteger:offer.ident] stringValue]];
     if(lastImpression && [now timeIntervalSinceDate:lastImpression] < offer.rateLimit) {
-        NSLog(@"Offer '%@' ineligible (rate limited)", [offer insertionPoint]);
+        [TSLogging logAtLevel:kTSLoggingInfo
+            format:@"Offer '%@' ineligible (rate limited)",
+            [offer insertionPoint]];
         return NO;
     }
     
-    NSLog(@"Offer '%@' eligible", [offer insertionPoint]);
+    [TSLogging logAtLevel:kTSLoggingInfo
+        format:@"Offer '%@' eligible",
+        [offer insertionPoint]];
+
     return YES;
 }
 
 - (void)offerForInsertionPoint:(NSString *)insertionPoint result:(void (^)(TSOffer *))callback
 {
-    NSLog(@"Requesting offer for insertion point '%@'", insertionPoint);
+    [TSLogging logAtLevel:kTSLoggingInfo
+        format:@"Requesting offer for insertion point '%@'", insertionPoint];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         if(!insertionPoint) {
             if(callback) {
@@ -145,8 +153,10 @@
         NSError *error;
         NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
         NSInteger status = response ? ((NSHTTPURLResponse *)response).statusCode : -1;
-        
-        NSLog(@"Offers request complete (status %d)", (int)status);
+
+        [TSLogging logAtLevel:kTSLoggingInfo
+                    format:@"Offers request complete (status %d)",
+                    (int)status];
         
         if(data && status >= 200 && status < 300) {
             NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
@@ -202,7 +212,10 @@
         NSArray *results = [NSArray array];
         if(response && response.statusCode >= 200 && response.statusCode < 300 && data) {
             results = [TSWordOfMouthController parseRewards:data];
-            NSLog(@"Checking %d returned potential rewards for quantity", [results count]);
+            
+            [TSLogging logAtLevel:kTSLoggingInfo
+                        format:@"Checking %d returned potential rewards for quantity",
+                        [results count]];
             
             // Calculate quantity for each reward, and only return those with a positive quantity
             @synchronized(self.rewardConsumptionCounts) {
@@ -213,9 +226,12 @@
                     [reward calculateQuantity:consumed];
                     
                     if(reward.quantity > 0){
-                        NSLog(@"Eligible reward: %@", [reward sku]);
+                        
+                        [TSLogging logAtLevel:kTSLoggingInfo
+                            format:@"Eligible reward: %@", [reward sku]];
                     }else{
-                        NSLog(@"Reward not eligible: %@", [reward sku]);
+                        [TSLogging logAtLevel:kTSLoggingInfo
+                            format:@"Reward not eligible: %@", [reward sku]];
                     }
 
                     return reward.quantity > 0;
@@ -234,7 +250,8 @@
 - (void)consumeReward:(TSReward *)reward
 {
     if(reward && ![reward isConsumed]) {
-        NSLog(@"Consuming reward '%@' ...", [reward sku]);
+        [TSLogging logAtLevel:kTSLoggingInfo
+            format:@"Consuming reward '%@' ...", [reward sku]];
         @synchronized(self.rewardConsumptionCounts) {
             NSString *key = [[NSNumber numberWithInteger:reward.offerIdent] stringValue];
             NSNumber *consumedVal = [self.rewardConsumptionCounts objectForKey:key];
