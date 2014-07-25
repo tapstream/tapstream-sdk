@@ -385,15 +385,9 @@ class Core {
 		appendPostPair("", "hardware-open-udid", config.getOpenUdid());
 		appendPostPair("", "hardware", config.getHardware());
 
-		if (config.getCollectWifiMac()) {
-			appendPostPair("", "hardware-wifi-mac", platform.getWifiMac());
-		}
-		if (config.getCollectDeviceId()) {
-			appendPostPair("", "hardware-android-device-id", platform.getDeviceId());
-		}
-		if (config.getCollectAndroidId()) {
-			appendPostPair("", "hardware-android-android-id", platform.getAndroidId());
-		}
+		appendPostPair("", "hardware-wifi-mac", config.getWifiMac());
+		appendPostPair("", "hardware-android-device-id", config.getDeviceId());
+		appendPostPair("", "hardware-android-android-id", config.getAndroidId());
 
 		appendPostPair("", "uuid", platform.loadUuid());
 		appendPostPair("", "platform", "Android");
