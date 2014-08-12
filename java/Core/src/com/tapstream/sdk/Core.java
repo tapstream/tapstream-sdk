@@ -125,6 +125,8 @@ class Core {
 						String aaid = platform.getAdvertisingId();
 						if(aaid != null && aaid.length() > 0) {
 							appendPostPair("", "android-advertising-id", aaid);
+						}else{
+							Logging.log(Logging.WARN, "Advertising id could be collected. Is Google Play Services installed?");
 						}
 						Boolean limitAdTracking = platform.getLimitAdTracking();
 						if(limitAdTracking != null) {
