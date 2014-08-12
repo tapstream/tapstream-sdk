@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class Core {
-	public static final String VERSION = "2.7.1";
+	public static final String VERSION = "2.8.0";
 	private static final String EVENT_URL_TEMPLATE = "https://api.tapstream.com/%s/event/%s/";
 	private static final String HIT_URL_TEMPLATE = "http://api.tapstream.com/%s/hit/%s.gif";
 	private static final String CONVERSION_URL_TEMPLATE = "https://reporting.tapstream.com/v1/timelines/lookup?secret=%s&event_session=%s";
@@ -125,6 +125,8 @@ class Core {
 						String aaid = platform.getAdvertisingId();
 						if(aaid != null && aaid.length() > 0) {
 							appendPostPair("", "android-advertising-id", aaid);
+						}else{
+							Logging.log(Logging.WARN, "Advertising id could be collected. Is Google Play Services installed?");
 						}
 						Boolean limitAdTracking = platform.getLimitAdTracking();
 						if(limitAdTracking != null) {
@@ -385,15 +387,9 @@ class Core {
 		appendPostPair("", "hardware-open-udid", config.getOpenUdid());
 		appendPostPair("", "hardware", config.getHardware());
 
-		if (config.getCollectWifiMac()) {
-			appendPostPair("", "hardware-wifi-mac", platform.getWifiMac());
-		}
-		if (config.getCollectDeviceId()) {
-			appendPostPair("", "hardware-android-device-id", platform.getDeviceId());
-		}
-		if (config.getCollectAndroidId()) {
-			appendPostPair("", "hardware-android-android-id", platform.getAndroidId());
-		}
+		appendPostPair("", "hardware-wifi-mac", config.getWifiMac());
+		appendPostPair("", "hardware-android-device-id", config.getDeviceId());
+		appendPostPair("", "hardware-android-android-id", config.getAndroidId());
 
 		appendPostPair("", "uuid", platform.loadUuid());
 		appendPostPair("", "platform", "Android");

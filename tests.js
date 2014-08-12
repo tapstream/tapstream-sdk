@@ -267,6 +267,7 @@ test('required-post-data', function() {
 	util.assertTrue(pd.search('package-name=') != -1);
 	util.assertTrue(pd.search('gmtoffset=') != -1);
 });
+/*
 test('collect-device-info-defaults-to-true', function() {
 	var q = util.newOperationQueue(),
 		conf = util.newConfig(),
@@ -320,6 +321,7 @@ test('collect-device-info-opt-out', function() {
 		util.assertTrue(pd.search('hardware-wifi-mac=') == -1);
 	}
 });
+*/
 test('device-info-opt-in', function() {
 	var q = util.newOperationQueue(),
 		conf = util.newConfig();
@@ -327,6 +329,9 @@ test('device-info-opt-in', function() {
 	callSetter(conf, 'odin1', 'test');
 	if(language == 'java') {
 		callSetter(conf, 'openUdid', 'test');
+		callSetter(conf, 'wifiMac', 'test-wifi-mac');
+		callSetter(conf, 'deviceId', 'test-android-device-id');
+		callSetter(conf, 'androidId', 'test-android-id');
 	} else if(language == 'cs') {
 	} else if(language == 'objc') {
 		if(platform == 'ios') {
@@ -342,9 +347,12 @@ test('device-info-opt-in', function() {
 	var pd = util.getPostData(ts);
 	util.log(pd);
 
-	util.assertTrue(pd.search('hardware-odin1=') != -1);
+	util.assertTrue(pd.search('hardware-odin1=test') != -1);
 	if(language == 'java') {
-		util.assertTrue(pd.search('hardware-open-udid=') != -1);
+		util.assertTrue(pd.search('hardware-open-udid=test') != -1);
+		util.assertTrue(pd.search('hardware-wifi-mac=test-wifi-mac') != -1);
+		util.assertTrue(pd.search('hardware-android-device-id=test-android-device-id') != -1);
+		util.assertTrue(pd.search('hardware-android-android-id=test-android-id') != -1);
 	} else if(language == 'cs') {
 	} else if(language == 'objc') {
 		if(platform == 'ios') {
