@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class Core {
-	public static final String VERSION = "2.7.1";
+	public static final String VERSION = "2.8.0";
 	private static final String EVENT_URL_TEMPLATE = "https://api.tapstream.com/%s/event/%s/";
 	private static final String HIT_URL_TEMPLATE = "http://api.tapstream.com/%s/hit/%s.gif";
 	private static final String CONVERSION_URL_TEMPLATE = "https://reporting.tapstream.com/v1/timelines/lookup?secret=%s&event_session=%s";
