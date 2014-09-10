@@ -156,7 +156,7 @@ static void TSLoadStoreKitClasses()
 				receipt = [NSData dataWithContentsOfURL:receiptUrl];
 #endif
 				
-				if(receipt)
+				if(receipt && transaction.transactionIdentifier != nil)
 				{
 					@synchronized(self)
 					{
