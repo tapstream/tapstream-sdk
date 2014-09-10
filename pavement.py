@@ -113,7 +113,7 @@ def _package_java_whitelabel():
 @task
 def make_java():
 	_make_java('java')
-
+	
 @task
 def test_java():
 	sh('java -jar ./java/TapstreamTest/build/jar/TapstreamTest.jar tests.js')
@@ -158,7 +158,7 @@ def package_cs():
 	path('builds/win8').rmtree()
 	path('builds/win8').makedirs()
 	path.copy(path('./cs/Tapstream/bin/%s/TapstreamMetrics.winmd' % CONFIGURATION), path('./builds/win8/'))
-
+	
 	path('builds/winphone').rmtree()
 	path('builds/winphone').makedirs()
 	path.copy(path('./cs/TapstreamWinPhone/Bin/%s/TapstreamMetrics.dll' % CONFIGURATION), path('./builds/winphone/'))
@@ -209,7 +209,7 @@ def make_objc():
 		sh('%s -isysroot %s -miphoneos-version-min=4.3 -arch armv7 -fobjc-arc -shared %s %s -o ./TapstreamTest/bin/Tapstream.so -framework Foundation -framework UIKit' % (
 			clang, sdk_root, include_dirs, tapstream_sources
 		))
-
+		
 		# Mac With and without ARC
 		sh('clang -fno-objc-arc -shared %s %s -o ./TapstreamTest/bin/Tapstream.so -framework Foundation -framework AppKit -framework IOKit' % (
 			include_dirs, tapstream_sources
@@ -226,7 +226,7 @@ def make_objc():
 		sh('clang++ -fobjc-arc %s %s -o ./TapstreamTest/bin/TapstreamTestMac -DTEST_PLATFORM=mac -lv8 -framework Foundation -framework IOKit' % (
 			include_dirs, tapstream_test_sources
 		))
-
+		
 
 @task
 def test_objc_mac():
@@ -251,21 +251,20 @@ def package_objc():
 		for file_type in ('.h', '.m'):
 			sh('cp ./objc/Tapstream/*%s ./builds/%s/Tapstream/' % (file_type, sdk))
 			sh('cp ./objc/Core/*%s ./builds/%s/Tapstream/' % (file_type, sdk))
-		#if sdk == 'ios':
-			#path('builds/%s/WordOfMouth' % sdk).makedirs()
-			#sh('cp -r ./objc/WordOfMouth/* ./builds/%s/WordOfMouth/' % sdk)
+		if sdk == 'ios':
+			path('builds/%s/WordOfMouth' % sdk).makedirs()
+			sh('cp -r ./objc/WordOfMouth/* ./builds/%s/WordOfMouth/' % sdk)
 		path('builds/tapstream-%s-%s.zip' % (VERSION, sdk)).remove()
 		with pushd('builds/%s' % sdk):
-			#folders = 'Tapstream ' + ('WordOfMouth' if sdk == 'ios' else '')
-			folders = 'Tapstream'
+			folders = 'Tapstream ' + ('WordOfMouth' if sdk == 'ios' else '')
 			sh('zip -r ../tapstream-%s-%s.zip %s' % (VERSION, sdk, folders))
 
 		# Generate whitelabel
 		path('builds/%s-whitelabel' % sdk).rmtree()
 		path('builds/%s-whitelabel' % sdk).mkdir()
 		sh('cp -r ./builds/%s/Tapstream ./builds/%s-whitelabel/' % (sdk, sdk))
-		#if sdk == 'ios':
-			#sh('cp -r ./builds/%s/WordOfMouth ./builds/%s-whitelabel/' % (sdk, sdk))
+		if sdk == 'ios':
+			sh('cp -r ./builds/%s/WordOfMouth ./builds/%s-whitelabel/' % (sdk, sdk))
 		with pushd('./builds/%s-whitelabel' % sdk):
 			sh('mv Tapstream ConversionTracker')
 			sh('mv ConversionTracker/TSTapstream.h ConversionTracker/ConversionTracker.h')
@@ -282,8 +281,7 @@ def package_objc():
 
 		path('builds/tapstream-%s-%s-whitelabel.zip' % (VERSION, sdk)).remove()
 		with pushd('builds/%s-whitelabel' % sdk):
-			#folders = 'ConversionTracker ' + ('WordOfMouth' if sdk == 'ios' else '')
-			folders = 'ConversionTracker'
+			folders = 'ConversionTracker ' + ('WordOfMouth' if sdk == 'ios' else '')
 			sh('zip -r ../tapstream-%s-%s-whitelabel.zip %s' % (VERSION, sdk, folders))
 
 
@@ -345,7 +343,7 @@ def make_titanium():
 @task
 def package_titanium():
 	path('builds/tapstream-%s-titanium.zip' % VERSION).remove()
-	with pushd('builds/titanium'):
+	with pushd('builds/titanium'):		
 		_zip('../tapstream-%s-titanium.zip' % VERSION, 'modules')
 
 
@@ -426,7 +424,7 @@ def make_unity():
 	sh('cp objc/Tapstream/*.h builds/unity/Plugins/iOS')
 	sh('cp unity/TapstreamObjcInterface.m builds/unity/Plugins/iOS')
 	sh('cp unity/Tapstream.cs builds/unity')
-
+	
 @needs('make_unity')
 @task
 def package_unity():

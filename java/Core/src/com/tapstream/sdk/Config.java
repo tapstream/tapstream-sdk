@@ -11,11 +11,9 @@ public class Config {
 	// Optional hardware identifiers that can be provided by the caller
 	private String odin1 = null;
 	private String openUdid = null;
-
-	// Set these to false if you do NOT want to collect this data.
-	private boolean collectWifiMac = true;
-	private boolean collectDeviceId = true;
-	private boolean collectAndroidId = true;
+	private String wifiMac = null;
+	private String deviceId = null;
+	private String androidId = null;
 
 	// Set these if you want to override the names of the automatic events sent by the sdk
 	private String installEventName = null;
@@ -44,14 +42,34 @@ public class Config {
 	public String getOpenUdid() { return openUdid; }
 	public void setOpenUdid(String openUdid) { this.openUdid = openUdid; }
 
-	public boolean getCollectWifiMac() { return collectWifiMac; }
-	public void setCollectWifiMac(boolean collect) { collectWifiMac = collect; }
+	public String getDeviceId(){ return deviceId; }
+	public void setDeviceId(String deviceId){ this.deviceId = deviceId; }
 
-	public boolean getCollectDeviceId() { return collectDeviceId; }
-	public void setCollectDeviceId(boolean collect) { collectDeviceId = collect; }
+	public String getWifiMac(){ return wifiMac; }
+	public void setWifiMac(String wifiMac){ this.wifiMac = wifiMac; }
 
-	public boolean getCollectAndroidId() { return collectAndroidId; }
-	public void setCollectAndroidId(boolean collect) { collectAndroidId = collect; }
+	public String getAndroidId(){ return androidId; }
+	public void setAndroidId(String androidId){ this.androidId = androidId; }
+
+        /**
+         * @deprecated Wifi mac, device id, and android id are no longer collected
+         * automatically. You may provide them using `setWifiMac`, `setDeviceId`,
+         * and `setAndroidId`.
+         */
+	@Deprecated
+	public boolean getCollectWifiMac() { return false; }
+	@Deprecated
+	public void setCollectWifiMac(boolean collect) {}
+
+	@Deprecated
+	public boolean getCollectDeviceId() { return false; }
+	@Deprecated
+	public void setCollectDeviceId(boolean collect) {}
+
+	@Deprecated
+	public boolean getCollectAndroidId() { return false; }
+	@Deprecated
+	public void setCollectAndroidId(boolean collect) { }
 
 	public String getInstallEventName() { return installEventName; }
 	public void setInstallEventName(String name) { installEventName = name; }
