@@ -108,7 +108,7 @@ static void TSLoadStoreKitClasses()
 		if(TSSKPaymentQueue != nil)
 		{
 			self.requestTransactions = [NSMutableDictionary dictionary];
-			[[TSSKPaymentQueue defaultQueue] addTransactionObserver:self];
+			[(id)[TSSKPaymentQueue defaultQueue] addTransactionObserver:self];
 		}
 		self.transactionReceiptSnapshots = [NSMutableDictionary dictionary];
 	}
@@ -156,7 +156,7 @@ static void TSLoadStoreKitClasses()
 				receipt = [NSData dataWithContentsOfURL:receiptUrl];
 #endif
 				
-				if(receipt)
+				if(receipt && transaction.transactionIdentifier != nil)
 				{
 					@synchronized(self)
 					{
@@ -263,7 +263,7 @@ static void TSLoadStoreKitClasses()
 {
 	if(TSSKPaymentQueue != nil)
 	{
-		[[TSSKPaymentQueue defaultQueue] removeTransactionObserver:self];
+		[(id)[TSSKPaymentQueue defaultQueue] removeTransactionObserver:self];
 	}
 
 	if(foregroundedEventObserver != nil)

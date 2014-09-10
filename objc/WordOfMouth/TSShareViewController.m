@@ -43,13 +43,15 @@
 {
     if(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
         self.offer = offerVal;
-        self.parentViewController = parentViewControllerVal;
         self.delegate = delegateVal;
         
         hasTwitter = [SLComposeViewController isAvailableForServiceType:SLServiceTypeTwitter];
         hasFacebook = [SLComposeViewController isAvailableForServiceType:SLServiceTypeFacebook];
         hasEmail = [MFMailComposeViewController canSendMail];
         hasMessaging = [MFMessageComposeViewController canSendText];
+
+        id view = self.view; // Force instantiation of view.
+        [parentViewControllerVal addChildViewController:self];
     }
     return self;
 }
