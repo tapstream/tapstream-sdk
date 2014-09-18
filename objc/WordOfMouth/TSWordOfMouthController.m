@@ -62,7 +62,7 @@
             [[NSUserDefaults standardUserDefaults] synchronize];
         }
         
-        self.lastOfferImpressionTimes = [[NSUserDefaults standardUserDefaults] objectForKey:kTSLastOfferImpressionTimesKey];
+        self.lastOfferImpressionTimes = [[[NSUserDefaults standardUserDefaults] objectForKey:kTSLastOfferImpressionTimesKey] mutableCopy];
         if(!self.lastOfferImpressionTimes) {
             self.lastOfferImpressionTimes = [NSMutableDictionary dictionaryWithCapacity:8];
         }
