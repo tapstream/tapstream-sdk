@@ -11,7 +11,7 @@
 #import "TSWordOfMouthController.h"
 
 @interface ViewController ()
-
+@property(STRONG_OR_RETAIN, nonatomic) TSWordOfMouthController *wom;
 @end
 
 @implementation ViewController
@@ -23,16 +23,16 @@
     
     NSLog(@"Requesting offer");
     
-    TSWordOfMouthController *wom = [TSTapstream wordOfMouthController];
+    self.wom = [TSTapstream wordOfMouthController];
     
-    [wom offerForInsertionPoint:@"launch" result:^(TSOffer *offer) {
+    [self.wom offerForInsertionPoint:@"launch" result:^(TSOffer *offer) {
         if(offer) {
-            [wom showOffer:offer parentViewController:self];
+            [self.wom showOffer:offer parentViewController:self];
         }
     }];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10 * NSEC_PER_SEC)), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [wom availableRewards:^(NSArray *rewards){
+        [self.wom availableRewards:^(NSArray *rewards){
             NSLog(@"Rewards: %@", rewards);
         }];
     });
