@@ -8,21 +8,53 @@
 	NSString *uid;
 	NSString *name;
 	NSString *encodedName;
-	BOOL oneTimeOnly;
+	BOOL isOneTimeOnly;
+	BOOL isTransaction;
+	NSString *productId;
+	NSMutableDictionary *customFields;
 	NSMutableString *postData;
 }
 
 @property(nonatomic, STRONG_OR_RETAIN, readonly) NSString *uid;
 @property(nonatomic, STRONG_OR_RETAIN, readonly) NSString *name;
 @property(nonatomic, STRONG_OR_RETAIN, readonly) NSString *encodedName;
+@property(nonatomic, STRONG_OR_RETAIN, readonly) NSString *productId;
+@property(nonatomic, STRONG_OR_RETAIN, readonly) NSMutableDictionary *customFields;
 @property(nonatomic, STRONG_OR_RETAIN, readonly) NSString *postData;
-@property(nonatomic, assign, readonly) BOOL oneTimeOnly;
+@property (nonatomic, assign, readonly) BOOL isOneTimeOnly;
+@property (nonatomic, assign, readonly) BOOL isTransaction;
+
 
 + (id)eventWithName:(NSString *)name oneTimeOnly:(BOOL)oneTimeOnly;
-- (void)addValue:(NSString *)value forKey:(NSString *)key;
-- (void)addIntegerValue:(int)value forKey:(NSString *)key;
-- (void)addUnsignedIntegerValue:(uint)value forKey:(NSString *)key;
-- (void)addDoubleValue:(double)value forKey:(NSString *)key;
-- (void)addBooleanValue:(BOOL)value forKey:(NSString *)key;
+
++ (id)eventWithTransactionId:(NSString *)transactionId
+	productId:(NSString *)productId
+	quantity:(int)quantity;
+
++ (id)eventWithTransactionId:(NSString *)transactionId
+	productId:(NSString *)productId
+	quantity:(int)quantity
+	priceInCents:(int)priceInCents
+	currency:(NSString *)currencyCode;
+
++ (id)eventWithTransactionId:(NSString *)transactionId
+	productId:(NSString *)productId
+	quantity:(int)quantity
+	priceInCents:(int)priceInCents
+	currency:(NSString *)currencyCode
+	base64Receipt:(NSString *)base64Receipt;
+
+- (void)addValue:(NSObject *)obj forKey:(NSString *)key;
+
+
+- (void)addIntegerValue:(int)value forKey:(NSString *)key				__attribute__((deprecated));
+- (void)addUnsignedIntegerValue:(uint)value forKey:(NSString *)key 		__attribute__((deprecated));
+- (void)addDoubleValue:(double)value forKey:(NSString *)key 			__attribute__((deprecated));
+- (void)addFloatValue:(float)value forKey:(NSString *)key 				__attribute__((deprecated));
+- (void)addBooleanValue:(BOOL)value forKey:(NSString *)key 				__attribute__((deprecated));
+
 
 @end
+
+
+

@@ -13,6 +13,11 @@
 - (NSString *)getLocale;
 - (NSString *)getWifiMac;
 - (NSString *)getAppName;
+- (NSString *)getAppVersion;
 - (NSString *)getPackageName;
-- (TSResponse *)request:(NSString *)url data:(NSString *)data;
+- (TSResponse *)request:(NSString *)url data:(NSString *)data method:(NSString *)method;
+- (NSSet *)getProcessSet;
+- (NSString *)getComputerGUID;
+- (NSString *)getBundleIdentifier;
+- (NSString *)getBundleShortVersion;
 @end

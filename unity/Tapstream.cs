@@ -55,6 +55,8 @@ public class Tapstream : MonoBehaviour
 	[DllImport ("__Internal")]
 	private static extern void Tapstream_FireEvent(IntPtr ev);
 
+	[DllImport ("__Internal")]
+	private static extern void Tapstream_GetConversionData(string className, string methodName);
 
 	public class Config
 	{
@@ -152,6 +154,11 @@ public class Tapstream : MonoBehaviour
 	public static void FireEvent(Event e)
 	{
 		Tapstream_FireEvent(e.handle);
+	}
+
+	public static void GetConversionData(string className, string methodName)
+	{
+		Tapstream_GetConversionData(className, methodName);
 	}
 
 #elif UNITY_ANDROID
@@ -260,7 +267,7 @@ public class Tapstream : MonoBehaviour
 			{
 				using(AndroidJavaClass cls = new AndroidJavaClass("com.tapstream.sdk.Tapstream"))
 				{
-					cls.CallStatic("create", context, accountName, developerSecret, conf.handle);
+					cls.CallStatic("create", context.Call<AndroidJavaObject>("getApplication"), accountName, developerSecret, conf.handle);
 				}
 			}
 		}
@@ -274,6 +281,14 @@ public class Tapstream : MonoBehaviour
 			{
 				inst.Call("fireEvent", e.handle);
 			}
+		}
+	}
+
+	public static void GetConversionData(string callbackClass, string callbackMethod)
+	{
+		using(AndroidJavaClass cls = new AndroidJavaClass("com.tapstream.sdk.UnityConversionListener"))
+		{
+			cls.CallStatic("getConversionData", callbackClass, callbackMethod);
 		}
 	}
 

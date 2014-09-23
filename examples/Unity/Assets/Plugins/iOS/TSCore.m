@@ -1,15 +1,19 @@
 #import "TSCore.h"
 #import "TSHelpers.h"
 #import "TSLogging.h"
+#import "TSUtils.h"
 
-#define kTSVersion @"2.3"
+#define kTSVersion @"2.8.2"
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
 #define kTSHitUrlTemplate @"http://api.tapstream.com/%@/hit/%@.gif"
+#define kTSConversionUrlTemplate @"https://reporting.tapstream.com/v1/timelines/lookup?secret=%@&event_session=%@"
+#define kTSConversionPollInterval 1
+#define kTSConversionPollCount 10
 
 @interface TSEvent(hidden)
-- (void)firing;
+- (void)prepare:(NSDictionary *)globalEventParams;
+- (void)setTransactionNameWithAppName:(NSString *)appName platform:(NSString *)platformName;
 @end
-
 
 
 
@@ -18,27 +22,32 @@
 @property(nonatomic, STRONG_OR_RETAIN) id<TSDelegate> del;
 @property(nonatomic, STRONG_OR_RETAIN) id<TSPlatform> platform;
 @property(nonatomic, STRONG_OR_RETAIN) id<TSCoreListener> listener;
+@property(nonatomic, STRONG_OR_RETAIN) id<TSAppEventSource> appEventSource;
 @property(nonatomic, STRONG_OR_RETAIN) TSConfig *config;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *accountName;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *secret;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *encodedAppName;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableString *postData;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableSet *firingEvents;
 @property(nonatomic, STRONG_OR_RETAIN) NSMutableSet *firedEvents;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *failingEventId;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *appName;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *platformName;
 
 - (NSString *)clean:(NSString *)s;
 - (void)increaseDelay;
-- (void)appendPostPairWithKey:(NSString *)key value:(NSString *)value;
-- (void)makePostArgsWithSecret:(NSString *)secret;
+- (void)makePostArgs;
 @end
 
 
 @implementation TSCore
 
-@synthesize del, platform, listener, config, accountName, postData, firingEvents, firedEvents, failingEventId;
+@synthesize del, platform, listener, appEventSource, config, accountName, secret, encodedAppName, postData, firingEvents, firedEvents, failingEventId, appName, platformName;
 
 - (id)initWithDelegate:(id<TSDelegate>)delegateVal
 	platform:(id<TSPlatform>)platformVal
 	listener:(id<TSCoreListener>)listenerVal
+	appEventSource:(id<TSAppEventSource>)appEventSourceVal
 	accountName:(NSString *)accountNameVal
 	developerSecret:(NSString *)developerSecretVal
 	config:(TSConfig *)configVal
@@ -49,13 +58,18 @@
 		self.platform = platformVal;
 		self.listener = listenerVal;
 		self.config = configVal;
+		self.appEventSource = appEventSourceVal;
 		self.accountName = [self clean:accountNameVal];
+		self.secret = developerSecretVal;
+		self.encodedAppName = nil;
 		self.postData = nil;
 		self.failingEventId = nil;
+		self.appName = nil;
+		self.platformName = [kTSPlatform lowercaseString];
 
-		[self makePostArgsWithSecret:developerSecretVal];
+		[self makePostArgs];
 
-		self.firingEvents = [[NSMutableSet alloc] initWithCapacity:32];
+        firingEvents = [[NSMutableSet alloc] initWithCapacity:32];
 		self.firedEvents = [platform loadFiredEvents];
 	}
 	return self;
@@ -66,26 +80,24 @@
 	RELEASE(del);
 	RELEASE(platform);
 	RELEASE(listener);
+	RELEASE(appEventSource);
 	RELEASE(accountName);
+	RELEASE(secret);
 	RELEASE(postData);
 	RELEASE(firingEvents);
 	RELEASE(firedEvents);
 	RELEASE(failingEventId);
+	RELEASE(appName);
+	RELEASE(platformName);
 	SUPER_DEALLOC;
 }
 
 - (void)start
 {
-#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-	NSString *platformName = @"ios";
-#else
-	NSString *platformName = @"mac";
-#endif
-
-	NSString *appName = [platform getAppName];
-	if(appName == nil)
+	self.appName = [platform getAppName];
+	if(self.appName == nil)
 	{
-		appName = @"";
+		self.appName = @"";
 	}
 
 	if(config.fireAutomaticInstallEvent)
@@ -96,22 +108,50 @@
 		}
 		else
 		{
-			NSString *eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, appName];
+			NSString *eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, self.appName];
 			[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:YES]];
 		}
 	}
 
+	__unsafe_unretained TSCore *me = self;
+
 	if(config.fireAutomaticOpenEvent)
 	{
+		// Fire the initial open event
 		if(config.openEventName != nil)
 		{
 			[self fireEvent:[TSEvent eventWithName:config.openEventName oneTimeOnly:NO]];
 		}
 		else
 		{
-			NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, appName];
+			NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, self.appName];
 			[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
 		}
+
+		// Subscribe to be notified whenever the app enters the foreground
+		[appEventSource setOpenHandler:^() {
+			if(me.config.openEventName != nil)
+			{
+				[me fireEvent:[TSEvent eventWithName:me.config.openEventName oneTimeOnly:NO]];
+			}
+			else
+			{
+				NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", me.platformName, me.appName];
+				[me fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
+			}
+		}];
+	}
+
+	if(config.fireAutomaticIAPEvents)
+	{
+		[appEventSource setTransactionHandler:^(NSString *transactionId, NSString *productId, int quantity, int priceInCents, NSString *currencyCode, NSString *base64Receipt) {
+			[me fireEvent:[TSEvent eventWithTransactionId:transactionId
+				productId:productId
+				quantity:quantity
+				priceInCents:priceInCents
+				currency:currencyCode
+				base64Receipt:base64Receipt]];
+		}];
 	}
 }
 
@@ -119,23 +159,29 @@
 {
 	@synchronized(self)
 	{
-		// Notify the event that we are going to fire it so it can record the time
-		[e firing];
+		if(e.isTransaction)
+		{
+			[e setTransactionNameWithAppName:appName platform:platformName];
+		}
 
-		if(e.oneTimeOnly)
+		// Add global event params if they have not yet been added
+		// Notify the event that we are going to fire it so it can record the time and bake its post data
+		[e prepare:config.globalEventParams];
+
+		if(e.isOneTimeOnly)
 		{
 			if([firedEvents containsObject:e.name])
 			{
 				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that has already been fired", e.name];
-				[listener reportOperation:@"event-ignored-already-fired" arg:e.name];
-				[listener reportOperation:@"job-ended" arg:e.name];
+				[listener reportOperation:@"event-ignored-already-fired" arg:e.encodedName];
+				[listener reportOperation:@"job-ended" arg:e.encodedName];
 				return;
 			}
 			else if([firingEvents containsObject:e.name])
 			{
 				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that is already in progress", e.name];
-				[listener reportOperation:@"event-ignored-already-in-progress" arg:e.name];
-				[listener reportOperation:@"job-ended" arg:e.name];
+				[listener reportOperation:@"event-ignored-already-in-progress" arg:e.encodedName];
+				[listener reportOperation:@"job-ended" arg:e.encodedName];
 				return;
 			}
 
@@ -145,18 +191,29 @@
 		NSString *url = [NSString stringWithFormat:kTSEventUrlTemplate, accountName, e.encodedName];
 		NSString *data = [postData stringByAppendingString:e.postData];
 
-
 		int actualDelay = [del getDelay];
 		dispatch_time_t dispatchTime = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * actualDelay);
 		dispatch_after(dispatchTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 
-			TSResponse *response = [platform request:url data:data];
+			NSString *allData = data;
+			if(config.collectTasteData)
+			{
+				NSString *processes = @"";
+				NSSet *processSet = [platform getProcessSet];
+				if(processSet)
+				{
+					processes = [TSUtils encodeString:[[processSet allObjects] componentsJoinedByString:@","]];
+				}
+				allData = [[data stringByAppendingString:@"&processes="] stringByAppendingString:processes];
+			}
+
+			TSResponse *response = [platform request:url data:allData method:@"POST"];
 			bool failed = response.status < 200 || response.status >= 300;
 			bool shouldRetry = response.status < 0 || (response.status >= 500 && response.status < 600);
 
 			@synchronized(self)
 			{
-				if(e.oneTimeOnly)
+				if(e.isOneTimeOnly)
 				{
 					[firingEvents removeObject:e.name];
 				}
@@ -182,12 +239,12 @@
 				}
 				else
 				{
-					if(e.oneTimeOnly)
+					if(e.isOneTimeOnly)
 					{
 						[firedEvents addObject:e.name];
 
 						[platform saveFiredEvents:firedEvents];
-						[listener reportOperation:@"fired-list-saved" arg:e.name];
+						[listener reportOperation:@"fired-list-saved" arg:e.encodedName];
 					}
 
 					// Success of any event resets the delay
@@ -219,11 +276,11 @@
 					[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, http code %d.%@", response.status, retryMsg];
 				}
 
-				[listener reportOperation:@"event-failed" arg:e.name];
+				[listener reportOperation:@"event-failed" arg:e.encodedName];
 				if(shouldRetry)
 				{
-					[listener reportOperation:@"retry" arg:e.name];
-					[listener reportOperation:@"job-ended" arg:e.name];
+					[listener reportOperation:@"retry" arg:e.encodedName];
+					[listener reportOperation:@"job-ended" arg:e.encodedName];
 					if([del isRetryAllowed])
 					{
 						[self fireEvent:e];
@@ -234,10 +291,10 @@
 			else
 			{
 				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream fired event named \"%@\"", e.name];
-				[listener reportOperation:@"event-succeeded" arg:e.name];
+				[listener reportOperation:@"event-succeeded" arg:e.encodedName];
 			}
-		
-			[listener reportOperation:@"job-ended" arg:e.name];
+
+			[listener reportOperation:@"job-ended" arg:e.encodedName];
 		});
 	}
 }
@@ -248,7 +305,7 @@
 	NSString *data = hit.postData;
 
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		TSResponse *response = [platform request:url data:data];
+		TSResponse *response = [platform request:url data:data method:@"POST"];
 		if(response.status < 200 || response.status >= 300)
 		{
 			[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire hit, http code: %d", response.status];
@@ -267,22 +324,90 @@
 	});
 }
 
+- (void)getConversionData:(void(^)(NSData *))completion
+{
+	if(completion == nil)
+	{
+		return;
+	}
+
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+    	[self getConversionData:[completion copy] tries:0];
+    });
+}
+
+- (void)getConversionData:(void(^)(NSData *))completion tries:(int)tries {
+	tries++;
+
+	NSString *url = [NSString stringWithFormat:kTSConversionUrlTemplate, secret, [platform loadUuid]];
+	TSResponse *response = [platform request:url data:nil method:@"GET"];
+
+	if(response.status >= 200 && response.status < 300)
+	{
+		NSData *jsonData = RETAIN(response.data);
+		NSString *jsonString = AUTORELEASE([[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]);
+
+		// If it is not an empty json array, then make the callback
+		NSError *error = nil;
+		NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^\\s*\\[\\s*\\]\\s*$" options:0 error:&error];
+		if(error == nil && [regex numberOfMatchesInString:jsonString options:NSMatchingAnchored range:NSMakeRange(0, [jsonString length])] == 0)
+		{
+			// Call the user's completion handler in the main thread
+			dispatch_async(dispatch_get_main_queue(), ^{
+				completion(jsonData);
+				RELEASE(jsonData);
+				RELEASE(completion);
+			});
+			return;
+		} else {
+			// Cleanup for the next round of polling
+			RELEASE(jsonData);
+		}
+	}
+
+	BOOL serverError = NO;
+	if (response.status >= 400 && response.status <= 499){
+		[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: 4XX while getting conversion data"];
+		serverError = YES;
+	}
+
+	BOOL triesExhausted = NO;
+	if (tries >= kTSConversionPollCount){
+		[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Tries exhausted while getting conversion data"];
+		triesExhausted = YES;
+	}
+
+	if(serverError || triesExhausted)
+	{
+		// Don't try any more
+		dispatch_async(dispatch_get_main_queue(), ^{
+			completion(nil);
+			RELEASE(completion);
+		});
+		return;
+	}
+	else
+	{
+		// Schedule a retry after kTSConversionPollInterval seconds
+		dispatch_after(
+			dispatch_time(DISPATCH_TIME_NOW, kTSConversionPollInterval * NSEC_PER_SEC),
+			dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+				[self getConversionData:completion tries:tries];
+		});
+		return;
+	}
+}
+
 - (int)getDelay
 {
 	return delay;
-}
-
-- (NSString *)encodeString:(NSString *)s
-{
-	return AUTORELEASE((BRIDGE_TRANSFER NSString *)CFURLCreateStringByAddingPercentEscapes(
-		NULL, (CFStringRef)s, NULL, (CFStringRef)@"!*'();:@&=+$,/?%#[]", kCFStringEncodingUTF8));
 }
 
 - (NSString *)clean:(NSString *)s
 {
 	s = [s lowercaseString];
 	s = [s stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	return [self encodeString:s];
+	return [TSUtils encodeString:s];
 }
 
 - (void)increaseDelay
@@ -301,143 +426,69 @@
 	[listener reportOperation:@"increased-delay"];
 }
 
-- (void)appendPostPairWithKey:(NSString *)key value:(NSString *)value
+- (void)appendPostPairWithPrefix:(NSString *)prefix key:(NSString *)key value:(NSString *)value
 {
-	if(value == nil)
+	NSString *encodedPair = [TSUtils encodeEventPairWithPrefix:prefix key:key value:value limitValueLength:YES];
+	if(encodedPair == nil)
 	{
 		return;
 	}
 
 	if(postData == nil)
 	{
-		self.postData = [[NSMutableString alloc] initWithCapacity:256];
+		NSMutableString *newPostDataString = [[NSMutableString alloc] initWithCapacity:256];
+        self.postData = newPostDataString;
+        RELEASE(newPostDataString);
 	}
 	else
 	{
-		[postData appendString:@"&"];
+        [postData appendString:@"&"];
 	}
-	[postData appendString:[self encodeString:key]];
-	[postData appendString:@"="];
-	[postData appendString:[self encodeString:value]];
+	[postData appendString:encodedPair];
 }
 
-- (void)makePostArgsWithSecret:(NSString *)secret
+- (void)makePostArgs
 {
-	[self appendPostPairWithKey:@"secret" value:secret];
-	[self appendPostPairWithKey:@"sdkversion" value:kTSVersion];
+	[self appendPostPairWithPrefix:@"" key:@"secret" value:secret];
+	[self appendPostPairWithPrefix:@"" key:@"sdkversion" value:kTSVersion];
 
-	if(config.hardware != nil)
-	{
-		if([config.hardware length] > 255)
-		{
-			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Hardware argument exceeds 255 characters, it will not be included with fired events"];
-		}
-		else
-		{
-			[self appendPostPairWithKey:@"hardware" value:config.hardware];
-		}
-	}
-
-	if(config.odin1 != nil)
-	{
-		if([config.odin1 length] > 255)
-		{
-			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: ODIN-1 argument exceeds 255 characters, it will not be included with fired events"];
-		}
-		else
-		{
-			[self appendPostPairWithKey:@"hardware-odin1" value:config.odin1];
-		}
-	}
-
+	[self appendPostPairWithPrefix:@"" key:@"hardware" value:config.hardware];
+	[self appendPostPairWithPrefix:@"" key:@"hardware-odin1" value:config.odin1];
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-
-	if(config.openUdid != nil)
-	{
-		if([config.openUdid length] > 255)
-		{
-			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: OpenUDID argument exceeds 255 characters, it will not be included with fired events"];
-		}
-		else
-		{
-			[self appendPostPairWithKey:@"hardware-open-udid" value:config.openUdid];
-		}
-	}
-
-	if(config.udid != nil)
-	{
-		if([config.udid length] > 255)
-		{
-			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: UDID argument exceeds 255 characters, it will not be included with fired events"];
-		}
-		else
-		{
-			[self appendPostPairWithKey:@"hardware-ios-udid" value:config.udid];
-		}
-	}
-
-	if(config.idfa != nil)
-	{
-		if([config.idfa length] > 255)
-		{
-			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: IDFA argument exceeds 255 characters, it will not be included with fired events"];
-		}
-		else
-		{
-			[self appendPostPairWithKey:@"hardware-ios-idfa" value:config.idfa];
-		}
-	}
-
-	if(config.secureUdid != nil)
-	{
-		if([config.secureUdid length] > 255)
-		{
-			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: SecureUDID argument exceeds 255 characters, it will not be included with fired events"];
-		}
-		else
-		{
-			[self appendPostPairWithKey:@"hardware-ios-secure-udid" value:config.secureUdid];
-		}
-	}
-
+	[self appendPostPairWithPrefix:@"" key:@"hardware-open-udid" value:config.openUdid];
+	[self appendPostPairWithPrefix:@"" key:@"hardware-ios-udid" value:config.udid];
+	[self appendPostPairWithPrefix:@"" key:@"hardware-ios-idfa" value:config.idfa];
+	[self appendPostPairWithPrefix:@"" key:@"hardware-ios-secure-udid" value:config.secureUdid];
 #else
-
-	if([config.serialNumber length] > 255)
-	{
-		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Serial number argument exceeds 255 characters, it will not be included with fired events"];
-	}
-	else
-	{
-		[self appendPostPairWithKey:@"hardware-mac-serial-number" value:config.serialNumber];
-	}
-
+	[self appendPostPairWithPrefix:@"" key:@"hardware-mac-serial-number" value:config.serialNumber];
 #endif
-
-
 
 	if(config.collectWifiMac)
 	{
-		[self appendPostPairWithKey:@"hardware-wifi-mac" value:[platform getWifiMac]];
+		[self appendPostPairWithPrefix:@"" key:@"hardware-wifi-mac" value:[platform getWifiMac]];
 	}
 
-	[self appendPostPairWithKey:@"uuid" value:[platform loadUuid]];
+	[self appendPostPairWithPrefix:@"" key:@"uuid" value:[platform loadUuid]];
+	[self appendPostPairWithPrefix:@"" key:@"platform" value:kTSPlatform];
+	[self appendPostPairWithPrefix:@"" key:@"vendor" value:[platform getManufacturer]];
+	[self appendPostPairWithPrefix:@"" key:@"model" value:[platform getModel]];
+	[self appendPostPairWithPrefix:@"" key:@"os" value:[platform getOs]];
+	[self appendPostPairWithPrefix:@"" key:@"resolution" value:[platform getResolution]];
+	[self appendPostPairWithPrefix:@"" key:@"locale" value:[platform getLocale]];
+	[self appendPostPairWithPrefix:@"" key:@"app-name" value:[platform getAppName]];
+	[self appendPostPairWithPrefix:@"" key:@"app-version" value:[platform getAppVersion]];
+	[self appendPostPairWithPrefix:@"" key:@"package-name" value:[platform getPackageName]];
+	[self appendPostPairWithPrefix:@"" key:@"gmtoffset" value:[TSUtils stringifyInteger:(int)[[NSTimeZone systemTimeZone] secondsFromGMT]]];
 
-#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-	[self appendPostPairWithKey:@"platform" value:@"iOS"];
-#else
-	[self appendPostPairWithKey:@"platform" value:@"Mac"];
-#endif
+	// Fields necessary for receipt validation
+	// Use developer-provided values (if available) for stricter validation, otherwise get values from bundle
+	[self appendPostPairWithPrefix:@"" key:@"receipt-guid" value:[platform getComputerGUID]];
 
-	[self appendPostPairWithKey:@"vendor" value:[platform getManufacturer]];
-	[self appendPostPairWithKey:@"model" value:[platform getModel]];
-	[self appendPostPairWithKey:@"os" value:[platform getOs]];
-	[self appendPostPairWithKey:@"resolution" value:[platform getResolution]];
-	[self appendPostPairWithKey:@"locale" value:[platform getLocale]];
-	[self appendPostPairWithKey:@"app-name" value:[platform getAppName]];
-	[self appendPostPairWithKey:@"package-name" value:[platform getPackageName]];
+	NSString *bundleId = config.hardcodedBundleId ? config.hardcodedBundleId : [platform getBundleIdentifier];
+	[self appendPostPairWithPrefix:@"" key:@"receipt-bundle-id" value:bundleId];
 
-	NSString *offset = [NSString stringWithFormat:@"%d", (int)[[NSTimeZone systemTimeZone] secondsFromGMT]];
-	[self appendPostPairWithKey:@"gmtoffset" value:offset];
+	NSString *shortVersion = config.hardcodedBundleShortVersionString ? config.hardcodedBundleShortVersionString : [platform getBundleShortVersion];
+	[self appendPostPairWithPrefix:@"" key:@"receipt-short-version" value:shortVersion];
 }
 
 
