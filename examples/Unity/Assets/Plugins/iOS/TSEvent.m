@@ -3,118 +3,196 @@
 #import <stdio.h>
 #import <stdlib.h>
 #import "TSLogging.h"
+#import "TSUtils.h"
 
 @interface TSEvent()
-
-- (id)initWithName:(NSString *)name oneTimeOnly:(BOOL)oneTimeOnly;
-- (void)firing;
-- (NSString *)makeUid;
-
 @end
-
 
 
 @implementation TSEvent
 
-@synthesize uid, name, encodedName, oneTimeOnly, postData;
+@synthesize uid, name, encodedName, productId, customFields, postData, isOneTimeOnly, isTransaction;
 
 + (id)eventWithName:(NSString *)eventName oneTimeOnly:(BOOL)oneTimeOnlyArg
 {
 	return AUTORELEASE([[self alloc] initWithName:eventName oneTimeOnly:oneTimeOnlyArg]);
 }
 
-- (id)initWithName:(NSString *)eventName oneTimeOnly:(BOOL)oneTimeOnlyArg
++ (id)eventWithTransactionId:(NSString *)transactionId
+	productId:(NSString *)productId
+	quantity:(int)quantity
+{
+	return AUTORELEASE([[self alloc] initWithTransactionId:transactionId productId:productId quantity:quantity]);
+}
+
++ (id)eventWithTransactionId:(NSString *)transactionId
+	productId:(NSString *)productId
+	quantity:(int)quantity
+	priceInCents:(int)priceInCents
+	currency:(NSString *)currencyCode
+{
+	return AUTORELEASE([[self alloc] initWithTransactionId:transactionId productId:productId quantity:quantity priceInCents:priceInCents currency:currencyCode]);
+}
+
++ (id)eventWithTransactionId:(NSString *)transactionId
+	productId:(NSString *)productId
+	quantity:(int)quantity
+	priceInCents:(int)priceInCents
+	currency:(NSString *)currencyCode
+	base64Receipt:(NSString *)base64Receipt
+{
+	return AUTORELEASE([[self alloc] initWithTransactionId:transactionId productId:productId quantity:quantity priceInCents:priceInCents currency:currencyCode base64Receipt:base64Receipt]);
+}
+
+- (id)initWithName:(NSString *)eventName
+	oneTimeOnly:(BOOL)oneTimeOnlyArg
 {
 	if((self = [super init]) != nil)
 	{
 		firstFiredTime = 0;
 		uid = RETAIN([self makeUid]);
-		name = RETAIN([[eventName lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]);
-		encodedName = RETAIN([self encodeString:name]);
-		oneTimeOnly = oneTimeOnlyArg;
+		[self setName:eventName];
+		postData = RETAIN([NSMutableString stringWithCapacity:64]);
+		isOneTimeOnly = oneTimeOnlyArg;
+		isTransaction = NO;
+		customFields = RETAIN([NSMutableDictionary dictionaryWithCapacity:16]);
 	}
 	return self;
 }
 
-- (NSString *)encodeString:(NSString *)s
+- (id)initWithTransactionId:(NSString *)transactionId
+	productId:(NSString *)productIdVal
+	quantity:(int)quantity
 {
-	return AUTORELEASE((BRIDGE_TRANSFER NSString *)CFURLCreateStringByAddingPercentEscapes(
-		NULL, (CFStringRef)s, NULL, (CFStringRef)@"!*'();:@&=+$,/?%#[]", kCFStringEncodingUTF8));
-}
-
-- (void)addValue:(NSString *)value forKey:(NSString *)key
-{
-	if(value == nil)
+	if((self = [super init]) != nil)
 	{
-		return;
-	}
-
-	if(key.length > 255)
-	{
-		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Custom key exceeds 255 characters, this field will not be included in the post (key=%@)", key];
-		return;
-	}
-	NSString *encodedKey = [self encodeString:[@"custom-" stringByAppendingString:key]];
-
-	NSString *encodedValue = [self encodeString:value];
-	if(encodedValue.length > 255)
-	{
-		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Custom value exceeds 255 characters, this field will not be included in the post (value=%@)", value];
-		return;
-	}
-
-	if(postData == nil)
-	{
+		firstFiredTime = 0;
+		uid = RETAIN([self makeUid]);
+		productId = RETAIN(productIdVal);
 		postData = RETAIN([NSMutableString stringWithCapacity:64]);
+		isOneTimeOnly = NO;
+		isTransaction = YES;
+		customFields = RETAIN([NSMutableDictionary dictionaryWithCapacity:16]);
+
+		[self addValue:transactionId forKey:@"purchase-transaction-id" withPrefix:@"" limitValueLength:YES];
+		[self addValue:productId forKey:@"purchase-product-id" withPrefix:@"" limitValueLength:YES];
+		[self addValue:[NSNumber numberWithInt:quantity] forKey:@"purchase-quantity" withPrefix:@"" limitValueLength:YES];
 	}
-	[postData appendString:@"&"];
-	[postData appendString:encodedKey];
-	[postData appendString:@"="];
-	[postData appendString:encodedValue];
+	return self;
 }
 
-- (void)addIntegerValue:(int)value forKey:(NSString *)key
+- (id)initWithTransactionId:(NSString *)transactionId
+				  productId:(NSString *)productIdVal
+				   quantity:(int)quantity
+			   priceInCents:(int)priceInCents
+				   currency:(NSString *)currencyCode
 {
-	[self addValue:[NSString stringWithFormat:@"%d", value] forKey:key];
+	if((self = [super init]) != nil)
+	{
+		firstFiredTime = 0;
+		uid = RETAIN([self makeUid]);
+		productId = RETAIN(productIdVal);
+		postData = RETAIN([NSMutableString stringWithCapacity:64]);
+		isOneTimeOnly = NO;
+		isTransaction = YES;
+		customFields = RETAIN([NSMutableDictionary dictionaryWithCapacity:16]);
+		
+		[self addValue:transactionId forKey:@"purchase-transaction-id" withPrefix:@"" limitValueLength:YES];
+		[self addValue:productId forKey:@"purchase-product-id" withPrefix:@"" limitValueLength:YES];
+		[self addValue:[NSNumber numberWithInt:quantity] forKey:@"purchase-quantity" withPrefix:@"" limitValueLength:YES];
+		[self addValue:[NSNumber numberWithInt:priceInCents] forKey:@"purchase-price" withPrefix:@"" limitValueLength:YES];
+		[self addValue:currencyCode forKey:@"purchase-currency" withPrefix:@"" limitValueLength:YES];
+	}
+	return self;
 }
 
-- (void)addUnsignedIntegerValue:(uint)value forKey:(NSString *)key
+- (id)initWithTransactionId:(NSString *)transactionId
+	productId:(NSString *)productIdVal
+	quantity:(int)quantity
+	priceInCents:(int)priceInCents
+	currency:(NSString *)currencyCode
+	base64Receipt:(NSString *)base64Receipt
 {
-	[self addValue:[NSString stringWithFormat:@"%u", value] forKey:key];
+	if((self = [super init]) != nil)
+	{
+		firstFiredTime = 0;
+		uid = RETAIN([self makeUid]);
+		productId = RETAIN(productIdVal);
+		postData = RETAIN([NSMutableString stringWithCapacity:64]);
+		isOneTimeOnly = NO;
+		isTransaction = YES;
+		customFields = RETAIN([NSMutableDictionary dictionaryWithCapacity:16]);
+
+		[self addValue:transactionId forKey:@"purchase-transaction-id" withPrefix:@"" limitValueLength:YES];
+		[self addValue:productId forKey:@"purchase-product-id" withPrefix:@"" limitValueLength:YES];
+		[self addValue:[NSNumber numberWithInt:quantity] forKey:@"purchase-quantity" withPrefix:@"" limitValueLength:YES];
+		[self addValue:[NSNumber numberWithInt:priceInCents] forKey:@"purchase-price" withPrefix:@"" limitValueLength:YES];
+		[self addValue:currencyCode forKey:@"purchase-currency" withPrefix:@"" limitValueLength:YES];
+		[self addValue:base64Receipt forKey:@"receipt-body" withPrefix:@"" limitValueLength:NO];
+	}
+	return self;
 }
 
-- (void)addDoubleValue:(double)value forKey:(NSString *)key
+- (NSString *)makeUid
 {
-	[self addValue:[NSString stringWithFormat:@"%g", value] forKey:key];
+	NSTimeInterval t = [[NSDate date] timeIntervalSince1970];
+	return [NSString stringWithFormat:@"%.0f:%f", t*1000, arc4random() / (float)0x10000000];
 }
 
-- (void)addBooleanValue:(BOOL)value forKey:(NSString *)key
+- (void)setName:(NSString *)eventName
 {
-	[self addValue:(value ? @"true" : @"false") forKey:key];
+	RELEASE(name);
+	name = RETAIN([[[eventName lowercaseString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] stringByReplacingOccurrencesOfString:@"." withString:@"_"]);
+
+	RELEASE(encodedName);
+	encodedName = RETAIN([TSUtils encodeString:name]);
 }
 
-- (NSString *)postData
+- (void)setTransactionNameWithAppName:(NSString *)appName platform:(NSString *)platformName
 {
-	NSString *data = postData != nil ? (NSString *)postData : @"";
-	return [[NSString stringWithFormat:@"&created=%u", (unsigned int)firstFiredTime] stringByAppendingString:data];
+	NSString *eventName = [NSString stringWithFormat:@"%@-%@-purchase-%@", platformName, [appName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]], productId];
+	[self setName:eventName];
 }
 
-- (void)firing
+- (void)addValue:(NSObject *)obj forKey:(NSString *)key
+{
+	if(key != nil && obj != nil) {
+		[self.customFields setObject:obj forKey:key];
+	}
+}
+
+- (void)prepare:(NSDictionary *)globalEventParams
 {
 	// Only record the time of the first fire attempt
 	if(firstFiredTime == 0)
 	{
 		firstFiredTime = [[NSDate date] timeIntervalSince1970];
+
+		for(NSString *key in globalEventParams)
+		{
+			if([self.customFields objectForKey:key] == nil)
+			{
+				[self addValue:[globalEventParams valueForKey:key] forKey:key];
+			}
+		}
+
+		[postData appendString:[NSString stringWithFormat:@"&created-ms=%.0f", firstFiredTime*1000]];
+		
+		for(NSString *key in self.customFields)
+		{
+			[self addValue:[self.customFields objectForKey:key] forKey:key withPrefix:@"custom-" limitValueLength:YES];
+		}
 	}
 }
 
-- (NSString *)makeUid
+- (void)addValue:(id)value forKey:(NSString *)key withPrefix:(NSString *)prefix limitValueLength:(BOOL)limitValueLength
 {
-	struct timeval time;
-	gettimeofday(&time, NULL);
-	long millis = (time.tv_sec * 1000) + (time.tv_usec / 1000);
-
-	return [NSString stringWithFormat:@"%ld:%f", millis, arc4random() / (float)0x10000000];
+	NSString *encodedPair = [TSUtils encodeEventPairWithPrefix:prefix key:key value:value limitValueLength:limitValueLength];
+	if(encodedPair != nil)
+	{
+		[postData appendString:@"&"];
+		[postData appendString:encodedPair];
+	}
 }
 
 - (void)dealloc
@@ -122,8 +200,37 @@
 	RELEASE(uid);
 	RELEASE(name);
 	RELEASE(encodedName);
+	RELEASE(productId);
+	RELEASE(customFields);
 	RELEASE(postData);
 	SUPER_DEALLOC;
 }
+
+
+- (void)addIntegerValue:(int)value forKey:(NSString *)key
+{
+	[self addValue:[NSNumber numberWithInt:value] forKey:key];
+}
+
+- (void)addUnsignedIntegerValue:(uint)value forKey:(NSString *)key
+{
+	[self addValue:[NSNumber numberWithUnsignedInt:value] forKey:key];
+}
+
+- (void)addDoubleValue:(double)value forKey:(NSString *)key
+{
+	[self addValue:[NSNumber numberWithDouble:value] forKey:key];
+}
+
+- (void)addFloatValue:(float)value forKey:(NSString *)key
+{
+	[self addValue:[NSNumber numberWithFloat:value] forKey:key];
+}
+
+- (void)addBooleanValue:(BOOL)value forKey:(NSString *)key
+{
+	[self addValue:[NSNumber numberWithBool:value] forKey:key];
+}
+
 
 @end

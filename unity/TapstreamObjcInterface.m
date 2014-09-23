@@ -92,6 +92,17 @@ void Tapstream_FireEvent(void *event)
 	[[TSTapstream instance] fireEvent:e];
 }
 
-
-
-
+void Tapstream_GetConversionData(const char *callbackClass, const char *callbackMethod)
+{
+	NSString *gameObjectName = [NSString stringWithUTF8String:callbackClass];
+	NSString *methodName = [NSString stringWithUTF8String:callbackMethod];
+	[[TSTapstream instance] getConversionData:^(NSData *jsonInfo) {
+		if(jsonInfo != nil){
+			UnitySendMessage(
+				[gameObjectName UTF8String],
+				[methodName UTF8String],
+				[jsonInfo bytes]
+			);
+		}
+	}];
+}

@@ -417,14 +417,18 @@ def make_unity():
 	path('builds/unity').makedirs()
 	path('builds/unity/Plugins/iOS').makedirs()
 	path('builds/unity/Plugins/Android').makedirs()
-	sh('cp builds/android/Tapstream.jar builds/unity/Plugins/Android')
+	with pushd('unity/java/'):
+		sh('ant release')
+	sh('cp unity/java/build/jar/Tapstream.jar builds/unity/Plugins/Android')
 	sh('cp objc/Core/*.m builds/unity/Plugins/iOS')
 	sh('cp objc/Core/*.h builds/unity/Plugins/iOS')
 	sh('cp objc/Tapstream/*.m builds/unity/Plugins/iOS')
 	sh('cp objc/Tapstream/*.h builds/unity/Plugins/iOS')
 	sh('cp unity/TapstreamObjcInterface.m builds/unity/Plugins/iOS')
 	sh('cp unity/Tapstream.cs builds/unity')
-	
+	# Update Example project
+	sh('cp -r builds/unity/* examples/Unity/Assets/')
+
 @needs('make_unity')
 @task
 def package_unity():

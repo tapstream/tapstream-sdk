@@ -21,7 +21,14 @@
 
 @synthesize fireAutomaticInstallEvent = fireAutomaticInstallEvent;
 @synthesize fireAutomaticOpenEvent = fireAutomaticOpenEvent;
+@synthesize fireAutomaticIAPEvents = fireAutomaticIAPEvents;
 
+@synthesize collectTasteData = collectTasteData;
+
+@synthesize globalEventParams = globalEventParams;
+
+@synthesize hardcodedBundleId = hardcodedBundleId;
+@synthesize hardcodedBundleShortVersionString = hardcodedBundleShortVersionString;
 
 + (id)configWithDefaults
 {
@@ -35,6 +42,9 @@
 		collectWifiMac = YES;
 		fireAutomaticInstallEvent = YES;
 		fireAutomaticOpenEvent = YES;
+		fireAutomaticIAPEvents = YES;
+        collectTasteData = YES;
+		self.globalEventParams = [NSMutableDictionary dictionaryWithCapacity:16];
 	}
 	return self;
 }
@@ -53,7 +63,10 @@
 #endif
 	RELEASE(installEventName);
 	RELEASE(openEventName);
+    RELEASE(globalEventParams);
 
+    RELEASE(hardcodedBundleId);
+    RELEASE(hardcodedBundleShortVersionString);
 	SUPER_DEALLOC;
 }
 
