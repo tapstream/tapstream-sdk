@@ -100,6 +100,32 @@
 		self.appName = @"";
 	}
 
+
+
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+		// Collect the IDFA, if the Advertising Framework is available
+		if(!config.idfa){
+			Class asIdentifierManagerClass = NSClassFromString(@"ASIdentifierManager");
+			if(asIdentifierManagerClass){
+				SEL getterSel = NSSelectorFromString(@"sharedManager");
+				IMP getterImp = [asIdentifierManagerClass methodForSelector:getterSel];
+
+				if(getterImp){
+					id asIdentifierManager = ((id (*)(id, SEL))getterImp)(asIdentifierManagerClass, getterSel);
+
+					if(asIdentifierManager){
+						SEL idfaSel = NSSelectorFromString(@"advertisingIdentifier");
+						IMP idfaImp = [asIdentifierManager methodForSelector:idfaSel];
+						
+						NSUUID *idfa = (NSUUID*) ((id (*)(id, SEL))idfaImp)(asIdentifierManager, idfaSel);
+						config.idfa = [idfa UUIDString];
+					}
+				}
+			}
+		}
+#endif
+    
+
 	if(config.fireAutomaticInstallEvent)
 	{
 		if(config.installEventName != nil)
