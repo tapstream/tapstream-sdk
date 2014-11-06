@@ -104,7 +104,7 @@
 
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 		// Collect the IDFA, if the Advertising Framework is available
-		if(!config.idfa){
+		if(!config.idfa && config.autoCollectIdfa){
 			Class asIdentifierManagerClass = NSClassFromString(@"ASIdentifierManager");
 			if(asIdentifierManagerClass){
 				SEL getterSel = NSSelectorFromString(@"sharedManager");
