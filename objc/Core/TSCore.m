@@ -121,10 +121,11 @@
 						config.idfa = [idfa UUIDString];
 					}
 				}
+			}else{
+				[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream could not retrieve an IDFA. Is the AdSupport Framework enabled?"];
 			}
 		}
 #endif
-    
 
 	if(config.fireAutomaticInstallEvent)
 	{
