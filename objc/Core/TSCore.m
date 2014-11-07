@@ -117,9 +117,15 @@
 						SEL idfaSel = NSSelectorFromString(@"advertisingIdentifier");
 						IMP idfaImp = [asIdentifierManager methodForSelector:idfaSel];
 						
-						NSUUID *idfa = (NSUUID*) ((id (*)(id, SEL))idfaImp)(asIdentifierManager, idfaSel);
-						config.idfa = [idfa UUIDString];
+						id idfa = ((id (*)(id, SEL))idfaImp)(asIdentifierManager, idfaSel);
+						if(idfa){
+							config.idfa = [((NSUUID*) idfa) UUIDString];
+						}
 					}
+				}
+
+				if(!config.idfa){
+					[TSLogging logAtLevel:kTSLoggingWarn format:@"An problem occurred retrieving the IDFA."];
 				}
 			}else{
 				[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream could not retrieve an IDFA. Is the AdSupport Framework enabled?"];
