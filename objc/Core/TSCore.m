@@ -54,6 +54,9 @@
 {
 	if((self = [super init]) != nil)
 	{
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+		[self attachIdfaIfNotPresent:configVal];
+#endif
 		self.del = delegateVal;
 		self.platform = platformVal;
 		self.listener = listenerVal;
@@ -92,6 +95,40 @@
 	SUPER_DEALLOC;
 }
 
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+- (void)attachIdfaIfNotPresent:(TSConfig *)configVal
+{
+	// Collect the IDFA, if the Advertising Framework is available
+	if(!configVal.idfa && configVal.autoCollectIdfa){
+		Class asIdentifierManagerClass = NSClassFromString(@"ASIdentifierManager");
+		if(asIdentifierManagerClass){
+			SEL getterSel = NSSelectorFromString(@"sharedManager");
+			IMP getterImp = [asIdentifierManagerClass methodForSelector:getterSel];
+
+			if(getterImp){
+				id asIdentifierManager = ((id (*)(id, SEL))getterImp)(asIdentifierManagerClass, getterSel);
+
+				if(asIdentifierManager){
+					SEL idfaSel = NSSelectorFromString(@"advertisingIdentifier");
+					IMP idfaImp = [asIdentifierManager methodForSelector:idfaSel];
+					
+					id idfa = ((id (*)(id, SEL))idfaImp)(asIdentifierManager, idfaSel);
+					if(idfa){
+						configVal.idfa = [((NSUUID*) idfa) UUIDString];
+					}
+				}
+			}
+
+			if(!configVal.idfa){
+				[TSLogging logAtLevel:kTSLoggingWarn format:@"An problem occurred retrieving the IDFA."];
+			}
+		}else{
+			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream could not retrieve an IDFA. Is the AdSupport Framework enabled?"];
+		}
+	}
+}
+#endif
+
 - (void)start
 {
 	self.appName = [platform getAppName];
@@ -101,37 +138,6 @@
 	}
 
 
-
-#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-		// Collect the IDFA, if the Advertising Framework is available
-		if(!config.idfa && config.autoCollectIdfa){
-			Class asIdentifierManagerClass = NSClassFromString(@"ASIdentifierManager");
-			if(asIdentifierManagerClass){
-				SEL getterSel = NSSelectorFromString(@"sharedManager");
-				IMP getterImp = [asIdentifierManagerClass methodForSelector:getterSel];
-
-				if(getterImp){
-					id asIdentifierManager = ((id (*)(id, SEL))getterImp)(asIdentifierManagerClass, getterSel);
-
-					if(asIdentifierManager){
-						SEL idfaSel = NSSelectorFromString(@"advertisingIdentifier");
-						IMP idfaImp = [asIdentifierManager methodForSelector:idfaSel];
-						
-						id idfa = ((id (*)(id, SEL))idfaImp)(asIdentifierManager, idfaSel);
-						if(idfa){
-							config.idfa = [((NSUUID*) idfa) UUIDString];
-						}
-					}
-				}
-
-				if(!config.idfa){
-					[TSLogging logAtLevel:kTSLoggingWarn format:@"An problem occurred retrieving the IDFA."];
-				}
-			}else{
-				[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream could not retrieve an IDFA. Is the AdSupport Framework enabled?"];
-			}
-		}
-#endif
 
 	if(config.fireAutomaticInstallEvent)
 	{
