@@ -32,6 +32,7 @@
 		12A98535185A67A500D388CD /* TSPlatformImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A98529185A67A500D388CD /* TSPlatformImpl.m */; };
 		12A98536185A67A500D388CD /* TSTapstream.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A9852B185A67A500D388CD /* TSTapstream.m */; };
 		12FFCF0A183FE5B300D54F4E /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12FFCF09183FE5B300D54F4E /* StoreKit.framework */; };
+		B5916E6A1A12CA3F00EFC9A6 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5916E691A12CA3F00EFC9A6 /* AdSupport.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -84,6 +85,7 @@
 		12A9852A185A67A500D388CD /* TSTapstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSTapstream.h; sourceTree = "<group>"; };
 		12A9852B185A67A500D388CD /* TSTapstream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSTapstream.m; sourceTree = "<group>"; };
 		12FFCF09183FE5B300D54F4E /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		B5916E691A12CA3F00EFC9A6 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +93,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5916E6A1A12CA3F00EFC9A6 /* AdSupport.framework in Frameworks */,
 				12FFCF0A183FE5B300D54F4E /* StoreKit.framework in Frameworks */,
 				12042FEA167D456200F509B7 /* UIKit.framework in Frameworks */,
 				12042FEC167D456200F509B7 /* Foundation.framework in Frameworks */,
@@ -123,6 +126,7 @@
 		12042FE8167D456200F509B7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B5916E691A12CA3F00EFC9A6 /* AdSupport.framework */,
 				12FFCF09183FE5B300D54F4E /* StoreKit.framework */,
 				12042FE9167D456200F509B7 /* UIKit.framework */,
 				12042FEB167D456200F509B7 /* Foundation.framework */,

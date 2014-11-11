@@ -3,7 +3,7 @@
 #import "TSLogging.h"
 #import "TSUtils.h"
 
-#define kTSVersion @"2.8.3"
+#define kTSVersion @"2.8.4"
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
 #define kTSHitUrlTemplate @"http://api.tapstream.com/%@/hit/%@.gif"
 #define kTSConversionUrlTemplate @"https://reporting.tapstream.com/v1/timelines/lookup?secret=%@&event_session=%@"
@@ -54,6 +54,9 @@
 {
 	if((self = [super init]) != nil)
 	{
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+		[self attachIdfaIfNotPresent:configVal];
+#endif
 		self.del = delegateVal;
 		self.platform = platformVal;
 		self.listener = listenerVal;
@@ -92,6 +95,40 @@
 	SUPER_DEALLOC;
 }
 
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+- (void)attachIdfaIfNotPresent:(TSConfig *)configVal
+{
+	// Collect the IDFA, if the Advertising Framework is available
+	if(!configVal.idfa && configVal.autoCollectIdfa){
+		Class asIdentifierManagerClass = NSClassFromString(@"ASIdentifierManager");
+		if(asIdentifierManagerClass){
+			SEL getterSel = NSSelectorFromString(@"sharedManager");
+			IMP getterImp = [asIdentifierManagerClass methodForSelector:getterSel];
+
+			if(getterImp){
+				id asIdentifierManager = ((id (*)(id, SEL))getterImp)(asIdentifierManagerClass, getterSel);
+
+				if(asIdentifierManager){
+					SEL idfaSel = NSSelectorFromString(@"advertisingIdentifier");
+					IMP idfaImp = [asIdentifierManager methodForSelector:idfaSel];
+
+					id idfa = ((id (*)(id, SEL))idfaImp)(asIdentifierManager, idfaSel);
+					if(idfa){
+						configVal.idfa = [((NSUUID*) idfa) UUIDString];
+					}
+				}
+			}
+
+			if(!configVal.idfa){
+				[TSLogging logAtLevel:kTSLoggingWarn format:@"An problem occurred retrieving the IDFA."];
+			}
+		}else{
+			[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream could not retrieve an IDFA. Is the AdSupport Framework enabled?"];
+		}
+	}
+}
+#endif
+
 - (void)start
 {
 	self.appName = [platform getAppName];
@@ -99,6 +136,8 @@
 	{
 		self.appName = @"";
 	}
+
+
 
 	if(config.fireAutomaticInstallEvent)
 	{

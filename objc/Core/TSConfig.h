@@ -11,6 +11,7 @@
 	NSString *odin1;
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR	
 	NSString *udid;
+	BOOL autoCollectIdfa;
 	NSString *idfa;
 	NSString *secureUdid;
 	NSString *openUdid;
@@ -53,6 +54,7 @@
 @property(nonatomic, STRONG_OR_RETAIN) NSString *odin1;
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR	
 @property(nonatomic, STRONG_OR_RETAIN) NSString *udid;
+@property(nonatomic, assign) BOOL autoCollectIdfa;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *idfa;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *secureUdid;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *openUdid;
