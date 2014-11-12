@@ -22,9 +22,6 @@ public class Config {
 	// Unset these if you want to disable the sending of the automatic events
 	private boolean fireAutomaticInstallEvent = true;
 	private boolean fireAutomaticOpenEvent = true;
-	
-	// Unset this if you want to disable the collection of taste data
-	private boolean collectTasteData = true;
 
 	// Unset this if you want to disable automatic collection of Android Advertising Id
 	private boolean collectAdvertisingId = true;
@@ -83,8 +80,10 @@ public class Config {
 	public boolean getFireAutomaticOpenEvent() { return fireAutomaticOpenEvent; }
 	public void setFireAutomaticOpenEvent(boolean fire) { fireAutomaticOpenEvent = fire; }
 	
-	public boolean getCollectTasteData() { return collectTasteData; }
-	public void setCollectTasteData(boolean collect) { collectTasteData = collect; }
+	@Deprecated
+	public boolean getCollectTasteData() { return false; }
+	@Deprecated
+	public void setCollectTasteData(boolean collect) { }
 
 	public boolean getCollectAdvertisingId() { return collectAdvertisingId; }
 	public void setCollectAdvertisingId(boolean collect) { collectAdvertisingId = collect; }
