@@ -1,7 +1,6 @@
 language: objective-c
 before_install:
   - cd /usr/local && brew update && git checkout bb7fcab /usr/local/Library/Formula/v8.rb && brew install v8 && cd $TRAVIS_BUILD_DIR
-  - brew install python
   - pip install paver
   - paver package_objc
 script:
