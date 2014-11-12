@@ -8,6 +8,7 @@
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 @synthesize openUdid = openUdid;
 @synthesize udid = udid;
+@synthesize autoCollectIdfa = autoCollectIdfa;
 @synthesize idfa = idfa;
 @synthesize secureUdid = secureUdid;
 #else
@@ -39,6 +40,9 @@
 {
 	if((self = [super init]) != nil)
 	{
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+		autoCollectIdfa = YES;
+#endif
 		collectWifiMac = YES;
 		fireAutomaticInstallEvent = YES;
 		fireAutomaticOpenEvent = YES;
