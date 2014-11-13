@@ -3,7 +3,7 @@
 #import "TSLogging.h"
 #import "TSUtils.h"
 
-#define kTSVersion @"2.8.3"
+#define kTSVersion @"2.8.4"
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
 #define kTSHitUrlTemplate @"http://api.tapstream.com/%@/hit/%@.gif"
 #define kTSConversionUrlTemplate @"https://reporting.tapstream.com/v1/timelines/lookup?secret=%@&event_session=%@"
@@ -111,7 +111,7 @@
 				if(asIdentifierManager){
 					SEL idfaSel = NSSelectorFromString(@"advertisingIdentifier");
 					IMP idfaImp = [asIdentifierManager methodForSelector:idfaSel];
-					
+
 					id idfa = ((id (*)(id, SEL))idfaImp)(asIdentifierManager, idfaSel);
 					if(idfa){
 						configVal.idfa = [((NSUUID*) idfa) UUIDString];

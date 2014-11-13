@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class Core {
-	public static final String VERSION = "2.8.0";
+	public static final String VERSION = "2.8.1";
 	private static final String EVENT_URL_TEMPLATE = "https://api.tapstream.com/%s/event/%s/";
 	private static final String HIT_URL_TEMPLATE = "http://api.tapstream.com/%s/hit/%s.gif";
 	private static final String CONVERSION_URL_TEMPLATE = "https://reporting.tapstream.com/v1/timelines/lookup?secret=%s&event_session=%s";
@@ -57,7 +57,7 @@ class Core {
 		firedEvents = platform.loadFiredEvents();
 
 		executor = new ScheduledThreadPoolExecutor(MAX_THREADS, platform.makeWorkerThreadFactory());
-		executor.prestartAllCoreThreads();		
+		executor.prestartAllCoreThreads();
 	}
 
 	public void start() {
@@ -67,13 +67,13 @@ class Core {
 			appName = "";
 		}
 		final String appNameFinal = appName;
-		
+
 		if(config.getFireAutomaticInstallEvent()) {
 			String installEventName = config.getInstallEventName();
 			if(installEventName != null) {
 				fireEvent(new Event(installEventName, true));
 			} else {
-				fireEvent(new Event(String.format(Locale.US, "android-%s-install", appName), true));	
+				fireEvent(new Event(String.format(Locale.US, "android-%s-install", appName), true));
 			}
 		}
 
@@ -82,10 +82,10 @@ class Core {
 			if(openEventName != null) {
 				fireEvent(new Event(openEventName, false));
 			} else {
-				fireEvent(new Event(String.format(Locale.US, "android-%s-open", appName), false));	
+				fireEvent(new Event(String.format(Locale.US, "android-%s-open", appName), false));
 			}
 		}
-		
+
 		activityEventSource.setListener(new ActivityEventSource.ActivityListener() {
 			@Override
 			public void onOpen() {
@@ -94,18 +94,18 @@ class Core {
 					if(openEventName != null) {
 						fireEvent(new Event(openEventName, false));
 					} else {
-						fireEvent(new Event(String.format(Locale.US, "android-%s-open", appNameFinal), false));	
+						fireEvent(new Event(String.format(Locale.US, "android-%s-open", appNameFinal), false));
 					}
 				}
 			}
 		});
-		
+
 		// If google play services is available, we'll have an AndroidAdvertisingId instance.
 		// If we do, then schedule it immediately so it can fetch the ID.
 		if(adIdFetcher != null && config.getCollectAdvertisingId()) {
 			executor.schedule(adIdFetcher, 0, TimeUnit.SECONDS);
 		}
-		
+
 		// Flush retained events (and disable retention) after a short delay
 		final Core self = this;
 		executor.schedule(new Runnable() {
@@ -113,13 +113,13 @@ class Core {
 			public void run() {
 				synchronized(self) {
 					retainEvents = false;
-					
+
 					// Add referrer info to our common post data
 					String referrer = platform.getReferrer();
 					if(referrer != null && referrer.length() > 0) {
 						appendPostPair("", "android-referrer", referrer);
 					}
-					
+
 					// Add android advertising id to our common post data
 					if(self.config.getCollectAdvertisingId()) {
 						String aaid = platform.getAdvertisingId();
@@ -138,7 +138,7 @@ class Core {
 					fireEvent(e);
 				}
 				retainedEvents = null;
-			}			
+			}
 		}, EVENT_RETENTION_TIME, TimeUnit.SECONDS);
 	}
 
@@ -148,7 +148,7 @@ class Core {
 			retainedEvents.add(e);
 			return;
 		}
-		
+
 		// Transaction events need their names prefixed with platform and app name
 		if(e.isTransaction()) {
 			e.setNamePrefix(appName);
@@ -157,7 +157,7 @@ class Core {
 		// Add global event params if they have not yet been added
 		// Notify the event that we are going to fire it so it can record the time and bake its post data
 		e.prepare(config.globalEventParams);
-		
+
 		if (e.isOneTimeOnly()) {
 			if (firedEvents.contains(e.getName())) {
 				Logging.log(Logging.INFO, "Tapstream ignoring event named \"%s\" because it is a one-time-only event that has already been fired", e.getName());
@@ -288,18 +288,18 @@ class Core {
 		};
 		executor.schedule(task, 0, TimeUnit.SECONDS);
 	}
-	
+
 	public void getConversionData(final ConversionListener completion)
 	{
 		if(completion != null) {
 			final String url = String.format(Locale.US, CONVERSION_URL_TEMPLATE, secret, platform.loadUuid());
 			Runnable task = new Runnable() {
 				private int tries = 0;
-				
+
 				@Override
 				public void run() {
 					tries++;
-					
+
 					Response res = platform.request(url, null, "GET");
 					if(res.status >= 200 && res.status < 300) {
 						Matcher m = Pattern.compile("^\\s*\\[\\s*\\]\\s*$").matcher(res.data);
@@ -309,19 +309,19 @@ class Core {
 							return;
 						}
 					}
-					
+
 					if(tries >= CONVERSION_POLL_COUNT) {
 						completion.conversionData(null);
 						return;
 					}
-					
+
 					executor.schedule(this, CONVERSION_POLL_INTERVAL, TimeUnit.SECONDS);
 				}
 			};
 			executor.schedule(task, CONVERSION_POLL_INTERVAL, TimeUnit.SECONDS);
 		}
 	}
-	
+
 	public String getPostData() {
 		return postData.toString();
 	}
@@ -367,7 +367,7 @@ class Core {
 	private void makePostArgs() {
 		appendPostPair("", "secret", secret);
 		appendPostPair("", "sdkversion", VERSION);
-		
+
 		appendPostPair("", "hardware", config.getHardware());
 		appendPostPair("", "hardware-odin1", config.getOdin1());
 		appendPostPair("", "hardware-open-udid", config.getOpenUdid());
