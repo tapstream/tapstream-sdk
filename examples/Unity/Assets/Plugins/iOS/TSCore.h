@@ -32,6 +32,9 @@
 }
 
 - (id)initWithDelegate:(id<TSDelegate>)delegate platform:(id<TSPlatform>)platform listener:(id<TSCoreListener>)listener appEventSource:(id<TSAppEventSource>)appEventSource accountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)config;
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+- (void)attachIdfaIfNotPresent:(TSConfig *)configVal;
+#endif
 - (void)start;
 - (void)fireEvent:(TSEvent *)event;
 - (void)fireHit:(TSHit *)hit completion:(void(^)(TSResponse *))completion;
