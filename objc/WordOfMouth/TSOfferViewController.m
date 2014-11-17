@@ -10,14 +10,14 @@
 
 @implementation TSOfferViewController
 
-@synthesize parentViewController, offer, delegate;
+@synthesize offer, delegate;
 
-+ (id)controllerWithOffer:(TSOffer *)offer parentViewController:(UIViewController *)parentViewController delegate:(id<TSWordOfMouthDelegate>)delegate
++ (id)controllerWithOffer:(TSOffer *)offer delegate:(id<TSWordOfMouthDelegate>)delegate
 {
-    return AUTORELEASE([[TSOfferViewController alloc] initWithNibName:@"TSOfferView" bundle:nil offer:offer parentViewController:parentViewController delegate:delegate]);
+    return AUTORELEASE([[TSOfferViewController alloc] initWithNibName:@"TSOfferView" bundle:nil offer:offer delegate:delegate]);
 }
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil offer:(TSOffer *)offerVal parentViewController:(UIViewController *)parentViewControllerVal delegate:(id<TSWordOfMouthDelegate>)delegateVal
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil offer:(TSOffer *)offerVal delegate:(id<TSWordOfMouthDelegate>)delegateVal
 {
     if(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
         self.offer = offerVal;
@@ -25,8 +25,6 @@
         self.delegate = delegateVal;
         ((UIWebView *)self.view).delegate = self;
         [((UIWebView *)self.view) loadHTMLString:self.offer.markup baseURL:[NSURL URLWithString:@""]];
-
-        [parentViewControllerVal addChildViewController:self];
     }
     return self;
 }
@@ -36,7 +34,6 @@
     SUPER_DEALLOC;
     
     RELEASE(self->offer);
-    RELEASE(self->parentViewController);
 }
 
 - (void)viewDidLoad

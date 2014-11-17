@@ -186,12 +186,16 @@
 - (void)showOffer:(TSOffer *)offer parentViewController:(UIViewController *)parentViewController;
 {
     if(offer && parentViewController) {
-        self.offerViewController = [TSOfferViewController controllerWithOffer:offer parentViewController:parentViewController delegate:self];
+        self.offerViewController = [TSOfferViewController controllerWithOffer:offer delegate:self];
         self.offerViewController.view.frame = parentViewController.view.bounds;
+        [parentViewController addChildViewController:self.offerViewController];
         [UIView transitionWithView:parentViewController.view
                           duration:0.3
                            options:UIViewAnimationOptionTransitionCrossDissolve
-                        animations:^{ [parentViewController.view addSubview:self.offerViewController.view]; }
+                        animations:^{
+                            [parentViewController.view addSubview:self.offerViewController.view];
+                            [self.offerViewController didMoveToParentViewController:parentViewController];
+                        }
                         completion:NULL];
 
         [self.delegate showedOffer:offer.ident];
@@ -291,14 +295,22 @@
         TSOffer *offer = self.offerViewController.offer;
         UIViewController *parent = self.offerViewController.parentViewController;
         
-        self.shareViewController = [TSShareViewController controllerWithOffer:offer parentViewController:parent delegate:self];
+        self.shareViewController = [TSShareViewController controllerWithOffer:offer delegate:self];
         self.shareViewController.view.frame = parent.view.bounds;
+        [parent addChildViewController:self.shareViewController];
         [UIView transitionWithView:parent.view
                           duration:0.3
                            options:UIViewAnimationOptionTransitionCrossDissolve
-                        animations:^{ [parent.view addSubview:self.shareViewController.view]; }
+                        animations:^{
+                            [parent.view addSubview:self.shareViewController.view];
+                            [self.shareViewController didMoveToParentViewController:parent];
+                        }
                         completion:NULL];
     }
+    [self.offerViewController willMoveToParentViewController:nil];
+    [self.offerViewController.view removeFromSuperview];
+    [self.offerViewController removeFromParentViewController];
+    
     self.offerViewController = nil;
     [self.delegate dismissedOffer:accepted];
 }
@@ -310,6 +322,9 @@
 
 - (void)dismissedSharing
 {
+    [self.shareViewController willMoveToParentViewController:nil];
+    [self.shareViewController.view removeFromSuperview];
+    [self.shareViewController removeFromParentViewController];
     self.shareViewController = nil;
     [self.delegate dismissedSharing];
 }
