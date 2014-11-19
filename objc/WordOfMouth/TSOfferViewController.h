@@ -14,9 +14,8 @@
 @interface TSOfferViewController : UIViewController<UIWebViewDelegate>
 
 @property(STRONG_OR_RETAIN, nonatomic) TSOffer *offer;
-@property(STRONG_OR_RETAIN, nonatomic) UIViewController *parentViewController;
 @property(assign, nonatomic) id<TSWordOfMouthDelegate> delegate;
 
-+ (id)controllerWithOffer:(TSOffer *)offer parentViewController:(UIViewController *)parentViewController delegate:(id<TSWordOfMouthDelegate>)delegate;
++ (id)controllerWithOffer:(TSOffer *)offer delegate:(id<TSWordOfMouthDelegate>)delegate;
 
 @end

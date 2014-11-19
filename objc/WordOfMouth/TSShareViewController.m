@@ -16,7 +16,6 @@
 }
 
 @property(STRONG_OR_RETAIN, nonatomic) TSOffer *offer;
-@property(STRONG_OR_RETAIN, nonatomic) UIViewController *parentViewController;
 @property(assign, nonatomic) id<TSWordOfMouthDelegate> delegate;
 @property(STRONG_OR_RETAIN, nonatomic) SLComposeViewController *twitterComposeViewController;
 @property(STRONG_OR_RETAIN, nonatomic) SLComposeViewController *facebookComposeViewController;
@@ -28,18 +27,18 @@
 
 @implementation TSShareViewController
 
-@synthesize offer, parentViewController, twitterComposeViewController, facebookComposeViewController, emailComposeViewController, messageComposeViewController, bg, doneButton,
+@synthesize offer, twitterComposeViewController, facebookComposeViewController, emailComposeViewController, messageComposeViewController, bg, doneButton,
     twitterButton, twitterButtonCheck,
     facebookButton, facebookButtonCheck,
     emailButton, emailButtonCheck,
     messagingButton, messagingButtonCheck;
 
-+ (id)controllerWithOffer:(TSOffer *)offer parentViewController:(UIViewController *)parentViewController delegate:(id<TSWordOfMouthDelegate>)delegate
++ (id)controllerWithOffer:(TSOffer *)offer delegate:(id<TSWordOfMouthDelegate>)delegate
 {
-    return AUTORELEASE([[TSShareViewController alloc] initWithNibName:@"TSShareView" bundle:nil offer:offer parentViewController:parentViewController delegate:delegate]);
+    return AUTORELEASE([[TSShareViewController alloc] initWithNibName:@"TSShareView" bundle:nil offer:offer delegate:delegate]);
 }
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil offer:(TSOffer *)offerVal parentViewController:(UIViewController *)parentViewControllerVal delegate:(id<TSWordOfMouthDelegate>)delegateVal
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil offer:(TSOffer *)offerVal delegate:(id<TSWordOfMouthDelegate>)delegateVal
 {
     if(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
         self.offer = offerVal;
@@ -51,7 +50,6 @@
         hasMessaging = [MFMessageComposeViewController canSendText];
 
         id view = self.view; // Force instantiation of view.
-        [parentViewControllerVal addChildViewController:self];
     }
     return self;
 }
