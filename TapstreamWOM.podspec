@@ -17,4 +17,6 @@ Pod::Spec.new do |s|
   s.source_files = "objc/WordofMouth"
   s.dependency "Tapstream"
 
+  s.requires_arc = false
+
 end
