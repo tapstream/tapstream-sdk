@@ -28,7 +28,7 @@
 @property(STRONG_OR_RETAIN) IBOutlet UIButton *messagingButton;
 @property(STRONG_OR_RETAIN) IBOutlet UIView *messagingButtonCheck;
 
-+ (id)controllerWithOffer:(TSOffer *)offer parentViewController:(UIViewController *)parentViewController delegate:(id<TSWordOfMouthDelegate>)delegate;
++ (id)controllerWithOffer:(TSOffer *)offer delegate:(id<TSWordOfMouthDelegate>)delegate;
 
 - (IBAction)onBtnClose:(id)sender;
 - (IBAction)onBtnDone:(id)sender;
