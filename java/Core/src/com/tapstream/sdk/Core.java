@@ -124,7 +124,7 @@ class Core {
 					if(self.config.getCollectAdvertisingId()) {
 						String aaid = platform.getAdvertisingId();
 						if(aaid != null && aaid.length() > 0) {
-							appendPostPair("", "android-advertising-id", aaid);
+							appendPostPair("", "hardware-android-advertising-id", aaid);
 						}else{
 							Logging.log(Logging.WARN, "Advertising id could be collected. Is Google Play Services installed?");
 						}
