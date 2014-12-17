@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class Core {
-	public static final String VERSION = "2.8.1";
+	public static final String VERSION = "2.8.2";
 	private static final String EVENT_URL_TEMPLATE = "https://api.tapstream.com/%s/event/%s/";
 	private static final String HIT_URL_TEMPLATE = "http://api.tapstream.com/%s/hit/%s.gif";
 	private static final String CONVERSION_URL_TEMPLATE = "https://reporting.tapstream.com/v1/timelines/lookup?secret=%s&event_session=%s";
@@ -124,9 +124,9 @@ class Core {
 					if(self.config.getCollectAdvertisingId()) {
 						String aaid = platform.getAdvertisingId();
 						if(aaid != null && aaid.length() > 0) {
-							appendPostPair("", "android-advertising-id", aaid);
+							appendPostPair("", "hardware-android-advertising-id", aaid);
 						}else{
-							Logging.log(Logging.WARN, "Advertising id could be collected. Is Google Play Services installed?");
+							Logging.log(Logging.WARN, "Advertising ID could not be collected. Is Google Play Services installed?");
 						}
 						Boolean limitAdTracking = platform.getLimitAdTracking();
 						if(limitAdTracking != null) {
