@@ -126,7 +126,7 @@ class Core {
 						if(aaid != null && aaid.length() > 0) {
 							appendPostPair("", "hardware-android-advertising-id", aaid);
 						}else{
-							Logging.log(Logging.WARN, "Advertising id could be collected. Is Google Play Services installed?");
+							Logging.log(Logging.WARN, "Advertising ID could not be collected. Is Google Play Services installed?");
 						}
 						Boolean limitAdTracking = platform.getLimitAdTracking();
 						if(limitAdTracking != null) {
