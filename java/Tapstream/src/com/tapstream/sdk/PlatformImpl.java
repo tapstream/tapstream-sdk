@@ -23,7 +23,6 @@ import org.apache.http.params.CoreProtocolPNames;
 
 import android.content.Context;
 import android.app.ActivityManager;
-import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -181,16 +180,6 @@ class PlatformImpl implements Platform {
 			return new Response(200, null, responseData);
 		}
 		return new Response(statusLine.getStatusCode(), statusLine.getReasonPhrase(), null);
-	}
-	
-	public Set<String> getProcessSet() {
-		ActivityManager actvityManager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
-		List<RunningAppProcessInfo> procInfos = actvityManager.getRunningAppProcesses();
-		Set<String> set = new HashSet<String>();
-		for(RunningAppProcessInfo info : procInfos) {
-			set.add(info.processName);
-		}
-		return set;
 	}
 	
 	public String getReferrer() {
