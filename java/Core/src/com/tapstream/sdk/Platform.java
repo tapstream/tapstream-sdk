@@ -30,8 +30,6 @@ interface Platform {
 
 	public Response request(String url, String data, String method);
 	
-	public Set<String> getProcessSet();
-
 	public String getReferrer();
 	
 	public String getAdvertisingId();

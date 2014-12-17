@@ -79,11 +79,6 @@ public class Config {
 
 	public boolean getFireAutomaticOpenEvent() { return fireAutomaticOpenEvent; }
 	public void setFireAutomaticOpenEvent(boolean fire) { fireAutomaticOpenEvent = fire; }
-	
-	@Deprecated
-	public boolean getCollectTasteData() { return false; }
-	@Deprecated
-	public void setCollectTasteData(boolean collect) { }
 
 	public boolean getCollectAdvertisingId() { return collectAdvertisingId; }
 	public void setCollectAdvertisingId(boolean collect) { collectAdvertisingId = collect; }

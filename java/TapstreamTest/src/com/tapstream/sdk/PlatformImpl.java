@@ -75,13 +75,6 @@ class PlatformImpl implements Platform {
 		return response;
 	}
 	
-	public Set<String> getProcessSet() {
-		Set<String> s = new HashSet<String>();
-		s.add("Test App");
-		s.add("Another App");
-		return s;
-	}
-
 	public String getReferrer() {
 		return "utm_campaign=blah&utm_source=google";
 	}
