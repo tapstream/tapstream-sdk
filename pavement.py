@@ -384,45 +384,19 @@ def build_objc_static_lib(dest_path, additional_sources=[], addition_include_dir
 @needs('make_java')
 @task
 def make_xamarin():
-	path('builds/xamarin').rmtree()
-	path('builds/xamarin').makedirs()
-	build_objc_static_lib('xamarin/Tapstream/TapstreamiOS/TapstreamiOS.a', ['xamarin/TapstreamObjcInterface.m'], ['objc/Core', 'objc/Tapstream'])
-	sh('cp builds/android/Tapstream.jar xamarin/Tapstream/TapstreamAndroid')
-
-        #sh('xbuild /t:Clean /p:Configuration=Release xamarin/Tapstream/TapstreamiOS/TapstreamiOS.csproj')
-	sh('xbuild /t:Clean /p:Configuration=Release xamarin/Tapstream/TapstreamAndroid/TapstreamAndroid.csproj')
-
-	sh('xbuild /t:Build /p:Configuration=Release xamarin/Tapstream/TapstreamAndroid/TapstreamAndroid.csproj')
-	sh('cp xamarin/Tapstream/TapstreamAndroid/bin/Release/TapstreamAndroid.dll builds/xamarin')
-
-	with pushd('xamarin/Tapstream/TapstreamiOS/'):
-		sh('/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/bin/btouch /v' +
-			' /baselib:/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/2.1/monotouch.dll' +
-			' /unsafe ApiDefinition.cs /s:StructsAndEnums.cs' +
-			' -r /Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/2.1/System.dll' +
-			' -r /Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/2.1/monotouch.dll' +
-			' -r /Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/2.1/System.Core.dll' +
-			' -r /Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/2.1/mscorlib.dll' +
-			' /tmpdir:obj/Release/ios/ /sourceonly:obj/Release/ios//sources.list')
-		sh('/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/bin/smcs /noconfig /debug:full' +
-			' /optimize+ /out:obj/Release/TapstreamiOS.dll /resource:TapstreamiOS.a Wrapper.cs TapstreamiOS.linkwith.cs' +
-			' StructsAndEnums.cs obj/Release/ios/ObjCRuntime/Messaging.g.cs /target:library /unsafe+ /nostdlib' +
-			' /reference:/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/2.1/System.dll' +
-			' /reference:/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/2.1/monotouch.dll' +
-			' /reference:/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/2.1/System.Core.dll' +
-			' /reference:/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/2.1/mscorlib.dll /warn:4')
-
-	sh('cp xamarin/Tapstream/TapstreamiOS/obj/Release/TapstreamiOS.dll builds/xamarin')
+	raise Exception("The Xamarin SDK must be built within Xamarin. So decrees the wizard of licensing!")
 
 
-@needs('make_xamarin')
 @task
 def package_xamarin():
+	sh('cp xamarin/Tapstream/TapstreamAndroid/bin/Release/TapstreamAndroid.dll builds/xamarin')
+	sh('cp xamarin/Tapstream/TapstreamiOS/bin/Release/TapstreamiOS.dll builds/xamarin')
 	path('builds/tapstream-%s-xamarin.zip' % VERSION).remove()
 	with pushd('builds'):
 		sh('cp -r xamarin tapstream-%s-xamarin' % VERSION)
 		_zip('tapstream-%s-xamarin.zip' % VERSION, 'tapstream-%s-xamarin' % VERSION)
 		sh('rm -rf tapstream-%s-xamarin' % VERSION)
+	sh('echo "Make sure you built the project in Xamarin before running this"')
 
 
 
