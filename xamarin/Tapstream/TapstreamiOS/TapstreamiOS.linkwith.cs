@@ -6,5 +6,5 @@ using MonoTouch.ObjCRuntime;
      LinkTarget.ArmV7 | LinkTarget.ArmV7s | LinkTarget.Simulator,
      ForceLoad = true,
      Frameworks = "Foundation UIKit",
-     LinkerFlags = "-cxx"
+     IsCxx = true
      )]
