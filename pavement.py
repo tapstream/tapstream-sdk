@@ -384,28 +384,19 @@ def build_objc_static_lib(dest_path, additional_sources=[], addition_include_dir
 @needs('make_java')
 @task
 def make_xamarin():
-	path('builds/xamarin').rmtree()
-	path('builds/xamarin').makedirs()
-	build_objc_static_lib('xamarin/Tapstream/TapstreamiOS/TapstreamiOS.a', ['xamarin/TapstreamObjcInterface.m'], ['objc/Core', 'objc/Tapstream'])
-	sh('cp builds/android/Tapstream.jar xamarin/Tapstream/TapstreamAndroid')
+	raise Exception("The Xamarin SDK must be built within Xamarin. So decrees the wizard of licensing!")
 
-	sh('xbuild /t:Clean /p:Configuration=Release xamarin/Tapstream/TapstreamiOS/TapstreamiOS.csproj')
-	sh('xbuild /t:Clean /p:Configuration=Release xamarin/Tapstream/TapstreamAndroid/TapstreamAndroid.csproj')
 
-	sh('xbuild /t:Build /p:Configuration=Release xamarin/Tapstream/TapstreamiOS/TapstreamiOS.csproj')
-	sh('xbuild /t:Build /p:Configuration=Release xamarin/Tapstream/TapstreamAndroid/TapstreamAndroid.csproj')
-
-	sh('cp xamarin/Tapstream/TapstreamiOS/bin/Release/TapstreamiOS.dll builds/xamarin')
-	sh('cp xamarin/Tapstream/TapstreamAndroid/bin/Release/TapstreamAndroid.dll builds/xamarin')
-
-@needs('make_xamarin')
 @task
 def package_xamarin():
+	sh('cp xamarin/Tapstream/TapstreamAndroid/bin/Release/TapstreamAndroid.dll builds/xamarin')
+	sh('cp xamarin/Tapstream/TapstreamiOS/bin/Release/TapstreamiOS.dll builds/xamarin')
 	path('builds/tapstream-%s-xamarin.zip' % VERSION).remove()
 	with pushd('builds'):
 		sh('cp -r xamarin tapstream-%s-xamarin' % VERSION)
 		_zip('tapstream-%s-xamarin.zip' % VERSION, 'tapstream-%s-xamarin' % VERSION)
 		sh('rm -rf tapstream-%s-xamarin' % VERSION)
+	sh('echo "Make sure you built the project in Xamarin before running this"')
 
 
 
