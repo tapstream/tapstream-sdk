@@ -88,14 +88,6 @@
 }
 
 
-- (NSSet *)getProcessSet
-{
-    NSMutableSet *set = [NSMutableSet setWithCapacity:10];
-    [set addObject:@"Test App"];
-    [set addObject:@"Another App"];
-    return set;
-}
-
 - (NSString *)getComputerGUID
 {
 	return @"00000000000000000000000000000000";
