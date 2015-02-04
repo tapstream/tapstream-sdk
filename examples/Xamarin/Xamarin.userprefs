@@ -1,12 +1,6 @@
-﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhone.6.0" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="XamariniOS/AppDelegate.cs">
-    <Files>
-      <File FileName="XamarinAndroid/MainActivity.cs" Line="9" Column="1" />
-      <File FileName="XamariniOS/Main.cs" Line="1" Column="1" />
-      <File FileName="XamariniOS/AppDelegate.cs" Line="27" Column="41" />
-    </Files>
-  </MonoDevelop.Ide.Workbench>
+﻿<Properties StartupItem="XamariniOS/XamariniOS.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|iPhoneSimulator" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhone4s.8.1" />
+  <MonoDevelop.Ide.Workbench />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
