@@ -3,7 +3,7 @@
 #import "TSLogging.h"
 #import "TSUtils.h"
 
-#define kTSVersion @"2.8.4"
+#define kTSVersion @"2.8.5"
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
 #define kTSHitUrlTemplate @"http://api.tapstream.com/%@/hit/%@.gif"
 #define kTSConversionUrlTemplate @"https://reporting.tapstream.com/v1/timelines/lookup?secret=%@&event_session=%@"
@@ -235,16 +235,6 @@
 		dispatch_after(dispatchTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 
 			NSString *allData = data;
-			if(config.collectTasteData)
-			{
-				NSString *processes = @"";
-				NSSet *processSet = [platform getProcessSet];
-				if(processSet)
-				{
-					processes = [TSUtils encodeString:[[processSet allObjects] componentsJoinedByString:@","]];
-				}
-				allData = [[data stringByAppendingString:@"&processes="] stringByAppendingString:processes];
-			}
 
 			TSResponse *response = [platform request:url data:allData method:@"POST"];
 			bool failed = response.status < 200 || response.status >= 300;

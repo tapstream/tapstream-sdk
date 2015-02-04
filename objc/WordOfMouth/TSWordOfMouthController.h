@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Tapstream. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 #import "TSHelpers.h"
 #import "TSOffer.h"
 #import "TSReward.h"
