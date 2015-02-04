@@ -13,10 +13,10 @@ Pod::Spec.new do |s|
   s.author       = { "Benjamin Fox" => "support@tapstream.com" }
 
   s.platform     = :ios, "6.0"
-  s.source       = { :git => "https://github.com/tapstream/tapstream-sdk.git", :tag => "v2.8.5" }
+  s.source       = { :git => "https://github.com/tapstream/tapstream-sdk.git", :tag => "v2.8.5-objc" }
   s.source_files = "objc/WordofMouth"
   s.dependency "Tapstream"
 
-  s.requires_arc = false
+  s.requires_arc = true
 
 end
