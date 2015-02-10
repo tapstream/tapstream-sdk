@@ -37,6 +37,9 @@
     <WarningLevel>4</WarningLevel>
     <MtouchLink>None</MtouchLink>
     <ConsolePause>false</ConsolePause>
+    <MtouchI18n>
+    </MtouchI18n>
+    <MtouchArch>i386, x86_64</MtouchArch>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -94,8 +97,7 @@
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
     <Reference Include="TapstreamiOS">
-      <HintPath>..\..\..\builds\xamarin\TapstreamiOS.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\..\xamarin\Tapstream\TapstreamiOS\bin\Release\TapstreamiOS.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
