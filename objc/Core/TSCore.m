@@ -502,6 +502,7 @@
 	[self appendPostPairWithPrefix:@"" key:@"vendor" value:[platform getManufacturer]];
 	[self appendPostPairWithPrefix:@"" key:@"model" value:[platform getModel]];
 	[self appendPostPairWithPrefix:@"" key:@"os" value:[platform getOs]];
+	[self appendPostPairWithPrefix:@"" key:@"os-build" value:[platform getOsBuild]];
 	[self appendPostPairWithPrefix:@"" key:@"resolution" value:[platform getResolution]];
 	[self appendPostPairWithPrefix:@"" key:@"locale" value:[platform getLocale]];
 	[self appendPostPairWithPrefix:@"" key:@"app-name" value:[platform getAppName]];
