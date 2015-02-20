@@ -19,6 +19,7 @@
 - (NSString *)getManufacturer;
 - (NSString *)getModel;
 - (NSString *)getOs;
+- (NSString *)getOsBuild;
 - (NSString *)getLocale;
 - (NSString *)getWifiMac;
 - (NSString *)getAppName;
