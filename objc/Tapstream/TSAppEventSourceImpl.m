@@ -165,6 +165,12 @@ static void TSLoadStoreKitClasses()
 				}
 			}
 			break;
+            case SKPaymentTransactionStateDeferred:
+            case SKPaymentTransactionStateFailed:
+            case SKPaymentTransactionStatePurchasing:
+            case SKPaymentTransactionStateRestored:
+            break;
+            
 		}
 	}
 }
