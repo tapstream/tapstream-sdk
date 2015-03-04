@@ -132,10 +132,11 @@ static void TSLoadStoreKitClasses()
 				
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 				// For ios 7 and up, try to get the Grand Unified Receipt.
-                // Old method, using transactionReceipt, has been deprecated.
 				if(floor(NSFoundationVersionNumber) >= NSFoundationVersionNumber_iOS_7_0)
 				{
 					receipt = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]];
+				}else{ // For (real) old ios versions, use transactionReceipt.
+					receipt = transaction.transactionReceipt;
 				}
 #else
 				// For mac, try to load the receipt out of the bundle.  If appStoreReceiptURL method is
@@ -161,7 +162,6 @@ static void TSLoadStoreKitClasses()
 				}
 			}
 			break;
-            case SKPaymentTransactionStateDeferred:
             case SKPaymentTransactionStateFailed:
             case SKPaymentTransactionStatePurchasing:
             case SKPaymentTransactionStateRestored:
