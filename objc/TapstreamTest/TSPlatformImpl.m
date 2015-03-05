@@ -57,6 +57,11 @@
 	return @"TestOs";
 }
 
+- (NSString *)getOsBuild
+{
+	return @"FACADE";
+}
+
 - (NSString *)getLocale
 {
 	return @"en_US";

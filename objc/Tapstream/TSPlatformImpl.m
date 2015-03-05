@@ -86,6 +86,11 @@
 #endif
 }
 
+- (NSString *)getOsBuild
+{
+	return [self systemInfoByName:@"kern.osversion"];
+}
+
 - (NSString *)getOs
 {
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR

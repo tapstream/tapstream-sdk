@@ -131,14 +131,11 @@ static void TSLoadStoreKitClasses()
 				NSData *receipt = nil;
 				
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-				// For ios 7 and up, try to get the Grand Unified Receipt
-				// If we can't get that, fall back to the transactionReceipt
-				if(floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
+				// For ios 7 and up, try to get the Grand Unified Receipt.
+				if(floor(NSFoundationVersionNumber) >= NSFoundationVersionNumber_iOS_7_0)
 				{
 					receipt = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]];
-				}
-				if(!receipt)
-				{
+				}else{ // For (real) old ios versions, use transactionReceipt.
 					receipt = transaction.transactionReceipt;
 				}
 #else
@@ -165,6 +162,11 @@ static void TSLoadStoreKitClasses()
 				}
 			}
 			break;
+            case SKPaymentTransactionStateFailed:
+            case SKPaymentTransactionStatePurchasing:
+            case SKPaymentTransactionStateRestored:
+            break;
+            
 		}
 	}
 }
