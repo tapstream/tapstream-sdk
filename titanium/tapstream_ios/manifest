@@ -2,7 +2,7 @@
 # this is your module manifest and used by Titanium
 # during compilation, packaging, distribution, etc.
 #
-version: 2.3
+version: 2.3.1
 apiversion: 2
 description: Tapstream SDK module for Titanium
 author: Benjamin Fox
@@ -15,4 +15,4 @@ name: tapstream_ios
 moduleid: com.tapstream.sdk
 guid: c29651c0-c056-44ab-b920-e1cf024f319a
 platform: iphone
-minsdk: 3.1.1.GA
+minsdk: 3.5.0.GA
