@@ -17,7 +17,7 @@ import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.kroll.common.Log;
 import org.appcelerator.titanium.TiApplication;
 
-import android.content.Context;
+import android.app.Application;
 
 import com.tapstream.sdk.Config;
 import com.tapstream.sdk.Event;
@@ -27,12 +27,12 @@ import com.tapstream.sdk.Tapstream;
 public class TapstreamAndroidModule extends KrollModule
 {
 	private static final String TAG = "TapstreamAndroidModule";
-	private static Context context = null;
+	private static Application app = null;
 	
 	@Kroll.onAppCreate
-	public static void onAppCreate(TiApplication app)
+	public static void onAppCreate(TiApplication tiapp)
 	{
-		context = app.getApplicationContext();
+		app = tiapp;
 	}
 	
 	public TapstreamAndroidModule()
@@ -87,7 +87,7 @@ public class TapstreamAndroidModule extends KrollModule
 			}
 		}
 
-		Tapstream.create(context, accountName, developerSecret, config);
+		Tapstream.create(app, accountName, developerSecret, config);
 	}
 
 	@Kroll.method

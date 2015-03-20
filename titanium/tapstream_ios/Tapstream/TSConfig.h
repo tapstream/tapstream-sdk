@@ -1,5 +1,6 @@
 #pragma once
 #import <Foundation/Foundation.h>
+#import "TSHelpers.h"
 
 @interface TSConfig : NSObject {
 @private
@@ -10,6 +11,7 @@
 	NSString *odin1;
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR	
 	NSString *udid;
+	BOOL autoCollectIdfa;
 	NSString *idfa;
 	NSString *secureUdid;
 	NSString *openUdid;
@@ -27,28 +29,57 @@
 	// Unset these if you want to disable the sending of the automatic events
 	BOOL fireAutomaticInstallEvent;
 	BOOL fireAutomaticOpenEvent;
+	BOOL fireAutomaticIAPEvents;
+	
+	// Unset this if you want to disable the collection of taste data
+	BOOL collectTasteData;
+
+	// These parameters will be automatically attached to all events fired by the sdk
+	NSMutableDictionary *globalEventParams;
+
+	
+	// Receipt validation
+	// Set these if you want to make Tapstream's server-side receipt validation stricter.  You
+	// should provide hard-coded string literals here, do not dynamically retrieve the values
+	// from your plist file and set them.
+	
+	// hardcodedBundleId should match the CFBundleIdentifier value in your Info.plist
+	NSString *hardcodedBundleId;
+
+	// hardcodedBundleShortVersionString should match the CFBundleShortVersionString value in your Info.plist
+	NSString *hardcodedBundleShortVersionString;
 }
 
-@property(nonatomic, retain) NSString *hardware;
-@property(nonatomic, retain) NSString *odin1;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *hardware;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *odin1;
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR	
-@property(nonatomic, retain) NSString *udid;
-@property(nonatomic, retain) NSString *idfa;
-@property(nonatomic, retain) NSString *secureUdid;
-@property(nonatomic, retain) NSString *openUdid;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *udid;
+@property(nonatomic, assign) BOOL autoCollectIdfa;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *idfa;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *secureUdid;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *openUdid;
 #else
-@property(nonatomic, retain) NSString *serialNumber;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *serialNumber;
 #endif
 
 @property(nonatomic, assign) BOOL collectWifiMac;
 
-@property(nonatomic, retain) NSString *installEventName;
-@property(nonatomic, retain) NSString *openEventName;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *installEventName;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *openEventName;
 
 @property(nonatomic, assign) BOOL fireAutomaticInstallEvent;
 @property(nonatomic, assign) BOOL fireAutomaticOpenEvent;
+@property(nonatomic, assign) BOOL fireAutomaticIAPEvents;
 
-- (id)init;
+@property(nonatomic, assign) BOOL collectTasteData;
+
+@property(nonatomic, STRONG_OR_RETAIN) NSMutableDictionary *globalEventParams;
+
+@property(nonatomic, STRONG_OR_RETAIN) NSString *hardcodedBundleId;
+@property(nonatomic, STRONG_OR_RETAIN) NSString *hardcodedBundleShortVersionString;
+
 + (id)configWithDefaults;
+- (id)init;
 
 @end
+

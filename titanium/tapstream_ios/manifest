@@ -15,4 +15,4 @@ name: tapstream_ios
 moduleid: com.tapstream.sdk
 guid: c29651c0-c056-44ab-b920-e1cf024f319a
 platform: iphone
-minsdk: 3.5.0.GA
+minsdk: 3.5.1.GA
