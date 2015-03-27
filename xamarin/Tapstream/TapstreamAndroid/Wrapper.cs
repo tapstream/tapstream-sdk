@@ -1,6 +1,7 @@
 using System;
 using Android.Runtime;
 using Android.Content;
+using Android.App;
 
 namespace TapstreamMetrics
 {
@@ -127,11 +128,11 @@ namespace TapstreamMetrics
 		private static IntPtr getInstanceId = JNIEnv.GetStaticMethodID(cls, "getInstance", "()Lcom/tapstream/sdk/Tapstream;");
 		private static IntPtr fireEventId = JNIEnv.GetMethodID(cls, "fireEvent", "(Lcom/tapstream/sdk/Event;)V");
 
-		public static void Create(Context context, string accountName, string developerSecret, Config conf)
+		public static void Create(Application app, string accountName, string developerSecret, Config conf)
 		{
 			JNIEnv.CallStaticVoidMethod(cls,
-                JNIEnv.GetStaticMethodID(cls, "create", "(Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;Lcom/tapstream/sdk/Config;)V"),
-			    new JValue(context), new JValue(new Java.Lang.String(accountName)), new JValue(new Java.Lang.String(developerSecret)), new JValue(conf.handle.Handle));
+                JNIEnv.GetStaticMethodID(cls, "create", "(Landroid/app/Application;Ljava/lang/String;Ljava/lang/String;Lcom/tapstream/sdk/Config;)V"),
+			    new JValue(app), new JValue(new Java.Lang.String(accountName)), new JValue(new Java.Lang.String(developerSecret)), new JValue(conf.handle.Handle));
 		}
 
 		public static void FireEvent(Event e)

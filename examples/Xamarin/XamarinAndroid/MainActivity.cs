@@ -33,7 +33,7 @@ namespace XamarinAndroid
 			Config conf = new Config();
 			conf.Set("fireAutomaticInstallEvent", false);
 			conf.Set("openEventName", "xamarin open");
-			Tapstream.Create(this, "sdktest", "YGP2pezGTI6ec48uti4o1w", conf);
+			Tapstream.Create(this.Application, "sdktest", "YGP2pezGTI6ec48uti4o1w", conf);
 
 			Event e = new Event("test-event", false);
 			e.AddPair("level", 5);

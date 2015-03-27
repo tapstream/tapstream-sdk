@@ -383,7 +383,13 @@ def build_objc_static_lib(dest_path, additional_sources=[], addition_include_dir
 	sh('xcrun -sdk iphonesimulator ar rcu objc/Tapstreami386.a ./*.o')
 	sh('rm ./*.o')
 
-	sh('xcrun -sdk iphoneos lipo -create objc/TapstreamArm7.a objc/TapstreamArm7s.a objc/TapstreamArm64.a objc/Tapstreami386.a -output %s' % dest_path)
+	sh('xcrun -sdk iphonesimulator clang -isysroot %s -miphoneos-version-min=4.3 -arch x86_64 -fno-objc-arc %s -c %s' % (
+		simulator_sdk_root, include_dirs, listify(inputs)
+	))
+	sh('xcrun -sdk iphonesimulator ar rcu objc/TapstreamX64.a ./*.o')
+	sh('rm ./*.o')
+
+	sh('xcrun -sdk iphoneos lipo -create objc/TapstreamArm7.a objc/TapstreamArm7s.a objc/TapstreamArm64.a objc/Tapstreami386.a objc/TapstreamX64.a -output %s' % dest_path)
 	sh('rm objc/Tapstream*.a')
 
 
