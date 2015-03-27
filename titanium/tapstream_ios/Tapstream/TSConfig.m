@@ -8,6 +8,7 @@
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 @synthesize openUdid = openUdid;
 @synthesize udid = udid;
+@synthesize autoCollectIdfa = autoCollectIdfa;
 @synthesize idfa = idfa;
 @synthesize secureUdid = secureUdid;
 #else
@@ -21,7 +22,14 @@
 
 @synthesize fireAutomaticInstallEvent = fireAutomaticInstallEvent;
 @synthesize fireAutomaticOpenEvent = fireAutomaticOpenEvent;
+@synthesize fireAutomaticIAPEvents = fireAutomaticIAPEvents;
 
+@synthesize collectTasteData = collectTasteData;
+
+@synthesize globalEventParams = globalEventParams;
+
+@synthesize hardcodedBundleId = hardcodedBundleId;
+@synthesize hardcodedBundleShortVersionString = hardcodedBundleShortVersionString;
 
 + (id)configWithDefaults
 {
@@ -32,9 +40,15 @@
 {
 	if((self = [super init]) != nil)
 	{
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+		autoCollectIdfa = YES;
+#endif
 		collectWifiMac = YES;
 		fireAutomaticInstallEvent = YES;
 		fireAutomaticOpenEvent = YES;
+		fireAutomaticIAPEvents = YES;
+        collectTasteData = YES;
+		self.globalEventParams = [NSMutableDictionary dictionaryWithCapacity:16];
 	}
 	return self;
 }
@@ -53,7 +67,10 @@
 #endif
 	RELEASE(installEventName);
 	RELEASE(openEventName);
+    RELEASE(globalEventParams);
 
+    RELEASE(hardcodedBundleId);
+    RELEASE(hardcodedBundleShortVersionString);
 	SUPER_DEALLOC;
 }
 

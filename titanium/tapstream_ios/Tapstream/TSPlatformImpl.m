@@ -54,7 +54,7 @@
 {
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 	CGRect frame = [UIScreen mainScreen].bounds;
-	float scale = [UIScreen mainScreen].scale;
+	float scale = (float)[UIScreen mainScreen].scale;
 	return [NSString stringWithFormat:@"%dx%d", (int)(frame.size.width * scale), (int)(frame.size.height * scale)];
 #else
 	NSRect frame = [NSScreen mainScreen].frame;
@@ -169,29 +169,38 @@
 	return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
 }
 
+- (NSString *)getAppVersion
+{
+	return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+}
+
 - (NSString *)getPackageName
 {
 	return [[NSBundle mainBundle] bundleIdentifier];
 }
 
-- (TSResponse *)request:(NSString *)url data:(NSString *)data
+- (TSResponse *)request:(NSString *)url data:(NSString *)data method:(NSString *)method
 {
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
-	[request setHTTPMethod:@"POST"];
-	[request setHTTPBody:[data dataUsingEncoding:NSUTF8StringEncoding]];
+	[request setHTTPMethod:method];
+	if(data != nil)
+	{
+		[request setHTTPBody:[data dataUsingEncoding:NSUTF8StringEncoding]];
+	}
 
 	NSError *error = nil;
 	NSHTTPURLResponse *response = nil;
-	if(![NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error] || !response)
+	NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+	if(responseData == nil || !response)
 	{
-		if(error)
+		if(error != nil)
 		{
 			NSString *msg = [NSString stringWithFormat:@"%@", error];
-			return AUTORELEASE([[TSResponse alloc] initWithStatus:-1 message:msg]);
+			return AUTORELEASE([[TSResponse alloc] initWithStatus:-1 message:msg data:nil]);
 		}
-		return AUTORELEASE([[TSResponse alloc] initWithStatus:-1 message:@"Unknown"]);
+		return AUTORELEASE([[TSResponse alloc] initWithStatus:-1 message:@"Unknown" data:nil]);
 	}
-	return AUTORELEASE([[TSResponse alloc] initWithStatus:response.statusCode message:[NSHTTPURLResponse localizedStringForStatusCode:response.statusCode]]);
+	return AUTORELEASE([[TSResponse alloc] initWithStatus:(int)response.statusCode message:[NSHTTPURLResponse localizedStringForStatusCode:response.statusCode] data:responseData]);
 }
 
 - (NSString *)systemInfoByName:(NSString *)name
@@ -206,6 +215,86 @@
 
 	return value;
 }
+
+- (NSString *)getComputerGUID
+{
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+	// Only need this value on ios 7 and up (for grand unified receipt validation)
+	if(floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
+	{
+		return [[[[UIDevice currentDevice] identifierForVendor] UUIDString] stringByReplacingOccurrencesOfString:@"-" withString:@""];
+	}
+	else
+	{
+		return @"";
+	}
+#else
+
+	// Adapted from Listing 1-3
+	// https://developer.apple.com/library/mac/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateLocally.html
+	//
+	// Requires the project to link against the IOKit framework
+	
+	kern_return_t kernResult;
+	mach_port_t masterPort;
+	CFMutableDictionaryRef matchingDict;
+	io_iterator_t iterator;
+	io_object_t service;
+	
+	CFDataRef macAddress = nil;
+	
+	kernResult = IOMasterPort(MACH_PORT_NULL, &masterPort);
+	if (kernResult != KERN_SUCCESS) {
+		return @"";
+	}
+	
+	matchingDict = IOBSDNameMatching(masterPort, 0, "en0");
+	if (!matchingDict) {
+		return @"";
+	}
+	
+	kernResult = IOServiceGetMatchingServices(masterPort, matchingDict, &iterator);
+	if (kernResult != KERN_SUCCESS) {
+		return @"";
+	}
+	
+	while((service = IOIteratorNext(iterator)) != 0) {
+		io_object_t parentService;
+		kernResult = IORegistryEntryGetParentEntry(service, kIOServicePlane, &parentService);
+		if (kernResult == KERN_SUCCESS) {
+			if (macAddress) CFRelease(macAddress);
+			macAddress = (CFDataRef) IORegistryEntryCreateCFProperty(parentService, CFSTR("IOMACAddress"), kCFAllocatorDefault, 0);
+			IOObjectRelease(parentService);
+		}
+		IOObjectRelease(service);
+	}
+	IOObjectRelease(iterator);
+	
+	if(macAddress) {
+		NSMutableString *addr = [NSMutableString stringWithCapacity:32];
+		const unsigned char *bytes = CFDataGetBytePtr(macAddress);
+		long len = CFDataGetLength(macAddress);
+		for(long i = 0; i < len; i++) {
+			[addr appendFormat:@"%02x", bytes[i]];
+		}
+		CFRelease(macAddress);
+		return addr;
+	}
+	return @"";
+	
+#endif
+}
+
+- (NSString *)getBundleIdentifier
+{
+	return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
+}
+
+- (NSString *)getBundleShortVersion
+{
+	return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+}
+
 
 @end
 
