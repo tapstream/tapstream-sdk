@@ -66,7 +66,7 @@
                                                     <state key="normal" image="icon-messaging">
                                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                                     </state>
-                                                    <state key="disabled" title="Messaging" image="icon-messaging-disabled"/>
+                                                    <state key="disabled" image="icon-messaging-disabled"/>
                                                     <connections>
                                                         <action selector="onBtnMessaging:" destination="-1" eventType="touchUpInside" id="jhb-qc-DrH"/>
                                                     </connections>
