@@ -38,8 +38,6 @@
 		128512F01940DFB500712477 /* TSOfferView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 128512CA1940DFB500712477 /* TSOfferView.xib */; };
 		128512F11940DFB500712477 /* TSOfferViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 128512CC1940DFB500712477 /* TSOfferViewController.m */; };
 		128512F21940DFB500712477 /* TSReward.m in Sources */ = {isa = PBXBuildFile; fileRef = 128512CE1940DFB500712477 /* TSReward.m */; };
-		128512F31940DFB500712477 /* TSShareView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 128512CF1940DFB500712477 /* TSShareView.xib */; };
-		128512F41940DFB500712477 /* TSShareViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 128512D11940DFB500712477 /* TSShareViewController.m */; };
 		128512F51940DFB500712477 /* TSWordOfMouthController.m in Sources */ = {isa = PBXBuildFile; fileRef = 128512D31940DFB500712477 /* TSWordOfMouthController.m */; };
 		1285130A1940E01200712477 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 128512F81940E01200712477 /* AppDelegate.m */; };
 		1285130B1940E01200712477 /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 128512F91940E01200712477 /* Main_iPad.storyboard */; };
@@ -115,9 +113,6 @@
 		128512CC1940DFB500712477 /* TSOfferViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSOfferViewController.m; sourceTree = "<group>"; };
 		128512CD1940DFB500712477 /* TSReward.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSReward.h; sourceTree = "<group>"; };
 		128512CE1940DFB500712477 /* TSReward.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSReward.m; sourceTree = "<group>"; };
-		128512CF1940DFB500712477 /* TSShareView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TSShareView.xib; sourceTree = "<group>"; };
-		128512D01940DFB500712477 /* TSShareViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSShareViewController.h; sourceTree = "<group>"; };
-		128512D11940DFB500712477 /* TSShareViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSShareViewController.m; sourceTree = "<group>"; };
 		128512D21940DFB500712477 /* TSWordOfMouthController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSWordOfMouthController.h; sourceTree = "<group>"; };
 		128512D31940DFB500712477 /* TSWordOfMouthController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSWordOfMouthController.m; sourceTree = "<group>"; };
 		128512F71940E01200712477 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -209,9 +204,6 @@
 				128512CC1940DFB500712477 /* TSOfferViewController.m */,
 				128512CD1940DFB500712477 /* TSReward.h */,
 				128512CE1940DFB500712477 /* TSReward.m */,
-				128512CF1940DFB500712477 /* TSShareView.xib */,
-				128512D01940DFB500712477 /* TSShareViewController.h */,
-				128512D11940DFB500712477 /* TSShareViewController.m */,
 				128512D21940DFB500712477 /* TSWordOfMouthController.h */,
 				128512D31940DFB500712477 /* TSWordOfMouthController.m */,
 			);
@@ -455,7 +447,6 @@
 				128512D41940DFB500712477 /* check.png in Resources */,
 				128512DC1940DFB500712477 /* done-down.png in Resources */,
 				128512E41940DFB500712477 /* icon-facebook-disabled@2x.png in Resources */,
-				128512F31940DFB500712477 /* TSShareView.xib in Resources */,
 				128512E81940DFB500712477 /* icon-messaging-disabled@2x.png in Resources */,
 				128512E71940DFB500712477 /* icon-messaging-disabled.png in Resources */,
 				128512E21940DFB500712477 /* icon-email@2x.png in Resources */,
@@ -518,7 +509,6 @@
 				1285130A1940E01200712477 /* AppDelegate.m in Sources */,
 				128512EF1940DFB500712477 /* TSOffer.m in Sources */,
 				1285130F1940E01200712477 /* main.m in Sources */,
-				128512F41940DFB500712477 /* TSShareViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
