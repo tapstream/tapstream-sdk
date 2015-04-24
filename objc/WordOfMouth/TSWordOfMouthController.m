@@ -8,7 +8,6 @@
 
 #import "TSWordOfMouthController.h"
 #import "TSOfferViewController.h"
-#import "TSShareViewController.h"
 #import "TSTapstream.h"
 #import "TSUtils.h"
 
@@ -36,7 +35,6 @@
 @property(STRONG_OR_RETAIN, nonatomic) NSMutableDictionary *rewardConsumptionCounts;
 @property(STRONG_OR_RETAIN, nonatomic) NSURLRequest *rewardsRequest;
 @property(STRONG_OR_RETAIN, nonatomic) TSOfferViewController *offerViewController;
-@property(STRONG_OR_RETAIN, nonatomic) TSShareViewController *shareViewController;
 
 + (NSArray *)parseRewards:(NSData *)rewardsJson;
 
@@ -46,7 +44,7 @@
 
 @implementation TSWordOfMouthController
 
-@synthesize delegate, secret, bundle, uuid, installDate, lastOfferImpressionTimes, offerCache, rewardConsumptionCounts, rewardsRequest, offerViewController, shareViewController;
+@synthesize delegate, secret, bundle, uuid, installDate, lastOfferImpressionTimes, offerCache, rewardConsumptionCounts, rewardsRequest, offerViewController;
 
 - (id)initWithSecret:(NSString *)secretVal uuid:(NSString *)uuidVal bundle:(NSString *)bundleVal
 {
@@ -88,7 +86,6 @@
     RELEASE(self->rewardConsumptionCounts);
     RELEASE(self->rewardsRequest);
     RELEASE(self->offerViewController);
-    RELEASE(self->shareViewController);
 }
 
 - (BOOL)isEligible:(TSOffer *)offer
