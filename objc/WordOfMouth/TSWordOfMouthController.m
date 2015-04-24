@@ -294,19 +294,33 @@
     if(accepted) {
         TSOffer *offer = self.offerViewController.offer;
         UIViewController *parent = self.offerViewController.parentViewController;
-        
-        self.shareViewController = [TSShareViewController controllerWithOffer:offer delegate:self];
-        self.shareViewController.view.frame = parent.view.bounds;
-        [parent addChildViewController:self.shareViewController];
-        [UIView transitionWithView:parent.view
-                          duration:0.3
-                           options:UIViewAnimationOptionTransitionCrossDissolve
-                        animations:^{
-                            [parent.view addSubview:self.shareViewController.view];
-                            [self.shareViewController didMoveToParentViewController:parent];
-                        }
-                        completion:NULL];
-    }
+
+
+		UIActivityViewController* c = [[UIActivityViewController alloc]
+									   initWithActivityItems:@[offer.message] applicationActivities:nil];
+
+		[c setCompletionHandler:^(NSString* type, BOOL completed){
+			if(completed){
+				NSString* cleanedType = type;
+
+				if([type isEqualToString:UIActivityTypeMail]){
+					cleanedType = @"email";
+				}else if([type isEqualToString:UIActivityTypeMessage]){
+					cleanedType = @"messaging";
+				}else if([type isEqualToString:UIActivityTypePostToFacebook]){
+					cleanedType = @"facebook";
+				}else if([type isEqualToString:UIActivityTypePostToTwitter]){
+					cleanedType = @"twitter";
+				}
+
+				[self completedShare:offer.ident socialMedium:cleanedType];
+			}
+		}];
+
+		[parent presentViewController:c animated:YES completion:nil];
+	}
+
+	// Clean up offer view
     [self.offerViewController willMoveToParentViewController:nil];
     [self.offerViewController.view removeFromSuperview];
     [self.offerViewController removeFromParentViewController];
@@ -318,15 +332,6 @@
 - (void)showedSharing:(NSUInteger)offerId
 {
     [self.delegate showedSharing:offerId];
-}
-
-- (void)dismissedSharing
-{
-    [self.shareViewController willMoveToParentViewController:nil];
-    [self.shareViewController.view removeFromSuperview];
-    [self.shareViewController removeFromParentViewController];
-    self.shareViewController = nil;
-    [self.delegate dismissedSharing];
 }
 
 - (void)completedShare:(NSUInteger)offerId socialMedium:(NSString *)medium
