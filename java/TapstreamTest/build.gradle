@@ -1,0 +1,32 @@
+apply plugin: 'java'
+
+compileJava {
+    options.debug = true
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'lib', include: ['*.jar'])
+    compile files('../Core/build/classes/main')
+}
+
+jar {
+    from files('../Core/build/classes/main')
+    from files('build/classes/main')
+    fileTree(dir: 'lib', include: ['*.jar']).each { t ->
+        from zipTree(t)
+    }
+    from fileTree(dir: 'src', include: '**/*.java')
+    from fileTree(dir: '../Core/src', include: '**/*.java')
+
+    manifest {
+        attributes("Main-Class": "com.tapstream.sdk.TestRunner")
+    }
+}

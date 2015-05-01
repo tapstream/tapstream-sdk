@@ -8,7 +8,7 @@ import platform
 """
 Notes:
 
-Java build tasks require ant to be on your path
+Java build tasks require gradle to be on your path
 
 C# tasks require Visual Studio and might need to be run using the
 vcpaver.cmd script which sets up the VC environment variables. (You may
@@ -66,13 +66,17 @@ def debug():
 # Java sdk for Android
 def _make_java(path):
 	target = CONFIGURATION.lower()
+        if target == "debug":
+            prefix = "TS_DEBUG=true "
+        else:
+            prefix = ""
 	with pushd(path):
 		with pushd('Core'):
-			sh('ant %s' % target)
+			sh('%sgradle build' % prefix)
 		with pushd('Tapstream'):
-			sh('ant %s' % target)
+			sh('%sgradle build' % prefix)
 		with pushd('TapstreamTest'):
-			sh('ant %s' % target)
+			sh('gradle build')  # Always debug
 
 def _gen_java_whitelabel():
 	path('java-whitelabel').rmtree()
@@ -95,8 +99,8 @@ def _gen_java_whitelabel():
 def _package_java():
 	path('builds/android').rmtree()
 	path('builds/android').makedirs()
-	path.copy(path('./java/Tapstream/build/jar/Tapstream.jar'), path('./builds/android/'))
-	path.copy(path('./java/Tapstream/build/jar/Tapstream.jar'), path('./examples/Android/Example/libs/'))
+	path.copy(path('./java/Tapstream/build/libs/Tapstream.jar'), path('./builds/android/'))
+	path.copy(path('./java/Tapstream/build/libs/Tapstream.jar'), path('./examples/Android/Example/libs/'))
 	path('builds/tapstream-%s-android.zip' % VERSION).remove()
 	with pushd('builds/android'):
 		_zip("../tapstream-%s-android.zip" % VERSION, 'Tapstream.jar')
@@ -104,7 +108,7 @@ def _package_java():
 def _package_java_whitelabel():
 	path('builds/android-whitelabel').rmtree()
 	path('builds/android-whitelabel').makedirs()
-	path.copy(path('./java-whitelabel/Tapstream/build/jar/Tapstream.jar'), path('./builds/android-whitelabel/ConversionTracker.jar'))
+	path.copy(path('./java-whitelabel/Tapstream/build/libs/Tapstream.jar'), path('./builds/android-whitelabel/ConversionTracker.jar'))
 	path('builds/tapstream-%s-android-whitelabel.zip' % VERSION).remove()
 	with pushd('builds/android-whitelabel'):
 		_zip("../tapstream-%s-android-whitelabel.zip" % VERSION, 'ConversionTracker.jar')
@@ -116,7 +120,7 @@ def make_java():
 	
 @task
 def test_java():
-	sh('java -jar ./java/TapstreamTest/build/jar/TapstreamTest.jar tests.js')
+	sh('java -jar ./java/TapstreamTest/build/libs/TapstreamTest.jar tests.js')
 
 @task
 def package_java():
