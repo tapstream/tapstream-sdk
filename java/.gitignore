@@ -1,0 +1,6 @@
+Core/target
+Tapstream/target
+TapstreamTest/target
+target
+*.iml
+.idea

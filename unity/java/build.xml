@@ -3,8 +3,8 @@
 
     <path id="project.classpath">
         <pathelement path="${java.class.path}"/>
-        <pathelement path="../../java/Core/build/classes/"/>
-        <pathelement path="../../java/Tapstream/build/classes/"/>
+        <pathelement path="../../java/Core/target/classes/"/>
+        <pathelement path="../../java/Tapstream/target/classes/"/>
         <fileset dir="${env.ANDROID_HOME}/platforms/android-17/" includes="android.jar"/>
     </path>
 

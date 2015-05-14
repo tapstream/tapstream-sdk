@@ -8,7 +8,7 @@ import platform
 """
 Notes:
 
-Java build tasks require gradle to be on your path
+Java build tasks require maven to be on your path
 
 C# tasks require Visual Studio and might need to be run using the
 vcpaver.cmd script which sets up the VC environment variables. (You may
@@ -65,29 +65,22 @@ def debug():
 
 # Java sdk for Android
 def _make_java(path):
-	target = CONFIGURATION.lower()
-        if target == "debug":
-            prefix = "TS_DEBUG=true "
-        else:
-            prefix = ""
 	with pushd(path):
-		with pushd('Core'):
-			sh('%sgradle build' % prefix)
-		with pushd('Tapstream'):
-			sh('%sgradle build' % prefix)
-		with pushd('TapstreamTest'):
-			sh('gradle build')  # Always debug
+		sh('mvn -pl Core clean install')
+		sh('mvn -pl Tapstream clean package')
+		sh('mvn -pl TapstreamTest clean package')
 
 def _gen_java_whitelabel():
 	path('java-whitelabel').rmtree()
 	path.copytree(path('java'), path('java-whitelabel'))
 	for d in ('Core', 'Tapstream', 'TapstreamTest'):
-		path.move(path('java-whitelabel/%s/src/com/tapstream' % d), path('java-whitelabel/%s/src/com/conversiontracker' % d))
-	path.move(path('java-whitelabel/Tapstream/src/com/conversiontracker/sdk/Tapstream.java'), path('java-whitelabel/Tapstream/src/com/conversiontracker/sdk/ConversionTracker.java'))
+		path.move(path('java-whitelabel/%s/src/main/java/com/tapstream' % d), path('java-whitelabel/%s/src/main/java/com/conversiontracker' % d))
+	path.move(path('java-whitelabel/Tapstream/src/test/java/com/tapstream'), path('java-whitelabel/Tapstream/src/test/java/com/conversiontracker'))
+	path.move(path('java-whitelabel/Tapstream/src/main/java/com/conversiontracker/sdk/Tapstream.java'), path('java-whitelabel/Tapstream/src/main/java/com/conversiontracker/sdk/ConversionTracker.java'))
 
 	package_name = re.compile(r'com\.tapstream\.sdk')
 	class_name = re.compile(r'([\s("])Tapstream([\s(.])')
-	for file_path in path('java-whitelabel').walkfiles('*.java'):
+        def clean_file(file_path):
 		with open(file_path, 'rb+') as f:
 			data = f.read()
 			data = package_name.sub('com.conversiontracker.sdk', data)
@@ -95,20 +88,24 @@ def _gen_java_whitelabel():
 			f.seek(0)
 			f.write(data)
 			f.truncate()
+	for file_path in path('java-whitelabel').walkfiles('*.java'):
+		clean_file(file_path)
+	for file_path in path('java-whitelabel').walkfiles('pom.xml'):
+		clean_file(file_path)
 
 def _package_java():
 	path('builds/android').rmtree()
 	path('builds/android').makedirs()
-	path.copy(path('./java/Tapstream/build/libs/Tapstream.jar'), path('./builds/android/'))
-	path.copy(path('./java/Tapstream/build/libs/Tapstream.jar'), path('./examples/Android/Example/libs/'))
+	path.copy(path('./java/Tapstream/target/Tapstream-%s.jar' % VERSION), path('./builds/android/'))
+	path.copy(path('./java/Tapstream/target/Tapstream-%s.jar' % VERSION), path('./examples/Android/Example/libs/'))
 	path('builds/tapstream-%s-android.zip' % VERSION).remove()
 	with pushd('builds/android'):
-		_zip("../tapstream-%s-android.zip" % VERSION, 'Tapstream.jar')
+		_zip("../tapstream-%s-android.zip" % VERSION, 'Tapstream-%s.jar' % VERSION)
 
 def _package_java_whitelabel():
 	path('builds/android-whitelabel').rmtree()
 	path('builds/android-whitelabel').makedirs()
-	path.copy(path('./java-whitelabel/Tapstream/build/libs/Tapstream.jar'), path('./builds/android-whitelabel/ConversionTracker.jar'))
+	path.copy(path('./java-whitelabel/Tapstream/target/Tapstream-%s.jar' % VERSION), path('./builds/android-whitelabel/ConversionTracker.jar'))
 	path('builds/tapstream-%s-android-whitelabel.zip' % VERSION).remove()
 	with pushd('builds/android-whitelabel'):
 		_zip("../tapstream-%s-android-whitelabel.zip" % VERSION, 'ConversionTracker.jar')
@@ -120,7 +117,7 @@ def make_java():
 	
 @task
 def test_java():
-	sh('java -jar ./java/TapstreamTest/build/libs/TapstreamTest.jar tests.js')
+	sh('java -jar ./java/TapstreamTest/target/sdk-test-%s.jar tests.js' % VERSION)
 
 @task
 def package_java():
@@ -296,7 +293,7 @@ def make_phonegap():
 	path('builds/phonegap').makedirs()
 	sh('cp -r phonegap builds')
 	sh('cp -r builds/ios/Tapstream builds/phonegap/src/ios')
-	sh('cp builds/android/Tapstream.jar builds/phonegap/src/android')
+	sh('cp builds/android/Tapstream-%s.jar builds/phonegap/src/android/Tapstream.jar' % VERSION)
 
 	# Generate plugin xml elements that will copy each ios source file to the right place
 	# Format these elements into the plugin file
@@ -329,7 +326,7 @@ def package_phonegap():
 def make_titanium():
 	path('builds/titanium').rmtree()
 	path('builds/titanium').makedirs()
-	sh('cp builds/android/Tapstream.jar titanium/tapstream_android/lib/Tapstream.jar')
+	sh('cp builds/android/Tapstream-%s.jar titanium/tapstream_android/lib/Tapstream.jar' % VERSION)
 	path('titanium/tapstream_ios/Tapstream').rmtree()
 	sh('cp -r builds/ios/Tapstream titanium/tapstream_ios')
 
