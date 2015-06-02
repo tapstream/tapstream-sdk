@@ -23,8 +23,8 @@
         <mkdir dir="build/jar"/>
         <jar destfile="build/jar/${ant.project.name}.jar">
             <fileset dir="build/classes"/>
-            <fileset dir="../../java/Tapstream/build/classes"/>
-            <fileset dir="../../java/Core/build/classes"/>
+            <fileset dir="../../java/Tapstream/target/classes"/>
+            <fileset dir="../../java/Core/target/classes"/>
         </jar>
     </target>
 
