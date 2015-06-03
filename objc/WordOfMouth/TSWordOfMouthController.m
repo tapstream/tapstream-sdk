@@ -291,33 +291,49 @@
     if(accepted) {
         TSOffer *offer = self.offerViewController.offer;
         UIViewController *parent = self.offerViewController.parentViewController;
+        
+        
+        UIActivityViewController* c = [[UIActivityViewController alloc]
+                                       initWithActivityItems:@[offer.message] applicationActivities:nil];
+        
+#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
+        
+        __weak typeof(c) weakC = c;
+        
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+        [c setCompletionWithItemsHandler:^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
+#else
+        [c setCompletionHandler:^(NSString* type, BOOL completed){
+#endif
+            __strong typeof(weakC) strongC = weakC;
+            
+            if (completed) {
+                NSString* cleanedType = activityType;
+                
+                if([activityType isEqualToString:UIActivityTypeMail]){
+                    cleanedType = @"email";
+                }else if([activityType isEqualToString:UIActivityTypeMessage]){
+                    cleanedType = @"messaging";
+                }else if([activityType isEqualToString:UIActivityTypePostToFacebook]){
+                    cleanedType = @"facebook";
+                }else if([activityType isEqualToString:UIActivityTypePostToTwitter]){
+                    cleanedType = @"twitter";
+                }
+                
+                [self completedShare:offer.ident socialMedium:cleanedType];
+            }
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+                strongC.completionWithItemsHandler = nil;
+#else
+                strongC.completionHandler = nil;
+#endif
+        }];
+#endif
 
-
-		UIActivityViewController* c = [[UIActivityViewController alloc]
-									   initWithActivityItems:@[offer.message] applicationActivities:nil];
-
-		[c setCompletionHandler:^(NSString* type, BOOL completed){
-			if(completed){
-				NSString* cleanedType = type;
-
-				if([type isEqualToString:UIActivityTypeMail]){
-					cleanedType = @"email";
-				}else if([type isEqualToString:UIActivityTypeMessage]){
-					cleanedType = @"messaging";
-				}else if([type isEqualToString:UIActivityTypePostToFacebook]){
-					cleanedType = @"facebook";
-				}else if([type isEqualToString:UIActivityTypePostToTwitter]){
-					cleanedType = @"twitter";
-				}
-
-				[self completedShare:offer.ident socialMedium:cleanedType];
-			}
-		}];
-
-		[parent presentViewController:c animated:YES completion:nil];
-	}
-
-	// Clean up offer view
+        [parent presentViewController:c animated:YES completion:nil];
+    }
+    
+    // Clean up offer view
     [self.offerViewController willMoveToParentViewController:nil];
     [self.offerViewController.view removeFromSuperview];
     [self.offerViewController removeFromParentViewController];
