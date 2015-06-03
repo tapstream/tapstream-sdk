@@ -2,22 +2,34 @@ package com.tapstream.exampleasdf234fsad;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.json.JSONException;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 
 import com.google.analytics.tracking.android.EasyTracker;
 import com.tapstream.sdk.Config;
+import com.tapstream.sdk.ConversionListener;
 import com.tapstream.sdk.Event;
+import com.tapstream.sdk.Maybe;
 import com.tapstream.sdk.Tapstream;
+import com.tapstream.sdk.wordofmouth.Offer;
+import com.tapstream.sdk.wordofmouth.Reward;
+import com.tapstream.sdk.wordofmouth.WordOfMouth;
 
 public class MainActivity extends Activity {
+	private Handler mHandler = new Handler();
 	private static final String pubKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyM2jltjS4SJofPAy7inRNNvXUh7pBL/hEtdomzyxT3s3di0kiIMaZeqS0HERpH3Ps2zAkmYSIqq7nCfFJkQ5kaT85jMBBUDBrzo97IdS8eCa5/+Yx+bk80R1RXDdrT/jXOWdhO2tUO5gxy0mtFMxMZm5XSq3AIiAHOGZHpULWZ3BWSoUKRKMHUU7GPN2YpxY/lEikXfb0OO8KUL3oK5aUBy57qr4tP0zzMkoCDWZgLWt2RXbudrS1B4muyNtYkydbRphUnO5c1hBob+U1nNOEHKe231PN9vqjcincggKHsGFiearwyI2DYd6xRUa0QULMzZSlTnLVAtPoWXlbZLXUQIDAQAB";
 	protected static final String TAG = "MainActivity";
 	
@@ -28,6 +40,8 @@ public class MainActivity extends Activity {
 	private IabHelper.QueryInventoryFinishedListener mGotInventoryListener;
 	private IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener;
 	private Inventory mInventory;
+	
+	private Future<Maybe<Offer>> eventuallyMaybeOffer;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +55,28 @@ public class MainActivity extends Activity {
 		Tapstream.create(getApplication(), "sdktest", "YGP2pezGTI6ec48uti4o1w", config);
 				
 		final Tapstream tracker = Tapstream.getInstance();
+		final WordOfMouth wom = tracker.getInstance().getWordOfMouth("com.tapstream.example");
+		eventuallyMaybeOffer = wom.getOffer("test123");
+		
+		mHandler.post(new Runnable(){
+			@Override
+			public void run(){
+				List<Reward> rewards;
+				try {
+					rewards = wom.getRewardList().get(10, TimeUnit.SECONDS);
+				
+					for(Reward reward: rewards){
+						if(!wom.isConsumed(reward)){
+							Log.i("WOM", "CONSUMING REWARD FOR OFFER " + reward.getOfferId());
+							wom.consumeReward(reward);
+						}
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
 
 		tracker.getConversionData(new ConversionListener() {
 			@Override
@@ -128,6 +164,25 @@ public class MainActivity extends Activity {
 			}
 		});
 	}
+	
+	@Override
+	public boolean onMenuItemSelected(int featureId, android.view.MenuItem item) {
+		switch(item.getItemId()){
+		case R.id.menu_share:
+			try {
+				Maybe<Offer> o = eventuallyMaybeOffer.get(10, TimeUnit.SECONDS);
+				if(o.isPresent()){					
+					WordOfMouth wom = Tapstream.getInstance().getWordOfMouth("com.tapstream.example");
+					wom.showOffer(this, getWindow().getDecorView(), o.get());
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return false;
+		default:
+			return false;
+		}
+	};
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
