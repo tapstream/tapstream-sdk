@@ -117,9 +117,6 @@ static void TSLoadStoreKitClasses()
 
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
 {
-#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
-#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-    
 	for(SKPaymentTransaction *transaction in transactions)
 	{
 		switch(transaction.transactionState)
@@ -139,9 +136,11 @@ static void TSLoadStoreKitClasses()
                 if ([mainBundle respondsToSelector:@selector(appStoreReceiptURL)])
                 {
                     receipt = [NSData dataWithContentsOfURL:[mainBundle appStoreReceiptURL]];
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
 #if __IPHONE_OS_VERSION_MIN_REQUIRED < 70000
 				}else{ // For (real) old ios versions, use transactionReceipt.
 					receipt = transaction.transactionReceipt;
+#endif
 #endif
 				}
 #else
@@ -171,18 +170,15 @@ static void TSLoadStoreKitClasses()
             case SKPaymentTransactionStateFailed:
             case SKPaymentTransactionStatePurchasing:
             case SKPaymentTransactionStateRestored:
+#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
             case SKPaymentTransactionStateDeferred:
-            {
-                
-            }
+#endif
 #endif
             break;
             
 		}
 	}
-#endif
-#endif
 }
 
 - (void)paymentQueue:(SKPaymentQueue *)queue removedTransactions:(NSArray *)transactions

@@ -302,7 +302,9 @@
         
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
         [c setCompletionWithItemsHandler:^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
-            
+#else
+        [c setCompletionHandler:^(NSString* type, BOOL completed){
+#endif
             __strong typeof(weakC) strongC = weakC;
             
             if (completed) {
@@ -319,37 +321,15 @@
                 }
                 
                 [self completedShare:offer.ident socialMedium:cleanedType];
-                
+            }
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
                 strongC.completionWithItemsHandler = nil;
-            }
-        }];
 #else
-        [c setCompletionHandler:^(NSString* type, BOOL completed){
-            
-            __strong typeof(weakC) strongC = weakC;
-            
-            if(completed){
-                NSString* cleanedType = type;
-                
-                if([type isEqualToString:UIActivityTypeMail]){
-                    cleanedType = @"email";
-                }else if([type isEqualToString:UIActivityTypeMessage]){
-                    cleanedType = @"messaging";
-                }else if([type isEqualToString:UIActivityTypePostToFacebook]){
-                    cleanedType = @"facebook";
-                }else if([type isEqualToString:UIActivityTypePostToTwitter]){
-                    cleanedType = @"twitter";
-                }
-                
-                [self completedShare:offer.ident socialMedium:cleanedType];
-                
                 strongC.completionHandler = nil;
-            }
+#endif
         }];
-        
 #endif
-#endif
-        
+
         [parent presentViewController:c animated:YES completion:nil];
     }
     
