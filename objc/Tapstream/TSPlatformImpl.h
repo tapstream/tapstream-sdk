@@ -2,6 +2,7 @@
 #import <Foundation/Foundation.h>
 #import "TSPlatform.h"
 #import "TSResponse.h"
+#import "TSLogging.h"
 
 @interface TSPlatformImpl : NSObject<TSPlatform> {}
 
