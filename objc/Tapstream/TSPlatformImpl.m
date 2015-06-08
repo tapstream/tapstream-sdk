@@ -69,11 +69,11 @@
 
 - (NSString *)getModel
 {
-	NSString *machine = [self systemInfoByName:@"hw.machine"];
+	NSString *machine = [self systemInfoByName:@"hw.machine" default:@""];
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 	return machine;
 #else
-	NSString *model = [self systemInfoByName:@"hw.model"];
+        NSString *model = [self systemInfoByName:@"hw.model" default:@""];
 	if(model != nil)
 	{
 		if(machine != nil)
@@ -88,7 +88,7 @@
 
 - (NSString *)getOsBuild
 {
-	return [self systemInfoByName:@"kern.osversion"];
+	return [self systemInfoByName:@"kern.osversion" default:@""];
 }
 
 - (NSString *)getOs
@@ -208,14 +208,29 @@
 	return AUTORELEASE([[TSResponse alloc] initWithStatus:(int)response.statusCode message:[NSHTTPURLResponse localizedStringForStatusCode:response.statusCode] data:responseData]);
 }
 
-- (NSString *)systemInfoByName:(NSString *)name
+- (NSString *)systemInfoByName:(NSString *)name default:(NSString *)def
 {
 	size_t size;
-	sysctlbyname( [name UTF8String], NULL, &size, NULL, 0);
+	int result;
+	result = sysctlbyname( [name UTF8String], NULL, &size, NULL, 0);
+	if(result != 0){
+		// Handle an error value
+		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Failed to retrieve size of system value %@ (Error code: %d)", name, errno];
+		return def;
+	}
 
 	char *pBuffer = malloc(size);
-	sysctlbyname( [name UTF8String], pBuffer, &size, NULL, 0);
-	NSString *value = [NSString stringWithUTF8String:pBuffer];
+	NSString* value;
+
+	result = sysctlbyname( [name UTF8String], pBuffer, &size, NULL, 0);
+
+	if(result == 0){
+		value = [NSString stringWithUTF8String:pBuffer];
+	}else{
+		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream Warning: Failed to retrieve system value %@ (Error code: %d)", name, errno];
+		value = def;
+	}
+
 	free( pBuffer );
 
 	return value;
