@@ -295,44 +295,62 @@
         
         UIActivityViewController* c = [[UIActivityViewController alloc]
                                        initWithActivityItems:@[offer.message] applicationActivities:nil];
-        
-#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
+
         
         __weak typeof(c) weakC = c;
-        
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-        [c setCompletionWithItemsHandler:^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
-#else
-        [c setCompletionHandler:^(NSString* type, BOOL completed){
-#endif
-            __strong typeof(weakC) strongC = weakC;
-            
-            if (completed) {
-                NSString* cleanedType = activityType;
-                
-                if([activityType isEqualToString:UIActivityTypeMail]){
-                    cleanedType = @"email";
-                }else if([activityType isEqualToString:UIActivityTypeMessage]){
-                    cleanedType = @"messaging";
-                }else if([activityType isEqualToString:UIActivityTypePostToFacebook]){
-                    cleanedType = @"facebook";
-                }else if([activityType isEqualToString:UIActivityTypePostToTwitter]){
-                    cleanedType = @"twitter";
-                }
-                
-                [self completedShare:offer.ident socialMedium:cleanedType];
-            }
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-                strongC.completionWithItemsHandler = nil;
-#else
-                strongC.completionHandler = nil;
-#endif
-        }];
-#endif
+
+		if([c respondsToSelector:@selector(setCompletionWithItemsHandler:)]){
+			[c setCompletionWithItemsHandler:^(NSString* activityType, BOOL completed, NSArray* items, NSError* error){
+
+				__strong typeof(weakC) strongC = weakC;
+
+				if (completed) {
+					NSString* cleanedType = activityType;
+
+					if([activityType isEqualToString:UIActivityTypeMail]){
+						cleanedType = @"email";
+					}else if([activityType isEqualToString:UIActivityTypeMessage]){
+						cleanedType = @"messaging";
+					}else if([activityType isEqualToString:UIActivityTypePostToFacebook]){
+						cleanedType = @"facebook";
+					}else if([activityType isEqualToString:UIActivityTypePostToTwitter]){
+						cleanedType = @"twitter";
+					}
+
+					[self completedShare:offer.ident socialMedium:cleanedType];
+				}
+				strongC.completionWithItemsHandler = nil;
+
+			}];
+		}else{
+			[c setCompletionHandler:^(NSString* activityType, BOOL completed){
+
+				__strong typeof(weakC) strongC = weakC;
+
+				if (completed) {
+					NSString* cleanedType = activityType;
+
+					if([activityType isEqualToString:UIActivityTypeMail]){
+						cleanedType = @"email";
+					}else if([activityType isEqualToString:UIActivityTypeMessage]){
+						cleanedType = @"messaging";
+					}else if([activityType isEqualToString:UIActivityTypePostToFacebook]){
+						cleanedType = @"facebook";
+					}else if([activityType isEqualToString:UIActivityTypePostToTwitter]){
+						cleanedType = @"twitter";
+					}
+
+					[self completedShare:offer.ident socialMedium:cleanedType];
+				}
+				strongC.completionHandler = nil;
+				
+			}];
+		}
+
 
         [parent presentViewController:c animated:YES completion:nil];
     }
-    
+
     // Clean up offer view
     [self.offerViewController willMoveToParentViewController:nil];
     [self.offerViewController.view removeFromSuperview];
