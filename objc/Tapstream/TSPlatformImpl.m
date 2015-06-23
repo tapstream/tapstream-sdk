@@ -88,7 +88,11 @@
 
 - (NSString *)getOsBuild
 {
+#if TARGET_IPHONE_SIMULATOR	
+	return nil;  // Simulators lie.
+#else
 	return [self systemInfoByName:@"kern.osversion" default:@""];
+#endif
 }
 
 - (NSString *)getOs
