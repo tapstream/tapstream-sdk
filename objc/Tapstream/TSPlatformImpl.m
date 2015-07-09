@@ -224,6 +224,12 @@
 	}
 
 	char *pBuffer = malloc(size);
+	if(pBuffer == NULL)
+	{
+		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream warning: failed to retrieve system value %@ (malloc failed)", name];
+		return def;
+	}
+
 	NSString* value;
 
 	result = sysctlbyname( [name UTF8String], pBuffer, &size, NULL, 0);
