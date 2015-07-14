@@ -17,7 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class Core implements ExecutorProvider {
-	public static final String VERSION = "2.9.0";
+	public static final String VERSION = "2.9.3";
 	private static final String EVENT_URL_TEMPLATE = "https://api.tapstream.com/%s/event/%s/";
 	private static final String HIT_URL_TEMPLATE = "http://api.tapstream.com/%s/hit/%s.gif";
 	private static final String CONVERSION_URL_TEMPLATE = "https://reporting.tapstream.com/v1/timelines/lookup?secret=%s&event_session=%s";
@@ -206,7 +206,7 @@ class Core implements ExecutorProvider {
 								// one to manage delay timing
 								self.failingEventId = e.getUid();
 								self.increaseDelay();
-							} else if (self.failingEventId == e.getUid()) {
+							} else if (self.failingEventId != null && self.failingEventId.equals(e.getUid())) {
 								// This job is failing for a subsequent time
 								self.increaseDelay();
 							}
