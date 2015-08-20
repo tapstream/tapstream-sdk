@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "TapstreamWOM"
-  s.version      = "2.9.4"
+  s.version      = "2.9.5"
   s.summary      = "Tapstream Word of Mouth"
   s.description  = <<-DESC
                    Tapstream Word of Mouth is a drop-in referral program for iOS. It rewards
@@ -13,8 +13,8 @@ Pod::Spec.new do |s|
   s.author       = { "Benjamin Fox" => "support@tapstream.com" }
 
   s.platform     = :ios, "6.0"
-  s.source       = { :git => "https://github.com/tapstream/tapstream-sdk.git", :tag => "v2.9.4-objc" }
-  s.source_files = "objc/WordofMouth/*.{h,m,xib}"
+  s.source       = { :git => "https://github.com/tapstream/tapstream-sdk.git", :tag => "v2.9.5-objc" }
+  s.source_files = "objc/WordofMouth/*.{h,m}"
   s.resources    = ["objc/WordofMouth/*.xib"]
   s.dependency "Tapstream"
 
