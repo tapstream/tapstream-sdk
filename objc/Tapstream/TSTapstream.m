@@ -130,6 +130,12 @@ static TSTapstream *instance = nil;
 }
 
 
+- (NSData*)getConversionDataBlocking:(int)timeout_ms;
+{
+	return [core getConversionDataBlocking:timeout_ms];
+}
+
+
 // Word-of-mouth delegate
 - (void)showedOffer:(NSUInteger)offerId
 {

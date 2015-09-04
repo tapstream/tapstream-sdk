@@ -29,32 +29,37 @@
 
     
     TSTapstream *tracker = [TSTapstream instance];
-    [tracker getConversionData:^(NSData *jsonInfo) {
-        if(jsonInfo == nil)
-        {
-            // No conversion data available. This might be because Tapstream
-            // took longer than 10 seconds to respond, or because the Tapstream
-            // API server returned a 4xx response.
-        }
-        else
-        {
-            NSError *error      = nil;
-            NSDictionary *jsonDict  = [NSJSONSerialization JSONObjectWithData:jsonInfo
-                                                                      options:kNilOptions
-                                                                        error:&error];
-            
-            
-            if(jsonDict && !error)
-            {
-                NSArray *hits = [jsonDict objectForKey:@"hits"];
-                NSArray *events = [jsonDict objectForKey:@"events"];
-                
-                NSLog(@"Hits: %@", hits);
-                NSLog(@"Events: %@", events);
-                
-            }
-        }
-    }];
+
+	// Sync getConversionData
+	NSData* jsonInfo = [tracker getConversionDataBlocking:10000];
+
+	// Async getConversionData
+	[tracker getConversionData:^(NSData* jsonInfo) {
+		if(jsonInfo == nil)
+		{
+			// No conversion data available. This might be because Tapstream
+			// took longer than 10 seconds to respond, or because the Tapstream
+			// API server returned a 4xx response.
+		} else {
+			NSError *error      = nil;
+			NSDictionary *jsonDict  = [NSJSONSerialization JSONObjectWithData:jsonInfo
+																	  options:kNilOptions
+																		error:&error];
+
+
+			if(jsonDict && !error)
+			{
+				NSArray *hits = [jsonDict objectForKey:@"hits"];
+				NSArray *events = [jsonDict objectForKey:@"events"];
+
+				NSLog(@"Hits: %@", hits);
+				NSLog(@"Events: %@", events);
+				
+			}
+		}
+
+	}];
+
     
     TSEvent *e = [TSEvent eventWithName:@"test-event" oneTimeOnly:NO];
     [e addValue:@"John Doe" forKey:@"player"];

@@ -87,7 +87,7 @@
 	return @"com.test.TestApp";
 }
 
-- (TSResponse *)request:(NSString *)url data:(NSString *)data method:(NSString *)method
+- (TSResponse *)request:(NSString *)url data:(NSString *)data method:(NSString *)method timeout_ms:(int)timeout_ms
 {
 	return response;
 }
