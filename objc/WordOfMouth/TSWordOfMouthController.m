@@ -347,8 +347,15 @@
 			}];
 		}
 
-
-        [parent presentViewController:c animated:YES completion:nil];
+		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+			[parent presentViewController:c animated:YES completion:nil];
+		}else{
+			UIPopoverController *popup = [[UIPopoverController alloc] initWithContentViewController:c];
+			[popup presentPopoverFromRect:CGRectMake(parent.view.frame.size.width/2, parent.view.frame.size.height, 0, 0)
+								   inView:parent.view
+				 permittedArrowDirections:UIPopoverArrowDirectionUnknown
+								 animated:YES];
+		}
     }
 
     // Clean up offer view
