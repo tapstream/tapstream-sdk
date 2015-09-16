@@ -16,7 +16,7 @@
 - (NSString *)getAppName;
 - (NSString *)getAppVersion;
 - (NSString *)getPackageName;
-- (TSResponse *)request:(NSString *)url data:(NSString *)data method:(NSString *)method;
+- (TSResponse *)request:(NSString *)url data:(NSString *)data method:(NSString *)method timeout_ms:(int)timeout_ms;
 - (NSString *)getComputerGUID;
 - (NSString *)getBundleIdentifier;
 - (NSString *)getBundleShortVersion;
