@@ -13,7 +13,7 @@ void Config_Delete(void *conf)
 
 void _Config_Set(void *conf, const char *key, NSObject *value)
 {
-	TSConfig *c = (TSConfig *)conf;
+	TSConfig *c = (BRIDGE_TRANSFER TSConfig *)conf;
 	NSString *k = [NSString stringWithUTF8String:key];
 	if([c respondsToSelector:NSSelectorFromString(k)])
 	{
@@ -56,27 +56,27 @@ void Event_AddPairString(void *event, const char *key, const char *value)
 {
 	NSString *k = [NSString stringWithUTF8String:key];
 	NSString *v = [NSString stringWithUTF8String:value];
-	[(TSEvent *)event addValue:v forKey:k];
+	[(BRIDGE_TRANSFER TSEvent *)event addValue:v forKey:k];
 }
 void Event_AddPairBool(void *event, const char *key, bool value)
 {
 	NSString *k = [NSString stringWithUTF8String:key];
-	[(TSEvent *)event addBooleanValue:(int)value forKey:k];
+	[(BRIDGE_TRANSFER TSEvent *)event addBooleanValue:(int)value forKey:k];
 }
 void Event_AddPairInt(void *event, const char *key, int value)
 {
 	NSString *k = [NSString stringWithUTF8String:key];
-	[(TSEvent *)event addIntegerValue:value forKey:k];
+	[(BRIDGE_TRANSFER TSEvent *)event addIntegerValue:value forKey:k];
 }
 void Event_AddPairUInt(void *event, const char *key, unsigned int value)
 {
 	NSString *k = [NSString stringWithUTF8String:key];
-	[(TSEvent *)event addUnsignedIntegerValue:value forKey:k];
+	[(BRIDGE_TRANSFER TSEvent *)event addUnsignedIntegerValue:value forKey:k];
 }
 void Event_AddPairDouble(void *event, const char *key, double value)
 {
 	NSString *k = [NSString stringWithUTF8String:key];
-	[(TSEvent *)event addDoubleValue:value forKey:k];
+	[(BRIDGE_TRANSFER TSEvent *)event addDoubleValue:value forKey:k];
 }
 
 void Tapstream_Create(const char *accountName, const char *developerSecret, void *conf)
