@@ -1,8 +1,12 @@
+
+#import "TSSafariViewControllerDelegate.h"
 #import "TSTapstream.h"
 #import "TSHelpers.h"
 #import "TSPlatformImpl.h"
 #import "TSCoreListenerImpl.h"
 #import "TSAppEventSourceImpl.h"
+
+#define kTSCookieMatchFlag @"__tapstream_cookiematchfired"
 
 @interface TSDelegateImpl : NSObject<TSDelegate> {
 	TSTapstream *ts;
@@ -83,7 +87,11 @@ static TSTapstream *instance = nil;
 			accountName:accountName
 			developerSecret:developerSecret
 			config:config]);
+
 		[core start];
+		if(config.awaitCookieMatch){
+			[self registerCookieMatchObserver];
+		}
         
         // Dynamically instantiate TSWordOfMouthController, if the source files have been
         // included in the developer's project.
@@ -112,6 +120,50 @@ static TSTapstream *instance = nil;
     RELEASE(wordOfMouthController);
 	RELEASE(core);
 	SUPER_DEALLOC;
+}
+
+- (void)registerCookieMatchObserver
+{
+	if([platform getPersistentFlagVal:kTSCookieMatchFlag]){
+		// Already sent, let core know
+		[core fireCookieMatch];
+	}else{
+		[[NSNotificationCenter defaultCenter]
+		 addObserver:self
+			selector:@selector(handleNotification:)
+				name:UIApplicationDidBecomeActiveNotification
+			  object:nil];
+	}
+}
+
+- (void)handleNotification:(NSNotification*)notification
+{
+	[[NSNotificationCenter defaultCenter]
+	 removeObserver:self
+	 name:UIApplicationDidBecomeActiveNotification
+	 object:nil];
+
+	UIViewController* rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+	[self fireCookieMatch:rootViewController completion:nil];
+}
+
+- (void)fireCookieMatch:(UIViewController*)controller completion:(void(^)(void))completion
+{
+	if (![platform getPersistentFlagVal:kTSCookieMatchFlag]){ // Only fires once.
+		[platform setPersistentFlagVal:kTSCookieMatchFlag];
+		NSString* accountName = [core getAccountName];
+		NSString* urlstr = [NSString stringWithFormat:@"https://api.taps.io/%@/cookiematch", accountName];
+		NSURL* url = [[NSURL alloc] initWithString:urlstr];
+
+		TSSafariViewControllerDelegate* delegate = [[TSSafariViewControllerDelegate alloc]
+													initWithURLAndCompletion:url completion:^{
+														if(completion != nil){
+															completion();
+														}
+														[core fireCookieMatch];
+													}];
+		[controller presentViewController:delegate animated:NO completion:nil];
+	}
 }
 
 - (void)fireEvent:(TSEvent *)event

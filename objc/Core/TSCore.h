@@ -29,7 +29,9 @@
 	NSString *failingEventId;
 	NSString *appName;
 	int delay;
+	BOOL cookieMatchFired;
 }
+
 
 - (id)initWithDelegate:(id<TSDelegate>)delegate platform:(id<TSPlatform>)platform listener:(id<TSCoreListener>)listener appEventSource:(id<TSAppEventSource>)appEventSource accountName:(NSString *)accountName developerSecret:(NSString *)developerSecret config:(TSConfig *)config;
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
@@ -38,9 +40,11 @@
 - (void)start;
 - (void)fireEvent:(TSEvent *)event;
 - (void)fireHit:(TSHit *)hit completion:(void(^)(TSResponse *))completion;
+- (void)fireCookieMatch;
 - (void)getConversionData:(void(^)(NSData *))completion;
 - (NSData*)getConversionDataBlocking:(int)timeout_ms;
 - (int)getDelay;
+- (NSString*)getAccountName;
 - (NSMutableString *)postData;
 
 @end

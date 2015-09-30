@@ -15,8 +15,9 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     TSConfig *config = [TSConfig configWithDefaults];
+	config.awaitCookieMatch = true;
     [TSTapstream createWithAccountName:@"sdktest" developerSecret:@"YGP2pezGTI6ec48uti4o1w" config:config];
-    
+
     return YES;
 }
 

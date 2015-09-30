@@ -34,6 +34,9 @@
 @property(nonatomic, STRONG_OR_RETAIN) NSString *failingEventId;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *appName;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *platformName;
+@property(nonatomic) dispatch_queue_t queue;
+@property(nonatomic) dispatch_queue_t concurrentQueue;
+@property(nonatomic) BOOL cookieMatchFired;
 
 - (NSString *)clean:(NSString *)s;
 - (void)increaseDelay;
@@ -43,7 +46,7 @@
 
 @implementation TSCore
 
-@synthesize del, platform, listener, appEventSource, config, accountName, secret, encodedAppName, postData, firingEvents, firedEvents, failingEventId, appName, platformName;
+@synthesize del, platform, listener, appEventSource, config, accountName, secret, encodedAppName, postData, firingEvents, firedEvents, failingEventId, appName, platformName, queue, concurrentQueue, cookieMatchFired;
 
 - (id)initWithDelegate:(id<TSDelegate>)delegateVal
 	platform:(id<TSPlatform>)platformVal
@@ -75,6 +78,8 @@
 
         firingEvents = [[NSMutableSet alloc] initWithCapacity:32];
 		self.firedEvents = [platform loadFiredEvents];
+		self.queue = RETAIN(dispatch_queue_create("Tapstream Serial Queue", DISPATCH_QUEUE_SERIAL));
+		self.concurrentQueue = RETAIN(dispatch_queue_create("Tapstream Concurrent Queue", DISPATCH_QUEUE_CONCURRENT));
 	}
 	return self;
 }
@@ -93,6 +98,8 @@
 	RELEASE(failingEventId);
 	RELEASE(appName);
 	RELEASE(platformName);
+	RELEASE(queue);
+	RELEASE(concurrentQueue);
 	SUPER_DEALLOC;
 }
 
@@ -139,6 +146,21 @@
 	}
 
 
+	if(config.awaitCookieMatch)
+	{
+		// Block queue until cookie match fired
+		dispatch_async(self.queue, ^{
+			BOOL hasFired = false;
+
+			do{
+				@synchronized(self) {
+					hasFired = self.cookieMatchFired;
+				}
+			}
+			while(!hasFired);
+			NSLog(@"Cookie Match Complete");
+		});
+	}
 
 	if(config.fireAutomaticInstallEvent)
 	{
@@ -195,6 +217,11 @@
 	}
 }
 
+- (void)fireCookieMatch
+{
+	self.cookieMatchFired = true;
+}
+
 - (void)fireEvent:(TSEvent *)e
 {
 	@synchronized(self)
@@ -233,8 +260,7 @@
 
 		int actualDelay = [del getDelay];
 		dispatch_time_t dispatchTime = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * actualDelay);
-		dispatch_after(dispatchTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-
+		dispatch_after(dispatchTime, self.queue, ^{
 			NSString *allData = data;
 
 			TSResponse *response = [platform request:url data:allData method:@"POST" timeout_ms:kTSDefaultTimeout];
@@ -334,7 +360,7 @@
 	NSString *url = [NSString stringWithFormat:kTSHitUrlTemplate, accountName, hit.encodedTrackerName];
 	NSString *data = hit.postData;
 
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+	dispatch_async(self.queue, ^{
 		TSResponse *response = [platform request:url data:data method:@"POST" timeout_ms:kTSDefaultTimeout];
 		if(response.status < 200 || response.status >= 300)
 		{
@@ -361,7 +387,7 @@
 		return;
 	}
 
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+    dispatch_async(self.concurrentQueue, ^{
 		[self getConversionData:[completion copy] tries:0 timeout_ms:kTSDefaultTimeout];
     });
 }
@@ -383,7 +409,7 @@
 		// Schedule a retry after kTSConversionPollInterval seconds
 		dispatch_after(
 			dispatch_time(DISPATCH_TIME_NOW, kTSConversionPollInterval * NSEC_PER_SEC),
-			dispatch_get_current_queue(), ^{
+			self.concurrentQueue, ^{
 			  [self getConversionData:completion tries:tries timeout_ms:timeout_ms];
 			}
 		);
@@ -444,6 +470,11 @@
 - (int)getDelay
 {
 	return delay;
+}
+
+- (NSString*)getAccountName
+{
+	return accountName;
 }
 
 - (NSString *)clean:(NSString *)s

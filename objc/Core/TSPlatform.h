@@ -3,6 +3,8 @@
 #import "TSResponse.h"
 
 @protocol TSPlatform<NSObject>
+- (void)setPersistentFlagVal:(NSString*)key;
+- (BOOL)getPersistentFlagVal:(NSString*)key;
 - (NSString *)loadUuid;
 - (NSMutableSet *)loadFiredEvents;
 - (void)saveFiredEvents:(NSMutableSet *)firedEvents;
