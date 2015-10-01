@@ -8,14 +8,15 @@
     <artifactId>tapstream-parent</artifactId>
     <packaging>pom</packaging>
     <version>2.9.3</version>
-    <description>Tapstream Android SDK</description>
+
+    <name>Tapstream Android SDK</name>
+    <description>This library enables Tapstream tracking for your Android application</description>
     <url>https://github.com/tapstream/tapstream-sdk</url>
 
     <modules>
         <module>Core</module>
         <module>Tapstream</module>
         <module>TapstreamTest</module>
-        <module>TapstreamShaded</module>
     </modules>
 
     <organization>

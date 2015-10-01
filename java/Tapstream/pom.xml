@@ -15,7 +15,7 @@
         <dependency>
             <groupId>com.tapstream.sdk</groupId>
             <artifactId>tapstream-core</artifactId>
-            <version>2.9.3</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.android</groupId>
@@ -48,5 +48,34 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>shaded</shadedClassifierName>
+                            <relocations>
+                                <relocation>
+                                  <pattern>org.json</pattern>
+                                  <shadedPattern>com.tapstream.shaded.json</shadedPattern>
+                                </relocation>
+                              </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
