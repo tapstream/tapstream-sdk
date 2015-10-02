@@ -29,7 +29,7 @@
 	NSString *failingEventId;
 	NSString *appName;
 	int delay;
-	BOOL cookieMatchFired;
+	dispatch_semaphore_t cookieMatchFired;
 }
 
 
@@ -44,7 +44,7 @@
 - (void)getConversionData:(void(^)(NSData *))completion;
 - (NSData*)getConversionDataBlocking:(int)timeout_ms;
 - (int)getDelay;
-- (NSString*)getAccountName;
+- (NSURL*)getCookieMatchURL;
 - (NSMutableString *)postData;
 
 @end

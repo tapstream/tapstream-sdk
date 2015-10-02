@@ -35,8 +35,7 @@
 @property(nonatomic, STRONG_OR_RETAIN) NSString *appName;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *platformName;
 @property(nonatomic) dispatch_queue_t queue;
-@property(nonatomic) dispatch_queue_t concurrentQueue;
-@property(nonatomic) BOOL cookieMatchFired;
+@property(nonatomic) dispatch_semaphore_t cookieMatchFired;
 
 - (NSString *)clean:(NSString *)s;
 - (void)increaseDelay;
@@ -46,7 +45,7 @@
 
 @implementation TSCore
 
-@synthesize del, platform, listener, appEventSource, config, accountName, secret, encodedAppName, postData, firingEvents, firedEvents, failingEventId, appName, platformName, queue, concurrentQueue, cookieMatchFired;
+@synthesize del, platform, listener, appEventSource, config, accountName, secret, encodedAppName, postData, firingEvents, firedEvents, failingEventId, appName, platformName, queue, cookieMatchFired;
 
 - (id)initWithDelegate:(id<TSDelegate>)delegateVal
 	platform:(id<TSPlatform>)platformVal
@@ -74,12 +73,14 @@
 		self.appName = nil;
 		self.platformName = [kTSPlatform lowercaseString];
 
+
 		[self makePostArgs];
 
         firingEvents = [[NSMutableSet alloc] initWithCapacity:32];
 		self.firedEvents = [platform loadFiredEvents];
-		self.queue = RETAIN(dispatch_queue_create("Tapstream Serial Queue", DISPATCH_QUEUE_SERIAL));
-		self.concurrentQueue = RETAIN(dispatch_queue_create("Tapstream Concurrent Queue", DISPATCH_QUEUE_CONCURRENT));
+		self.queue = RETAIN(dispatch_queue_create("Tapstream Internal Queue", DISPATCH_QUEUE_CONCURRENT));
+		self.cookieMatchFired = RETAIN(dispatch_semaphore_create(0));
+
 	}
 	return self;
 }
@@ -99,7 +100,7 @@
 	RELEASE(appName);
 	RELEASE(platformName);
 	RELEASE(queue);
-	RELEASE(concurrentQueue);
+	RELEASE(cookieMatchFired);
 	SUPER_DEALLOC;
 }
 
@@ -145,63 +146,56 @@
 		self.appName = @"";
 	}
 
+	__unsafe_unretained TSCore *me = self;
 
 	if(config.awaitCookieMatch)
 	{
 		// Block queue until cookie match fired
-		dispatch_async(self.queue, ^{
-			BOOL hasFired = false;
-
-			do{
-				@synchronized(self) {
-					hasFired = self.cookieMatchFired;
-				}
-			}
-			while(!hasFired);
-			NSLog(@"Cookie Match Complete");
+		dispatch_barrier_async(self.queue, ^{
+			dispatch_semaphore_wait(self.cookieMatchFired, DISPATCH_TIME_FOREVER);
+			NSLog(@"Tapstream: Cookie Match Complete");
 		});
-	}
-
-	if(config.fireAutomaticInstallEvent)
-	{
-		if(config.installEventName != nil)
+	}else {
+		if(config.fireAutomaticInstallEvent)
 		{
-			[self fireEvent:[TSEvent eventWithName:config.installEventName oneTimeOnly:YES]];
-		}
-		else
-		{
-			NSString *eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, self.appName];
-			[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:YES]];
-		}
-	}
-
-	__unsafe_unretained TSCore *me = self;
-
-	if(config.fireAutomaticOpenEvent)
-	{
-		// Fire the initial open event
-		if(config.openEventName != nil)
-		{
-			[self fireEvent:[TSEvent eventWithName:config.openEventName oneTimeOnly:NO]];
-		}
-		else
-		{
-			NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, self.appName];
-			[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
-		}
-
-		// Subscribe to be notified whenever the app enters the foreground
-		[appEventSource setOpenHandler:^() {
-			if(me.config.openEventName != nil)
+			if(config.installEventName != nil)
 			{
-				[me fireEvent:[TSEvent eventWithName:me.config.openEventName oneTimeOnly:NO]];
+				[self fireEvent:[TSEvent eventWithName:config.installEventName oneTimeOnly:YES]];
 			}
 			else
 			{
-				NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", me.platformName, me.appName];
-				[me fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
+				NSString *eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, self.appName];
+				[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:YES]];
 			}
-		}];
+		}
+
+
+		if(config.fireAutomaticOpenEvent)
+		{
+			// Fire the initial open event
+			if(config.openEventName != nil)
+			{
+				[self fireEvent:[TSEvent eventWithName:config.openEventName oneTimeOnly:NO]];
+			}
+			else
+			{
+				NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, self.appName];
+				[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
+			}
+
+			// Subscribe to be notified whenever the app enters the foreground
+			[appEventSource setOpenHandler:^() {
+				if(me.config.openEventName != nil)
+				{
+					[me fireEvent:[TSEvent eventWithName:me.config.openEventName oneTimeOnly:NO]];
+				}
+				else
+				{
+					NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", me.platformName, me.appName];
+					[me fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
+				}
+			}];
+		}
 	}
 
 	if(config.fireAutomaticIAPEvents)
@@ -219,7 +213,7 @@
 
 - (void)fireCookieMatch
 {
-	self.cookieMatchFired = true;
+	dispatch_semaphore_signal(self.cookieMatchFired);
 }
 
 - (void)fireEvent:(TSEvent *)e
@@ -387,7 +381,7 @@
 		return;
 	}
 
-    dispatch_async(self.concurrentQueue, ^{
+    dispatch_async(self.queue, ^{
 		[self getConversionData:[completion copy] tries:0 timeout_ms:kTSDefaultTimeout];
     });
 }
@@ -409,7 +403,7 @@
 		// Schedule a retry after kTSConversionPollInterval seconds
 		dispatch_after(
 			dispatch_time(DISPATCH_TIME_NOW, kTSConversionPollInterval * NSEC_PER_SEC),
-			self.concurrentQueue, ^{
+			self.queue, ^{
 			  [self getConversionData:completion tries:tries timeout_ms:timeout_ms];
 			}
 		);
@@ -472,9 +466,25 @@
 	return delay;
 }
 
-- (NSString*)getAccountName
+- (NSURL*)getCookieMatchURL
 {
-	return accountName;
+	NSMutableString* urlString = [NSMutableString stringWithFormat:@"https://api.taps.io/%@/cookiematch", accountName];
+	BOOL first = true;
+	for(NSString *key in config.globalEventParams)
+	{
+		if (first){
+			[urlString appendString:@"?"];
+			first = false;
+		}else{
+			[urlString appendString:@"&"];
+		}
+		NSString* value = [config.globalEventParams valueForKey:key];
+		[urlString appendString:[TSUtils encodeEventPairWithPrefix:@"custom-"
+															   key:key
+															 value:value
+												  limitValueLength:NO]];
+	}
+	return [NSURL URLWithString:urlString];
 }
 
 - (NSString *)clean:(NSString *)s

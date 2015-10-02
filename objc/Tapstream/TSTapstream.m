@@ -151,10 +151,7 @@ static TSTapstream *instance = nil;
 {
 	if (![platform getPersistentFlagVal:kTSCookieMatchFlag]){ // Only fires once.
 		[platform setPersistentFlagVal:kTSCookieMatchFlag];
-		NSString* accountName = [core getAccountName];
-		NSString* urlstr = [NSString stringWithFormat:@"https://api.taps.io/%@/cookiematch", accountName];
-		NSURL* url = [[NSURL alloc] initWithString:urlstr];
-
+		NSURL* url = [core getCookieMatchURL];
 		TSSafariViewControllerDelegate* delegate = [[TSSafariViewControllerDelegate alloc]
 													initWithURLAndCompletion:url completion:^{
 														if(completion != nil){
