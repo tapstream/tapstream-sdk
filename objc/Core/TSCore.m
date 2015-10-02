@@ -146,16 +146,16 @@
 		self.appName = @"";
 	}
 
-	__unsafe_unretained TSCore *me = self;
-
-	if(config.awaitCookieMatch)
+	if(config.awaitCookieMatch) // cookie match replaces initial install and open events
 	{
 		// Block queue until cookie match fired
 		dispatch_barrier_async(self.queue, ^{
 			dispatch_semaphore_wait(self.cookieMatchFired, DISPATCH_TIME_FOREVER);
 			NSLog(@"Tapstream: Cookie Match Complete");
 		});
-	}else {
+	}
+	else
+	{
 		if(config.fireAutomaticInstallEvent)
 		{
 			if(config.installEventName != nil)
@@ -169,7 +169,6 @@
 			}
 		}
 
-
 		if(config.fireAutomaticOpenEvent)
 		{
 			// Fire the initial open event
@@ -182,20 +181,25 @@
 				NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", platformName, self.appName];
 				[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
 			}
-
-			// Subscribe to be notified whenever the app enters the foreground
-			[appEventSource setOpenHandler:^() {
-				if(me.config.openEventName != nil)
-				{
-					[me fireEvent:[TSEvent eventWithName:me.config.openEventName oneTimeOnly:NO]];
-				}
-				else
-				{
-					NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", me.platformName, me.appName];
-					[me fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
-				}
-			}];
 		}
+	}
+
+	__unsafe_unretained TSCore *me = self;
+	if(config.fireAutomaticOpenEvent)
+	{
+
+		// Subscribe to be notified whenever the app enters the foreground
+		[appEventSource setOpenHandler:^() {
+			if(me.config.openEventName != nil)
+			{
+				[me fireEvent:[TSEvent eventWithName:me.config.openEventName oneTimeOnly:NO]];
+			}
+			else
+			{
+				NSString *eventName = [NSString stringWithFormat:@"%@-%@-open", me.platformName, me.appName];
+				[me fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:NO]];
+			}
+		}];
 	}
 
 	if(config.fireAutomaticIAPEvents)
