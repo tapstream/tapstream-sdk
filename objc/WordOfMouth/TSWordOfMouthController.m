@@ -381,6 +381,9 @@
     [self.delegate showedSharing:offerId];
 }
 
+- (void)dismissedSharing
+{}
+
 - (void)completedShare:(NSUInteger)offerId socialMedium:(NSString *)medium
 {
     [self.delegate completedShare:offerId socialMedium:medium];
