@@ -66,6 +66,8 @@
 		12A24508192818EC0096DC1F /* TSCoreListenerImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A244FB192818EC0096DC1F /* TSCoreListenerImpl.m */; };
 		12A24509192818EC0096DC1F /* TSPlatformImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A244FD192818EC0096DC1F /* TSPlatformImpl.m */; };
 		12A2450A192818EC0096DC1F /* TSTapstream.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A244FF192818EC0096DC1F /* TSTapstream.m */; };
+		6620038A1BC744BC00ACED07 /* TSSafariViewControllerDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 662003891BC744BC00ACED07 /* TSSafariViewControllerDelegate.m */; settings = {ASSET_TAGS = (); }; };
+		6620038E1BC7617B00ACED07 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6620038D1BC7617B00ACED07 /* SafariServices.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -166,6 +168,9 @@
 		12A244FE192818EC0096DC1F /* TSTapstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSTapstream.h; sourceTree = "<group>"; };
 		12A244FF192818EC0096DC1F /* TSTapstream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSTapstream.m; sourceTree = "<group>"; };
 		12A2450C19281B3A0096DC1F /* TSWordOfMouthDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSWordOfMouthDelegate.h; sourceTree = "<group>"; };
+		662003881BC744BC00ACED07 /* TSSafariViewControllerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSSafariViewControllerDelegate.h; sourceTree = "<group>"; };
+		662003891BC744BC00ACED07 /* TSSafariViewControllerDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSSafariViewControllerDelegate.m; sourceTree = "<group>"; };
+		6620038D1BC7617B00ACED07 /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = System/Library/Frameworks/SafariServices.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -173,6 +178,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6620038E1BC7617B00ACED07 /* SafariServices.framework in Frameworks */,
 				12A244DD1927D9060096DC1F /* Social.framework in Frameworks */,
 				1288B950191D6330005DC5B3 /* CoreGraphics.framework in Frameworks */,
 				1288B952191D6330005DC5B3 /* UIKit.framework in Frameworks */,
@@ -298,6 +304,7 @@
 		1288B94C191D6330005DC5B3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6620038D1BC7617B00ACED07 /* SafariServices.framework */,
 				12A244DC1927D9060096DC1F /* Social.framework */,
 				1288B94D191D6330005DC5B3 /* Foundation.framework */,
 				1288B94F191D6330005DC5B3 /* CoreGraphics.framework */,
@@ -339,6 +346,8 @@
 		12A244F6192818EC0096DC1F /* Tapstream */ = {
 			isa = PBXGroup;
 			children = (
+				662003881BC744BC00ACED07 /* TSSafariViewControllerDelegate.h */,
+				662003891BC744BC00ACED07 /* TSSafariViewControllerDelegate.m */,
 				12A244F7192818EC0096DC1F /* bin */,
 				12A244F8192818EC0096DC1F /* TSAppEventSourceImpl.h */,
 				12A244F9192818EC0096DC1F /* TSAppEventSourceImpl.m */,
@@ -499,6 +508,7 @@
 				128512F21940DFB500712477 /* TSReward.m in Sources */,
 				12A24506192818EC0096DC1F /* TSUtils.m in Sources */,
 				12A24505192818EC0096DC1F /* TSResponse.m in Sources */,
+				6620038A1BC744BC00ACED07 /* TSSafariViewControllerDelegate.m in Sources */,
 				128513101940E01200712477 /* ViewController.m in Sources */,
 				12A24503192818EC0096DC1F /* TSHit.m in Sources */,
 				12A24500192818EC0096DC1F /* TSConfig.m in Sources */,

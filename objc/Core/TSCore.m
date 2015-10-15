@@ -5,7 +5,8 @@
 
 #define kTSVersion @"2.9.6"
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
-#define kTSHitUrlTemplate @"http://api.tapstream.com/%@/hit/%@.gif"
+#define kTSCookieMatchUrlTemplate @"https://api.taps.io/%@/event/%@/?cookiematch=true&%@"
+#define kTSHitUrlTemplate @"https://api.tapstream.com/%@/hit/%@.gif"
 #define kTSConversionUrlTemplate @"https://reporting.tapstream.com/v1/timelines/lookup?secret=%@&event_session=%@"
 #define kTSConversionPollInterval 1
 #define kTSConversionPollCount 10
@@ -34,6 +35,8 @@
 @property(nonatomic, STRONG_OR_RETAIN) NSString *failingEventId;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *appName;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *platformName;
+@property(nonatomic) dispatch_queue_t queue;
+@property(nonatomic) dispatch_semaphore_t cookieMatchFired;
 
 - (NSString *)clean:(NSString *)s;
 - (void)increaseDelay;
@@ -43,7 +46,7 @@
 
 @implementation TSCore
 
-@synthesize del, platform, listener, appEventSource, config, accountName, secret, encodedAppName, postData, firingEvents, firedEvents, failingEventId, appName, platformName;
+@synthesize del, platform, listener, appEventSource, config, accountName, secret, encodedAppName, postData, firingEvents, firedEvents, failingEventId, appName, platformName, queue, cookieMatchFired;
 
 - (id)initWithDelegate:(id<TSDelegate>)delegateVal
 	platform:(id<TSPlatform>)platformVal
@@ -71,10 +74,14 @@
 		self.appName = nil;
 		self.platformName = [kTSPlatform lowercaseString];
 
+
 		[self makePostArgs];
 
         firingEvents = [[NSMutableSet alloc] initWithCapacity:32];
 		self.firedEvents = [platform loadFiredEvents];
+		self.queue = RETAIN(dispatch_queue_create("Tapstream Internal Queue", DISPATCH_QUEUE_CONCURRENT));
+		self.cookieMatchFired = RETAIN(dispatch_semaphore_create(0));
+
 	}
 	return self;
 }
@@ -93,6 +100,8 @@
 	RELEASE(failingEventId);
 	RELEASE(appName);
 	RELEASE(platformName);
+	RELEASE(queue);
+	RELEASE(cookieMatchFired);
 	SUPER_DEALLOC;
 }
 
@@ -138,23 +147,33 @@
 		self.appName = @"";
 	}
 
-
-
-	if(config.fireAutomaticInstallEvent)
+	if(config.attemptCookieMatch) // cookie match replaces initial install and open events
 	{
-		if(config.installEventName != nil)
+		// Block queue until cookie match fired
+		dispatch_barrier_async(self.queue, ^{
+			dispatch_semaphore_wait(self.cookieMatchFired, DISPATCH_TIME_FOREVER);
+			[platform registerFirstRun];
+			NSLog(@"Tapstream: Cookie Match Complete");
+		});
+	}
+	else
+	{
+		if(config.fireAutomaticInstallEvent && [platform isFirstRun])
 		{
-			[self fireEvent:[TSEvent eventWithName:config.installEventName oneTimeOnly:YES]];
-		}
-		else
-		{
-			NSString *eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, self.appName];
-			[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:YES]];
+			if(config.installEventName != nil)
+			{
+				[self fireEvent:[TSEvent eventWithName:config.installEventName oneTimeOnly:YES]];
+			}
+			else
+			{
+				NSString *eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, self.appName];
+				[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:YES]];
+			}
+			[platform registerFirstRun];			
 		}
 	}
 
 	__unsafe_unretained TSCore *me = self;
-
 	if(config.fireAutomaticOpenEvent)
 	{
 		// Fire the initial open event
@@ -195,6 +214,11 @@
 	}
 }
 
+- (void)fireCookieMatch
+{
+	dispatch_semaphore_signal(self.cookieMatchFired);
+}
+
 - (void)fireEvent:(TSEvent *)e
 {
 	@synchronized(self)
@@ -233,8 +257,7 @@
 
 		int actualDelay = [del getDelay];
 		dispatch_time_t dispatchTime = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * actualDelay);
-		dispatch_after(dispatchTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-
+		dispatch_after(dispatchTime, self.queue, ^{
 			NSString *allData = data;
 
 			TSResponse *response = [platform request:url data:allData method:@"POST" timeout_ms:kTSDefaultTimeout];
@@ -334,7 +357,7 @@
 	NSString *url = [NSString stringWithFormat:kTSHitUrlTemplate, accountName, hit.encodedTrackerName];
 	NSString *data = hit.postData;
 
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+	dispatch_async(self.queue, ^{
 		TSResponse *response = [platform request:url data:data method:@"POST" timeout_ms:kTSDefaultTimeout];
 		if(response.status < 200 || response.status >= 300)
 		{
@@ -361,7 +384,7 @@
 		return;
 	}
 
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+    dispatch_async(self.queue, ^{
 		[self getConversionData:[completion copy] tries:0 timeout_ms:kTSDefaultTimeout];
     });
 }
@@ -383,7 +406,7 @@
 		// Schedule a retry after kTSConversionPollInterval seconds
 		dispatch_after(
 			dispatch_time(DISPATCH_TIME_NOW, kTSConversionPollInterval * NSEC_PER_SEC),
-			dispatch_get_current_queue(), ^{
+			self.queue, ^{
 			  [self getConversionData:completion tries:tries timeout_ms:timeout_ms];
 			}
 		);
@@ -444,6 +467,30 @@
 - (int)getDelay
 {
 	return delay;
+}
+
+- (NSURL*)getCookieMatchURL
+{
+	NSString* eventName = config.installEventName;
+	if(eventName == nil)
+	{
+		eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, self.appName];
+	}
+
+	NSMutableString* urlString = [NSMutableString stringWithFormat:kTSCookieMatchUrlTemplate,
+								  accountName, eventName, postData];
+
+	for(NSString *key in config.globalEventParams)
+	{
+		[urlString appendString:@"&"];
+
+		NSString* value = [config.globalEventParams valueForKey:key];
+		[urlString appendString:[TSUtils encodeEventPairWithPrefix:@"custom-"
+															   key:key
+															 value:value
+												  limitValueLength:NO]];
+	}
+	return [NSURL URLWithString:urlString];
 }
 
 - (NSString *)clean:(NSString *)s

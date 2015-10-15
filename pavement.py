@@ -204,10 +204,10 @@ def make_objc():
 		# iOS With and without ARC
 		clang = sh('echo xcrun -sdk iphoneos clang', capture=True).strip()
 		sdk_root = sh('echo $(xcodebuild -version -sdk iphoneos Path)', capture=True).strip()
-		sh('%s -isysroot %s -miphoneos-version-min=4.3 -arch armv7 -fno-objc-arc -shared %s %s -o ./TapstreamTest/bin/Tapstream.so -framework Foundation -framework UIKit' % (
+		sh('%s -isysroot %s -miphoneos-version-min=4.3 -arch armv7 -fno-objc-arc -shared %s %s -o ./TapstreamTest/bin/Tapstream.so -framework Foundation -framework UIKit -framework SafariServices -framework CoreGraphics' % (
 			clang, sdk_root, include_dirs, tapstream_sources
 		))
-		sh('%s -isysroot %s -miphoneos-version-min=4.3 -arch armv7 -fobjc-arc -shared %s %s -o ./TapstreamTest/bin/Tapstream.so -framework Foundation -framework UIKit' % (
+		sh('%s -isysroot %s -miphoneos-version-min=4.3 -arch armv7 -fobjc-arc -shared %s %s -o ./TapstreamTest/bin/Tapstream.so -framework Foundation -framework UIKit -framework SafariServices -framework CoreGraphics' % (
 			clang, sdk_root, include_dirs, tapstream_sources
 		))
 		

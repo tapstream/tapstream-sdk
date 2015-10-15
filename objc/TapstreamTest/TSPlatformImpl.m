@@ -3,7 +3,7 @@
 
 @implementation TSPlatformImpl
 
-@synthesize response, savedFiredList;
+@synthesize response, savedFiredList, firstRun;
 
 - (id)init
 {
@@ -11,6 +11,7 @@
 	{
 		response = [[TSResponse alloc] initWithStatus:200 message:nil data:nil];
 		savedFiredList = nil;
+		firstRun = true;
 	}
 	return self;
 }
@@ -20,6 +21,27 @@
 	RELEASE(response);
 	RELEASE(savedFiredList);
 	SUPER_DEALLOC;
+}
+
+- (void)setPersistentFlagVal:(NSString*)key
+{
+	[[NSUserDefaults standardUserDefaults] setBool:true forKey:key];
+}
+
+- (BOOL)getPersistentFlagVal:(NSString*)key
+{
+	BOOL val = [[NSUserDefaults standardUserDefaults] boolForKey:key];
+	return val;
+}
+
+- (BOOL) isFirstRun
+{
+	return firstRun;
+}
+
+- (void) registerFirstRun
+{
+	firstRun = false;
 }
 
 - (NSString *)loadUuid

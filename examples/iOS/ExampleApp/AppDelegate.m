@@ -23,6 +23,7 @@
     }
     
     TSConfig *config = [TSConfig configWithDefaults];
+	config.attemptCookieMatch = true;
     [config.globalEventParams setValue:@25.4 forKey:@"degrees"];
     
     [TSTapstream createWithAccountName:@"sdktest" developerSecret:@"YGP2pezGTI6ec48uti4o1w" config:config];

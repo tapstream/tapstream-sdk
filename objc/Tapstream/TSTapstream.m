@@ -1,8 +1,14 @@
+
+#import "TSSafariViewControllerDelegate.h"
 #import "TSTapstream.h"
 #import "TSHelpers.h"
 #import "TSPlatformImpl.h"
 #import "TSCoreListenerImpl.h"
 #import "TSAppEventSourceImpl.h"
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#import <UIKit/UIKit.h>
+#endif
+
 
 @interface TSDelegateImpl : NSObject<TSDelegate> {
 	TSTapstream *ts;
@@ -83,7 +89,11 @@ static TSTapstream *instance = nil;
 			accountName:accountName
 			developerSecret:developerSecret
 			config:config]);
+
 		[core start];
+		if(config.attemptCookieMatch){
+			[self registerCookieMatchObserver];
+		}
         
         // Dynamically instantiate TSWordOfMouthController, if the source files have been
         // included in the developer's project.
@@ -113,6 +123,51 @@ static TSTapstream *instance = nil;
 	RELEASE(core);
 	SUPER_DEALLOC;
 }
+
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+- (void)registerCookieMatchObserver
+{
+	if([platform isFirstRun]){
+		[[NSNotificationCenter defaultCenter]
+		 addObserver:self
+			selector:@selector(handleNotification:)
+		 name:UIApplicationDidBecomeActiveNotification
+		 object:nil];
+	}else{
+		// Already sent, let core know
+		[core fireCookieMatch];
+	}
+}
+
+- (void)handleNotification:(NSNotification*)notification
+{
+	[[NSNotificationCenter defaultCenter]
+	 removeObserver:self
+	 name:UIApplicationDidBecomeActiveNotification
+	 object:nil];
+
+	UIViewController* rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+	[self fireCookieMatch:rootViewController completion:nil];
+}
+
+- (void)fireCookieMatch:(UIViewController*)controller completion:(void(^)(void))completion
+{
+	if ([platform isFirstRun]){ // Only fires once.
+		NSURL* url = [core getCookieMatchURL];
+
+		[TSSafariViewControllerDelegate
+		 presentSafariViewControllerWithURLAndCompletion:url
+		 completion:^{
+			if(completion != nil){
+				completion();
+			}
+			[core fireCookieMatch];
+		  }];
+	}
+}
+#else
+- (void)registerCookieMatchObserver {}
+#endif
 
 - (void)fireEvent:(TSEvent *)event
 {

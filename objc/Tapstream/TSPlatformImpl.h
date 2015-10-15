@@ -6,6 +6,10 @@
 
 @interface TSPlatformImpl : NSObject<TSPlatform> {}
 
+- (void)setPersistentFlagVal:(NSString*)key;
+- (BOOL)getPersistentFlagVal:(NSString*)key;
+- (BOOL) isFirstRun;
+- (void) registerFirstRun;
 - (NSString *)loadUuid;
 - (NSMutableSet *)loadFiredEvents;
 - (void)saveFiredEvents:(NSMutableSet *)firedEvents;
