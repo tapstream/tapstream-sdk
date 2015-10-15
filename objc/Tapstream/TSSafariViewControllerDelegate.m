@@ -50,16 +50,6 @@
 	SUPER_DEALLOC;
 }
 
-// SFSafariViewController delegate methods
-- (NSArray<UIActivity *> *)safariViewController:(id)controller activityItemsForURL:(NSURL *)URL title:(nullable NSString *)title
-{
-	return nil;
-}
-
-- (void)safariViewControllerDidFinish:(id)controller
-{
-}
-
 - (void)safariViewController:(id)controller didCompleteInitialLoad:(BOOL)didLoadSuccessfully
 {
 	[controller dismissViewControllerAnimated:false completion:^{
