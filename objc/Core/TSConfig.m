@@ -23,6 +23,7 @@
 @synthesize fireAutomaticInstallEvent = fireAutomaticInstallEvent;
 @synthesize fireAutomaticOpenEvent = fireAutomaticOpenEvent;
 @synthesize fireAutomaticIAPEvents = fireAutomaticIAPEvents;
+@synthesize attemptCookieMatch = attemptCookieMatch;
 
 @synthesize collectTasteData = collectTasteData;
 
@@ -47,6 +48,7 @@
 		fireAutomaticInstallEvent = YES;
 		fireAutomaticOpenEvent = YES;
 		fireAutomaticIAPEvents = YES;
+		attemptCookieMatch = NO;
         collectTasteData = YES;
 		self.globalEventParams = [NSMutableDictionary dictionaryWithCapacity:16];
 	}

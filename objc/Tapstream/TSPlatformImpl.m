@@ -17,8 +17,30 @@
 
 #define kTSFiredEventsKey @"__tapstream_fired_events"
 #define kTSUUIDKey @"__tapstream_uuid"
+#define kTSHasRunKey @"__tapstream_has_run"
 
 @implementation TSPlatformImpl
+
+- (void)setPersistentFlagVal:(NSString*)key
+{
+	[[NSUserDefaults standardUserDefaults] setBool:true forKey:key];
+}
+
+- (BOOL)getPersistentFlagVal:(NSString*)key
+{
+	BOOL val = [[NSUserDefaults standardUserDefaults] boolForKey:key];
+	return val;
+}
+
+- (BOOL) isFirstRun
+{
+	return ![self getPersistentFlagVal:kTSHasRunKey];
+}
+
+- (void) registerFirstRun
+{
+	[self setPersistentFlagVal:kTSHasRunKey];
+}
 
 - (NSString *)loadUuid
 {

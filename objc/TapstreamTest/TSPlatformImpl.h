@@ -11,7 +11,12 @@
 
 @property(nonatomic, STRONG_OR_RETAIN) TSResponse *response;
 @property(nonatomic, STRONG_OR_RETAIN) NSArray *savedFiredList;
+@property(nonatomic) BOOL firstRun;
 
+- (void)setPersistentFlagVal:(NSString*)key;
+- (BOOL)getPersistentFlagVal:(NSString*)key;
+- (BOOL) isFirstRun;
+- (void) registerFirstRun;
 - (NSString *)loadUuid;
 - (NSMutableSet *)loadFiredEvents;
 - (void)saveFiredEvents:(NSMutableSet *)firedEvents;

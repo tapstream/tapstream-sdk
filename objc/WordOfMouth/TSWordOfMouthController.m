@@ -347,13 +347,22 @@
 			}];
 		}
 
-		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+		{
 			[parent presentViewController:c animated:YES completion:nil];
-		}else{
+		}
+		else if ([parent respondsToSelector:@selector(popoverPresentationController)])
+		{
+			c.popoverPresentationController.sourceRect = CGRectMake(parent.view.frame.size.width/2, parent.view.frame.size.height, 0, 0);
+			c.popoverPresentationController.sourceView = parent.view;
+			[parent presentViewController:c animated:YES completion:nil];
+		}
+		else
+		{
 			UIPopoverController *popup = [[UIPopoverController alloc] initWithContentViewController:c];
 			[popup presentPopoverFromRect:CGRectMake(parent.view.frame.size.width/2, parent.view.frame.size.height, 0, 0)
 								   inView:parent.view
-				 permittedArrowDirections:UIPopoverArrowDirectionUnknown
+				 permittedArrowDirections:UIPopoverArrowDirectionDown
 								 animated:YES];
 		}
     }
