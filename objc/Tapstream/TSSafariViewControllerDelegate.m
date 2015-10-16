@@ -30,7 +30,6 @@
 			me.hiddenWindow.hidden = true;
 
 			me.view.hidden = YES;
-			me.modalPresentationStyle = UIModalPresentationOverFullScreen;
 
 			[safController performSelector:@selector(setDelegate:) withObject:me];
 
