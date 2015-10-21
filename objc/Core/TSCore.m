@@ -37,6 +37,7 @@
 @property(nonatomic, STRONG_OR_RETAIN) NSString *platformName;
 @property(nonatomic) dispatch_queue_t queue;
 @property(nonatomic) dispatch_semaphore_t cookieMatchFired;
+@property(nonatomic) BOOL cookieMatchInProgress;
 
 - (NSString *)clean:(NSString *)s;
 - (void)increaseDelay;
@@ -147,18 +148,18 @@
 		self.appName = @"";
 	}
 
-	if(config.attemptCookieMatch) // cookie match replaces initial install and open events
+	if([platform isFirstRun])
 	{
-		// Block queue until cookie match fired
-		dispatch_barrier_async(self.queue, ^{
-			dispatch_semaphore_wait(self.cookieMatchFired, DISPATCH_TIME_FOREVER);
-			[platform registerFirstRun];
-			NSLog(@"Tapstream: Cookie Match Complete");
-		});
-	}
-	else
-	{
-		if(config.fireAutomaticInstallEvent && [platform isFirstRun])
+		if(config.attemptCookieMatch) // cookie match replaces initial install and open events
+		{
+			// Block queue until cookie match fired
+			dispatch_barrier_async(self.queue, ^{
+				dispatch_semaphore_wait(self.cookieMatchFired, DISPATCH_TIME_FOREVER);
+				[platform registerFirstRun];
+				NSLog(@"Tapstream: Cookie Match Complete");
+			});
+		}
+		else if(config.fireAutomaticInstallEvent)
 		{
 			if(config.installEventName != nil)
 			{
@@ -169,9 +170,10 @@
 				NSString *eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, self.appName];
 				[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:YES]];
 			}
-			[platform registerFirstRun];			
+			[platform registerFirstRun];
 		}
 	}
+
 
 	__unsafe_unretained TSCore *me = self;
 	if(config.fireAutomaticOpenEvent)
@@ -214,11 +216,66 @@
 	}
 }
 
-- (void)fireCookieMatch
+- (void)firedCookieMatch
 {
+	[platform setCookieMatchFired:[[NSDate date] timeIntervalSince1970]];
 	dispatch_semaphore_signal(self.cookieMatchFired);
 }
 
+- (BOOL)shouldFireEvent:(TSEvent *)e
+{
+
+	if(e.isOneTimeOnly)
+	{
+		if([firedEvents containsObject:e.name])
+		{
+			[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that has already been fired", e.name];
+			[listener reportOperation:@"event-ignored-already-fired" arg:e.encodedName];
+			[listener reportOperation:@"job-ended" arg:e.encodedName];
+			return false;
+		}
+		else if([firingEvents containsObject:e.name])
+		{
+			[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that is already in progress", e.name];
+			[listener reportOperation:@"event-ignored-already-in-progress" arg:e.encodedName];
+			[listener reportOperation:@"job-ended" arg:e.encodedName];
+			return false;
+		}
+
+		[firingEvents addObject:e.name];
+	}
+	return true;
+}
+
+- (TSResponse*)sendEventRequest:(TSEvent*)e{
+
+	NSString *data = [postData stringByAppendingString:e.postData];
+	if(config.attemptCookieMatch && [platform shouldCookieMatch] && !self.cookieMatchInProgress)
+	{
+		self.cookieMatchInProgress = true;
+		NSURL* url = [self makeCookieMatchURL:data];
+		dispatch_semaphore_t flag = dispatch_semaphore_create(0);
+		__block TSResponse* responseToReturn = nil;
+		[platform fireCookieMatch:url completion:^(TSResponse* response){
+			@synchronized(response) {
+				responseToReturn = response;
+			}
+			self.cookieMatchInProgress = false;
+			dispatch_semaphore_signal(flag);
+		}];
+		dispatch_semaphore_wait(flag, dispatch_time(DISPATCH_TIME_NOW, kTSDefaultTimeout * NSEC_PER_MSEC));
+
+		if(responseToReturn == nil){
+			return [[TSResponse alloc] initWithStatus:-1 message:@"Request incomplete" data:nil];
+		}else{
+			[self cookieMatchFired];
+			return responseToReturn;
+		}
+	}else{
+		NSString *url = [NSString stringWithFormat:kTSEventUrlTemplate, accountName, e.encodedName];
+		return [platform request:url data:data method:@"POST" timeout_ms:kTSDefaultTimeout];
+	}
+}
 - (void)fireEvent:(TSEvent *)e
 {
 	@synchronized(self)
@@ -232,35 +289,17 @@
 		// Notify the event that we are going to fire it so it can record the time and bake its post data
 		[e prepare:config.globalEventParams];
 
-		if(e.isOneTimeOnly)
+		if(![self shouldFireEvent:e])
 		{
-			if([firedEvents containsObject:e.name])
-			{
-				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that has already been fired", e.name];
-				[listener reportOperation:@"event-ignored-already-fired" arg:e.encodedName];
-				[listener reportOperation:@"job-ended" arg:e.encodedName];
-				return;
-			}
-			else if([firingEvents containsObject:e.name])
-			{
-				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that is already in progress", e.name];
-				[listener reportOperation:@"event-ignored-already-in-progress" arg:e.encodedName];
-				[listener reportOperation:@"job-ended" arg:e.encodedName];
-				return;
-			}
-
-			[firingEvents addObject:e.name];
+			return;
 		}
 
-		NSString *url = [NSString stringWithFormat:kTSEventUrlTemplate, accountName, e.encodedName];
-		NSString *data = [postData stringByAppendingString:e.postData];
 
 		int actualDelay = [del getDelay];
 		dispatch_time_t dispatchTime = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * actualDelay);
 		dispatch_after(dispatchTime, self.queue, ^{
-			NSString *allData = data;
+			TSResponse *response = [self sendEventRequest:e];
 
-			TSResponse *response = [platform request:url data:allData method:@"POST" timeout_ms:kTSDefaultTimeout];
 			bool failed = response.status < 200 || response.status >= 300;
 			bool shouldRetry = response.status < 0 || (response.status >= 500 && response.status < 600);
 
@@ -395,10 +434,11 @@
 
 	BOOL error = false;
 
-	NSData* result = [self getConversionDataBlocking:timeout_ms error:&error];
+	NSData* result = RETAIN([self getConversionDataBlocking:timeout_ms error:&error]);
 
 	if (error) // Hard error: do not retry
 	{
+		RELEASE(result);
 		result = nil;
 	}
 	else if(result == nil && tries < kTSConversionPollCount)
@@ -423,6 +463,7 @@
 		^{
 			completion(result);
 			RELEASE(completion);
+			RELEASE(result);
 		}
 	);
 }
@@ -469,7 +510,12 @@
 	return delay;
 }
 
-- (NSURL*)getCookieMatchURL
+- (NSURL*)makeCookieMatchURL
+{
+	return [self makeCookieMatchURL:postData];
+}
+
+- (NSURL*)makeCookieMatchURL:(NSString*)data
 {
 	NSString* eventName = config.installEventName;
 	if(eventName == nil)
@@ -478,7 +524,7 @@
 	}
 
 	NSMutableString* urlString = [NSMutableString stringWithFormat:kTSCookieMatchUrlTemplate,
-								  accountName, eventName, postData];
+								  accountName, eventName, data];
 
 	for(NSString *key in config.globalEventParams)
 	{

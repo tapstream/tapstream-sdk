@@ -27,4 +27,7 @@
 - (NSString *)getComputerGUID;
 - (NSString *)getBundleIdentifier;
 - (NSString *)getBundleShortVersion;
+- (BOOL) shouldCookieMatch;
+- (void)setCookieMatchFired:(NSTimeInterval)t;
+- (void)fireCookieMatch:(NSURL*)url completion:(void(^)(TSResponse*))completion;
 @end

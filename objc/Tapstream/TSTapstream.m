@@ -135,7 +135,7 @@ static TSTapstream *instance = nil;
 		 object:nil];
 	}else{
 		// Already sent, let core know
-		[core fireCookieMatch];
+		[core firedCookieMatch];
 	}
 }
 
@@ -146,23 +146,11 @@ static TSTapstream *instance = nil;
 	 name:UIApplicationDidBecomeActiveNotification
 	 object:nil];
 
-	UIViewController* rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
-	[self fireCookieMatch:rootViewController completion:nil];
-}
-
-- (void)fireCookieMatch:(UIViewController*)controller completion:(void(^)(void))completion
-{
 	if ([platform isFirstRun]){ // Only fires once.
-		NSURL* url = [core getCookieMatchURL];
-
-		[TSSafariViewControllerDelegate
-		 presentSafariViewControllerWithURLAndCompletion:url
-		 completion:^{
-			if(completion != nil){
-				completion();
-			}
-			[core fireCookieMatch];
-		  }];
+		NSURL* url = [core makeCookieMatchURL];
+		[platform fireCookieMatch:url completion:^(TSResponse* response){
+			[core firedCookieMatch];
+		}];
 	}
 }
 #else
