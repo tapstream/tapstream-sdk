@@ -30,4 +30,6 @@
 - (BOOL) shouldCookieMatch;
 - (void)setCookieMatchFired:(NSTimeInterval)t;
 - (void)fireCookieMatch:(NSURL*)url completion:(void(^)(TSResponse*))completion;
+- (void)registerCookieMatchObserver:(id)observerClass selector:(SEL)observerSelector;
+- (void)unregisterCookieMatchObserver:(id)observerClass;
 @end

@@ -81,11 +81,15 @@
 #else
 // Stub for Mac
 @implementation TSSafariViewControllerDelegate
-+ (void)presentSafariViewControllerWithURLAndCompletion:(NSURL*)url completion:(void (^)(void))completion
++ (void)presentSafariViewControllerWithURLAndCompletion:(NSURL*)url completion:(void (^)(TSResponse*))completion
 {
 	[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream cookie matching should only be used on iOS devices"];
+
 	if (completion != nil){
-		completion();
+		completion([[TSResponse alloc]
+					initWithStatus:-1
+						   message:@"SafariServices framework not loaded, cookie match impossible"
+							  data:nil]);
 	}
 }
 @end

@@ -91,9 +91,6 @@ static TSTapstream *instance = nil;
 			config:config]);
 
 		[core start];
-		if(config.attemptCookieMatch){
-			[self registerCookieMatchObserver];
-		}
         
         // Dynamically instantiate TSWordOfMouthController, if the source files have been
         // included in the developer's project.
@@ -123,39 +120,6 @@ static TSTapstream *instance = nil;
 	RELEASE(core);
 	SUPER_DEALLOC;
 }
-
-#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-- (void)registerCookieMatchObserver
-{
-	if([platform isFirstRun]){
-		[[NSNotificationCenter defaultCenter]
-		 addObserver:self
-			selector:@selector(handleNotification:)
-		 name:UIApplicationDidBecomeActiveNotification
-		 object:nil];
-	}else{
-		// Already sent, let core know
-		[core firedCookieMatch];
-	}
-}
-
-- (void)handleNotification:(NSNotification*)notification
-{
-	[[NSNotificationCenter defaultCenter]
-	 removeObserver:self
-	 name:UIApplicationDidBecomeActiveNotification
-	 object:nil];
-
-	if ([platform isFirstRun]){ // Only fires once.
-		NSURL* url = [core makeCookieMatchURL];
-		[platform fireCookieMatch:url completion:^(TSResponse* response){
-			[core firedCookieMatch];
-		}];
-	}
-}
-#else
-- (void)registerCookieMatchObserver {}
-#endif
 
 - (void)fireEvent:(TSEvent *)event
 {

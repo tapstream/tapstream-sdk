@@ -152,12 +152,15 @@
 	{
 		if(config.attemptCookieMatch) // cookie match replaces initial install and open events
 		{
+			[self registerCookieMatchObserver];
+
 			// Block queue until cookie match fired
 			dispatch_barrier_async(self.queue, ^{
 				dispatch_semaphore_wait(self.cookieMatchFired, DISPATCH_TIME_FOREVER);
 				[platform registerFirstRun];
 				NSLog(@"Tapstream: Cookie Match Complete");
 			});
+
 		}
 		else if(config.fireAutomaticInstallEvent)
 		{
@@ -216,6 +219,33 @@
 	}
 }
 
+
+
+
+- (void)registerCookieMatchObserver
+{
+	if([platform isFirstRun]){
+		[platform registerCookieMatchObserver:self selector:@selector(handleNotification:)];
+	}else{
+		// Already sent, let core know
+		[self firedCookieMatch];
+	}
+}
+
+- (void)handleNotification:(NSNotification*)notification
+{
+	[platform unregisterCookieMatchObserver:self];
+	if ([platform isFirstRun]){ // Only fires once.
+		NSURL* url = [self makeCookieMatchURL];
+		__unsafe_unretained TSCore* me = self;
+		[platform fireCookieMatch:url completion:^(TSResponse* response){
+			[me firedCookieMatch];
+		}];
+	}
+}
+
+
+
 - (void)firedCookieMatch
 {
 	[platform setCookieMatchFired:[[NSDate date] timeIntervalSince1970]];
@@ -257,9 +287,7 @@
 		dispatch_semaphore_t flag = dispatch_semaphore_create(0);
 		__block TSResponse* responseToReturn = nil;
 		[platform fireCookieMatch:url completion:^(TSResponse* response){
-			@synchronized(response) {
-				responseToReturn = response;
-			}
+			responseToReturn = response;
 			self.cookieMatchInProgress = false;
 			dispatch_semaphore_signal(flag);
 		}];
