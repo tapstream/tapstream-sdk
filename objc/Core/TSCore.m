@@ -7,6 +7,7 @@
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
 #define kTSCookieMatchUrlTemplate @"https://api.taps.io/%@/event/%@/?cookiematch=true&%@"
 #define kTSHitUrlTemplate @"https://api.tapstream.com/%@/hit/%@.gif"
+#define kTSLanderUrlTemplate @"https://reporting.tapstream.com/v1/in_app_landers/display/?secret=%@&event_session=%@"
 #define kTSConversionUrlTemplate @"https://reporting.tapstream.com/v1/timelines/lookup?secret=%@&event_session=%@"
 #define kTSConversionPollInterval 1
 #define kTSConversionPollCount 10
@@ -536,6 +537,13 @@
 - (int)getDelay
 {
 	return delay;
+}
+
+- (NSURL*)makeLanderURL
+{
+	NSString* eventSession = [platform loadUuid];
+	eventSession = @"163cda5a-7280-42be-a530-5558401d1746";
+	return [[NSURL alloc] initWithString:[NSString stringWithFormat:kTSLanderUrlTemplate, secret, eventSession]];
 }
 
 - (NSURL*)makeCookieMatchURL

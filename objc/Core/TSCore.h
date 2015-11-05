@@ -44,6 +44,7 @@
 - (void)getConversionData:(void(^)(NSData *))completion;
 - (NSData*)getConversionDataBlocking:(int)timeout_ms;
 - (int)getDelay;
+- (NSURL*)makeLanderURL;
 - (NSURL*)makeCookieMatchURL;
 - (NSURL*)makeCookieMatchURL:(NSString*)data;
 - (NSMutableString *)postData;

@@ -5,6 +5,8 @@
 #import "TSPlatformImpl.h"
 #import "TSCoreListenerImpl.h"
 #import "TSAppEventSourceImpl.h"
+#import "TSLanderController.h"
+#import "TSLanderDelegateWrapper.h"
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 #import <UIKit/UIKit.h>
 #endif
@@ -174,8 +176,48 @@ static TSTapstream *instance = nil;
     [self fireEvent:event];
 }
 
-@end
+- (TSLander*)fetchLanderIfNotShown{
+	NSHTTPURLResponse *response;
+	NSError *error;
+	NSURLRequest* request = [[NSURLRequest alloc] initWithURL:[core makeLanderURL]];
+	NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+	NSInteger status = response ? ((NSHTTPURLResponse *)response).statusCode : -1;
 
+	[TSLogging logAtLevel:kTSLoggingInfo
+				   format:@"Offers request complete (status %d)",
+	 (int)status];
+
+	if(data && status >= 200 && status < 300) {
+		NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+		if(json) {
+			TSLander* lander = [[TSLander alloc] initWithDescription:json];
+			if(![platform landerShown:lander.ident]){
+				return lander;
+			}
+		}
+	}
+	return nil;
+}
+
+- (void)showLanderIfExists:(UIViewController *)parentViewController delegate:(id<TSLanderDelegate>)delegate
+{
+	TSLander* lander = [self fetchLanderIfNotShown];
+	TSLanderDelegateWrapper* wrappedDelegate = [[TSLanderDelegateWrapper alloc] initWithPlatformAndDelegate:platform delegate:delegate];
+	if(parentViewController && lander != nil) {
+		TSLanderController* c = [TSLanderController controllerWithLander:lander delegate:wrappedDelegate];
+		c.view.frame = parentViewController.view.bounds;
+		[parentViewController addChildViewController:c];
+		[UIView transitionWithView:parentViewController.view
+						  duration:0.3
+						   options:UIViewAnimationOptionTransitionCrossDissolve
+						animations:^{
+							[parentViewController.view addSubview:c.view];
+							[c didMoveToParentViewController:parentViewController];
+						}
+						completion:NULL];
+	}
+}
+@end
 
 
 

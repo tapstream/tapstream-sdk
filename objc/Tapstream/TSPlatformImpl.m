@@ -20,6 +20,7 @@
 #define kTSUUIDKey @"__tapstream_uuid"
 #define kTSHasRunKey @"__tapstream_has_run"
 #define kTSLastCookieMatchTimestampKey @"__tapstream_cookie_match_timestamp"
+#define kTSLandersShownKey @"__tapstream_landers_shown"
 #define SECONDS_PER_DAY 86400
 
 @implementation TSPlatformImpl
@@ -351,6 +352,24 @@
 	return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 }
 
+- (BOOL)landerShown:(NSUInteger) landerId
+{
+	NSNumber* numberObj = [NSNumber numberWithUnsignedInteger:landerId];
+	NSArray* landerArray = [[NSUserDefaults standardUserDefaults] objectForKey:kTSLandersShownKey];
+	NSMutableSet* shownLanders = [NSMutableSet setWithArray:landerArray];
+	return [shownLanders containsObject:numberObj];
+}
+
+- (void)setLanderShown:(NSUInteger) landerId
+{
+	NSNumber* numberObj = [NSNumber numberWithUnsignedInteger:landerId];
+	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+	NSArray* landerArray = [defaults objectForKey:kTSLandersShownKey];
+	NSMutableSet* shownLanders = [NSMutableSet setWithArray:landerArray];
+	[shownLanders addObject:numberObj];
+	[[NSUserDefaults standardUserDefaults] setObject:[shownLanders allObjects] forKey:kTSLandersShownKey];
+	[[NSUserDefaults standardUserDefaults] synchronize];
+}
 
 - (NSTimeInterval) getCookieMatchFired
 {
