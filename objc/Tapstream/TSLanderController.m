@@ -23,7 +23,11 @@
 	if(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
 		((UIWebView *)self.view).delegate = self;
 		self.delegate = delegate;
-		[((UIWebView *)self.view) loadHTMLString:lander.html baseURL:nil];
+		if(lander.url != nil){
+			[((UIWebView *)self.view) loadRequest:[NSURLRequest requestWithURL:lander.url]];
+		}else{
+			[((UIWebView *)self.view) loadHTMLString:lander.html baseURL:nil];
+		}
 		[self.delegate showedLander:lander.ident];
 	}
 	return self;
@@ -31,6 +35,7 @@
 
 - (void)close
 {
+	[((UIWebView *) self.view) loadHTMLString:@"" baseURL:nil];
 	[UIView transitionWithView:self.view.superview
 					  duration:0.3
 					   options:UIViewAnimationOptionTransitionCrossDissolve
@@ -61,8 +66,8 @@
 	NSURL* url = [req URL];
 	NSString* s = [url absoluteString];
 	if(![s isEqualToString:@"about:blank"]){
-        [self.delegate submittedLander];
 		[self close];
+        [self.delegate submittedLander];
 	}
 }
 
