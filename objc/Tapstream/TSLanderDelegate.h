@@ -8,13 +8,6 @@
 
 #ifndef TSLanderDelegate_h
 #define TSLanderDelegate_h
-//
-//  TSWordOfMouthDelegate.h
-//  WordOfMouth
-//
-//  Created by Eric on 2014-05-17.
-//  Copyright (c) 2014 Tapstream. All rights reserved.
-//
 
 #import <Foundation/Foundation.h>
 
