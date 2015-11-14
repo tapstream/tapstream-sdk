@@ -46,7 +46,7 @@
 - (int)getDelay;
 - (NSURL*)makeLanderURL;
 - (NSURL*)makeCookieMatchURL;
-- (NSURL*)makeCookieMatchURL:(NSString*)data;
+- (NSURL*)makeCookieMatchURL:(NSString*)eventName data:(NSString*)data;
 - (NSMutableString *)postData;
 
 @end
