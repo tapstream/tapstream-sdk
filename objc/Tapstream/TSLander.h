@@ -14,6 +14,7 @@
 @property(STRONG_OR_RETAIN, nonatomic, readonly) NSString *html;
 @property(STRONG_OR_RETAIN, nonatomic, readonly) NSURL *url;
 - (id)initWithDescription:(NSDictionary *)descriptionVal;
+- (BOOL)isValid;
 @end
 
 #endif /* TSLander_h */

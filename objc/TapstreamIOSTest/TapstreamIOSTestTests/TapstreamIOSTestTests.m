@@ -14,6 +14,7 @@
 #import "TSAppEventSourceImpl.h"
 #import "TSCoreListener.h"
 #import "TSCore.h"
+#import "TSLander.h"
 
 @interface TSDelegateTestImpl : NSObject<TSDelegate>
 - (int)getDelay;
@@ -237,6 +238,61 @@
 		XCTAssertEqual(@"POST", [[requests firstObject] lastObject]);
 		XCTAssertEqual(@"GET", [[requests lastObject] lastObject]);
 	}
+}
+
+- (void) testInitTSLander {
+	// Try to cause errors initializing TSLander; all should just return a nil lander.
+
+	// Test with nil data
+	TSLander* lander = [[TSLander alloc] initWithDescription:nil];
+
+	// Empty JSON
+	NSString* jsonStr = @"{}";
+	NSDictionary* data = [NSJSONSerialization JSONObjectWithData:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]
+														 options:nil
+														   error:nil];
+	lander = [[TSLander alloc] initWithDescription:data];
+	XCTAssertFalse([lander isValid]);
+
+	// Null URL
+	jsonStr = @"{\"url\": null}";
+	data = [NSJSONSerialization JSONObjectWithData:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]
+														 options:nil
+														   error:nil];
+	lander = [[TSLander alloc] initWithDescription:data];
+	XCTAssertFalse([lander isValid]);
+
+	// Null Markup + URL + id
+	jsonStr = @"{\"url\": null, \"markup\": null, \"id\": null}";
+	data = [NSJSONSerialization JSONObjectWithData:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]
+										   options:nil
+											 error:nil];
+	lander = [[TSLander alloc] initWithDescription:data];
+	XCTAssertFalse([lander isValid]);
+
+	// Invalid (no scheme) url
+	jsonStr = @"{\"url\": \"www.myspace.com\", \"markup\": null, \"id\": 31}";
+	data = [NSJSONSerialization JSONObjectWithData:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]
+										   options:nil
+											 error:nil];
+	lander = [[TSLander alloc] initWithDescription:data];
+	XCTAssertFalse([lander isValid]);
+
+	// Valid url
+	jsonStr = @"{\"url\": \"https://www.myspace.com\", \"markup\": null, \"id\": 31}";
+	data = [NSJSONSerialization JSONObjectWithData:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]
+										   options:nil
+											 error:nil];
+	lander = [[TSLander alloc] initWithDescription:data];
+	XCTAssertTrue([lander isValid]);
+
+	// Valid markup
+	jsonStr = @"{\"url\": null, \"markup\": \"<h1>Ok</h1>\", \"id\": 31}";
+	data = [NSJSONSerialization JSONObjectWithData:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]
+										   options:nil
+											 error:nil];
+	lander = [[TSLander alloc] initWithDescription:data];
+	XCTAssertTrue([lander isValid]);
 }
 
 - (void)testPerformanceExample {

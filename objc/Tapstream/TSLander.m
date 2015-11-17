@@ -17,20 +17,60 @@
 @end
 
 @implementation TSLander
-@synthesize html, ident, url;
 
 - (id)initWithDescription:(NSDictionary *)descriptionVal
 {
+	self.ident = -1;
+	self.html = nil;
+	self.url = nil;
+
 	if(self = [super init]) {
-		self.ident = [[descriptionVal objectForKey:@"id"] unsignedIntegerValue];
-		self.html = [descriptionVal objectForKey:@"markup"];
+		id ident = [descriptionVal objectForKey:@"id"];
+		if(ident != nil && ident != (id)[NSNull null]){
+			self.ident = [ident unsignedIntegerValue];
+		}
+
+		NSString* html = [descriptionVal objectForKey:@"markup"];
+		if(html != nil && html != (id)[NSNull null]){
+			self.html = html;
+		}
+
 		NSString* urlString = [descriptionVal objectForKey:@"url"];
-		if(urlString != nil){
+		if(urlString != nil && urlString != (id)[NSNull null]){
 			self.url = [NSURL URLWithString:urlString];
-		}else{
-			self.url = nil;
 		}
 	}
 	return self;
+}
+- (BOOL)isValid
+{
+	if(self.ident <= 0)
+	{
+		return false;
+	}
+
+	// Markup type: any HTML is ok
+	if(self.url == nil && self.html != nil)
+	{
+		return true;
+	}
+
+	// Url type: make sure url is present and scheme is http or https
+	if(self.url == nil)
+	{
+		return false;
+	}
+
+	if([[self.url scheme] isEqualToString:@"http"])
+	{
+		return true;
+	}
+
+	if([[self.url scheme] isEqualToString:@"https"])
+	{
+		return true;
+	}
+	
+	return false;
 }
 @end

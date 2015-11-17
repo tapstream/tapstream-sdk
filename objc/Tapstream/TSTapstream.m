@@ -191,7 +191,7 @@ static TSTapstream *instance = nil;
 		NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
 		if(json) {
 			TSLander* lander = [[TSLander alloc] initWithDescription:json];
-			if(![platform landerShown:lander.ident]){
+			if([lander isValid] && ![platform landerShown:lander.ident]){
 				return lander;
 			}
 		}
