@@ -175,7 +175,7 @@ static TSTapstream *instance = nil;
     [event addValue:medium forKey:@"medium"];
     [self fireEvent:event];
 }
-
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 - (TSLander*)fetchLanderIfNotShown{
 	NSHTTPURLResponse *response;
 	NSError *error;
@@ -222,6 +222,11 @@ static TSTapstream *instance = nil;
 		}
 	}];
 }
+#else
+// NOOP outside of iOS
+- (void)showLanderIfExistsWithDelegate:(id<TSLanderDelegate>)delegate
+{}
+#endif
 @end
 
 

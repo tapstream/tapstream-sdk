@@ -11,6 +11,7 @@
 #import "TSLander.h"
 #import "TSLanderController.h"
 
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 @implementation TSLanderController
 
 + (id)controllerWithLander:(TSLander*)lander delegate:(id<TSLanderDelegate>)delegate
@@ -72,3 +73,7 @@
 }
 
 @end
+#else
+@implementation TSLanderController
+@end
+#endif

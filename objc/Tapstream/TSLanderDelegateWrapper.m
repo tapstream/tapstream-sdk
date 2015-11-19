@@ -7,6 +7,7 @@
 //  Copyright © 2015 Tapstream. All rights reserved.
 //
 
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 #import <Foundation/Foundation.h>
 #import "TSLanderDelegate.h"
 #import "TSPlatform.h"
@@ -41,3 +42,7 @@
 	self.window = nil;
 }
 @end
+#else
+@implementation TSLanderDelegateWrapper
+@end
+#endif
