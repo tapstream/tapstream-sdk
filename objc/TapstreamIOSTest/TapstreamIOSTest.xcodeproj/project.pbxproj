@@ -1,0 +1,622 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		661FAF971BD24B1A00CCBD1C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 661FAF961BD24B1A00CCBD1C /* main.m */; };
+		661FAF9A1BD24B1A00CCBD1C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 661FAF991BD24B1A00CCBD1C /* AppDelegate.m */; };
+		661FAF9D1BD24B1A00CCBD1C /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 661FAF9C1BD24B1A00CCBD1C /* ViewController.m */; };
+		661FAFA01BD24B1A00CCBD1C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 661FAF9E1BD24B1A00CCBD1C /* Main.storyboard */; };
+		661FAFA21BD24B1A00CCBD1C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 661FAFA11BD24B1A00CCBD1C /* Assets.xcassets */; };
+		661FAFA51BD24B1A00CCBD1C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 661FAFA31BD24B1A00CCBD1C /* LaunchScreen.storyboard */; };
+		661FAFB01BD24B1A00CCBD1C /* TapstreamIOSTestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 661FAFAF1BD24B1A00CCBD1C /* TapstreamIOSTestTests.m */; };
+		661FAFBB1BD24B1A00CCBD1C /* TapstreamIOSTestUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 661FAFBA1BD24B1A00CCBD1C /* TapstreamIOSTestUITests.m */; };
+		66D915211BD254DE00782905 /* libTapstream.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D9151F1BD254DE00782905 /* libTapstream.a */; };
+		66D915221BD254DE00782905 /* libTapstreamWOM.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D915201BD254DE00782905 /* libTapstreamWOM.a */; };
+		66D915241BD254F400782905 /* libPods-TapstreamIOSTestTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D915231BD254F400782905 /* libPods-TapstreamIOSTestTests.a */; };
+		E8E5439F6FD04F59A40ABA10 /* libPods-TapstreamIOSTestTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5065BB279B27859413C55EE2 /* libPods-TapstreamIOSTestTests.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		661FAFAC1BD24B1A00CCBD1C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 661FAF8A1BD24B1A00CCBD1C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 661FAF911BD24B1A00CCBD1C;
+			remoteInfo = TapstreamIOSTest;
+		};
+		661FAFB71BD24B1A00CCBD1C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 661FAF8A1BD24B1A00CCBD1C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 661FAF911BD24B1A00CCBD1C;
+			remoteInfo = TapstreamIOSTest;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		2C4D6B042810ABE2C65452ED /* Pods-TapstreamIOSTestTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TapstreamIOSTestTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TapstreamIOSTestTests/Pods-TapstreamIOSTestTests.debug.xcconfig"; sourceTree = "<group>"; };
+		5065BB279B27859413C55EE2 /* libPods-TapstreamIOSTestTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TapstreamIOSTestTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		661FAF921BD24B1A00CCBD1C /* TapstreamIOSTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TapstreamIOSTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		661FAF961BD24B1A00CCBD1C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		661FAF981BD24B1A00CCBD1C /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		661FAF991BD24B1A00CCBD1C /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		661FAF9B1BD24B1A00CCBD1C /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		661FAF9C1BD24B1A00CCBD1C /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		661FAF9F1BD24B1A00CCBD1C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		661FAFA11BD24B1A00CCBD1C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		661FAFA41BD24B1A00CCBD1C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		661FAFA61BD24B1A00CCBD1C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		661FAFAB1BD24B1A00CCBD1C /* TapstreamIOSTestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TapstreamIOSTestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		661FAFAF1BD24B1A00CCBD1C /* TapstreamIOSTestTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TapstreamIOSTestTests.m; sourceTree = "<group>"; };
+		661FAFB11BD24B1A00CCBD1C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		661FAFB61BD24B1A00CCBD1C /* TapstreamIOSTestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TapstreamIOSTestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		661FAFBA1BD24B1A00CCBD1C /* TapstreamIOSTestUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TapstreamIOSTestUITests.m; sourceTree = "<group>"; };
+		661FAFBC1BD24B1A00CCBD1C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		66D9151F1BD254DE00782905 /* libTapstream.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libTapstream.a; path = "Pods/../build/Debug-iphoneos/libTapstream.a"; sourceTree = "<group>"; };
+		66D915201BD254DE00782905 /* libTapstreamWOM.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libTapstreamWOM.a; path = "Pods/../build/Debug-iphoneos/libTapstreamWOM.a"; sourceTree = "<group>"; };
+		66D915231BD254F400782905 /* libPods-TapstreamIOSTestTests.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libPods-TapstreamIOSTestTests.a"; path = "Pods/../build/Debug-iphoneos/libPods-TapstreamIOSTestTests.a"; sourceTree = "<group>"; };
+		7F557048FBFBB0EF9A9B2220 /* Pods-TapstreamIOSTestTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TapstreamIOSTestTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-TapstreamIOSTestTests/Pods-TapstreamIOSTestTests.release.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		661FAF8F1BD24B1A00CCBD1C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				66D915241BD254F400782905 /* libPods-TapstreamIOSTestTests.a in Frameworks */,
+				66D915211BD254DE00782905 /* libTapstream.a in Frameworks */,
+				66D915221BD254DE00782905 /* libTapstreamWOM.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		661FAFA81BD24B1A00CCBD1C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8E5439F6FD04F59A40ABA10 /* libPods-TapstreamIOSTestTests.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		661FAFB31BD24B1A00CCBD1C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		661FAF891BD24B1A00CCBD1C = {
+			isa = PBXGroup;
+			children = (
+				661FAF941BD24B1A00CCBD1C /* TapstreamIOSTest */,
+				661FAFAE1BD24B1A00CCBD1C /* TapstreamIOSTestTests */,
+				661FAFB91BD24B1A00CCBD1C /* TapstreamIOSTestUITests */,
+				661FAF931BD24B1A00CCBD1C /* Products */,
+				C9E9DFC38ED82709CA2E8FBC /* Pods */,
+				BEB481E00FF38471100101EE /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		661FAF931BD24B1A00CCBD1C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				661FAF921BD24B1A00CCBD1C /* TapstreamIOSTest.app */,
+				661FAFAB1BD24B1A00CCBD1C /* TapstreamIOSTestTests.xctest */,
+				661FAFB61BD24B1A00CCBD1C /* TapstreamIOSTestUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		661FAF941BD24B1A00CCBD1C /* TapstreamIOSTest */ = {
+			isa = PBXGroup;
+			children = (
+				661FAF981BD24B1A00CCBD1C /* AppDelegate.h */,
+				661FAF991BD24B1A00CCBD1C /* AppDelegate.m */,
+				661FAF9B1BD24B1A00CCBD1C /* ViewController.h */,
+				661FAF9C1BD24B1A00CCBD1C /* ViewController.m */,
+				661FAF9E1BD24B1A00CCBD1C /* Main.storyboard */,
+				661FAFA11BD24B1A00CCBD1C /* Assets.xcassets */,
+				661FAFA31BD24B1A00CCBD1C /* LaunchScreen.storyboard */,
+				661FAFA61BD24B1A00CCBD1C /* Info.plist */,
+				661FAF951BD24B1A00CCBD1C /* Supporting Files */,
+			);
+			path = TapstreamIOSTest;
+			sourceTree = "<group>";
+		};
+		661FAF951BD24B1A00CCBD1C /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				661FAF961BD24B1A00CCBD1C /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		661FAFAE1BD24B1A00CCBD1C /* TapstreamIOSTestTests */ = {
+			isa = PBXGroup;
+			children = (
+				661FAFAF1BD24B1A00CCBD1C /* TapstreamIOSTestTests.m */,
+				661FAFB11BD24B1A00CCBD1C /* Info.plist */,
+			);
+			path = TapstreamIOSTestTests;
+			sourceTree = "<group>";
+		};
+		661FAFB91BD24B1A00CCBD1C /* TapstreamIOSTestUITests */ = {
+			isa = PBXGroup;
+			children = (
+				661FAFBA1BD24B1A00CCBD1C /* TapstreamIOSTestUITests.m */,
+				661FAFBC1BD24B1A00CCBD1C /* Info.plist */,
+			);
+			path = TapstreamIOSTestUITests;
+			sourceTree = "<group>";
+		};
+		BEB481E00FF38471100101EE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				66D915231BD254F400782905 /* libPods-TapstreamIOSTestTests.a */,
+				66D9151F1BD254DE00782905 /* libTapstream.a */,
+				66D915201BD254DE00782905 /* libTapstreamWOM.a */,
+				5065BB279B27859413C55EE2 /* libPods-TapstreamIOSTestTests.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C9E9DFC38ED82709CA2E8FBC /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				2C4D6B042810ABE2C65452ED /* Pods-TapstreamIOSTestTests.debug.xcconfig */,
+				7F557048FBFBB0EF9A9B2220 /* Pods-TapstreamIOSTestTests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		661FAF911BD24B1A00CCBD1C /* TapstreamIOSTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 661FAFBF1BD24B1A00CCBD1C /* Build configuration list for PBXNativeTarget "TapstreamIOSTest" */;
+			buildPhases = (
+				661FAF8E1BD24B1A00CCBD1C /* Sources */,
+				661FAF8F1BD24B1A00CCBD1C /* Frameworks */,
+				661FAF901BD24B1A00CCBD1C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TapstreamIOSTest;
+			productName = TapstreamIOSTest;
+			productReference = 661FAF921BD24B1A00CCBD1C /* TapstreamIOSTest.app */;
+			productType = "com.apple.product-type.application";
+		};
+		661FAFAA1BD24B1A00CCBD1C /* TapstreamIOSTestTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 661FAFC21BD24B1A00CCBD1C /* Build configuration list for PBXNativeTarget "TapstreamIOSTestTests" */;
+			buildPhases = (
+				9ECA9D4247F87D229499F2F1 /* Check Pods Manifest.lock */,
+				661FAFA71BD24B1A00CCBD1C /* Sources */,
+				661FAFA81BD24B1A00CCBD1C /* Frameworks */,
+				661FAFA91BD24B1A00CCBD1C /* Resources */,
+				D65C8D7CAFB9BF02E8BC8EA7 /* Embed Pods Frameworks */,
+				2E44734F65C469781A4A355D /* Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				661FAFAD1BD24B1A00CCBD1C /* PBXTargetDependency */,
+			);
+			name = TapstreamIOSTestTests;
+			productName = TapstreamIOSTestTests;
+			productReference = 661FAFAB1BD24B1A00CCBD1C /* TapstreamIOSTestTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		661FAFB51BD24B1A00CCBD1C /* TapstreamIOSTestUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 661FAFC51BD24B1A00CCBD1C /* Build configuration list for PBXNativeTarget "TapstreamIOSTestUITests" */;
+			buildPhases = (
+				661FAFB21BD24B1A00CCBD1C /* Sources */,
+				661FAFB31BD24B1A00CCBD1C /* Frameworks */,
+				661FAFB41BD24B1A00CCBD1C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				661FAFB81BD24B1A00CCBD1C /* PBXTargetDependency */,
+			);
+			name = TapstreamIOSTestUITests;
+			productName = TapstreamIOSTestUITests;
+			productReference = 661FAFB61BD24B1A00CCBD1C /* TapstreamIOSTestUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		661FAF8A1BD24B1A00CCBD1C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				KnownAssetTags = (
+					New,
+				);
+				LastUpgradeCheck = 0700;
+				ORGANIZATIONNAME = "Adam Bard";
+				TargetAttributes = {
+					661FAF911BD24B1A00CCBD1C = {
+						CreatedOnToolsVersion = 7.0.1;
+					};
+					661FAFAA1BD24B1A00CCBD1C = {
+						CreatedOnToolsVersion = 7.0.1;
+						TestTargetID = 661FAF911BD24B1A00CCBD1C;
+					};
+					661FAFB51BD24B1A00CCBD1C = {
+						CreatedOnToolsVersion = 7.0.1;
+						TestTargetID = 661FAF911BD24B1A00CCBD1C;
+					};
+				};
+			};
+			buildConfigurationList = 661FAF8D1BD24B1A00CCBD1C /* Build configuration list for PBXProject "TapstreamIOSTest" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 661FAF891BD24B1A00CCBD1C;
+			productRefGroup = 661FAF931BD24B1A00CCBD1C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				661FAF911BD24B1A00CCBD1C /* TapstreamIOSTest */,
+				661FAFAA1BD24B1A00CCBD1C /* TapstreamIOSTestTests */,
+				661FAFB51BD24B1A00CCBD1C /* TapstreamIOSTestUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		661FAF901BD24B1A00CCBD1C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				661FAFA51BD24B1A00CCBD1C /* LaunchScreen.storyboard in Resources */,
+				661FAFA21BD24B1A00CCBD1C /* Assets.xcassets in Resources */,
+				661FAFA01BD24B1A00CCBD1C /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		661FAFA91BD24B1A00CCBD1C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		661FAFB41BD24B1A00CCBD1C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2E44734F65C469781A4A355D /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-TapstreamIOSTestTests/Pods-TapstreamIOSTestTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9ECA9D4247F87D229499F2F1 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		D65C8D7CAFB9BF02E8BC8EA7 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-TapstreamIOSTestTests/Pods-TapstreamIOSTestTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		661FAF8E1BD24B1A00CCBD1C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				661FAF9D1BD24B1A00CCBD1C /* ViewController.m in Sources */,
+				661FAF9A1BD24B1A00CCBD1C /* AppDelegate.m in Sources */,
+				661FAF971BD24B1A00CCBD1C /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		661FAFA71BD24B1A00CCBD1C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				661FAFB01BD24B1A00CCBD1C /* TapstreamIOSTestTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		661FAFB21BD24B1A00CCBD1C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				661FAFBB1BD24B1A00CCBD1C /* TapstreamIOSTestUITests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		661FAFAD1BD24B1A00CCBD1C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 661FAF911BD24B1A00CCBD1C /* TapstreamIOSTest */;
+			targetProxy = 661FAFAC1BD24B1A00CCBD1C /* PBXContainerItemProxy */;
+		};
+		661FAFB81BD24B1A00CCBD1C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 661FAF911BD24B1A00CCBD1C /* TapstreamIOSTest */;
+			targetProxy = 661FAFB71BD24B1A00CCBD1C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		661FAF9E1BD24B1A00CCBD1C /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				661FAF9F1BD24B1A00CCBD1C /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		661FAFA31BD24B1A00CCBD1C /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				661FAFA41BD24B1A00CCBD1C /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		661FAFBD1BD24B1A00CCBD1C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		661FAFBE1BD24B1A00CCBD1C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		661FAFC01BD24B1A00CCBD1C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = TapstreamIOSTest/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/build/Debug-iphoneos",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tapstream.TapstreamIOSTest;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		661FAFC11BD24B1A00CCBD1C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = TapstreamIOSTest/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/build/Debug-iphoneos",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tapstream.TapstreamIOSTest;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		661FAFC31BD24B1A00CCBD1C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2C4D6B042810ABE2C65452ED /* Pods-TapstreamIOSTestTests.debug.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = TapstreamIOSTestTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.tapstream.TapstreamIOSTestTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TapstreamIOSTest.app/TapstreamIOSTest";
+			};
+			name = Debug;
+		};
+		661FAFC41BD24B1A00CCBD1C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7F557048FBFBB0EF9A9B2220 /* Pods-TapstreamIOSTestTests.release.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = TapstreamIOSTestTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.tapstream.TapstreamIOSTestTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TapstreamIOSTest.app/TapstreamIOSTest";
+			};
+			name = Release;
+		};
+		661FAFC61BD24B1A00CCBD1C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = TapstreamIOSTestUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.tapstream.TapstreamIOSTestUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = TapstreamIOSTest;
+				USES_XCTRUNNER = YES;
+			};
+			name = Debug;
+		};
+		661FAFC71BD24B1A00CCBD1C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = TapstreamIOSTestUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.tapstream.TapstreamIOSTestUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = TapstreamIOSTest;
+				USES_XCTRUNNER = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		661FAF8D1BD24B1A00CCBD1C /* Build configuration list for PBXProject "TapstreamIOSTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				661FAFBD1BD24B1A00CCBD1C /* Debug */,
+				661FAFBE1BD24B1A00CCBD1C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		661FAFBF1BD24B1A00CCBD1C /* Build configuration list for PBXNativeTarget "TapstreamIOSTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				661FAFC01BD24B1A00CCBD1C /* Debug */,
+				661FAFC11BD24B1A00CCBD1C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		661FAFC21BD24B1A00CCBD1C /* Build configuration list for PBXNativeTarget "TapstreamIOSTestTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				661FAFC31BD24B1A00CCBD1C /* Debug */,
+				661FAFC41BD24B1A00CCBD1C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		661FAFC51BD24B1A00CCBD1C /* Build configuration list for PBXNativeTarget "TapstreamIOSTestUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				661FAFC61BD24B1A00CCBD1C /* Debug */,
+				661FAFC71BD24B1A00CCBD1C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 661FAF8A1BD24B1A00CCBD1C /* Project object */;
+}

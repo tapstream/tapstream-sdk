@@ -5,6 +5,8 @@
 #import "TSPlatformImpl.h"
 #import "TSCoreListenerImpl.h"
 #import "TSAppEventSourceImpl.h"
+#import "TSLanderController.h"
+#import "TSLanderDelegateWrapper.h"
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 #import <UIKit/UIKit.h>
 #endif
@@ -91,9 +93,6 @@ static TSTapstream *instance = nil;
 			config:config]);
 
 		[core start];
-		if(config.attemptCookieMatch){
-			[self registerCookieMatchObserver];
-		}
         
         // Dynamically instantiate TSWordOfMouthController, if the source files have been
         // included in the developer's project.
@@ -123,51 +122,6 @@ static TSTapstream *instance = nil;
 	RELEASE(core);
 	SUPER_DEALLOC;
 }
-
-#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-- (void)registerCookieMatchObserver
-{
-	if([platform isFirstRun]){
-		[[NSNotificationCenter defaultCenter]
-		 addObserver:self
-			selector:@selector(handleNotification:)
-		 name:UIApplicationDidBecomeActiveNotification
-		 object:nil];
-	}else{
-		// Already sent, let core know
-		[core fireCookieMatch];
-	}
-}
-
-- (void)handleNotification:(NSNotification*)notification
-{
-	[[NSNotificationCenter defaultCenter]
-	 removeObserver:self
-	 name:UIApplicationDidBecomeActiveNotification
-	 object:nil];
-
-	UIViewController* rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
-	[self fireCookieMatch:rootViewController completion:nil];
-}
-
-- (void)fireCookieMatch:(UIViewController*)controller completion:(void(^)(void))completion
-{
-	if ([platform isFirstRun]){ // Only fires once.
-		NSURL* url = [core getCookieMatchURL];
-
-		[TSSafariViewControllerDelegate
-		 presentSafariViewControllerWithURLAndCompletion:url
-		 completion:^{
-			if(completion != nil){
-				completion();
-			}
-			[core fireCookieMatch];
-		  }];
-	}
-}
-#else
-- (void)registerCookieMatchObserver {}
-#endif
 
 - (void)fireEvent:(TSEvent *)event
 {
@@ -222,8 +176,55 @@ static TSTapstream *instance = nil;
     [self fireEvent:event];
 }
 
-@end
+- (TSLander*)fetchLanderIfNotShown{
+	NSHTTPURLResponse *response;
+	NSError *error;
+	NSURLRequest* request = [[NSURLRequest alloc] initWithURL:[core makeLanderURL]];
+	NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+	NSInteger status = response ? ((NSHTTPURLResponse *)response).statusCode : -1;
 
+	[TSLogging logAtLevel:kTSLoggingInfo
+				   format:@"Offers request complete (status %d)",
+	 (int)status];
+
+	if(data && status >= 200 && status < 300) {
+		NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+		if(json) {
+			TSLander* lander = [[TSLander alloc] initWithDescription:json];
+			if([lander isValid] && ![platform landerShown:lander.ident]){
+				return lander;
+			}
+		}
+	}
+	return nil;
+}
+
+- (void)showLanderIfExists:(UIViewController *)parentViewController delegate:(id<TSLanderDelegate>)delegate
+{
+	[core dispatchOnQueue:^{
+		TSLander* lander = [self fetchLanderIfNotShown];
+		if(parentViewController && lander != nil) {
+			// Must run display code on main queue
+			dispatch_async(dispatch_get_main_queue(), ^{
+
+
+				TSLanderDelegateWrapper* wrappedDelegate = [[TSLanderDelegateWrapper alloc] initWithPlatformAndDelegate:platform delegate:delegate];
+				TSLanderController* c = [TSLanderController controllerWithLander:lander delegate:wrappedDelegate];
+				c.view.frame = parentViewController.view.bounds;
+				[parentViewController addChildViewController:c];
+				[UIView transitionWithView:parentViewController.view
+								  duration:0.3
+								   options:UIViewAnimationOptionTransitionCrossDissolve
+								animations:^{
+									[parentViewController.view addSubview:c.view];
+									[c didMoveToParentViewController:parentViewController];
+								}
+								completion:NULL];
+			});
+		}
+	}];
+}
+@end
 
 
 

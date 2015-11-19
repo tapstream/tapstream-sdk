@@ -7,6 +7,7 @@
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
 #define kTSCookieMatchUrlTemplate @"https://api.taps.io/%@/event/%@/?cookiematch=true&%@"
 #define kTSHitUrlTemplate @"https://api.tapstream.com/%@/hit/%@.gif"
+#define kTSLanderUrlTemplate @"https://reporting.tapstream.com/v1/in_app_landers/display/?secret=%@&event_session=%@"
 #define kTSConversionUrlTemplate @"https://reporting.tapstream.com/v1/timelines/lookup?secret=%@&event_session=%@"
 #define kTSConversionPollInterval 1
 #define kTSConversionPollCount 10
@@ -37,6 +38,7 @@
 @property(nonatomic, STRONG_OR_RETAIN) NSString *platformName;
 @property(nonatomic) dispatch_queue_t queue;
 @property(nonatomic) dispatch_semaphore_t cookieMatchFired;
+@property(nonatomic) BOOL cookieMatchInProgress;
 
 - (NSString *)clean:(NSString *)s;
 - (void)increaseDelay;
@@ -147,18 +149,25 @@
 		self.appName = @"";
 	}
 
-	if(config.attemptCookieMatch) // cookie match replaces initial install and open events
+	if([platform isFirstRun])
 	{
-		// Block queue until cookie match fired
-		dispatch_barrier_async(self.queue, ^{
-			dispatch_semaphore_wait(self.cookieMatchFired, DISPATCH_TIME_FOREVER);
-			[platform registerFirstRun];
-			NSLog(@"Tapstream: Cookie Match Complete");
-		});
-	}
-	else
-	{
-		if(config.fireAutomaticInstallEvent && [platform isFirstRun])
+		if(config.attemptCookieMatch) // cookie match replaces initial install and open events
+		{
+			NSURL* url = [self makeCookieMatchURL];
+			__unsafe_unretained TSCore* me = self;
+			[platform fireCookieMatch:url completion:^(TSResponse* response){
+				[me firedCookieMatch];
+			}];
+
+			// Block queue until cookie match fired
+			dispatch_barrier_async(self.queue, ^{
+				dispatch_semaphore_wait(self.cookieMatchFired, DISPATCH_TIME_FOREVER);
+				[platform registerFirstRun];
+				NSLog(@"Tapstream: Cookie Match Complete");
+			});
+
+		}
+		else if(config.fireAutomaticInstallEvent)
 		{
 			if(config.installEventName != nil)
 			{
@@ -169,9 +178,10 @@
 				NSString *eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, self.appName];
 				[self fireEvent:[TSEvent eventWithName:eventName oneTimeOnly:YES]];
 			}
-			[platform registerFirstRun];			
+			[platform registerFirstRun];
 		}
 	}
+
 
 	__unsafe_unretained TSCore *me = self;
 	if(config.fireAutomaticOpenEvent)
@@ -214,9 +224,159 @@
 	}
 }
 
-- (void)fireCookieMatch
+- (void)firedCookieMatch
 {
+	[platform setCookieMatchFired:[[NSDate date] timeIntervalSince1970]];
 	dispatch_semaphore_signal(self.cookieMatchFired);
+}
+
+- (BOOL)shouldFireEvent:(TSEvent *)e
+{
+
+	if(e.isOneTimeOnly)
+	{
+		if([firedEvents containsObject:e.name])
+		{
+			[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that has already been fired", e.name];
+			[listener reportOperation:@"event-ignored-already-fired" arg:e.encodedName];
+			[listener reportOperation:@"job-ended" arg:e.encodedName];
+			return false;
+		}
+		else if([firingEvents containsObject:e.name])
+		{
+			[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that is already in progress", e.name];
+			[listener reportOperation:@"event-ignored-already-in-progress" arg:e.encodedName];
+			[listener reportOperation:@"job-ended" arg:e.encodedName];
+			return false;
+		}
+
+		[firingEvents addObject:e.name];
+	}
+	return true;
+}
+
+- (void)sendEventRequest:(TSEvent*)e completion:(void(^)(TSResponse*))completion{
+
+	NSString *data = [postData stringByAppendingString:e.postData];
+	if(config.attemptCookieMatch && [platform shouldCookieMatch] && !self.cookieMatchInProgress)
+	{
+		self.cookieMatchInProgress = true;
+		NSURL* url = [self makeCookieMatchURL:e.name data:data];
+		__unsafe_unretained TSCore* me = self;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[platform fireCookieMatch:url completion:^(TSResponse* response){
+				if(me != nil){
+					me.cookieMatchInProgress = false;
+					if (response == nil){
+						completion([[TSResponse alloc] initWithStatus:-1 message:@"Request incomplete" data:nil]);
+					}else{
+						[me cookieMatchFired];
+						dispatch_async(me.queue, ^{
+							completion(response);
+						});
+					}
+				}
+			}];
+		});
+	}else{
+		dispatch_async(self.queue, ^{
+			NSString *url = [NSString stringWithFormat:kTSEventUrlTemplate, accountName, e.encodedName];
+			completion([platform request:url data:data method:@"POST" timeout_ms:kTSDefaultTimeout]);
+		});
+	}
+}
+
+- (void)handleEventRequestResponse:(TSEvent*)e response:(TSResponse*)response
+{
+
+
+	bool failed = response.status < 200 || response.status >= 300;
+	bool shouldRetry = response.status < 0 || (response.status >= 500 && response.status < 600);
+
+	@synchronized(self)
+	{
+		if(e.isOneTimeOnly)
+		{
+			[firingEvents removeObject:e.name];
+		}
+
+		if(failed)
+		{
+			// Only increase delays if we actually intend to retry the event
+			if(shouldRetry)
+			{
+				// Not every job that fails will increase the retry delay.  It will be the responsibility of
+				// the first failed job to increase the delay after every failure.
+				if(delay == 0)
+				{
+					// This is the first job to fail, it must be the one to manage delay timing
+					self.failingEventId = e.uid;
+					[self increaseDelay];
+				}
+				else if([failingEventId isEqualToString:e.uid])
+				{
+					[self increaseDelay];
+				}
+			}
+		}
+		else
+		{
+			if(e.isOneTimeOnly)
+			{
+				[firedEvents addObject:e.name];
+
+				[platform saveFiredEvents:firedEvents];
+				[listener reportOperation:@"fired-list-saved" arg:e.encodedName];
+			}
+
+			// Success of any event resets the delay
+			delay = 0;
+		}
+	}
+
+	if(failed)
+	{
+		if(response.status < 0)
+		{
+			[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, error=%@", response.message];
+		}
+		else if(response.status == 404)
+		{
+			[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, http code %d\nDoes your event name contain characters that are not url safe? This event will not be retried.", response.status];
+		}
+		else if(response.status == 403)
+		{
+			[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, http code %d\nAre your account name and application secret correct?  This event will not be retried.", response.status];
+		}
+		else
+		{
+			NSString *retryMsg = @"";
+			if(!shouldRetry)
+			{
+				retryMsg = @"  This event will not be retried.";
+			}
+			[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, http code %d.%@", response.status, retryMsg];
+		}
+
+		[listener reportOperation:@"event-failed" arg:e.encodedName];
+		if(shouldRetry)
+		{
+			[listener reportOperation:@"retry" arg:e.encodedName];
+			[listener reportOperation:@"job-ended" arg:e.encodedName];
+			if([del isRetryAllowed])
+			{
+				[self fireEvent:e];
+			}
+			return;
+		}
+	}
+	else
+	{
+		[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream fired event named \"%@\"", e.name];
+		[listener reportOperation:@"event-succeeded" arg:e.encodedName];
+	}
+
+	[listener reportOperation:@"job-ended" arg:e.encodedName];
 }
 
 - (void)fireEvent:(TSEvent *)e
@@ -232,122 +392,18 @@
 		// Notify the event that we are going to fire it so it can record the time and bake its post data
 		[e prepare:config.globalEventParams];
 
-		if(e.isOneTimeOnly)
+		if(![self shouldFireEvent:e])
 		{
-			if([firedEvents containsObject:e.name])
-			{
-				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that has already been fired", e.name];
-				[listener reportOperation:@"event-ignored-already-fired" arg:e.encodedName];
-				[listener reportOperation:@"job-ended" arg:e.encodedName];
-				return;
-			}
-			else if([firingEvents containsObject:e.name])
-			{
-				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream ignoring event named \"%@\" because it is a one-time-only event that is already in progress", e.name];
-				[listener reportOperation:@"event-ignored-already-in-progress" arg:e.encodedName];
-				[listener reportOperation:@"job-ended" arg:e.encodedName];
-				return;
-			}
-
-			[firingEvents addObject:e.name];
+			return;
 		}
 
-		NSString *url = [NSString stringWithFormat:kTSEventUrlTemplate, accountName, e.encodedName];
-		NSString *data = [postData stringByAppendingString:e.postData];
 
 		int actualDelay = [del getDelay];
 		dispatch_time_t dispatchTime = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * actualDelay);
 		dispatch_after(dispatchTime, self.queue, ^{
-			NSString *allData = data;
-
-			TSResponse *response = [platform request:url data:allData method:@"POST" timeout_ms:kTSDefaultTimeout];
-			bool failed = response.status < 200 || response.status >= 300;
-			bool shouldRetry = response.status < 0 || (response.status >= 500 && response.status < 600);
-
-			@synchronized(self)
-			{
-				if(e.isOneTimeOnly)
-				{
-					[firingEvents removeObject:e.name];
-				}
-
-				if(failed)
-				{
-					// Only increase delays if we actually intend to retry the event
-					if(shouldRetry)
-					{
-						// Not every job that fails will increase the retry delay.  It will be the responsibility of
-						// the first failed job to increase the delay after every failure.
-						if(delay == 0)
-						{
-							// This is the first job to fail, it must be the one to manage delay timing
-							self.failingEventId = e.uid;
-							[self increaseDelay];
-						}
-						else if([failingEventId isEqualToString:e.uid])
-						{
-							[self increaseDelay];
-						}
-					}
-				}
-				else
-				{
-					if(e.isOneTimeOnly)
-					{
-						[firedEvents addObject:e.name];
-
-						[platform saveFiredEvents:firedEvents];
-						[listener reportOperation:@"fired-list-saved" arg:e.encodedName];
-					}
-
-					// Success of any event resets the delay
-					delay = 0;
-				}
-			}
-
-			if(failed)
-			{
-				if(response.status < 0)
-				{
-					[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, error=%@", response.message];
-				}
-				else if(response.status == 404)
-				{
-					[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, http code %d\nDoes your event name contain characters that are not url safe? This event will not be retried.", response.status];
-				}
-				else if(response.status == 403)
-				{
-				   [TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, http code %d\nAre your account name and application secret correct?  This event will not be retried.", response.status];
-				}
-				else
-				{
-					NSString *retryMsg = @"";
-					if(!shouldRetry)
-					{
-						retryMsg = @"  This event will not be retried.";
-					}
-					[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream Error: Failed to fire event, http code %d.%@", response.status, retryMsg];
-				}
-
-				[listener reportOperation:@"event-failed" arg:e.encodedName];
-				if(shouldRetry)
-				{
-					[listener reportOperation:@"retry" arg:e.encodedName];
-					[listener reportOperation:@"job-ended" arg:e.encodedName];
-					if([del isRetryAllowed])
-					{
-						[self fireEvent:e];
-					}
-					return;
-				}
-			}
-			else
-			{
-				[TSLogging logAtLevel:kTSLoggingInfo format:@"Tapstream fired event named \"%@\"", e.name];
-				[listener reportOperation:@"event-succeeded" arg:e.encodedName];
-			}
-
-			[listener reportOperation:@"job-ended" arg:e.encodedName];
+			[self sendEventRequest:e completion:^(TSResponse* response){
+				[self handleEventRequestResponse:e response:response];
+			}];
 		});
 	}
 }
@@ -395,10 +451,11 @@
 
 	BOOL error = false;
 
-	NSData* result = [self getConversionDataBlocking:timeout_ms error:&error];
+	NSData* result = RETAIN([self getConversionDataBlocking:timeout_ms error:&error]);
 
 	if (error) // Hard error: do not retry
 	{
+		RELEASE(result);
 		result = nil;
 	}
 	else if(result == nil && tries < kTSConversionPollCount)
@@ -423,6 +480,7 @@
 		^{
 			completion(result);
 			RELEASE(completion);
+			RELEASE(result);
 		}
 	);
 }
@@ -464,21 +522,37 @@
 	return nil;
 }
 
+- (void)dispatchOnQueue:(void(^)())completion
+{
+	dispatch_async(self.queue, completion);
+}
+
 - (int)getDelay
 {
 	return delay;
 }
 
-- (NSURL*)getCookieMatchURL
+- (NSURL*)makeLanderURL
 {
-	NSString* eventName = config.installEventName;
+	NSString* eventSession = [platform loadUuid];
+	return [[NSURL alloc] initWithString:[NSString stringWithFormat:kTSLanderUrlTemplate, secret, eventSession]];
+}
+
+- (NSURL*)makeCookieMatchURL
+{
+	return [self makeCookieMatchURL:nil data:postData];
+}
+
+- (NSURL*)makeCookieMatchURL:(NSString*)eventName data:(NSString*)data
+{
+
 	if(eventName == nil)
 	{
 		eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, self.appName];
 	}
 
 	NSMutableString* urlString = [NSMutableString stringWithFormat:kTSCookieMatchUrlTemplate,
-								  accountName, eventName, postData];
+								  accountName, eventName, data];
 
 	for(NSString *key in config.globalEventParams)
 	{
