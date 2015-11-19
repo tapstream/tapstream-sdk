@@ -40,11 +40,14 @@
 - (void)start;
 - (void)fireEvent:(TSEvent *)event;
 - (void)fireHit:(TSHit *)hit completion:(void(^)(TSResponse *))completion;
-- (void)fireCookieMatch;
+- (void)firedCookieMatch;
 - (void)getConversionData:(void(^)(NSData *))completion;
 - (NSData*)getConversionDataBlocking:(int)timeout_ms;
 - (int)getDelay;
-- (NSURL*)getCookieMatchURL;
+- (NSURL*)makeLanderURL;
+- (NSURL*)makeCookieMatchURL;
+- (NSURL*)makeCookieMatchURL:(NSString*)eventName data:(NSString*)data;
 - (NSMutableString *)postData;
+- (void)dispatchOnQueue:(void(^)())completion;
 
 @end

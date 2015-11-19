@@ -8,18 +8,19 @@
 
 #import "TSSafariViewControllerDelegate.h"
 #import "TSLogging.h"
+#import "TSResponse.h"
 
 #if (TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
 @implementation TSSafariViewControllerDelegate
 
-+ (void)presentSafariViewControllerWithURLAndCompletion:(NSURL*)url completion:(void (^)(void))completion
++ (void)presentSafariViewControllerWithURLAndCompletion:(NSURL*)url completion:(void (^)(TSResponse*))completion
 {
 	Class safControllerClass = NSClassFromString(@"SFSafariViewController");
 	if(safControllerClass != nil){
 		UIViewController* safController = [[safControllerClass alloc] initWithURL:url];
 
 		if(safController != nil){
-			TSSafariViewControllerDelegate* me = [[TSSafariViewControllerDelegate alloc] init];
+			TSSafariViewControllerDelegate* me = AUTORELEASE([[TSSafariViewControllerDelegate alloc] init]);
 
 			me.safController = RETAIN(safController);
 
@@ -30,7 +31,6 @@
 			me.hiddenWindow.hidden = true;
 
 			me.view.hidden = YES;
-			me.modalPresentationStyle = UIModalPresentationOverFullScreen;
 
 			[safController performSelector:@selector(setDelegate:) withObject:me];
 
@@ -52,11 +52,27 @@
 
 - (void)safariViewController:(id)controller didCompleteInitialLoad:(BOOL)didLoadSuccessfully
 {
+	__unsafe_unretained UIWindow* window = self.hiddenWindow;
+	__unsafe_unretained void (^completion)(TSResponse*) = self.completion;
 	[controller dismissViewControllerAnimated:false completion:^{
-		[self.hiddenWindow.rootViewController dismissViewControllerAnimated:NO completion:nil];
-		if(self.completion != nil){
-			self.completion();
+
+		TSResponse* response;
+		if(didLoadSuccessfully) {
+			response = [[TSResponse alloc]
+						initWithStatus:200
+						message:[NSHTTPURLResponse localizedStringForStatusCode:200]
+						data:nil];
+		}else{
+			response = [[TSResponse alloc]
+						initWithStatus:-1
+						message:@"An error occurred presenting Safari View controller"
+						data:nil];
 		}
+		if(completion != nil){
+			completion(response);
+		}
+		[window.rootViewController dismissViewControllerAnimated:NO completion:nil];
+		window.rootViewController = nil;
 	}];
 }
 
@@ -65,11 +81,15 @@
 #else
 // Stub for Mac
 @implementation TSSafariViewControllerDelegate
-+ (void)presentSafariViewControllerWithURLAndCompletion:(NSURL*)url completion:(void (^)(void))completion
++ (void)presentSafariViewControllerWithURLAndCompletion:(NSURL*)url completion:(void (^)(TSResponse*))completion
 {
 	[TSLogging logAtLevel:kTSLoggingError format:@"Tapstream cookie matching should only be used on iOS devices"];
+
 	if (completion != nil){
-		completion();
+		completion([[TSResponse alloc]
+					initWithStatus:-1
+						   message:@"SafariServices framework not loaded, cookie match impossible"
+							  data:nil]);
 	}
 }
 @end

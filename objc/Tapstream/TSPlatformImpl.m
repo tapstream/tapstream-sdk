@@ -1,4 +1,5 @@
 #import "TSPlatformImpl.h"
+#import "TSSafariViewControllerDelegate.h"
 #import <sys/types.h>
 #import <sys/sysctl.h>
 #import <sys/socket.h>
@@ -18,6 +19,9 @@
 #define kTSFiredEventsKey @"__tapstream_fired_events"
 #define kTSUUIDKey @"__tapstream_uuid"
 #define kTSHasRunKey @"__tapstream_has_run"
+#define kTSLastCookieMatchTimestampKey @"__tapstream_cookie_match_timestamp"
+#define kTSLandersShownKey @"__tapstream_landers_shown"
+#define SECONDS_PER_DAY 86400
 
 @implementation TSPlatformImpl
 
@@ -346,6 +350,48 @@
 - (NSString *)getBundleShortVersion
 {
 	return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+}
+
+- (BOOL)landerShown:(NSUInteger) landerId
+{
+	NSNumber* numberObj = [NSNumber numberWithUnsignedInteger:landerId];
+	NSArray* landerArray = [[NSUserDefaults standardUserDefaults] objectForKey:kTSLandersShownKey];
+	NSMutableSet* shownLanders = [NSMutableSet setWithArray:landerArray];
+	return [shownLanders containsObject:numberObj];
+}
+
+- (void)setLanderShown:(NSUInteger) landerId
+{
+	NSNumber* numberObj = [NSNumber numberWithUnsignedInteger:landerId];
+	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+	NSArray* landerArray = [defaults objectForKey:kTSLandersShownKey];
+	NSMutableSet* shownLanders = [NSMutableSet setWithArray:landerArray];
+	[shownLanders addObject:numberObj];
+	[[NSUserDefaults standardUserDefaults] setObject:[shownLanders allObjects] forKey:kTSLandersShownKey];
+	[[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (NSTimeInterval) getCookieMatchFired
+{
+	return [[NSUserDefaults standardUserDefaults] doubleForKey:kTSLastCookieMatchTimestampKey];
+}
+- (void) setCookieMatchFired:(NSTimeInterval)t
+{
+	[[NSUserDefaults standardUserDefaults] setDouble:t forKey:kTSLastCookieMatchTimestampKey];
+}
+- (BOOL) shouldCookieMatch
+{
+	NSTimeInterval lastCookieMatch = [self getCookieMatchFired];
+	NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
+	return (now - lastCookieMatch) >= SECONDS_PER_DAY;
+}
+
+- (void)fireCookieMatch:(NSURL*)url completion:(void(^)(TSResponse*))completion
+{
+	[TSSafariViewControllerDelegate
+	 presentSafariViewControllerWithURLAndCompletion:url
+	 completion:completion];
+
 }
 
 

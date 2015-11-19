@@ -10,6 +10,7 @@
 #import "TSResponse.h"
 #import "TSLogging.h"
 #import "TSWordOfMouthDelegate.h"
+#import "TSLanderDelegate.h"
 
 @interface TSTapstream : NSObject<TSApi, TSWordOfMouthDelegate> {
 @private
@@ -29,5 +30,6 @@
 - (void)fireHit:(TSHit *)hit completion:(void(^)(TSResponse *))completion;
 - (void)getConversionData:(void(^)(NSData *))completion;
 - (NSData*)getConversionDataBlocking:(int)timeout_ms;
+- (void)showLanderIfExistsWithDelegate:(id<TSLanderDelegate>)delegate;
 
 @end
