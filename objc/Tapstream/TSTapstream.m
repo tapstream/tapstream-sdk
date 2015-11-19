@@ -201,21 +201,28 @@ static TSTapstream *instance = nil;
 
 - (void)showLanderIfExists:(UIViewController *)parentViewController delegate:(id<TSLanderDelegate>)delegate
 {
-	TSLander* lander = [self fetchLanderIfNotShown];
-	TSLanderDelegateWrapper* wrappedDelegate = [[TSLanderDelegateWrapper alloc] initWithPlatformAndDelegate:platform delegate:delegate];
-	if(parentViewController && lander != nil) {
-		TSLanderController* c = [TSLanderController controllerWithLander:lander delegate:wrappedDelegate];
-		c.view.frame = parentViewController.view.bounds;
-		[parentViewController addChildViewController:c];
-		[UIView transitionWithView:parentViewController.view
-						  duration:0.3
-						   options:UIViewAnimationOptionTransitionCrossDissolve
-						animations:^{
-							[parentViewController.view addSubview:c.view];
-							[c didMoveToParentViewController:parentViewController];
-						}
-						completion:NULL];
-	}
+	[core dispatchOnQueue:^{
+		TSLander* lander = [self fetchLanderIfNotShown];
+		if(parentViewController && lander != nil) {
+			// Must run display code on main queue
+			dispatch_async(dispatch_get_main_queue(), ^{
+
+
+				TSLanderDelegateWrapper* wrappedDelegate = [[TSLanderDelegateWrapper alloc] initWithPlatformAndDelegate:platform delegate:delegate];
+				TSLanderController* c = [TSLanderController controllerWithLander:lander delegate:wrappedDelegate];
+				c.view.frame = parentViewController.view.bounds;
+				[parentViewController addChildViewController:c];
+				[UIView transitionWithView:parentViewController.view
+								  duration:0.3
+								   options:UIViewAnimationOptionTransitionCrossDissolve
+								animations:^{
+									[parentViewController.view addSubview:c.view];
+									[c didMoveToParentViewController:parentViewController];
+								}
+								completion:NULL];
+			});
+		}
+	}];
 }
 @end
 

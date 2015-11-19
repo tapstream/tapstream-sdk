@@ -395,29 +395,5 @@
 }
 
 
-#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-
-- (void)registerCookieMatchObserver:(id)observerClass selector:(SEL)observerSelector
-{
-	[[NSNotificationCenter defaultCenter]
-	 addObserver:observerClass
-	 selector:observerSelector
-	 name:UIApplicationDidBecomeActiveNotification
-	 object:nil];
-}
-
-- (void)unregisterCookieMatchObserver:(id)observerClass
-{
-	[[NSNotificationCenter defaultCenter]
-	 removeObserver:observerClass
-	 name:UIApplicationDidBecomeActiveNotification
-	 object:nil];
-}
-#else
-// noop on mac
-- (void)registerCookieMatchObserver:(id)observerClass selector:(SEL)observerSelector {}
-- (void)unregisterCookieMatchObserver:(id)observerClass {}
-#endif
-
 @end
 

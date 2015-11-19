@@ -48,5 +48,6 @@
 - (NSURL*)makeCookieMatchURL;
 - (NSURL*)makeCookieMatchURL:(NSString*)eventName data:(NSString*)data;
 - (NSMutableString *)postData;
+- (void)dispatchOnQueue:(void(^)())completion;
 
 @end

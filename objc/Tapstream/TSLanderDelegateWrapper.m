@@ -33,6 +33,6 @@
 }
 - (void)submittedLander
 {
-	[self.delegate dismissedLander];
+	[self.delegate submittedLander];
 }
 @end

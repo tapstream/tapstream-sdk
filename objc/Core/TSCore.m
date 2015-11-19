@@ -7,7 +7,7 @@
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
 #define kTSCookieMatchUrlTemplate @"https://api.taps.io/%@/event/%@/?cookiematch=true&%@"
 #define kTSHitUrlTemplate @"https://api.tapstream.com/%@/hit/%@.gif"
-#define kTSLanderUrlTemplate @"http://localhost:8080/api/v1/in_app_landers/display/?secret=%@&event_session=%@"
+#define kTSLanderUrlTemplate @"https://reporting.tapstream.com/v1/in_app_landers/display/?secret=%@&event_session=%@"
 #define kTSConversionUrlTemplate @"https://reporting.tapstream.com/v1/timelines/lookup?secret=%@&event_session=%@"
 #define kTSConversionPollInterval 1
 #define kTSConversionPollCount 10
@@ -153,7 +153,11 @@
 	{
 		if(config.attemptCookieMatch) // cookie match replaces initial install and open events
 		{
-			[self registerCookieMatchObserver];
+			NSURL* url = [self makeCookieMatchURL];
+			__unsafe_unretained TSCore* me = self;
+			[platform fireCookieMatch:url completion:^(TSResponse* response){
+				[me firedCookieMatch];
+			}];
 
 			// Block queue until cookie match fired
 			dispatch_barrier_async(self.queue, ^{
@@ -220,33 +224,6 @@
 	}
 }
 
-
-
-
-- (void)registerCookieMatchObserver
-{
-	if([platform isFirstRun]){
-		[platform registerCookieMatchObserver:self selector:@selector(handleNotification:)];
-	}else{
-		// Already sent, let core know
-		[self firedCookieMatch];
-	}
-}
-
-- (void)handleNotification:(NSNotification*)notification
-{
-	[platform unregisterCookieMatchObserver:self];
-	if ([platform isFirstRun]){ // Only fires once.
-		NSURL* url = [self makeCookieMatchURL];
-		__unsafe_unretained TSCore* me = self;
-		[platform fireCookieMatch:url completion:^(TSResponse* response){
-			[me firedCookieMatch];
-		}];
-	}
-}
-
-
-
 - (void)firedCookieMatch
 {
 	[platform setCookieMatchFired:[[NSDate date] timeIntervalSince1970]];
@@ -286,19 +263,21 @@
 		self.cookieMatchInProgress = true;
 		NSURL* url = [self makeCookieMatchURL:e.name data:data];
 		__unsafe_unretained TSCore* me = self;
-		[platform fireCookieMatch:url completion:^(TSResponse* response){
-			if(me != nil){
-				me.cookieMatchInProgress = false;
-				if (response == nil){
-					completion([[TSResponse alloc] initWithStatus:-1 message:@"Request incomplete" data:nil]);
-				}else{
-					[me cookieMatchFired];
-					dispatch_async(me.queue, ^{
-						completion(response);
-					});
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[platform fireCookieMatch:url completion:^(TSResponse* response){
+				if(me != nil){
+					me.cookieMatchInProgress = false;
+					if (response == nil){
+						completion([[TSResponse alloc] initWithStatus:-1 message:@"Request incomplete" data:nil]);
+					}else{
+						[me cookieMatchFired];
+						dispatch_async(me.queue, ^{
+							completion(response);
+						});
+					}
 				}
-			}
-		}];
+			}];
+		});
 	}else{
 		dispatch_async(self.queue, ^{
 			NSString *url = [NSString stringWithFormat:kTSEventUrlTemplate, accountName, e.encodedName];
@@ -421,7 +400,7 @@
 
 		int actualDelay = [del getDelay];
 		dispatch_time_t dispatchTime = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * actualDelay);
-		dispatch_after(dispatchTime, dispatch_get_main_queue(), ^{
+		dispatch_after(dispatchTime, self.queue, ^{
 			[self sendEventRequest:e completion:^(TSResponse* response){
 				[self handleEventRequestResponse:e response:response];
 			}];
@@ -543,6 +522,11 @@
 	return nil;
 }
 
+- (void)dispatchOnQueue:(void(^)())completion
+{
+	dispatch_async(self.queue, completion);
+}
+
 - (int)getDelay
 {
 	return delay;
@@ -551,7 +535,6 @@
 - (NSURL*)makeLanderURL
 {
 	NSString* eventSession = [platform loadUuid];
-	eventSession = @"163cda5a-7280-42be-a530-5558401d1746";
 	return [[NSURL alloc] initWithString:[NSString stringWithFormat:kTSLanderUrlTemplate, secret, eventSession]];
 }
 

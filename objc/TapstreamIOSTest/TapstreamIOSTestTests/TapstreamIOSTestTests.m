@@ -30,10 +30,8 @@
 
 @interface TSPlatformTestImpl : NSObject<TSPlatform>
 @property(nonatomic, strong) id<TSPlatform> delegate;
-@property(nonatomic, strong) dispatch_semaphore_t sem;
 @property(nonatomic) BOOL firstRun;
 @property(nonatomic, strong) NSMutableArray<NSArray<NSString*>*>* requests;
-- (dispatch_semaphore_t)expectRequest;
 - (NSMutableArray*)getRequests;
 @end
 
@@ -43,8 +41,7 @@
 	self = [super init];
 	self.delegate = delegate;
 	self.requests = [[NSMutableArray alloc] initWithCapacity:10];
-	self.sem = dispatch_semaphore_create(0);
-	self.firstRun;
+	self.firstRun = true;
 	return self;
 }
 
@@ -53,7 +50,6 @@
 
 	NSArray<NSString*>* requestData = [[NSArray alloc] initWithObjects:url, data, method, nil];
 	[self.requests addObject:requestData];
-	dispatch_semaphore_signal(self.sem);
 	return [[TSResponse alloc] initWithStatus:200 message:@"ok" data:nil];
 }
 
@@ -62,17 +58,11 @@
 	NSArray* requestData = [[NSArray alloc] initWithObjects:[url absoluteString], @"", @"GET", nil];
 	[self.requests addObject: requestData];
 	completion([[TSResponse alloc] initWithStatus:200 message:@"ok" data:nil]);
-	dispatch_semaphore_signal(self.sem);
 }
 
 - (NSMutableArray*)getRequests
 {
 	return self.requests;
-}
-
-- (dispatch_semaphore_t)expectRequest
-{
-	return self.sem;
 }
 
 - (void)setPersistentFlagVal:(NSString*)key{ [self.delegate setPersistentFlagVal:key]; }
@@ -95,8 +85,19 @@
 - (NSString *)getComputerGUID{ return [self.delegate getComputerGUID]; }
 - (NSString *)getBundleIdentifier{ return [self.delegate getBundleIdentifier]; }
 - (NSString *)getBundleShortVersion{ return [self.delegate getBundleShortVersion]; }
+- (BOOL)landerShown:(NSUInteger)landerId{ return [self.delegate landerShown:landerId]; }
+- (void)setLanderShown:(NSUInteger)landerId{ [self.delegate setLanderShown:landerId]; }
+
 - (BOOL) shouldCookieMatch{ return [self.delegate shouldCookieMatch]; }
 - (void)setCookieMatchFired:(NSTimeInterval)t{ [self.delegate setCookieMatchFired:t]; }
+- (void)registerCookieMatchObserver:(id)observerClass selector:(SEL)observerSelector
+{
+	[self.delegate registerCookieMatchObserver:observerClass selector:observerSelector];
+}
+- (void)unregisterCookieMatchObserver:(id)observerClass
+{
+	[self.delegate unregisterCookieMatchObserver:observerClass];
+}
 
 @end
 
@@ -165,17 +166,19 @@
 	config.attemptCookieMatch = true;
 	[self initCore:config];
 
+	self.platform.firstRun = true;
 	[[NSUserDefaults standardUserDefaults]
 	 setDouble:0
 	 forKey:@"__tapstream_cookie_match_timestamp"];
 
 	// Startup -- should cookie match
-	dispatch_semaphore_t flag = [self.platform expectRequest];
 	[self.core start];
-	dispatch_semaphore_wait(flag, DISPATCH_TIME_FOREVER);
+
+	[[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1]];
+
 	NSArray* requests = [self.platform getRequests];
 
-	XCTAssertEqual(1, [requests count]);
+	XCTAssertEqual(2, [requests count]);
 	NSString* cookieMatchUrl = [[requests firstObject] firstObject];
 	XCTAssertTrue([[[requests firstObject] lastObject] isEqualToString:@"GET"]);
 	XCTAssertTrue([cookieMatchUrl containsString:@"cookiematch=true"]);
@@ -186,8 +189,8 @@
 							  doubleForKey:@"__tapstream_cookie_match_timestamp"];
 	XCTAssertFalse([self.platform shouldCookieMatch]);
 	[self.core fireEvent:[TSEvent eventWithName:@"test-event" oneTimeOnly:NO]];
-	dispatch_semaphore_wait(flag, DISPATCH_TIME_FOREVER);
-	XCTAssertEqual(2, [requests count]);
+	[[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1]];
+	XCTAssertEqual(3, [requests count]);
 
 	NSString* regularEventUrl = [[requests lastObject] firstObject];
 	XCTAssertFalse([regularEventUrl containsString:@"cookiematch=true"]);
@@ -197,11 +200,14 @@
 	timestampBefore = [[NSUserDefaults standardUserDefaults]
 							  doubleForKey:@"__tapstream_cookie_match_timestamp"];
 	[[NSUserDefaults standardUserDefaults]
-	 setDouble:(timestampBefore - 86400.0)
+	 setDouble:(timestampBefore - 86410.0)
 	 forKey:@"__tapstream_cookie_match_timestamp"];
+
+	XCTAssertTrue([self.platform shouldCookieMatch]);
+
 	[self.core fireEvent:[TSEvent eventWithName:@"test-event2" oneTimeOnly:NO]];
-	dispatch_semaphore_wait(flag, DISPATCH_TIME_FOREVER);
-	XCTAssertEqual(3, [requests count]);
+	[[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1]];
+	XCTAssertEqual(4, [requests count]);
 
 	regularEventUrl = [[requests lastObject] firstObject];
 	XCTAssertTrue([regularEventUrl containsString:@"cookiematch=true"]);
@@ -217,13 +223,10 @@
 	 setDouble:0
 	 forKey:@"__tapstream_cookie_match_timestamp"];
 
-	dispatch_semaphore_t flag = [self.platform expectRequest];
-
 	// Should cookie match
 	[self.core fireEvent:[TSEvent eventWithName:@"test-event" oneTimeOnly:NO]];
 	[self.core fireEvent:[TSEvent eventWithName:@"test-event2" oneTimeOnly:NO]];
-	dispatch_semaphore_wait(flag, DISPATCH_TIME_FOREVER);
-	dispatch_semaphore_wait(flag, DISPATCH_TIME_FOREVER);
+	[[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1]];
 	NSArray* requests = [self.platform getRequests];
 
 	XCTAssertEqual(2, [requests count]);
@@ -238,6 +241,16 @@
 		XCTAssertEqual(@"POST", [[requests firstObject] lastObject]);
 		XCTAssertEqual(@"GET", [[requests lastObject] lastObject]);
 	}
+}
+
+/* Lander Features */
+
+- (void) testLanderPlatformImpl {
+	[[NSUserDefaults standardUserDefaults] removeObjectForKey:@"__tapstream_landers_shown"];
+	XCTAssertFalse([self.platform landerShown:1]);
+	[self.platform setLanderShown:1];
+	XCTAssertTrue([self.platform landerShown:1]);
+	XCTAssertFalse([self.platform landerShown:2]);
 }
 
 - (void) testInitTSLander {
@@ -295,11 +308,5 @@
 	XCTAssertTrue([lander isValid]);
 }
 
-- (void)testPerformanceExample {
-    // This is an example of a performance test case.
-    [self measureBlock:^{
-        // Put the code you want to measure the time of here.
-    }];
-}
 
 @end
