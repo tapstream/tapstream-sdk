@@ -199,27 +199,25 @@ static TSTapstream *instance = nil;
 	return nil;
 }
 
-- (void)showLanderIfExists:(UIViewController *)parentViewController delegate:(id<TSLanderDelegate>)delegate
+- (void)showLanderIfExistsWithDelegate:(id<TSLanderDelegate>)delegate
 {
 	[core dispatchOnQueue:^{
 		TSLander* lander = [self fetchLanderIfNotShown];
-		if(parentViewController && lander != nil) {
+		if(lander != nil) {
 			// Must run display code on main queue
 			dispatch_async(dispatch_get_main_queue(), ^{
+				UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
 
-
-				TSLanderDelegateWrapper* wrappedDelegate = [[TSLanderDelegateWrapper alloc] initWithPlatformAndDelegate:platform delegate:delegate];
+				TSLanderDelegateWrapper* wrappedDelegate = [[TSLanderDelegateWrapper alloc] initWithPlatformAndDelegateAndWindow:platform delegate:delegate window:window];
 				TSLanderController* c = [TSLanderController controllerWithLander:lander delegate:wrappedDelegate];
-				c.view.frame = parentViewController.view.bounds;
-				[parentViewController addChildViewController:c];
-				[UIView transitionWithView:parentViewController.view
-								  duration:0.3
-								   options:UIViewAnimationOptionTransitionCrossDissolve
-								animations:^{
-									[parentViewController.view addSubview:c.view];
-									[c didMoveToParentViewController:parentViewController];
-								}
-								completion:NULL];
+
+
+				window.rootViewController = c;
+				window.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+				window.opaque = NO;
+				window.backgroundColor = [UIColor clearColor];
+
+				[window makeKeyAndVisible];
 			});
 		}
 	}];

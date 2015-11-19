@@ -13,12 +13,13 @@
 #import "TSLanderDelegateWrapper.h"
 
 @implementation TSLanderDelegateWrapper
-- initWithPlatformAndDelegate:(id<TSPlatform>)platform delegate:(id<TSLanderDelegate>)delegate
+- initWithPlatformAndDelegateAndWindow:(id<TSPlatform>)platform delegate:(id<TSLanderDelegate>)delegate window:(UIWindow*)window
 {
 	if(self = [super init])
 	{
 		self.platform = platform;
 		self.delegate = delegate;
+		self.window = window;
 	}
 	return self;
 }
@@ -30,9 +31,13 @@
 - (void)dismissedLander
 {
 	[self.delegate dismissedLander];
+	[self.window removeFromSuperview];
+	self.window = nil;
 }
 - (void)submittedLander
 {
 	[self.delegate submittedLander];
+	[self.window removeFromSuperview];
+	self.window = nil;
 }
 @end

@@ -30,6 +30,6 @@
 - (void)fireHit:(TSHit *)hit completion:(void(^)(TSResponse *))completion;
 - (void)getConversionData:(void(^)(NSData *))completion;
 - (NSData*)getConversionDataBlocking:(int)timeout_ms;
-- (void)showLanderIfExists:(UIViewController *)parentViewController delegate:(id<TSLanderDelegate>)delegate;
+- (void)showLanderIfExistsWithDelegate:(id<TSLanderDelegate>)delegate;
 
 @end
