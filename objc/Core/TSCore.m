@@ -3,7 +3,7 @@
 #import "TSLogging.h"
 #import "TSUtils.h"
 
-#define kTSVersion @"2.10.0"
+#define kTSVersion @"2.10.1"
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
 #define kTSCookieMatchUrlTemplate @"https://api.taps.io/%@/event/%@/?cookiematch=true&%@"
 #define kTSHitUrlTemplate @"https://api.tapstream.com/%@/hit/%@.gif"

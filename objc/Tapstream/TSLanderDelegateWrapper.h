@@ -9,9 +9,13 @@
 #ifndef TSLanderDelegateWrapper_h
 #define TSLanderDelegateWrapper_h
 
-#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-#import "TSHelpers.h"
+#import "TSLanderDelegate.h"
 
+#if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+
+#import <UIKit/UIKit.h>
+#import "TSHelpers.h"
+#import "TSPlatform.h"
 
 @interface TSLanderDelegateWrapper : NSObject<TSLanderDelegate>
 @property(nonatomic, STRONG_OR_RETAIN) id<TSPlatform> platform;

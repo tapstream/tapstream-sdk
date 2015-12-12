@@ -7,11 +7,13 @@
 //  Copyright © 2015 Tapstream. All rights reserved.
 //
 
+#import "TSLanderDelegateWrapper.h"
+
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+
 #import <Foundation/Foundation.h>
 #import "TSLanderDelegate.h"
 #import "TSPlatform.h"
-#import "TSLanderDelegateWrapper.h"
 
 @implementation TSLanderDelegateWrapper
 - initWithPlatformAndDelegateAndWindow:(id<TSPlatform>)platform delegate:(id<TSLanderDelegate>)delegate window:(UIWindow*)window
