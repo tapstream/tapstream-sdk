@@ -28,6 +28,6 @@
 - (void)setLanderShown:(NSUInteger)landerId;
 - (BOOL) shouldCookieMatch;
 - (void)setCookieMatchFired:(NSTimeInterval)t;
-- (void)fireCookieMatch:(NSURL*)url completion:(void(^)(TSResponse*))completion;
+- (BOOL)fireCookieMatch:(NSURL*)url completion:(void(^)(TSResponse*))completion;
 
 @end

@@ -22,11 +22,11 @@
 @property(nonatomic, STRONG_OR_RETAIN) UIWindow* hiddenWindow;
 @property(nonatomic, STRONG_OR_RETAIN) UIViewController* safController;
 
-+ (void)presentSafariViewControllerWithURLAndCompletion:(NSURL*)url completion:(void (^)(TSResponse*))completion;
++ (BOOL)presentSafariViewControllerWithURLAndCompletion:(NSURL*)url completion:(void (^)(TSResponse*))completion;
 @end
 #else
 
 @interface TSSafariViewControllerDelegate : NSObject
-+ (void)presentSafariViewControllerWithURLAndCompletion:(NSURL*)url completion:(void (^)(TSResponse*))completion;
++ (BOOL)presentSafariViewControllerWithURLAndCompletion:(NSURL*)url completion:(void (^)(TSResponse*))completion;
 @end
 #endif
