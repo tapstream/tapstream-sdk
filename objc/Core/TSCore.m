@@ -263,13 +263,20 @@
 - (void)sendEventRequest:(TSEvent*)e completion:(void(^)(TSResponse*))completion{
 
 	NSString *data = [postData stringByAppendingString:e.postData];
+	void (^fireEvent)() = ^{
+		NSString *url = [NSString stringWithFormat:kTSEventUrlTemplate, accountName, e.encodedName];
+		completion([platform request:url data:data method:@"POST" timeout_ms:kTSDefaultTimeout]);
+	};
+
 	if(config.attemptCookieMatch && [platform shouldCookieMatch] && !self.cookieMatchInProgress)
 	{
 		self.cookieMatchInProgress = true;
 		NSURL* url = [self makeCookieMatchURL:e.name data:data];
 		__unsafe_unretained TSCore* me = self;
+
+		// SFSafariViewController must run on main thread
 		dispatch_async(dispatch_get_main_queue(), ^{
-			[platform fireCookieMatch:url completion:^(TSResponse* response){
+			BOOL firingCookieMatch = [platform fireCookieMatch:url completion:^(TSResponse* response){
 				if(me != nil){
 					me.cookieMatchInProgress = false;
 					if (response == nil){
@@ -282,12 +289,13 @@
 					}
 				}
 			}];
+
+			if (!firingCookieMatch){
+				dispatch_async(self.queue, fireEvent);
+			}
 		});
 	}else{
-		dispatch_async(self.queue, ^{
-			NSString *url = [NSString stringWithFormat:kTSEventUrlTemplate, accountName, e.encodedName];
-			completion([platform request:url data:data method:@"POST" timeout_ms:kTSDefaultTimeout]);
-		});
+		dispatch_async(self.queue, fireEvent);
 	}
 }
 
