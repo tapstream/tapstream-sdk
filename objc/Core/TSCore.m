@@ -172,7 +172,7 @@
 
 		}
 
-		if(!firingCookieMatch)
+		if(!firingCookieMatch && config.fireAutomaticInstallEvent)
 		{
 			if(config.installEventName != nil)
 			{
