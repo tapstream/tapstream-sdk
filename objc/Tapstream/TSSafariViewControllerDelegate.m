@@ -13,7 +13,7 @@
 #if (TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
 @implementation TSSafariViewControllerDelegate
 
-+ (void)presentSafariViewControllerWithURLAndCompletion:(NSURL*)url completion:(void (^)(TSResponse*))completion
++ (BOOL)presentSafariViewControllerWithURLAndCompletion:(NSURL*)url completion:(void (^)(TSResponse*))completion
 {
 	Class safControllerClass = NSClassFromString(@"SFSafariViewController");
 	if(safControllerClass != nil){
@@ -36,10 +36,12 @@
 
 			[me.hiddenWindow makeKeyAndVisible];
 			[me presentViewController:safController animated:YES completion:nil];
+			return true;
 		}
 	}else{
 		[TSLogging logAtLevel:kTSLoggingWarn format:@"Tapstream could not load SFSafariViewController, is Safari Services framework enabled?"];
 	}
+	return false;
 }
 
 

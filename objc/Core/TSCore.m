@@ -151,23 +151,28 @@
 
 	if([platform isFirstRun])
 	{
+		BOOL firingCookieMatch = false;
 		if(config.attemptCookieMatch) // cookie match replaces initial install and open events
 		{
 			NSURL* url = [self makeCookieMatchURL];
 			__unsafe_unretained TSCore* me = self;
-			[platform fireCookieMatch:url completion:^(TSResponse* response){
+			void (^completion)(TSResponse*) = ^(TSResponse* response){
 				[me firedCookieMatch];
-			}];
-
-			// Block queue until cookie match fired
-			dispatch_barrier_async(self.queue, ^{
-				dispatch_semaphore_wait(self.cookieMatchFired, DISPATCH_TIME_FOREVER);
-				[platform registerFirstRun];
-				NSLog(@"Tapstream: Cookie Match Complete");
-			});
+			};
+			firingCookieMatch = [platform fireCookieMatch:url completion:completion];
+			if(firingCookieMatch){
+				// Block queue until cookie match fired or for 10 seconds
+				dispatch_barrier_async(self.queue, ^{
+					dispatch_semaphore_wait(self.cookieMatchFired,
+											dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 10));
+					[platform registerFirstRun];
+					NSLog(@"Tapstream: Cookie Match Complete");
+				});
+			}
 
 		}
-		else if(config.fireAutomaticInstallEvent)
+
+		if(!firingCookieMatch)
 		{
 			if(config.installEventName != nil)
 			{
@@ -258,13 +263,20 @@
 - (void)sendEventRequest:(TSEvent*)e completion:(void(^)(TSResponse*))completion{
 
 	NSString *data = [postData stringByAppendingString:e.postData];
+	void (^fireEvent)() = ^{
+		NSString *url = [NSString stringWithFormat:kTSEventUrlTemplate, accountName, e.encodedName];
+		completion([platform request:url data:data method:@"POST" timeout_ms:kTSDefaultTimeout]);
+	};
+
 	if(config.attemptCookieMatch && [platform shouldCookieMatch] && !self.cookieMatchInProgress)
 	{
 		self.cookieMatchInProgress = true;
 		NSURL* url = [self makeCookieMatchURL:e.name data:data];
 		__unsafe_unretained TSCore* me = self;
+
+		// SFSafariViewController must run on main thread
 		dispatch_async(dispatch_get_main_queue(), ^{
-			[platform fireCookieMatch:url completion:^(TSResponse* response){
+			BOOL firingCookieMatch = [platform fireCookieMatch:url completion:^(TSResponse* response){
 				if(me != nil){
 					me.cookieMatchInProgress = false;
 					if (response == nil){
@@ -277,12 +289,13 @@
 					}
 				}
 			}];
+
+			if (!firingCookieMatch){
+				dispatch_async(self.queue, fireEvent);
+			}
 		});
 	}else{
-		dispatch_async(self.queue, ^{
-			NSString *url = [NSString stringWithFormat:kTSEventUrlTemplate, accountName, e.encodedName];
-			completion([platform request:url data:data method:@"POST" timeout_ms:kTSDefaultTimeout]);
-		});
+		dispatch_async(self.queue, fireEvent);
 	}
 }
 

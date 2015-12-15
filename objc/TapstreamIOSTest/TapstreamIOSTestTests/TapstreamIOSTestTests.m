@@ -90,14 +90,7 @@
 
 - (BOOL) shouldCookieMatch{ return [self.delegate shouldCookieMatch]; }
 - (void)setCookieMatchFired:(NSTimeInterval)t{ [self.delegate setCookieMatchFired:t]; }
-- (void)registerCookieMatchObserver:(id)observerClass selector:(SEL)observerSelector
-{
-	[self.delegate registerCookieMatchObserver:observerClass selector:observerSelector];
-}
-- (void)unregisterCookieMatchObserver:(id)observerClass
-{
-	[self.delegate unregisterCookieMatchObserver:observerClass];
-}
+
 
 @end
 

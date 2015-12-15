@@ -386,9 +386,9 @@
 	return (now - lastCookieMatch) >= SECONDS_PER_DAY;
 }
 
-- (void)fireCookieMatch:(NSURL*)url completion:(void(^)(TSResponse*))completion
+- (BOOL)fireCookieMatch:(NSURL*)url completion:(void(^)(TSResponse*))completion
 {
-	[TSSafariViewControllerDelegate
+	return [TSSafariViewControllerDelegate
 	 presentSafariViewControllerWithURLAndCompletion:url
 	 completion:completion];
 
