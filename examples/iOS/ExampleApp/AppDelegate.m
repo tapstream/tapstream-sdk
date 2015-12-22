@@ -128,6 +128,20 @@
     }
 }
 
+- (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity
+ restorationHandler:(void (^)(NSArray *restorableObjects))restorationHandler
+{
+	return [[TSTapstream instance] handleUniversalLink:userActivity completion:^(TSDeepLink* result){
+		NSLog(@"Deeplink scheme: %@", [result scheme]);
+		NSLog(@"Deeplink path: %@", [[result deepLinkUrl] path]);
+		NSEnumerator* keys = [[result parameters] keyEnumerator];
+		NSString* key;
+		while (key = [keys nextObject]){
+			NSLog(@"\t%@:%@", key, [[result parameters] valueForKey:key]);
+		}
+		NSLog(@"Universal Link Handled!");
+	}];
+}
 
 							
 - (void)applicationWillResignActive:(UIApplication *)application

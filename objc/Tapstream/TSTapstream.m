@@ -7,6 +7,8 @@
 #import "TSAppEventSourceImpl.h"
 #import "TSLanderController.h"
 #import "TSLanderDelegateWrapper.h"
+#import "TSDeepLink.h"
+
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 #import <UIKit/UIKit.h>
 #endif
@@ -227,9 +229,37 @@ static TSTapstream *instance = nil;
 - (void)showLanderIfExistsWithDelegate:(id<TSLanderDelegate>)delegate
 {}
 #endif
+
+
+- (BOOL) handleUniversalLinkAtUrl:(NSURL*) linkUrl completion:(void(^)(TSDeepLink*))completion
+{
+
+	NSURLComponents* comps = [NSURLComponents
+							  componentsWithURL:linkUrl
+							  resolvingAgainstBaseURL:nil];
+	NSArray* components = [comps queryItems];
+	for (int ii=0; ii < [components count]; ii++){
+		NSURLQueryItem* item = [components objectAtIndex:ii];
+		if ([@"deeplink" isEqualToString:[item name]] && [item value])
+		{
+			completion([TSDeepLink deepLinkWithString:[item value]]);
+			return true;
+		}
+	}
+	return false;
+}
+
+
+- (BOOL)handleUniversalLink:(NSUserActivity*)userActivity completion:(void(^)(TSDeepLink*))completion
+{
+	if (userActivity.activityType == NSUserActivityTypeBrowsingWeb){
+		if (userActivity.webpageURL != nil){
+			return [self handleUniversalLinkAtUrl:userActivity.webpageURL completion:completion];
+		}
+	}
+	return false;
+}
 @end
-
-
 
 
 @implementation TSDelegateImpl
