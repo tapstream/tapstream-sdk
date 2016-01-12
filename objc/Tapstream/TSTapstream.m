@@ -230,6 +230,10 @@ static TSTapstream *instance = nil;
 {}
 #endif
 
+
+#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+
 - (TSUniversalLink*)handleUniversalLink:(NSUserActivity*)userActivity
 {
 	if ([userActivity.activityType isEqualToString:NSUserActivityTypeBrowsingWeb]){
@@ -239,6 +243,9 @@ static TSTapstream *instance = nil;
 	}
 	return [TSUniversalLink universalLinkWithStatus:kTSULUnknown];
 }
+#endif
+#endif
+
 @end
 
 

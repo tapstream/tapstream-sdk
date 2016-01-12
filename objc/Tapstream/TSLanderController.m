@@ -1,11 +1,3 @@
-//
-//  TSLanderController.m
-//  ExampleApp
-//
-//  Created by Adam Bard on 2015-11-03.
-//  Copyright © 2015 Example. All rights reserved.
-//
-
 #import <Foundation/Foundation.h>
 #import "TSHelpers.h"
 #import "TSLander.h"

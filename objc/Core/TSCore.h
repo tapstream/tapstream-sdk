@@ -50,6 +50,11 @@
 - (NSURL*)makeCookieMatchURL:(NSString*)eventName data:(NSString*)data;
 - (NSMutableString *)postData;
 - (void)dispatchOnQueue:(void(^)())completion;
+
+#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
 - (TSUniversalLink*)handleUniversalLink:(NSURL*) url;
+#endif
+#endif
 
 @end

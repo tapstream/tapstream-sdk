@@ -1,11 +1,3 @@
-//
-//  TSSafariViewControllerDelegate.m
-//  ExampleApp
-//
-//  Created by Adam Bard on 2015-09-12.
-//  Copyright © 2015 Example. All rights reserved.
-//
-
 #import "TSSafariViewControllerDelegate.h"
 #import "TSLogging.h"
 #import "TSResponse.h"
@@ -34,8 +26,12 @@
 
 			[safController performSelector:@selector(setDelegate:) withObject:me];
 
-			[me.hiddenWindow makeKeyAndVisible];
-			[me presentViewController:safController animated:YES completion:nil];
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[me addChildViewController:safController];
+				[me.view addSubview:safController.view];
+				[safController didMoveToParentViewController:me];
+				[me.hiddenWindow makeKeyAndVisible];
+			});
 			return true;
 		}
 	}else{
@@ -56,26 +52,31 @@
 {
 	__unsafe_unretained UIWindow* window = self.hiddenWindow;
 	__unsafe_unretained void (^completion)(TSResponse*) = self.completion;
-	[controller dismissViewControllerAnimated:false completion:^{
 
-		TSResponse* response;
-		if(didLoadSuccessfully) {
-			response = [[TSResponse alloc]
-						initWithStatus:200
-						message:[NSHTTPURLResponse localizedStringForStatusCode:200]
-						data:nil];
-		}else{
-			response = [[TSResponse alloc]
-						initWithStatus:-1
-						message:@"An error occurred presenting Safari View controller"
-						data:nil];
-		}
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[controller willMoveToParentViewController:nil];
+		[((UIViewController*)controller).view removeFromSuperview];
+		[controller removeFromParentViewController];
+
+		[window removeFromSuperview];
+
 		if(completion != nil){
+			TSResponse* response;
+			if(didLoadSuccessfully) {
+				response = [[TSResponse alloc]
+							initWithStatus:200
+							message:[NSHTTPURLResponse localizedStringForStatusCode:200]
+							data:nil];
+			}else{
+				response = [[TSResponse alloc]
+							initWithStatus:-1
+							message:@"An error occurred presenting Safari View controller"
+							data:nil];
+			}
+
 			completion(response);
 		}
-		[window.rootViewController dismissViewControllerAnimated:NO completion:nil];
-		window.rootViewController = nil;
-	}];
+	});
 }
 
 @end

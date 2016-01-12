@@ -605,6 +605,8 @@
 	[listener reportOperation:@"increased-delay"];
 }
 
+#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
 - (TSUniversalLink*)handleUniversalLink:(NSURL*) url
 {
 	// Add __tsredirect=0 param and open in SafariViewController
@@ -630,12 +632,10 @@
 	NSURLComponents *dqComponents = [[NSURLComponents alloc] initWithURL:[NSURL URLWithString:deeplinkQueryURL]
 												 resolvingAgainstBaseURL:NO];
 	NSMutableArray* dqItems = [NSMutableArray arrayWithArray:[dqComponents queryItems]];
-	NSString* encodedUrl = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-	[dqItems addObject:[NSURLQueryItem queryItemWithName:@"__tsdqu" value:urlString]];
+
+	[dqItems addObject:[NSURLQueryItem queryItemWithName:@"__tsdqu" value:[url absoluteString]]];
 	[dqItems addObject:[NSURLQueryItem queryItemWithName:@"__tsdqp" value:@"iOS"]];
 	[dqComponents setQueryItems:dqItems];
-
-	NSString* tmp = [dqComponents string];
 
 	TSResponse* response = [platform request:[dqComponents string]
 										data:@""
@@ -644,6 +644,8 @@
 
 	return [TSUniversalLink universalLinkWithDeeplinkQueryResponse:response];
 }
+#endif
+#endif
 
 - (void)appendPostPairWithPrefix:(NSString *)prefix key:(NSString *)key value:(NSString *)value
 {

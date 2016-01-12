@@ -1,11 +1,3 @@
-//
-//  TSUniversalLink.h
-//  ExampleApp
-//
-//  Created by Adam Bard on 2015-12-17.
-//  Copyright © 2015 Example. All rights reserved.
-//
-
 #ifndef TSUniversalLink_h
 #define TSUniversalLink_h
 
