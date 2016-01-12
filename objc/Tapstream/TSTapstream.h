@@ -11,7 +11,7 @@
 #import "TSLogging.h"
 #import "TSWordOfMouthDelegate.h"
 #import "TSLanderDelegate.h"
-#import "TSDeepLink.h"
+#import "TSUniversalLink.h"
 
 @interface TSTapstream : NSObject<TSApi, TSWordOfMouthDelegate> {
 @private
@@ -32,6 +32,6 @@
 - (void)getConversionData:(void(^)(NSData *))completion;
 - (NSData*)getConversionDataBlocking:(int)timeout_ms;
 - (void)showLanderIfExistsWithDelegate:(id<TSLanderDelegate>)delegate;
-- (BOOL)handleUniversalLink:(NSUserActivity*)userActivity completion:(void(^)(TSDeepLink*))completion;
+- (TSUniversalLink*)handleUniversalLink:(NSUserActivity*)userActivity;
 
 @end

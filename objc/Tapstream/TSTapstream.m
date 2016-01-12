@@ -7,7 +7,7 @@
 #import "TSAppEventSourceImpl.h"
 #import "TSLanderController.h"
 #import "TSLanderDelegateWrapper.h"
-#import "TSDeepLink.h"
+#import "TSUniversalLink.h"
 
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 #import <UIKit/UIKit.h>
@@ -230,34 +230,14 @@ static TSTapstream *instance = nil;
 {}
 #endif
 
-
-- (BOOL) handleUniversalLinkAtUrl:(NSURL*) linkUrl completion:(void(^)(TSDeepLink*))completion
+- (TSUniversalLink*)handleUniversalLink:(NSUserActivity*)userActivity
 {
-
-	NSURLComponents* comps = [NSURLComponents
-							  componentsWithURL:linkUrl
-							  resolvingAgainstBaseURL:nil];
-	NSArray* components = [comps queryItems];
-	for (int ii=0; ii < [components count]; ii++){
-		NSURLQueryItem* item = [components objectAtIndex:ii];
-		if ([@"deeplink" isEqualToString:[item name]] && [item value])
-		{
-			completion([TSDeepLink deepLinkWithString:[item value]]);
-			return true;
-		}
-	}
-	return false;
-}
-
-
-- (BOOL)handleUniversalLink:(NSUserActivity*)userActivity completion:(void(^)(TSDeepLink*))completion
-{
-	if (userActivity.activityType == NSUserActivityTypeBrowsingWeb){
+	if ([userActivity.activityType isEqualToString:NSUserActivityTypeBrowsingWeb]){
 		if (userActivity.webpageURL != nil){
-			return [self handleUniversalLinkAtUrl:userActivity.webpageURL completion:completion];
+			return [core handleUniversalLink:userActivity.webpageURL];
 		}
 	}
-	return false;
+	return [TSUniversalLink universalLinkWithStatus:kTSULUnknown];
 }
 @end
 

@@ -8,6 +8,7 @@
 #import "TSResponse.h"
 #import "TSConfig.h"
 #import "TSAppEventSource.h"
+#import "TSUniversalLink.h"
 
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 #define kTSPlatform @"iOS"
@@ -49,5 +50,6 @@
 - (NSURL*)makeCookieMatchURL:(NSString*)eventName data:(NSString*)data;
 - (NSMutableString *)postData;
 - (void)dispatchOnQueue:(void(^)())completion;
+- (TSUniversalLink*)handleUniversalLink:(NSURL*) url;
 
 @end

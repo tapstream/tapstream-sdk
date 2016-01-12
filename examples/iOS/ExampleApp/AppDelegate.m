@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "TSTapstream.h"
+#import "TSUniversalLink.h"
 
 @implementation AppDelegate
 
@@ -131,16 +132,17 @@
 - (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity
  restorationHandler:(void (^)(NSArray *restorableObjects))restorationHandler
 {
-	return [[TSTapstream instance] handleUniversalLink:userActivity completion:^(TSDeepLink* result){
-		NSLog(@"Deeplink scheme: %@", [result scheme]);
-		NSLog(@"Deeplink path: %@", [[result deepLinkUrl] path]);
-		NSEnumerator* keys = [[result parameters] keyEnumerator];
-		NSString* key;
-		while (key = [keys nextObject]){
-			NSLog(@"\t%@:%@", key, [[result parameters] valueForKey:key]);
-		}
-		NSLog(@"Universal Link Handled!");
-	}];
+	TSUniversalLink* result = [[TSTapstream instance] handleUniversalLink:userActivity];
+	if(result.status == kTSULHandled)
+	{
+		// Do deeplink things
+		NSLog(@"Universal Link Handled");
+		return YES;
+	}
+
+	// Fall back to openURL if link not handled.
+	[[UIApplication sharedApplication] openURL:userActivity.webpageURL];
+	return NO;
 }
 
 							

@@ -2,11 +2,13 @@
 #import "TSHelpers.h"
 #import "TSLogging.h"
 #import "TSUtils.h"
+#import "TSUniversalLink.h"
 
 #define kTSVersion @"2.10.2"
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
 #define kTSCookieMatchUrlTemplate @"https://api.taps.io/%@/event/%@/?cookiematch=true&%@"
 #define kTSHitUrlTemplate @"https://api.tapstream.com/%@/hit/%@.gif"
+#define kTSDeeplinkQueryUrlTemplate @"https://api.tapstream.com/%@/deeplink_query/"
 #define kTSLanderUrlTemplate @"https://reporting.tapstream.com/v1/in_app_landers/display/?secret=%@&event_session=%@"
 #define kTSConversionUrlTemplate @"https://reporting.tapstream.com/v1/timelines/lookup?secret=%@&event_session=%@"
 #define kTSConversionPollInterval 1
@@ -601,6 +603,46 @@
 		delay = newDelay > 60 ? 60 : newDelay;
 	}
 	[listener reportOperation:@"increased-delay"];
+}
+
+- (TSUniversalLink*)handleUniversalLink:(NSURL*) url
+{
+	// Add __tsredirect=0 param and open in SafariViewController
+	NSURLComponents *components = [[NSURLComponents alloc] initWithURL:url resolvingAgainstBaseURL:NO];
+	NSMutableArray* items = [NSMutableArray arrayWithArray:[components queryItems]];
+	[items addObject:[[NSURLQueryItem alloc] initWithName:@"__tsredirect" value:@"0"]];
+	[components setQueryItems:items];
+	NSString* urlString = [components string];
+
+
+	[platform fireCookieMatch:[NSURL URLWithString:urlString]
+				   completion:^(TSResponse* response){
+					   if (response.status >= 200 && response.status < 300){
+						   [TSLogging logAtLevel:kTSLoggingInfo format:@"Deeplink registration succeeded for url %@", url];
+					   }else{
+						   [TSLogging logAtLevel:kTSLoggingWarn format:@"Deeplink registration failed for url %@", url];
+					   }
+				   }];
+
+
+	// Respond according to deeplink query
+	NSString* deeplinkQueryURL = [NSString stringWithFormat:kTSDeeplinkQueryUrlTemplate, accountName];
+	NSURLComponents *dqComponents = [[NSURLComponents alloc] initWithURL:[NSURL URLWithString:deeplinkQueryURL]
+												 resolvingAgainstBaseURL:NO];
+	NSMutableArray* dqItems = [NSMutableArray arrayWithArray:[dqComponents queryItems]];
+	NSString* encodedUrl = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+	[dqItems addObject:[NSURLQueryItem queryItemWithName:@"__tsdqu" value:urlString]];
+	[dqItems addObject:[NSURLQueryItem queryItemWithName:@"__tsdqp" value:@"iOS"]];
+	[dqComponents setQueryItems:dqItems];
+
+	NSString* tmp = [dqComponents string];
+
+	TSResponse* response = [platform request:[dqComponents string]
+										data:@""
+									  method:@"GET"
+								  timeout_ms:kTSDefaultTimeout];
+
+	return [TSUniversalLink universalLinkWithDeeplinkQueryResponse:response];
 }
 
 - (void)appendPostPairWithPrefix:(NSString *)prefix key:(NSString *)key value:(NSString *)value
