@@ -301,23 +301,4 @@
 	XCTAssertTrue([lander isValid]);
 }
 
--(void) testUniversalLinkParser
-{
-	NSString* deeplink = @"myapp://this/is/my/path?and=here&are=some#parameters";
-	TSDeepLink* result = [TSDeepLink deepLinkWithString:deeplink];
-
-	XCTAssertEqualObjects(@"myapp", [result scheme]);
-
-	NSArray* expectedPathComponents = [NSArray arrayWithObjects:@"this", @"is", @"my", @"path", nil];
-	for(int ii=0; ii<4; ii++){
-		XCTAssertEqualObjects(
-					   [expectedPathComponents objectAtIndex:ii],
-					   [[result pathComponents] objectAtIndex:ii]);
-	}
-
-	XCTAssertEqualObjects(@"some", [[result parameters] valueForKey:@"are"]);
-	XCTAssertEqualObjects(@"here", [[result parameters] valueForKey:@"and"]);
-}
-
-
 @end
