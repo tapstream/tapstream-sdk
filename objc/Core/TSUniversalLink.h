@@ -6,7 +6,7 @@
 
 typedef enum _TSUniversalLinkStatus
 {
-	kTSULHandled = 0,
+	kTSULValid = 0,
 	kTSULDisabled,
 	kTSULUnknown
 } TSUniversalLinkStatus;

@@ -34,19 +34,19 @@
 
 	if (fbUrlStr != nil){
 		fbUrl = [NSURL URLWithString:fbUrlStr];
-		status = kTSULHandled;
+		status = kTSULValid;
 	}else{
 		fbUrl = nil;
 	}
 
 	if (regUrlStr != nil){
 		regUrl = [NSURL URLWithString:regUrlStr];
-		status = kTSULHandled;
+		status = kTSULValid;
 	}else{
 		regUrl = nil;
 	}
 
-	if (status == kTSULHandled && !eul){
+	if (status == kTSULValid && !eul){
 		status = kTSULDisabled;
 	}
 

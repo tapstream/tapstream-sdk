@@ -133,7 +133,7 @@
  restorationHandler:(void (^)(NSArray *restorableObjects))restorationHandler
 {
 	TSUniversalLink* result = [[TSTapstream instance] handleUniversalLink:userActivity];
-	if(result.status == kTSULHandled)
+	if(result.status == kTSULValid)
 	{
 		// Do deeplink things
 		NSLog(@"Universal Link Handled");
