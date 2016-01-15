@@ -2,8 +2,8 @@
 #import "TSUniversalLink.h"
 
 @interface TSUniversalLink()
-@property(nonatomic, STRONG_OR_RETAIN, readwrite) NSURL* deeplinkUrl;
-@property(nonatomic, STRONG_OR_RETAIN, readwrite) NSURL* fallbackUrl;
+@property(nonatomic, STRONG_OR_RETAIN, readwrite) NSURL* deeplinkURL;
+@property(nonatomic, STRONG_OR_RETAIN, readwrite) NSURL* fallbackURL;
 @property(nonatomic, readwrite) TSUniversalLinkStatus status;
 @end
 
@@ -50,8 +50,8 @@
 		status = kTSULDisabled;
 	}
 
-	return [[self alloc] initWithDeeplinkUrl:regUrl
-								 fallbackUrl:fbUrl
+	return [[self alloc] initWithDeeplinkURL:regUrl
+								 fallbackURL:fbUrl
 									  status:status];
 }
 
@@ -63,18 +63,18 @@
 - (id)initWithStatus:(TSUniversalLinkStatus)status
 {
 	if([self init] != nil){
-		self.deeplinkUrl = nil;
-		self.fallbackUrl = nil;
+		self.deeplinkURL = nil;
+		self.fallbackURL = nil;
 		self.status = status;
 	}
 	return self;
 }
 
-- (id)initWithDeeplinkUrl:(NSURL*)deeplinkUrl fallbackUrl:(NSURL*)fallbackUrl status:(TSUniversalLinkStatus)status
+- (id)initWithDeeplinkURL:(NSURL*)deeplinkURL fallbackURL:(NSURL*)fallbackURL status:(TSUniversalLinkStatus)status
 {
 	if([self init] != nil){
-		self.deeplinkUrl = deeplinkUrl;
-		self.fallbackUrl = fallbackUrl;
+		self.deeplinkURL = deeplinkURL;
+		self.fallbackURL = fallbackURL;
 		self.status = status;
 	}
 	return self;

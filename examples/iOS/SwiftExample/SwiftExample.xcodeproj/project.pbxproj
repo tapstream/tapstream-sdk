@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6664B4C71C46009E006F81EE /* TSUniversalLink.m in Sources */ = {isa = PBXBuildFile; fileRef = 6664B4C61C46009E006F81EE /* TSUniversalLink.m */; };
+		6664B4D21C4603EC006F81EE /* TSLander.m in Sources */ = {isa = PBXBuildFile; fileRef = 6664B4C91C4603EC006F81EE /* TSLander.m */; };
+		6664B4D31C4603EC006F81EE /* TSLanderController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6664B4CB1C4603EC006F81EE /* TSLanderController.m */; };
+		6664B4D41C4603EC006F81EE /* TSLanderDelegateWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 6664B4CE1C4603EC006F81EE /* TSLanderDelegateWrapper.m */; };
+		6664B4D51C4603EC006F81EE /* TSLanderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6664B4CF1C4603EC006F81EE /* TSLanderView.xib */; };
+		6664B4D61C4603EC006F81EE /* TSSafariViewControllerDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6664B4D11C4603EC006F81EE /* TSSafariViewControllerDelegate.m */; };
 		66B043931A12CB93001C9873 /* TSConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B043771A12CB93001C9873 /* TSConfig.m */; };
 		66B043941A12CB93001C9873 /* TSCore.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B043791A12CB93001C9873 /* TSCore.m */; };
 		66B043951A12CB93001C9873 /* TSEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B0437D1A12CB93001C9873 /* TSEvent.m */; };
@@ -27,7 +33,20 @@
 
 /* Begin PBXFileReference section */
 		66317FD11A01775A00916FAC /* SwiftExample-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SwiftExample-Bridging-Header.h"; sourceTree = "<group>"; };
-		66B043711A12CB6D001C9873 /* SwiftExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = SwiftExample.app; path = "/Users/adam/tmp/tapstream-sdk/examples/iOS/SwiftExample/build/Debug-iphoneos/SwiftExample.app"; sourceTree = "<absolute>"; };
+		6664B4C41C45FD9D006F81EE /* SwiftExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6664B4C51C46009E006F81EE /* TSUniversalLink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSUniversalLink.h; sourceTree = "<group>"; };
+		6664B4C61C46009E006F81EE /* TSUniversalLink.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSUniversalLink.m; sourceTree = "<group>"; };
+		6664B4C81C4603EC006F81EE /* TSLander.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSLander.h; sourceTree = "<group>"; };
+		6664B4C91C4603EC006F81EE /* TSLander.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSLander.m; sourceTree = "<group>"; };
+		6664B4CA1C4603EC006F81EE /* TSLanderController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSLanderController.h; sourceTree = "<group>"; };
+		6664B4CB1C4603EC006F81EE /* TSLanderController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSLanderController.m; sourceTree = "<group>"; };
+		6664B4CC1C4603EC006F81EE /* TSLanderDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSLanderDelegate.h; sourceTree = "<group>"; };
+		6664B4CD1C4603EC006F81EE /* TSLanderDelegateWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSLanderDelegateWrapper.h; sourceTree = "<group>"; };
+		6664B4CE1C4603EC006F81EE /* TSLanderDelegateWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSLanderDelegateWrapper.m; sourceTree = "<group>"; };
+		6664B4CF1C4603EC006F81EE /* TSLanderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TSLanderView.xib; sourceTree = "<group>"; };
+		6664B4D01C4603EC006F81EE /* TSSafariViewControllerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSSafariViewControllerDelegate.h; sourceTree = "<group>"; };
+		6664B4D11C4603EC006F81EE /* TSSafariViewControllerDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSSafariViewControllerDelegate.m; sourceTree = "<group>"; };
+		6664B4D71C46043D006F81EE /* SwiftExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SwiftExample.entitlements; sourceTree = "<group>"; };
 		66B043741A12CB93001C9873 /* TSApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSApi.h; sourceTree = "<group>"; };
 		66B043751A12CB93001C9873 /* TSAppEventSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSAppEventSource.h; sourceTree = "<group>"; };
 		66B043761A12CB93001C9873 /* TSConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSConfig.h; sourceTree = "<group>"; };
@@ -81,6 +100,8 @@
 		66B043731A12CB93001C9873 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				6664B4C51C46009E006F81EE /* TSUniversalLink.h */,
+				6664B4C61C46009E006F81EE /* TSUniversalLink.m */,
 				66B043741A12CB93001C9873 /* TSApi.h */,
 				66B043751A12CB93001C9873 /* TSAppEventSource.h */,
 				66B043761A12CB93001C9873 /* TSConfig.h */,
@@ -110,6 +131,16 @@
 		66B043891A12CB93001C9873 /* Tapstream */ = {
 			isa = PBXGroup;
 			children = (
+				6664B4C81C4603EC006F81EE /* TSLander.h */,
+				6664B4C91C4603EC006F81EE /* TSLander.m */,
+				6664B4CA1C4603EC006F81EE /* TSLanderController.h */,
+				6664B4CB1C4603EC006F81EE /* TSLanderController.m */,
+				6664B4CC1C4603EC006F81EE /* TSLanderDelegate.h */,
+				6664B4CD1C4603EC006F81EE /* TSLanderDelegateWrapper.h */,
+				6664B4CE1C4603EC006F81EE /* TSLanderDelegateWrapper.m */,
+				6664B4CF1C4603EC006F81EE /* TSLanderView.xib */,
+				6664B4D01C4603EC006F81EE /* TSSafariViewControllerDelegate.h */,
+				6664B4D11C4603EC006F81EE /* TSSafariViewControllerDelegate.m */,
 				66B0438A1A12CB93001C9873 /* TSAppEventSourceImpl.h */,
 				66B0438B1A12CB93001C9873 /* TSAppEventSourceImpl.m */,
 				66B0438C1A12CB93001C9873 /* TSCoreListenerImpl.h */,
@@ -132,12 +163,14 @@
 				66D8B4321A004EA8001F762A /* AdSupport.framework */,
 				66D8B4121A004A35001F762A /* SwiftExample */,
 				66317FD11A01775A00916FAC /* SwiftExample-Bridging-Header.h */,
+				6664B4C41C45FD9D006F81EE /* SwiftExample.app */,
 			);
 			sourceTree = "<group>";
 		};
 		66D8B4121A004A35001F762A /* SwiftExample */ = {
 			isa = PBXGroup;
 			children = (
+				6664B4D71C46043D006F81EE /* SwiftExample.entitlements */,
 				66D8B4151A004A35001F762A /* AppDelegate.swift */,
 				66D8B4171A004A35001F762A /* ViewController.swift */,
 				66D8B4191A004A35001F762A /* Main.storyboard */,
@@ -172,7 +205,7 @@
 			);
 			name = SwiftExample;
 			productName = SwiftExample;
-			productReference = 66B043711A12CB6D001C9873 /* SwiftExample.app */;
+			productReference = 6664B4C41C45FD9D006F81EE /* SwiftExample.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -181,11 +214,19 @@
 		66D8B4081A004A35001F762A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftMigration = 0720;
+				LastSwiftUpdateCheck = 0720;
 				LastUpgradeCheck = 0600;
 				ORGANIZATIONNAME = "Adam Bard";
 				TargetAttributes = {
 					66D8B40F1A004A35001F762A = {
 						CreatedOnToolsVersion = 6.0;
+						DevelopmentTeam = ZDKMGAVQQS;
+						SystemCapabilities = {
+							com.apple.SafariKeychain = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -214,6 +255,7 @@
 			files = (
 				66D8B41B1A004A35001F762A /* Main.storyboard in Resources */,
 				66D8B41D1A004A35001F762A /* Images.xcassets in Resources */,
+				6664B4D51C4603EC006F81EE /* TSLanderView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -224,19 +266,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6664B4D61C4603EC006F81EE /* TSSafariViewControllerDelegate.m in Sources */,
+				6664B4D31C4603EC006F81EE /* TSLanderController.m in Sources */,
 				66B0439B1A12CB93001C9873 /* TSCoreListenerImpl.m in Sources */,
 				66B043961A12CB93001C9873 /* TSHit.m in Sources */,
+				6664B4C71C46009E006F81EE /* TSUniversalLink.m in Sources */,
 				66B0439D1A12CB93001C9873 /* TSTapstream.m in Sources */,
 				66B043951A12CB93001C9873 /* TSEvent.m in Sources */,
 				66B043931A12CB93001C9873 /* TSConfig.m in Sources */,
 				66B043971A12CB93001C9873 /* TSLogging.m in Sources */,
 				66B0439A1A12CB93001C9873 /* TSAppEventSourceImpl.m in Sources */,
 				66B043991A12CB93001C9873 /* TSUtils.m in Sources */,
+				6664B4D41C4603EC006F81EE /* TSLanderDelegateWrapper.m in Sources */,
 				66D8B4181A004A35001F762A /* ViewController.swift in Sources */,
 				66B043981A12CB93001C9873 /* TSResponse.m in Sources */,
 				66B0439C1A12CB93001C9873 /* TSPlatformImpl.m in Sources */,
 				66D8B4161A004A35001F762A /* AppDelegate.swift in Sources */,
 				66B043941A12CB93001C9873 /* TSCore.m in Sources */,
+				6664B4D21C4603EC006F81EE /* TSLander.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -341,9 +388,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = SwiftExample/SwiftExample.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = SwiftExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.tapstream.SwiftExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "SwiftExample-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -355,9 +407,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = SwiftExample/SwiftExample.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = SwiftExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.tapstream.SwiftExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "SwiftExample-Bridging-Header.h";
 			};
 			name = Release;

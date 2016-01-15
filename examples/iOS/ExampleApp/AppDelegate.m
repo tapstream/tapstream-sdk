@@ -136,12 +136,12 @@
 	if(result.status == kTSULValid)
 	{
 		// Do deeplink things
-		NSLog(@"Universal Link Handled");
+		NSLog(@"Universal Link Handled: %@, %@", result.deeplinkURL, result.fallbackURL);
 		return YES;
+	}else if([userActivity.activityType isEqualToString:NSUserActivityTypeBrowsingWeb]){
+		// Fall back to openURL if link not handled.
+		[[UIApplication sharedApplication] openURL:userActivity.webpageURL];
 	}
-
-	// Fall back to openURL if link not handled.
-	[[UIApplication sharedApplication] openURL:userActivity.webpageURL];
 	return NO;
 }
 

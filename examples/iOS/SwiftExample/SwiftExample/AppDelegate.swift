@@ -8,29 +8,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SKProductsRequestDelegate
     var products: [SKProduct] = []
 
 
-    func application(application: UIApplication!, didFinishLaunchingWithOptions launchOptions: NSDictionary!) -> Bool {
+	func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
+
         if(UIDevice.currentDevice().userInterfaceIdiom == UIUserInterfaceIdiom.Pad){
-            let splitViewController : UISplitViewController = self.window?.rootViewController as UISplitViewController
-            let navigationController : UINavigationController = splitViewController.viewControllers[splitViewController.viewControllers.endIndex] as UINavigationController
+            let splitViewController : UISplitViewController = self.window?.rootViewController as! UISplitViewController
+            let navigationController : UINavigationController = splitViewController.viewControllers[splitViewController.viewControllers.endIndex] as! UINavigationController
             splitViewController.delegate = navigationController.topViewController as? UISplitViewControllerDelegate
         }
         
 
-        let config = TSConfig.configWithDefaults() as TSConfig
+        let config = TSConfig.configWithDefaults() as! TSConfig
         config.globalEventParams.setValue(25.4, forKey: "degrees")
         TSTapstream.createWithAccountName("sdktest", developerSecret: "YGP2pezGTI6ec48uti4o1w", config: config)
         
-        let tracker = TSTapstream.instance() as TSTapstream
+        let tracker = TSTapstream.instance() as! TSTapstream
         
         func handleConversionData(jsonInfo: NSData!) -> Void {
             if jsonInfo == nil {
                 NSLog("No conversion data");
             }else{
                 NSLog("Conversion Data: %@", NSString(data: jsonInfo, encoding:NSUTF8StringEncoding)!)
-                var error: NSError?
-                let maybeData = NSJSONSerialization.JSONObjectWithData(jsonInfo, options: NSJSONReadingOptions(), error: &error) as? NSDictionary
-                
-                if maybeData != nil && error == nil{
+				let maybeData: NSDictionary?
+				do {
+					maybeData = try NSJSONSerialization.JSONObjectWithData(jsonInfo, options: NSJSONReadingOptions()) as? NSDictionary
+				} catch {
+					maybeData = nil
+				}
+
+
+                if maybeData != nil {
                     // Read some data from the JSON object
                 }
             }
@@ -39,7 +45,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SKProductsRequestDelegate
         }
         tracker.getConversionData(handleConversionData)
         
-        let e = TSEvent.eventWithName("test-event", oneTimeOnly: false) as TSEvent
+        let e = TSEvent.eventWithName("test-event", oneTimeOnly: false) as! TSEvent
         e.addValue("John Doe", forKey: "player")
         e.addValue(10.1, forKey: "degrees")
         e.addValue(5, forKey: "score")
@@ -49,25 +55,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SKProductsRequestDelegate
         
         
         let productIds = NSSet(array: ["com.tapstream.catalog.tiddlywinks"])
-        let request = SKProductsRequest(productIdentifiers: productIds)
+        let request = SKProductsRequest(productIdentifiers: productIds as! Set<String>)
         request.delegate = self
         request.start()
         
         return true
     }
     
-    func request(request: SKRequest!, didFailWithError error: NSError!) {
+    func request(request: SKRequest, didFailWithError error: NSError) {
         NSLog("%@", error.description);
     }
     
-    func productsRequest(request: SKProductsRequest!, didReceiveResponse response: SKProductsResponse!) {
+    func productsRequest(request: SKProductsRequest, didReceiveResponse response: SKProductsResponse) {
         self.products = response.products as [SKProduct]
         
         for ident in response.invalidProductIdentifiers as [NSString] {
             NSLog("Invalid Product Id: %@", ident)
         }
 
-        for ident in response.products as [NSString] {
+        for ident in response.products as [SKProduct] {
             NSLog("Valid Product Id: %@", ident)
         }
         
@@ -81,11 +87,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate, SKProductsRequestDelegate
         
     }
     
-    func paymentQueue(queue: SKPaymentQueue!, updatedTransactions transactions: [AnyObject]!) {
+    func paymentQueue(queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         for transaction in transactions {
-            NSLog("TX: %s", transaction.string);
+            NSLog("TX: %@", transaction);
         }
     }
+	
+	func application(application: UIApplication,
+		continueUserActivity userActivity: NSUserActivity,
+		restorationHandler: ([AnyObject]?) -> Void) -> Bool {
+			let tracker = TSTapstream.instance() as! TSTapstream
+			let ul = tracker.handleUniversalLink(userActivity)
+			if(ul.status == kTSULValid)
+			{
+				// Do deeplink things
+				let deeplinkURL = ul.deeplinkURL, fallbackURL = ul.fallbackURL
+				NSLog("Universal Link Handled: %@, %@", deeplinkURL, fallbackURL);
+				return true;
+			}
+			else if(userActivity.activityType == NSUserActivityTypeBrowsingWeb)
+			{
+				// Fall back to openURL if link not handled.
+				UIApplication.sharedApplication().openURL(userActivity.webpageURL!);
+			}
+
+			return false;
+	}
+
 
     func applicationWillResignActive(application: UIApplication!) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
