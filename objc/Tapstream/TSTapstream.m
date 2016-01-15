@@ -7,6 +7,8 @@
 #import "TSAppEventSourceImpl.h"
 #import "TSLanderController.h"
 #import "TSLanderDelegateWrapper.h"
+#import "TSUniversalLink.h"
+
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 #import <UIKit/UIKit.h>
 #endif
@@ -227,9 +229,24 @@ static TSTapstream *instance = nil;
 - (void)showLanderIfExistsWithDelegate:(id<TSLanderDelegate>)delegate
 {}
 #endif
+
+
+#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+
+- (TSUniversalLink*)handleUniversalLink:(NSUserActivity*)userActivity
+{
+	if ([userActivity.activityType isEqualToString:NSUserActivityTypeBrowsingWeb]){
+		if (userActivity.webpageURL != nil){
+			return [core handleUniversalLink:userActivity.webpageURL];
+		}
+	}
+	return [TSUniversalLink universalLinkWithStatus:kTSULUnknown];
+}
+#endif
+#endif
+
 @end
-
-
 
 
 @implementation TSDelegateImpl

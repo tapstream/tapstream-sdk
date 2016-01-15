@@ -32,8 +32,13 @@
 		12A98535185A67A500D388CD /* TSPlatformImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A98529185A67A500D388CD /* TSPlatformImpl.m */; };
 		12A98536185A67A500D388CD /* TSTapstream.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A9852B185A67A500D388CD /* TSTapstream.m */; };
 		12FFCF0A183FE5B300D54F4E /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12FFCF09183FE5B300D54F4E /* StoreKit.framework */; };
-		662003871BC7432900ACED07 /* TSSafariViewControllerDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 662003861BC7432900ACED07 /* TSSafariViewControllerDelegate.m */; settings = {ASSET_TAGS = (); }; };
+		662003871BC7432900ACED07 /* TSSafariViewControllerDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 662003861BC7432900ACED07 /* TSSafariViewControllerDelegate.m */; };
 		662003901BC7758400ACED07 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6620038F1BC7758400ACED07 /* SafariServices.framework */; };
+		66D258E51C2083E600667982 /* TSLander.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D258DE1C2083E600667982 /* TSLander.m */; };
+		66D258E61C2083E600667982 /* TSLanderController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D258E01C2083E600667982 /* TSLanderController.m */; };
+		66D258E71C2083E600667982 /* TSLanderDelegateWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D258E31C2083E600667982 /* TSLanderDelegateWrapper.m */; };
+		66D258E81C2083E600667982 /* TSLanderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66D258E41C2083E600667982 /* TSLanderView.xib */; };
+		66D258EB1C2950C600667982 /* TSUniversalLink.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D258EA1C2950C500667982 /* TSUniversalLink.m */; };
 		B5916E6A1A12CA3F00EFC9A6 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5916E691A12CA3F00EFC9A6 /* AdSupport.framework */; };
 /* End PBXBuildFile section */
 
@@ -90,6 +95,17 @@
 		662003851BC7432900ACED07 /* TSSafariViewControllerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSSafariViewControllerDelegate.h; sourceTree = "<group>"; };
 		662003861BC7432900ACED07 /* TSSafariViewControllerDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSSafariViewControllerDelegate.m; sourceTree = "<group>"; };
 		6620038F1BC7758400ACED07 /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = System/Library/Frameworks/SafariServices.framework; sourceTree = SDKROOT; };
+		66D258DD1C2083E600667982 /* TSLander.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSLander.h; sourceTree = "<group>"; };
+		66D258DE1C2083E600667982 /* TSLander.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSLander.m; sourceTree = "<group>"; };
+		66D258DF1C2083E600667982 /* TSLanderController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSLanderController.h; sourceTree = "<group>"; };
+		66D258E01C2083E600667982 /* TSLanderController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSLanderController.m; sourceTree = "<group>"; };
+		66D258E11C2083E600667982 /* TSLanderDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSLanderDelegate.h; sourceTree = "<group>"; };
+		66D258E21C2083E600667982 /* TSLanderDelegateWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSLanderDelegateWrapper.h; sourceTree = "<group>"; };
+		66D258E31C2083E600667982 /* TSLanderDelegateWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSLanderDelegateWrapper.m; sourceTree = "<group>"; };
+		66D258E41C2083E600667982 /* TSLanderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TSLanderView.xib; sourceTree = "<group>"; };
+		66D258E91C22C7A300667982 /* TSUniversalLink.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TSUniversalLink.h; sourceTree = "<group>"; };
+		66D258EA1C2950C500667982 /* TSUniversalLink.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSUniversalLink.m; sourceTree = "<group>"; };
+		66D258EC1C29A23C00667982 /* ExampleApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ExampleApp.entitlements; sourceTree = "<group>"; };
 		B5916E691A12CA3F00EFC9A6 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -145,6 +161,7 @@
 		12042FEF167D456200F509B7 /* ExampleApp */ = {
 			isa = PBXGroup;
 			children = (
+				66D258EC1C29A23C00667982 /* ExampleApp.entitlements */,
 				12042FF8167D456200F509B7 /* AppDelegate.h */,
 				12042FF9167D456200F509B7 /* AppDelegate.m */,
 				12043001167D456200F509B7 /* MainStoryboard_iPhone.storyboard */,
@@ -196,6 +213,8 @@
 				12A9851F185A67A500D388CD /* TSResponse.m */,
 				12A98520185A67A500D388CD /* TSUtils.h */,
 				12A98521185A67A500D388CD /* TSUtils.m */,
+				66D258E91C22C7A300667982 /* TSUniversalLink.h */,
+				66D258EA1C2950C500667982 /* TSUniversalLink.m */,
 			);
 			name = Core;
 			path = ../../objc/Core;
@@ -204,6 +223,14 @@
 		12A98522185A67A500D388CD /* Tapstream */ = {
 			isa = PBXGroup;
 			children = (
+				66D258DD1C2083E600667982 /* TSLander.h */,
+				66D258DE1C2083E600667982 /* TSLander.m */,
+				66D258DF1C2083E600667982 /* TSLanderController.h */,
+				66D258E01C2083E600667982 /* TSLanderController.m */,
+				66D258E11C2083E600667982 /* TSLanderDelegate.h */,
+				66D258E21C2083E600667982 /* TSLanderDelegateWrapper.h */,
+				66D258E31C2083E600667982 /* TSLanderDelegateWrapper.m */,
+				66D258E41C2083E600667982 /* TSLanderView.xib */,
 				662003851BC7432900ACED07 /* TSSafariViewControllerDelegate.h */,
 				662003861BC7432900ACED07 /* TSSafariViewControllerDelegate.m */,
 				12A98523185A67A500D388CD /* bin */,
@@ -258,6 +285,14 @@
 				TargetAttributes = {
 					12042FE4167D456200F509B7 = {
 						DevelopmentTeam = ZDKMGAVQQS;
+						SystemCapabilities = {
+							com.apple.Keychain = {
+								enabled = 0;
+							};
+							com.apple.SafariKeychain = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -284,6 +319,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				12042FF4167D456200F509B7 /* InfoPlist.strings in Resources */,
+				66D258E81C2083E600667982 /* TSLanderView.xib in Resources */,
 				12042FFC167D456200F509B7 /* Default.png in Resources */,
 				12042FFE167D456200F509B7 /* Default@2x.png in Resources */,
 				12043000167D456200F509B7 /* Default-568h@2x.png in Resources */,
@@ -301,11 +337,15 @@
 			files = (
 				12A98532185A67A500D388CD /* TSUtils.m in Sources */,
 				12042FF6167D456200F509B7 /* main.m in Sources */,
+				66D258E71C2083E600667982 /* TSLanderDelegateWrapper.m in Sources */,
 				12A98534185A67A500D388CD /* TSCoreListenerImpl.m in Sources */,
 				12A98533185A67A500D388CD /* TSAppEventSourceImpl.m in Sources */,
 				662003871BC7432900ACED07 /* TSSafariViewControllerDelegate.m in Sources */,
 				12042FFA167D456200F509B7 /* AppDelegate.m in Sources */,
+				66D258E61C2083E600667982 /* TSLanderController.m in Sources */,
+				66D258E51C2083E600667982 /* TSLander.m in Sources */,
 				12A98535185A67A500D388CD /* TSPlatformImpl.m in Sources */,
+				66D258EB1C2950C600667982 /* TSUniversalLink.m in Sources */,
 				12A98530185A67A500D388CD /* TSLogging.m in Sources */,
 				12043009167D456200F509B7 /* MasterViewController.m in Sources */,
 				12A9852D185A67A500D388CD /* TSCore.m in Sources */,
@@ -407,12 +447,13 @@
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
 				CLANG_WARN_INT_CONVERSION = NO;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CODE_SIGN_ENTITLEMENTS = ExampleApp/ExampleApp.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ExampleApp/ExampleApp-Prefix.pch";
 				INFOPLIST_FILE = "ExampleApp/ExampleApp-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
@@ -426,12 +467,13 @@
 				CLANG_WARN_IMPLICIT_SIGN_CONVERSION = NO;
 				CLANG_WARN_INT_CONVERSION = NO;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CODE_SIGN_ENTITLEMENTS = ExampleApp/ExampleApp.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ExampleApp/ExampleApp-Prefix.pch";
 				INFOPLIST_FILE = "ExampleApp/ExampleApp-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;

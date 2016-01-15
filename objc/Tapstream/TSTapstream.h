@@ -11,6 +11,7 @@
 #import "TSLogging.h"
 #import "TSWordOfMouthDelegate.h"
 #import "TSLanderDelegate.h"
+#import "TSUniversalLink.h"
 
 @interface TSTapstream : NSObject<TSApi, TSWordOfMouthDelegate> {
 @private
@@ -31,5 +32,12 @@
 - (void)getConversionData:(void(^)(NSData *))completion;
 - (NSData*)getConversionDataBlocking:(int)timeout_ms;
 - (void)showLanderIfExistsWithDelegate:(id<TSLanderDelegate>)delegate;
+
+#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+
+- (TSUniversalLink*)handleUniversalLink:(NSUserActivity*)userActivity;
+#endif
+#endif
 
 @end

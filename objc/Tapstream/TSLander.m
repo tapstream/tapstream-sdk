@@ -1,11 +1,3 @@
-//
-//  TSLander.m
-//  WordOfMouth
-//
-//  Created by Adam Bard on 2015-11-04.
-//  Copyright © 2015 Tapstream. All rights reserved.
-//
-
 #import <Foundation/Foundation.h>
 #import "TSHelpers.h"
 #import "TSLander.h"

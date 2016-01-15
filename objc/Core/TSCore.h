@@ -8,6 +8,7 @@
 #import "TSResponse.h"
 #import "TSConfig.h"
 #import "TSAppEventSource.h"
+#import "TSUniversalLink.h"
 
 #if TEST_IOS || TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 #define kTSPlatform @"iOS"
@@ -49,5 +50,11 @@
 - (NSURL*)makeCookieMatchURL:(NSString*)eventName data:(NSString*)data;
 - (NSMutableString *)postData;
 - (void)dispatchOnQueue:(void(^)())completion;
+
+#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+- (TSUniversalLink*)handleUniversalLink:(NSURL*) url;
+#endif
+#endif
 
 @end

@@ -2,11 +2,13 @@
 #import "TSHelpers.h"
 #import "TSLogging.h"
 #import "TSUtils.h"
+#import "TSUniversalLink.h"
 
 #define kTSVersion @"2.10.2"
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
 #define kTSCookieMatchUrlTemplate @"https://api.taps.io/%@/event/%@/?cookiematch=true&%@"
 #define kTSHitUrlTemplate @"https://api.tapstream.com/%@/hit/%@.gif"
+#define kTSDeeplinkQueryUrlTemplate @"https://api.tapstream.com/%@/deeplink_query/"
 #define kTSLanderUrlTemplate @"https://reporting.tapstream.com/v1/in_app_landers/display/?secret=%@&event_session=%@"
 #define kTSConversionUrlTemplate @"https://reporting.tapstream.com/v1/timelines/lookup?secret=%@&event_session=%@"
 #define kTSConversionPollInterval 1
@@ -602,6 +604,66 @@
 	}
 	[listener reportOperation:@"increased-delay"];
 }
+
+#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+- (NSURL*) urlWithQueryItems:(NSURL*)url, ... NS_REQUIRES_NIL_TERMINATION;
+{
+	NSURLComponents* components = [[NSURLComponents alloc] initWithURL:url
+											   resolvingAgainstBaseURL:NO];
+	NSMutableArray* items = [NSMutableArray arrayWithArray:[components queryItems]];
+
+	va_list args;
+	va_start(args, url);
+	NSString* key;
+	while ((key = va_arg(args, NSString*)) != nil)
+	{
+		[items addObject:[NSURLQueryItem queryItemWithName:key value:va_arg(args, NSString*)]];
+	}
+	va_end(args);
+
+	[components setQueryItems:items];
+	return [components URL];
+}
+
+
+- (TSUniversalLink*)handleUniversalLink:(NSURL*) url
+{
+	// Respond according to deeplink query
+	NSString* deeplinkQueryURL = [NSString stringWithFormat:kTSDeeplinkQueryUrlTemplate, accountName];
+	NSURL* newUrl = [self urlWithQueryItems:[NSURL URLWithString:deeplinkQueryURL],
+					 @"__tsdqu", [url absoluteString],
+					 @"__tsdqp", @"iOS",
+					 nil];
+
+	TSResponse* response = [platform request:[newUrl absoluteString	]
+										data:@""
+									  method:@"GET"
+								  timeout_ms:kTSDefaultTimeout];
+
+	TSUniversalLink* ul = [TSUniversalLink universalLinkWithDeeplinkQueryResponse:response];
+
+	// Fire simulated click if Tapstream recognizes the link
+	if (ul.status != kTSULUnknown){
+		NSURL* simulatedClickUrl = [self urlWithQueryItems:url,
+									@"__tsredirect", @"0",
+									@"__tsul", @"1",
+									nil];
+
+		[platform fireCookieMatch:simulatedClickUrl
+					   completion:^(TSResponse* response){
+			if (response.status >= 200 && response.status < 300){
+				[TSLogging logAtLevel:kTSLoggingInfo format:@"Universal link simulated click succeeded for url %@", url];
+			}else{
+				[TSLogging logAtLevel:kTSLoggingWarn format:@"Universal link simulated click failed for url %@", url];
+			}
+		}];
+	}
+
+	return ul;
+}
+#endif
+#endif
 
 - (void)appendPostPairWithPrefix:(NSString *)prefix key:(NSString *)key value:(NSString *)value
 {

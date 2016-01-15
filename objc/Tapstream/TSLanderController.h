@@ -1,11 +1,3 @@
-//
-//  TSLanderController.h
-//  ExampleApp
-//
-//  Created by Adam Bard on 2015-11-03.
-//  Copyright © 2015 Example. All rights reserved.
-//
-
 #ifndef TSLanderController_h
 #define TSLanderController_h
 

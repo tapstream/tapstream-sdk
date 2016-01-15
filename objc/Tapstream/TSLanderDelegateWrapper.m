@@ -1,11 +1,4 @@
-//
-//  TSLanderDelegateWrapper.m
-//
 //  Wraps TSLanderDelegate to record the lander being shown when it completes.
-//
-//  Created by Adam Bard on 2015-11-05.
-//  Copyright © 2015 Tapstream. All rights reserved.
-//
 
 #import "TSLanderDelegateWrapper.h"
 

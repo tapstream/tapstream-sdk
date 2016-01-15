@@ -301,5 +301,4 @@
 	XCTAssertTrue([lander isValid]);
 }
 
-
 @end
