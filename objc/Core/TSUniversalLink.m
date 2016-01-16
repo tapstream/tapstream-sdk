@@ -32,14 +32,14 @@
 
 	NSURL *regUrl, *fbUrl;
 
-	if (fbUrlStr != nil){
+	if (fbUrlStr != [NSNull null] && fbUrlStr != nil){
 		fbUrl = [NSURL URLWithString:fbUrlStr];
 		status = kTSULValid;
 	}else{
 		fbUrl = nil;
 	}
 
-	if (regUrlStr != nil){
+	if (regUrlStr != [NSNull null] && regUrlStr != nil){
 		regUrl = [NSURL URLWithString:regUrlStr];
 		status = kTSULValid;
 	}else{
