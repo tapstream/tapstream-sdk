@@ -28,7 +28,12 @@
 
 	id regUrlStr = [jsonDict objectForKey:@"registered_url"];
 	id fbUrlStr = [jsonDict objectForKey:@"fallback_url"];
-	BOOL eul = (BOOL) [jsonDict objectForKey:@"enable_universal_links"];
+	id enabledOrNull = [jsonDict objectForKey:@"enable_universal_links"];
+	BOOL eul = false;
+
+	if (enabledOrNull != [NSNull null] && enabledOrNull != nil){
+		eul = [enabledOrNull boolValue];
+	}
 
 	NSURL *regUrl, *fbUrl;
 
