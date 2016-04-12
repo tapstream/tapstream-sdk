@@ -2,17 +2,22 @@ package com.tapstream.sdk;
 
 import android.app.Application;
 import android.content.Context;
+
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+import com.tapstream.sdk.http.HttpRequest;
+import com.tapstream.sdk.http.HttpResponse;
 import com.tapstream.sdk.wordofmouth.Offer;
 import com.tapstream.sdk.wordofmouth.Reward;
 import com.tapstream.sdk.wordofmouth.WordOfMouth;
+
 import junit.framework.TestCase;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -41,20 +46,20 @@ public class TestTapstream extends TestCase {
         }
     }
 
-    class PlatformWithMockApi extends PlatformImpl {
-        Map<String, Response> responses = new HashMap<String, Response>();
+    class PlatformWithMockApi extends AndroidPlatform {
+        Map<String, HttpResponse> responses = new HashMap<String, HttpResponse>();
 
         public PlatformWithMockApi(Context context) {
             super(context);
         }
 
-        public void registerResponse(Response response, String method, String url){
+        public void registerResponse(HttpResponse response, String method, String url){
             responses.put(method + "|" + url, response);
         }
-        public Response request(String url, String data, String method) {
-            Response resp = responses.get(method + "|" + url);
+        public HttpResponse sendRequest(HttpRequest request) throws IOException {
+            HttpResponse resp = responses.get(request.getMethod() + "|" + request.getURL());
             if(resp == null){
-                fail("No response for " + method + "|" + url);
+                fail("No response for " + request.getMethod() + "|" + request.getURL());
             }
             return resp;
         }
@@ -77,20 +82,20 @@ public class TestTapstream extends TestCase {
 
     @Before
     public void setUp(){
-        Application app = Robolectric.application;
+        Application app = RuntimeEnvironment.application;
         app.getApplicationInfo().name = "TapstreamTest";
         platform = new PlatformWithMockApi(app);
         ts = new Tapstream(
             new DelegateImpl(),
             platform,
-            new CoreListenerImpl(),
+            new DefaultCoreListener(),
             new ActivityEventSource(),
             new AdvertisingIdFetcher(app),
             "sdktest", SDKTEST_SECRET, new Config());
     }
 
-    private Response jsonResponse(String jsonResourcePath){
-        return new Response(200, "", readResource(jsonResourcePath));
+    private HttpResponse jsonResponse(String jsonResourcePath){
+        return new HttpResponse(200, "", readResource(jsonResourcePath).getBytes());
     }
 
     private String getOfferUrl(String insertionPoint, String bundle){

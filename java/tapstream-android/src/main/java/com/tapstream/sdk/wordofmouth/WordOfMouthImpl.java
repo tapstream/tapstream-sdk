@@ -3,7 +3,6 @@ package com.tapstream.sdk.wordofmouth;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.view.Gravity;
@@ -12,14 +11,19 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.PopupWindow;
+
 import com.tapstream.sdk.ExecutorProvider;
 import com.tapstream.sdk.Logging;
 import com.tapstream.sdk.Maybe;
 import com.tapstream.sdk.Platform;
-import com.tapstream.sdk.Response;
+import com.tapstream.sdk.http.HttpMethod;
+import com.tapstream.sdk.http.HttpRequest;
+import com.tapstream.sdk.http.HttpResponse;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -37,7 +41,6 @@ public class WordOfMouthImpl implements WordOfMouth{
     final String bundle;
     final String OFFER_ENDPOINT = "https://app.tapstream.com/api/v1/word-of-mouth/offers/";
     final String REWARD_ENDPOINT = "https://app.tapstream.com/api/v1/word-of-mouth/rewards/";
-    final private String SHARED_PREFS_KEY = "TS_WOM_REWARD_COUNTS";
 
     public static WordOfMouth getInstance(ExecutorProvider executor, Platform platform, String sdkSecret, String bundle){
         return new WordOfMouthImpl(executor, platform, sdkSecret, bundle);
@@ -66,7 +69,7 @@ public class WordOfMouthImpl implements WordOfMouth{
         /**
          * - Build PopupWindow
          * - Make WebView (given Context)
-         * - Populate WebView with HTML content
+         * - Populate WebView with HTML postBody
          * - Add webview to PopupWindow
          * - Build WebViewClient
          *   - WebViewClient builds intent
@@ -111,12 +114,12 @@ public class WordOfMouthImpl implements WordOfMouth{
 
 
         try {
-            Response resp = platform.request(uri, null, "GET");
+            HttpResponse resp = platform.sendRequest(new HttpRequest(new URL(uri), HttpMethod.GET, null));
             if(resp.status != 200){
                 return Maybe.nope();
             }
 
-            JSONObject responseObject = new JSONObject(resp.data);
+            JSONObject responseObject = new JSONObject(resp.getBodyAsString());
             return Maybe.yup(Offer.fromApiResponse(responseObject));
         }catch(Exception e){
             e.printStackTrace();
@@ -135,9 +138,9 @@ public class WordOfMouthImpl implements WordOfMouth{
 
 
         try {
-            Response resp = platform.request(uri, null, "GET");
+            HttpResponse resp = platform.sendRequest(new HttpRequest(new URL(uri), HttpMethod.GET, null));
 
-            JSONArray responseObject = new JSONArray(resp.data);
+            JSONArray responseObject = new JSONArray(resp.getBodyAsString());
             List<Reward> result = new ArrayList<Reward>(responseObject.length());
             for(int ii=0; ii<responseObject.length(); ii++) {
                 Reward reward = Reward.fromApiResponse(responseObject.getJSONObject(ii));

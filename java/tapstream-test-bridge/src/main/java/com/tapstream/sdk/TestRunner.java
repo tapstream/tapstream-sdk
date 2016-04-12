@@ -1,5 +1,7 @@
 package com.tapstream.sdk;
 
+import com.tapstream.sdk.http.HttpResponse;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -64,7 +66,7 @@ public class TestRunner {
 		}
 
 		public void setResponseStatus(Tapstream ts, int status) {
-			((PlatformImpl) ts.platform).response = new Response(status, String.format(Locale.US, "Http %d", status), "");
+			((PlatformImpl) ts.platform).response = new HttpResponse(status, String.format(Locale.US, "Http %d", status), "");
 		}
 
 		public OperationQueue newOperationQueue() {

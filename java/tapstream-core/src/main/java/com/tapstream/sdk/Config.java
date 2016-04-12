@@ -5,6 +5,9 @@ import java.util.Map;
 
 public class Config {	
 
+	private Retry.Strategy eventRetryStrategy = Retry.DEFAULT_EVENT_STRATEGY;
+	private Retry.Strategy timelineLookupRetryStrategy = Retry.DEFAULT_TIMELINE_LOOKUP_STRATEGY;
+
 	// Deprecated, hardware-id field
 	private String hardware = null;
 
@@ -82,4 +85,10 @@ public class Config {
 
 	public boolean getCollectAdvertisingId() { return collectAdvertisingId; }
 	public void setCollectAdvertisingId(boolean collect) { collectAdvertisingId = collect; }
+
+	public Retry.Strategy getEventRetryStrategy() { return eventRetryStrategy; }
+	public void setEventRetryStrategy(Retry.Strategy eventRetryStrategy) {this.eventRetryStrategy = eventRetryStrategy;}
+
+	public Retry.Strategy getTimelineLookupRetryStrategy() {return timelineLookupRetryStrategy;}
+	public void setTimelineLookupRetryStrategy(Retry.Strategy timelineLookupRetryStrategy) { this.timelineLookupRetryStrategy = timelineLookupRetryStrategy; }
 }

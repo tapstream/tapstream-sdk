@@ -1,7 +1,14 @@
 package com.tapstream.sdk;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import com.tapstream.sdk.http.HttpRequest;
+import com.tapstream.sdk.http.HttpResponse;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -10,67 +17,47 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 class Core implements ExecutorProvider {
-	public static final String VERSION = "2.9.3";
-	private static final String EVENT_URL_TEMPLATE = "https://api.tapstream.com/%s/event/%s/";
-	private static final String HIT_URL_TEMPLATE = "http://api.tapstream.com/%s/hit/%s.gif";
-	private static final String CONVERSION_URL_TEMPLATE = "https://reporting.tapstream.com/v1/timelines/lookup?secret=%s&event_session=%s";
-	private static final int MAX_THREADS = 1;
-	private static final int CONVERSION_POLL_INTERVAL = 1;
-	private static final int CONVERSION_POLL_COUNT = 10;
-	private static final int EVENT_RETENTION_TIME = 3;
+	public static final String VERSION = "2.10.0";
 
-	private Delegate delegate;
-	private Platform platform;
-	private CoreListener listener;
-	private ActivityEventSource activityEventSource;
-	private Runnable adIdFetcher;
-	private Config config;
-	private String accountName;
-	private String secret;
-	private String appName;
-	private ScheduledThreadPoolExecutor executor;
-	private StringBuilder postData = null;
-	private Set<String> firingEvents = new HashSet<String>(16);
-	private Set<String> firedEvents = new HashSet<String>(16);
-	private String failingEventId = null;
-	private int delay = 0;
-	private boolean retainEvents = true;
+	private final Platform platform;
+	private final ActivityEventSource activityEventSource;
+	private final Config config;
+	private final String accountName;
+	private final String secret;
+	private final ScheduledExecutorService executor;
+	private final Set<String> firingEvents;
+	private final Set<String> firedEvents;
+	private AtomicBoolean retainEvents = new AtomicBoolean(true);
 	private List<Event> retainedEvents = new ArrayList<Event>();
+	private EventParams commonEventParams;
+	private final String appName;
 
-	Core(Delegate delegate, Platform platform, CoreListener listener, ActivityEventSource activityEventSource, Runnable adIdFetcher, String accountName, String developerSecret, Config config) {
-		this.delegate = delegate;
-		this.delegate.init(this);
+	Core(Platform platform, ActivityEventSource activityEventSource, String accountName, String developerSecret, Config config) {
 		this.platform = platform;
-		this.listener = listener;
 		this.activityEventSource = activityEventSource;
-		this.adIdFetcher = adIdFetcher;
 		this.config = config;
-
-		this.accountName = clean(accountName);
+		this.accountName = accountName;
 		this.secret = developerSecret;
-		makePostArgs();
+		this.firingEvents = new HashSet<String>();
+		this.firedEvents = platform.loadFiredEvents();
+		this.executor = Executors.newSingleThreadScheduledExecutor(new DeamonThreadFactory());
 
-		firedEvents = platform.loadFiredEvents();
-
-		executor = new ScheduledThreadPoolExecutor(MAX_THREADS, platform.makeWorkerThreadFactory());
-		executor.prestartAllCoreThreads();
+		String appName = platform.getAppName();
+		if (appName == null) {
+			appName = "";
+		}
+		this.appName = appName;
 	}
 
 	public void start() {
 		// Automatically fire run event
-		appName = platform.getAppName();
-		if(appName == null) {
-			appName = "";
-		}
-		final String appNameFinal = appName;
-
 		if(config.getFireAutomaticInstallEvent()) {
 			String installEventName = config.getInstallEventName();
 			if(installEventName != null) {
@@ -89,88 +76,108 @@ class Core implements ExecutorProvider {
 			}
 		}
 
-		activityEventSource.setListener(new ActivityEventSource.ActivityListener() {
-			@Override
-			public void onOpen() {
-				if(config.getFireAutomaticOpenEvent()) {
+		if (config.getFireAutomaticOpenEvent()){
+			activityEventSource.setListener(new ActivityEventSource.ActivityListener() {
+				@Override
+				public void onOpen() {
 					String openEventName = config.getOpenEventName();
 					if(openEventName != null) {
 						fireEvent(new Event(openEventName, false));
 					} else {
-						fireEvent(new Event(String.format(Locale.US, "android-%s-open", appNameFinal), false));
+						fireEvent(new Event(String.format(Locale.US, "android-%s-open", appName), false));
 					}
 				}
-			}
-		});
-
-		// If google play services is available, we'll have an AndroidAdvertisingId instance.
-		// If we do, then schedule it immediately so it can fetch the ID.
-		if(adIdFetcher != null && config.getCollectAdvertisingId()) {
-			executor.schedule(adIdFetcher, 0, TimeUnit.SECONDS);
+			});
 		}
 
-		// Flush retained events (and disable retention) after a short delay
-		final Core self = this;
-		executor.schedule(new Runnable() {
+		executor.submit(new Runnable() {
 			@Override
 			public void run() {
-				synchronized(self) {
-					retainEvents = false;
-
-					// Add referrer info to our common post data
-					String referrer = platform.getReferrer();
-					if(referrer != null && referrer.length() > 0) {
-						appendPostPair("", "android-referrer", referrer);
-					}
-
-					// Add android advertising id to our common post data
-					if(self.config.getCollectAdvertisingId()) {
-						String aaid = platform.getAdvertisingId();
-						if(aaid != null && aaid.length() > 0) {
-							appendPostPair("", "hardware-android-advertising-id", aaid);
-						}else{
-							Logging.log(Logging.WARN, "Advertising ID could not be collected. Is Google Play Services installed?");
-						}
-						Boolean limitAdTracking = platform.getLimitAdTracking();
-						if(limitAdTracking != null) {
-							appendPostPair("", "android-limit-ad-tracking", limitAdTracking);
-						}
-					}
-				}
-				for(Event e: retainedEvents) {
-					fireEvent(e);
-				}
-				retainedEvents = null;
+				commonEventParams = buildCommonEventParams();
+				dispatchRetainedEvents();
 			}
-		}, EVENT_RETENTION_TIME, TimeUnit.SECONDS);
+		});
 	}
+
+	private EventParams buildCommonEventParams(){
+		EventParams params = new EventParams();
+		params.put("secret", secret);
+		params.put("sdkversion", VERSION);
+		params.put("hardware", config.getHardware());
+		params.put("hardware-odin1", config.getOdin1());
+		params.put("hardware-open-udid", config.getOpenUdid());
+		params.put("hardware", config.getHardware());
+		params.put("hardware-wifi-mac", config.getWifiMac());
+		params.put("hardware-android-device-id", config.getDeviceId());
+		params.put("hardware-android-android-id", config.getAndroidId());
+		params.put("uuid", platform.loadUuid());
+		params.put("platform", "Android");
+		params.put("vendor", platform.getManufacturer());
+		params.put("model", platform.getModel());
+		params.put("os", platform.getOs());
+		params.put("resolution", platform.getResolution());
+		params.put("locale", platform.getLocale());
+		params.put("app-name", platform.getAppName());
+		params.put("app-version", platform.getAppVersion());
+		params.put("package-name", platform.getPackageName());
+
+		int offsetFromUtc = TimeZone.getDefault().getOffset((new Date()).getTime()) / 1000;
+		params.put("gmtoffset", Integer.toString(offsetFromUtc));
+
+		Callable<AdvertisingID> adIdFetcher = platform.getAdIdFetcher();
+		AdvertisingID advertisingIdInfo = null;
+
+		if (adIdFetcher != null && config.getCollectAdvertisingId()){
+			try{
+				advertisingIdInfo = adIdFetcher.call();
+			} catch (Exception e){
+				Logging.log(Logging.WARN, "Exception while getting the Advertising ID: " + e.getMessage());
+			}
+
+			if (advertisingIdInfo != null && advertisingIdInfo.isValid()){
+				params.put("hardware-android-advertising-id", advertisingIdInfo.getId());
+				params.put("android-limit-ad-tracking", Boolean.toString(advertisingIdInfo.isLimitAdTracking()));
+			} else {
+				Logging.log(Logging.WARN, "Advertising ID could not be collected. Is Google Play Services installed?");
+			}
+		}
+
+		String referrer = platform.getReferrer();
+		if(referrer != null && referrer.length() > 0) {
+			params.put("android-referrer", referrer);
+		}
+
+		return params;
+	}
+
+	private synchronized void dispatchRetainedEvents(){
+		retainEvents.set(false);
+
+		for(Event e: retainedEvents) {
+			fireEvent(e);
+		}
+
+		retainedEvents = null;
+	}
+
 
 	public synchronized void fireEvent(final Event e) {
 		// If we are retaining events, add them to a list to be sent later
-		if(retainEvents) {
+		if(retainEvents.get()) {
 			retainedEvents.add(e);
 			return;
 		}
 
-		// Transaction events need their names prefixed with platform and app name
-		if(e.isTransaction()) {
-			e.setNamePrefix(appName);
-		}
-
-		// Add global event params if they have not yet been added
-		// Notify the event that we are going to fire it so it can record the time and bake its post data
-		e.prepare(config.globalEventParams);
+		e.prepare(appName);
 
 		if (e.isOneTimeOnly()) {
 			if (firedEvents.contains(e.getName())) {
-				Logging.log(Logging.INFO, "Tapstream ignoring event named \"%s\" because it is a one-time-only event that has already been fired", e.getName());
-				listener.reportOperation("event-ignored-already-fired", e.getEncodedName());
-				listener.reportOperation("job-ended", e.getEncodedName());
+				Logging.log(Logging.INFO, "Tapstream ignoring event named \"%s\" because it is a " +
+						"one-time-only event that has already been fired", e.getName());
 				return;
 			} else if (firingEvents.contains(e.getName())) {
-				Logging.log(Logging.INFO, "Tapstream ignoring event named \"%s\" because it is a one-time-only event that is already in progress", e.getName());
-				listener.reportOperation("event-ignored-already-in-progress", e.getEncodedName());
-				listener.reportOperation("job-ended", e.getEncodedName());
+				Logging.log(Logging.INFO, "Tapstream ignoring event named \"%s\" because it is a " +
+						"one-time-only event that is already in progress", e.getName());
 				return;
 			}
 
@@ -178,221 +185,138 @@ class Core implements ExecutorProvider {
 		}
 
 		final Core self = this;
-		final String url = String.format(Locale.US, EVENT_URL_TEMPLATE, accountName, e.getEncodedName());
-		final StringBuilder data = new StringBuilder(postData.toString());
-		data.append(e.getPostData());
+
+		final HttpRequest eventRequest;
+
+		try{
+			eventRequest = RequestBuilders
+					.eventRequestBuilder(accountName, e.getName())
+					.postBody(e.buildPostBody(commonEventParams, config.globalEventParams))
+					.build();
+		} catch (MalformedURLException error){
+			// log the error
+			Logging.log(Logging.ERROR, "Tapstream failed to build the request URL: " + error.getMessage());
+			return;
+		}
+
+		fireEvent(e, eventRequest.makeRetryable(config.getEventRetryStrategy()));
+	}
+
+	private void fireEvent(final Event event, final Retry.Retryable<HttpRequest> retryableRequest){
+		final Core self = this;
 
 		Runnable task = new Runnable() {
-			public void innerRun() {
+			public void innerRun() throws IOException {
+				HttpResponse response = platform.sendRequest(retryableRequest.get());
 
-				Response response = platform.request(url, data.toString(), "POST");
-				boolean failed = response.status < 200 || response.status >= 300;
-				boolean shouldRetry = response.status < 0 || (response.status >= 500 && response.status < 600);
+				if (event.isOneTimeOnly()) {
+					synchronized (self) {
+						firingEvents.remove(event.getName());
 
-				synchronized (self) {
-					if (e.isOneTimeOnly()) {
-						self.firingEvents.remove(e.getName());
-					}
-
-					if (failed) {
-						// Only increase delays if we actually intend to retry the event
-						if (shouldRetry) {
-							// Not every job that fails will increase the retry
-							// delay. It will be the responsibility of
-							// the first failed job to increase the delay after
-							// every failure.
-							if (self.delay == 0) {
-								// This is the first job to fail, it must be the
-								// one to manage delay timing
-								self.failingEventId = e.getUid();
-								self.increaseDelay();
-							} else if (self.failingEventId != null && self.failingEventId.equals(e.getUid())) {
-								// This job is failing for a subsequent time
-								self.increaseDelay();
-							}
+						if (response.succeeded()){
+							firedEvents.add(event.getName());
+							platform.saveFiredEvents(self.firedEvents);
 						}
-					} else {
-						if (e.isOneTimeOnly()) {
-							self.firedEvents.add(e.getName());
-
-							self.platform.saveFiredEvents(self.firedEvents);
-							self.listener.reportOperation("fired-list-saved", e.getEncodedName());
-						}
-
-						// Success of any event resets the delay
-						self.delay = 0;
 					}
 				}
 
-				if (failed) {
-					if (response.status < 0) {
-						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, error=%s", response.message);
-					} else if (response.status == 404) {
-						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d\nDoes your event name contain characters that are not url safe? This event will not be retried.", response.status);
+				if (response.succeeded()){
+					Logging.log(Logging.INFO, "Tapstream fired event named \"%s\"", event.getName());
+				} else {
+					if (response.status == 404) {
+						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d\n" +
+								"Does your event name contain characters that are not url safe? This " +
+								"event will not be retried.", response.status);
 					} else if (response.status == 403) {
-						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d\nAre your account name and application secret correct?  This event will not be retried.", response.status);
+						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d\n" +
+								"Are your account name and application secret correct?  This event " +
+								"will not be retried.", response.status);
 					} else {
 						String retryMsg = "";
-						if (!shouldRetry) {
+						if (!response.shouldRetry()) {
 							retryMsg = "  This event will not be retried.";
 						}
-						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d.%s", response.status, retryMsg);
+						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d.%s",
+								response.status, retryMsg);
 					}
 
-					self.listener.reportOperation("event-failed", e.getEncodedName());
-					if (shouldRetry) {
-						self.listener.reportOperation("retry", e.getEncodedName());
-						self.listener.reportOperation("job-ended", e.getEncodedName());
-						if (self.delegate.isRetryAllowed()) {
-							self.fireEvent(e);
-						}
-						return;
+					if (response.shouldRetry() && retryableRequest.shouldRetry()) {
+						retryableRequest.incrementAttempt();
+						fireEvent(event, retryableRequest);
 					}
-				} else {
-					Logging.log(Logging.INFO, "Tapstream fired event named \"%s\"", e.getName());
-					self.listener.reportOperation("event-succeeded", e.getEncodedName());
 				}
-
-				self.listener.reportOperation("job-ended", e.getEncodedName());
 			}
 			public void run() {
 				try {
 					innerRun();
 				} catch(Exception ex) {
-					ex.printStackTrace();
+					Logging.log(Logging.ERROR, "Tapstream Error: Unhandled exception while firing event: " + ex.getMessage());
 				}
 			}
 		};
 
-		// Always ask the delegate what the delay should be, regardless of what
-		// our delay member says.
-		// The delegate may wish to override it if this is a testing scenario.
-		int delay = delegate.getDelay();
-		executor.schedule(task, delay, TimeUnit.SECONDS);
+		executor.schedule(task, retryableRequest.getDelay(), TimeUnit.MILLISECONDS);
 	}
 
-	public void fireHit(final Hit h, final Hit.CompletionHandler completion) {
-		final String url = String.format(Locale.US, HIT_URL_TEMPLATE, accountName, h.getEncodedTrackerName());
-		final String data = h.getPostData();
-		Runnable task = new Runnable() {
-			public void run() {
-				Response response = platform.request(url, data, "POST");
-				if (response.status < 200 || response.status >= 300) {
-					Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire hit, http code: %d", response.status);
-					listener.reportOperation("hit-failed");
-				} else {
-					Logging.log(Logging.INFO, "Tapstream fired hit to tracker: %s", h.getTrackerName());
-					listener.reportOperation("hit-succeeded");
-				}
-				if (completion != null) {
-					completion.complete(response);
-				}
-			}
-		};
-		executor.schedule(task, 0, TimeUnit.SECONDS);
-	}
-
-	public void getConversionData(final ConversionListener completion)
+	public void getConversionData(final Callback<JSONObject> callback)
 	{
-		if(completion != null) {
-			final String url = String.format(Locale.US, CONVERSION_URL_TEMPLATE, secret, platform.loadUuid());
-			Runnable task = new Runnable() {
-				private int tries = 0;
-
-				@Override
-				public void run() {
-					tries++;
-
-					Response res = platform.request(url, null, "GET");
-					if(res.status >= 200 && res.status < 300) {
-						Matcher m = Pattern.compile("^\\s*\\[\\s*\\]\\s*$").matcher(res.data);
-						if(!m.matches())
-						{
-							completion.conversionData(res.data);
-							return;
-						}
-					}
-
-					if(tries >= CONVERSION_POLL_COUNT) {
-						completion.conversionData(null);
-						return;
-					}
-
-					executor.schedule(this, CONVERSION_POLL_INTERVAL, TimeUnit.SECONDS);
-				}
-			};
-			executor.schedule(task, CONVERSION_POLL_INTERVAL, TimeUnit.SECONDS);
-		}
-	}
-
-	public String getPostData() {
-		return postData.toString();
-	}
-
-	public int getDelay() {
-		return delay;
-	}
-
-	private String clean(String s) {
+		final Retry.Retryable<HttpRequest> retryable;
 		try {
-			return URLEncoder.encode(s.toLowerCase().trim(), "UTF-8").replace("+", "%20");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			return "";
-		}
-	}
-
-	private void increaseDelay() {
-		if (delay == 0) {
-			// First failure
-			delay = 2;
-		} else {
-			// 2, 4, 8, 16, 32, 60, 60, 60...
-			int newDelay = (int) Math.pow(2, Math.round(Math.log(delay) / Math.log(2)) + 1);
-			delay = newDelay > 60 ? 60 : newDelay;
-		}
-		listener.reportOperation("increased-delay");
-	}
-
-	private void appendPostPair(String prefix, String key, Object value) {
-		String encodedPair = Utils.encodeEventPair(prefix, key, value, true);
-		if(encodedPair == null) {
+			retryable = RequestBuilders.timelineLookupRequestBuilder(secret, platform.loadUuid())
+					.build()
+					.makeRetryable(config.getTimelineLookupRetryStrategy());
+		} catch (MalformedURLException e) {
+			Logging.log(Logging.ERROR, "Tapstream Error: Failed to build timeline lookup URL");
 			return;
 		}
-		if (postData == null) {
-			postData = new StringBuilder();
-		} else {
-			postData.append("&");
-		}
-		postData.append(encodedPair);
-	}
 
-	private void makePostArgs() {
-		appendPostPair("", "secret", secret);
-		appendPostPair("", "sdkversion", VERSION);
+		Runnable task = new Runnable() {
+			public void checkedRun() throws IOException{
+				HttpResponse res = platform.sendRequest(retryable.get());
+				if(res.status >= 200 && res.status < 300) {
 
-		appendPostPair("", "hardware", config.getHardware());
-		appendPostPair("", "hardware-odin1", config.getOdin1());
-		appendPostPair("", "hardware-open-udid", config.getOpenUdid());
-		appendPostPair("", "hardware", config.getHardware());
+					// Check for the legacy "timeline not found" pattern
+					String responseBody = res.getBodyAsString();
+					Object jsonRoot = new JSONTokener(responseBody).nextValue();
 
-		appendPostPair("", "hardware-wifi-mac", config.getWifiMac());
-		appendPostPair("", "hardware-android-device-id", config.getDeviceId());
-		appendPostPair("", "hardware-android-android-id", config.getAndroidId());
+					if (jsonRoot instanceof JSONArray){
+						// The legacy empty timeline object is an empty array
+						JSONArray jsonRootArray = (JSONArray)jsonRoot;
 
-		appendPostPair("", "uuid", platform.loadUuid());
-		appendPostPair("", "platform", "Android");
-		appendPostPair("", "vendor", platform.getManufacturer());
-		appendPostPair("", "model", platform.getModel());
-		appendPostPair("", "os", platform.getOs());
-		appendPostPair("", "resolution", platform.getResolution());
-		appendPostPair("", "locale", platform.getLocale());
-		appendPostPair("", "app-name", platform.getAppName());
-		appendPostPair("", "app-version", platform.getAppVersion());
-		appendPostPair("", "package-name", platform.getPackageName());
+						if (jsonRootArray.length() == 0){
+							// We found the empty array. Poll again if the retry strategy allows it.
+							if (retryable.shouldRetry()){
+								retryable.incrementAttempt();
+								executor.schedule(this, retryable.getDelay(), TimeUnit.MILLISECONDS);
+							} else {
+								callback.error(new TimelineLookupFailed("Lookup attempts exhausted"));
+							}
+						} else {
+							callback.error(new TimelineLookupFailed("Unknown response structure"));
+						}
 
-		int offsetFromUtc = TimeZone.getDefault().getOffset((new Date()).getTime()) / 1000;
-		appendPostPair("", "gmtoffset", offsetFromUtc);
+					} else if (jsonRoot instanceof JSONObject){
+						callback.success((JSONObject)jsonRoot);
+					} else {
+						callback.error(new TimelineLookupFailed("Unknown response structure"));
+					}
+				}
+			}
+
+			@Override
+			public void run() {
+				try {
+					checkedRun();
+				} catch (Exception e){
+					Logging.log(Logging.ERROR, "Unhandled exception during timeline lookup");
+					callback.error(e);
+				}
+			}
+		};
+
+		executor.submit(task);
+
+
 	}
 
 	@Override

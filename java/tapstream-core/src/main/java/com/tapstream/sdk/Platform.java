@@ -1,44 +1,43 @@
 package com.tapstream.sdk;
 
+import com.tapstream.sdk.http.HttpRequest;
+import com.tapstream.sdk.http.HttpResponse;
 import com.tapstream.sdk.wordofmouth.Reward;
 
+import java.io.IOException;
 import java.util.Set;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.Callable;
 
 public interface Platform {
-	public ThreadFactory makeWorkerThreadFactory();
+	String loadUuid();
 
-	public String loadUuid();
+	Set<String> loadFiredEvents();
 
-	public Set<String> loadFiredEvents();
+	void saveFiredEvents(Set<String> firedEvents);
 
-	public void saveFiredEvents(Set<String> firedEvents);
+	String getResolution();
 
-	public String getResolution();
+	String getManufacturer();
 
-	public String getManufacturer();
+	String getModel();
 
-	public String getModel();
+	String getOs();
 
-	public String getOs();
+	String getLocale();
 
-	public String getLocale();
-
-	public String getAppName();
+	String getAppName();
 	
-	public String getAppVersion();
+	String getAppVersion();
 
-	public String getPackageName();
+	String getPackageName();
 
-	public Response request(String url, String data, String method);
+	HttpResponse sendRequest(HttpRequest request) throws IOException;
 	
-	public String getReferrer();
-	
-	public String getAdvertisingId();
+	String getReferrer();
 
-	public Boolean getLimitAdTracking();
+	Integer getCountForReward(Reward reward);
 
-	public Integer getCountForReward(Reward reward);
+	void consumeReward(Reward reward);
 
-	public void consumeReward(Reward reward);
+	Callable<AdvertisingID> getAdIdFetcher();
 }

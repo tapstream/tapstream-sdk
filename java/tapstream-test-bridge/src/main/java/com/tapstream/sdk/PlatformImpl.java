@@ -1,13 +1,16 @@
 package com.tapstream.sdk;
 
+import com.tapstream.sdk.http.HttpRequest;
+import com.tapstream.sdk.http.HttpResponse;
 import com.tapstream.sdk.wordofmouth.Reward;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 
 class PlatformImpl implements Platform {
-	public Response response = new Response(200, null, null);
+	public HttpResponse response = new HttpResponse(200, null, null);
 	public Set<String> savedFiredList = null;
 
 	public PlatformImpl() {
@@ -73,7 +76,7 @@ class PlatformImpl implements Platform {
 		return "com.test.TestApp";
 	}
 
-	public Response request(String url, String data, String method) {
+	public HttpResponse sendRequest(HttpRequest request) throws IOException {
 		return response;
 	}
 	
