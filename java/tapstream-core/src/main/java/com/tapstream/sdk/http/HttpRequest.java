@@ -7,7 +7,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class HttpRequest {
 
@@ -86,13 +85,19 @@ public class HttpRequest {
         }
 
         public HttpRequest build() throws MalformedURLException{
-            Objects.requireNonNull(scheme, "Scheme must not be null");
-            Objects.requireNonNull(host, "Host must not be null");
+            if (scheme == null)
+                throw new NullPointerException("Scheme must not be null");
+            if (host == null)
+                throw new NullPointerException("Host must not be null");
+            if (method == null)
+                throw new NullPointerException("Method must not be null");
 
             // Encode the parameters
             StringBuilder urlBuilder = new StringBuilder(scheme + "://" + host);
 
             if (path != null){
+                if (!path.startsWith("/"))
+                    urlBuilder.append("/");
                 urlBuilder.append(path);
             }
 

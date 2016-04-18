@@ -2,47 +2,43 @@ package com.tapstream.sdk;
 
 import android.app.Application;
 
+import com.tapstream.sdk.timeline.TimelineApiResponse;
 import com.tapstream.sdk.wordofmouth.WordOfMouth;
-import com.tapstream.sdk.wordofmouth.WordOfMouthImpl;
 
-import org.json.JSONObject;
+import java.io.IOException;
 
-import java.lang.reflect.Constructor;
-
-public class Tapstream implements AndroidApi {
+public class Tapstream implements AndroidApiClient {
 	private static Tapstream instance;
 	private WordOfMouth wom;
-
 	private Platform platform;
-	private CoreListener listener;
-	private Core core;
-	private String secret;
+	private ApiClient client;
 
-	public static void create(Application app, String accountName, String developerSecret, Config config) {
-		synchronized (Tapstream.class) {
-			if (instance == null) {
-				// Using reflection, try to instantiate the ActivityCallbacks class.  ActivityCallbacks
-				// is derived from a class only available in api 14, so we expect this to fail for any
-				// android version prior to 4.  For older android versions, a dummy implementation is used.
-				ActivityEventSource aes;
-				try {
-					Class<?> cls = Class.forName("com.tapstream.sdk.api14.ActivityCallbacks");
-					Constructor<?> constructor = cls.getConstructor(Application.class);
-					aes = (ActivityEventSource)constructor.newInstance(app);
-				} catch(Exception e) {
-					aes = new ActivityEventSource();
-				}
+	public interface ClientBuilder {
+		ApiClient build(Application app, Config config);
+	}
 
-				instance = new Tapstream(
-						new AndroidPlatform(app),
-						aes,
-						accountName,
-						developerSecret,
-						config
-				);
-			} else {
-				Logging.log(Logging.WARN, "Tapstream Warning: Tapstream already instantiated, it cannot be re-created.");
-			}
+	private static ClientBuilder clientBuilder;
+
+	public static class DefaultClientBuilder implements ClientBuilder {
+
+		@Override
+		public ApiClient build(Application app, Config config) {
+			HttpApiClient client = new HttpApiClient(new AndroidPlatform(app), config);
+			client.start();
+			return client;
+		}
+	}
+
+	synchronized public static void setClientBuilder(ClientBuilder clientBuilder){
+		Tapstream.clientBuilder = clientBuilder;
+	}
+
+	synchronized public static void create(Application app, Config config) {
+		if (instance == null) {
+			ClientBuilder builder = clientBuilder == null ? new DefaultClientBuilder() : clientBuilder;
+			instance = new Tapstream(builder.build(app, config));
+		} else {
+			Logging.log(Logging.WARN, "Tapstream Warning: Tapstream already instantiated, it cannot be re-created.");
 		}
 	}
 
@@ -53,27 +49,32 @@ public class Tapstream implements AndroidApi {
 		return instance;
 	}
 
-	Tapstream(Platform platform, ActivityEventSource aes,
-			  String accountName, String developerSecret, Config config){
-		this.core = new Core(platform, aes, accountName, developerSecret, config);
-		core.start();
+	Tapstream(ApiClient client){
+		this.client = client;
+	}
+
+	@Override
+	public void close() throws IOException {
+		instance.close();
 	}
 
 	@Override
 	public void fireEvent(Event e) {
-		core.fireEvent(e);
+		client.fireEvent(e);
 	}
 
 	@Override
-	public void getConversionData(Callback<JSONObject> completion) {
-		core.getConversionData(completion);
+	public void lookupTimeline(Callback<TimelineApiResponse> completion) {
+		client.lookupTimeline(completion);
 	}
 
 	@Override
 	synchronized public WordOfMouth getWordOfMouth(){
-		if(wom == null) {
-			wom = WordOfMouthImpl.getInstance(core, platform, secret, platform.getPackageName());
-		}
-		return wom;
+//		if(wom == null) {
+//			wom = WordOfMouthImpl.getInstance(client.getExecutor(), platform, secret, platform.getPackageName());
+//		}
+//		return wom;
+
+		return null;
 	}
 }

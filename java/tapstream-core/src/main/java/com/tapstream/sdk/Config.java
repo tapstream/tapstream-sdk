@@ -3,13 +3,18 @@ package com.tapstream.sdk;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Config {	
+public class Config {
+
+	private final String accountName;
+	private final String developerSecret;
+
+	public Config(String accountName, String developerSecret){
+		this.accountName = accountName;
+		this.developerSecret = developerSecret;
+	}
 
 	private Retry.Strategy eventRetryStrategy = Retry.DEFAULT_EVENT_STRATEGY;
 	private Retry.Strategy timelineLookupRetryStrategy = Retry.DEFAULT_TIMELINE_LOOKUP_STRATEGY;
-
-	// Deprecated, hardware-id field
-	private String hardware = null;
 
 	// Optional hardware identifiers that can be provided by the caller
 	private String odin1 = null;
@@ -30,11 +35,23 @@ public class Config {
 	private boolean collectAdvertisingId = true;
 	
 	// These parameters will be automatically attached to all events fired by the sdk.
-	public Map<String, Object> globalEventParams = new HashMap<String, Object>();
+	private final Map<String, String> globalEventParams = new HashMap<String, String>();
 
-	// Accessors for the private members above:
-	public String getHardware() { return hardware; }
-	public void setHardware(String hardware) { this.hardware = hardware; }
+	public String getAccountName(){
+		return accountName;
+	}
+
+	public String getDeveloperSecret(){
+		return developerSecret;
+	}
+
+	public void addGlobalEventParameter(String name, String value){
+		globalEventParams.put(name, value);
+	}
+
+	public Map<String, String> getGlobalEventParams(){
+		return globalEventParams;
+	}
 
 	public String getOdin1() { return odin1; }
 	public void setOdin1(String odin1) { this.odin1 = odin1; }
@@ -50,26 +67,6 @@ public class Config {
 
 	public String getAndroidId(){ return androidId; }
 	public void setAndroidId(String androidId){ this.androidId = androidId; }
-
-        /**
-         * @deprecated Wifi mac, device id, and android id are no longer collected
-         * automatically. You may provide them using `setWifiMac`, `setDeviceId`,
-         * and `setAndroidId`.
-         */
-	@Deprecated
-	public boolean getCollectWifiMac() { return false; }
-	@Deprecated
-	public void setCollectWifiMac(boolean collect) {}
-
-	@Deprecated
-	public boolean getCollectDeviceId() { return false; }
-	@Deprecated
-	public void setCollectDeviceId(boolean collect) {}
-
-	@Deprecated
-	public boolean getCollectAndroidId() { return false; }
-	@Deprecated
-	public void setCollectAndroidId(boolean collect) { }
 
 	public String getInstallEventName() { return installEventName; }
 	public void setInstallEventName(String name) { installEventName = name; }

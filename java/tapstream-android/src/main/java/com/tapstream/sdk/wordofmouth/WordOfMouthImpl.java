@@ -12,7 +12,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.PopupWindow;
 
-import com.tapstream.sdk.ExecutorProvider;
 import com.tapstream.sdk.Logging;
 import com.tapstream.sdk.Maybe;
 import com.tapstream.sdk.Platform;
@@ -27,8 +26,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Date: 15-05-01
@@ -36,17 +35,17 @@ import java.util.concurrent.TimeUnit;
  */
 public class WordOfMouthImpl implements WordOfMouth{
     final Platform platform;
-    final ExecutorProvider executor;
+    final ExecutorService executor;
     final String sdkSecret;
     final String bundle;
     final String OFFER_ENDPOINT = "https://app.tapstream.com/api/v1/word-of-mouth/offers/";
     final String REWARD_ENDPOINT = "https://app.tapstream.com/api/v1/word-of-mouth/rewards/";
 
-    public static WordOfMouth getInstance(ExecutorProvider executor, Platform platform, String sdkSecret, String bundle){
+    public static WordOfMouth getInstance(ExecutorService executor, Platform platform, String sdkSecret, String bundle){
         return new WordOfMouthImpl(executor, platform, sdkSecret, bundle);
     }
 
-    private WordOfMouthImpl(ExecutorProvider executor, Platform platform, String sdkSecret, String bundle){
+    private WordOfMouthImpl(ExecutorService executor, Platform platform, String sdkSecret, String bundle){
         this.executor = executor;
         this.platform = platform;
         this.sdkSecret = sdkSecret;
@@ -158,11 +157,12 @@ public class WordOfMouthImpl implements WordOfMouth{
     // Async
 
     public Future<Maybe<Offer>> getOffer(final String insertionPoint){
+
         return executor.submit(new Callable<Maybe<Offer>>() {
             public Maybe<Offer> call(){
                 return getOfferSync(insertionPoint);
             }
-        }, 0, TimeUnit.SECONDS);
+        });
     }
 
     public Future<List<Reward>> getRewardList(){
@@ -170,6 +170,6 @@ public class WordOfMouthImpl implements WordOfMouth{
             public List<Reward> call() {
                 return getRewardListSync();
             }
-        }, 0, TimeUnit.SECONDS);
+        });
     }
 }

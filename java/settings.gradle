@@ -1,1 +1,1 @@
-include ':tapstream-example', ':tapstream-core', ':tapstream-android', ':tapstream-test-bridge'
+include ':tapstream-example', ':tapstream-core', ':tapstream-android'

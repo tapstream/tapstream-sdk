@@ -2,6 +2,6 @@ package com.tapstream.sdk;
 
 import com.tapstream.sdk.wordofmouth.WordOfMouth;
 
-public interface AndroidApi extends Api{
+public interface AndroidApiClient extends ApiClient {
     WordOfMouth getWordOfMouth();
 }

@@ -29,7 +29,7 @@ public class FormPostBody implements RequestBody {
 
     @Override
     public String contentType(){
-        return "application/x-www-form-urlencoded";
+        return "application/x-www-form-urlencoded; charset=utf-8";
     }
 
     @Override

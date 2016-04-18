@@ -1,9 +1,5 @@
-package com.tapstream.sdk;
+package com.tapstream.sdk.http;
 
-
-import com.tapstream.sdk.http.HttpMethod;
-import com.tapstream.sdk.http.HttpRequest;
-import com.tapstream.sdk.http.URLEncoding;
 
 public class RequestBuilders {
 

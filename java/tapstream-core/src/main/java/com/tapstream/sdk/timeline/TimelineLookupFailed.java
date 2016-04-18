@@ -1,4 +1,4 @@
-package com.tapstream.sdk;
+package com.tapstream.sdk.timeline;
 
 
 public class TimelineLookupFailed extends Exception {

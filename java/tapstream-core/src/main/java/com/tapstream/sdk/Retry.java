@@ -1,8 +1,6 @@
 package com.tapstream.sdk;
 
-/**
- * Created by nsitarz on 2016-04-11.
- */
+
 public class Retry {
 
     public static final Strategy DEFAULT_EVENT_STRATEGY = new Exponential(1000, 2, 10);
@@ -106,7 +104,7 @@ public class Retry {
             return firstSent;
         }
 
-        public int getDelay(){
+        public int getDelayMs(){
             return retryStrategy.getDelay(attempt);
         }
 

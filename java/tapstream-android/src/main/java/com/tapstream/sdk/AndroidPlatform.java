@@ -11,13 +11,9 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.tapstream.sdk.http.HttpClient;
-import com.tapstream.sdk.http.HttpRequest;
-import com.tapstream.sdk.http.HttpResponse;
-import com.tapstream.sdk.http.StdLibHttpClient;
 import com.tapstream.sdk.wordofmouth.Reward;
 
-import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -32,19 +28,9 @@ class AndroidPlatform implements Platform {
 	private static final String WOM_REWARDS_KEY = "TapstreamWOMRewards";
 
 	private final Application app;
-	private final HttpClient httpClient;
-
-	AndroidPlatform(Application app, HttpClient httpClient){
-		this.app = app;
-		this.httpClient = httpClient;
-	}
 
 	public AndroidPlatform(Application app) {
-		this(app, defaultHttpClient());
-	}
-
-	public static HttpClient defaultHttpClient(){
-		return new StdLibHttpClient();
+		this.app = app;
 	}
 
 	@Override
@@ -140,10 +126,6 @@ class AndroidPlatform implements Platform {
 		return app.getPackageName();
 	}
 
-	@Override
-	public HttpResponse sendRequest(HttpRequest request) throws IOException {
-		return httpClient.sendRequest(request);
-	}
 
 	@Override
 	public String getReferrer() {
@@ -175,5 +157,21 @@ class AndroidPlatform implements Platform {
 	@Override
 	public Callable<AdvertisingID> getAdIdFetcher(){
 		return new AdvertisingIdFetcher(app);
+	}
+
+	@Override
+	public ActivityEventSource getActivityEventSource() {
+
+		// Using reflection, try to instantiate the ActivityCallbacks class.  ActivityCallbacks
+		// is derived from a class only available in api 14, so we expect this to fail for any
+		// android version prior to 4.  For older android versions, a dummy implementation is used.
+		ActivityEventSource aes;
+		try {
+			Class<?> cls = Class.forName("com.tapstream.sdk.api14.ActivityCallbacks");
+			Constructor<?> constructor = cls.getConstructor(Application.class);
+			return (ActivityEventSource)constructor.newInstance(app);
+		} catch(Exception e) {
+			return new ActivityEventSource();
+		}
 	}
 }

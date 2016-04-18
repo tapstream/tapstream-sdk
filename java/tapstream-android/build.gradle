@@ -28,5 +28,7 @@ dependencies {
     testCompile 'org.robolectric:robolectric:3.0'
     testCompile 'com.google.guava:guava:19.0'
     compile 'com.android.support:appcompat-v7:23.3.0'
-    compile project(':tapstream-core')
+    compile(project(path: ':tapstream-core')) {
+        exclude group: 'org.json', module: 'json'
+    }
 }

@@ -6,11 +6,60 @@ import com.tapstream.sdk.http.RequestBody;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
 public class Event {
+
+	public static class Params {
+
+		private final Map<String, String> params = new HashMap<String, String>();
+
+		public void put(String key, long value){
+			put(key, Long.toString(value));
+		}
+
+		public void put(String key, int value){
+			put(key, Integer.toString(value));
+		}
+
+		public void put(String key, String value){
+			put(key, value, true);
+		}
+
+		public void putWithoutTruncation(String key, String value){
+			put(key, value, false);
+		}
+
+		private void put(String key, String value, boolean limitValueLength){
+			if(key == null || value == null) {
+				return;
+			}
+
+			if (key.length() > 255) {
+				Logging.log(Logging.WARN, "Tapstream Warning: key exceeds 255 characters, " +
+						"this field will not be included in the post (key=%s)", key);
+				return;
+			}
+
+			if (limitValueLength && value.length() > 255) {
+				Logging.log(Logging.WARN, "Tapstream Warning: value exceeds 255 characters, " +
+						"this field will not be included in the post (value=%s)", value);
+				return;
+			}
+
+			params.put(key, value);
+		}
+
+		public Map<String, String> toMap(){
+			return params;
+		}
+
+	}
+
+
 	// Purchase field names
 	public static final String PURCHASE_TRANSACTION_ID = "purchase-transaction-id";
 	public static final String PURCHASE_PRODUCT_ID = "purchase-product-id";
@@ -20,17 +69,13 @@ public class Event {
 	public static final String RECEIPT_POST_BODY = "receipt-postBody";
 
 	private final UUID id;
-	private final EventParams params;
-	private final EventParams customParams;
+	private final Params params;
+	private final Params customParams;
 
-	private long preparedAt;
 	private String name;
 	private boolean oneTimeOnly;
 	private boolean isTransaction = false;
 	private String productSku;
-
-	//private static final String PURCHASE_TRANSACTION_ID = "";
-
 
 	/**
 	 * The default event constructor. This is what you want most of the time.
@@ -40,8 +85,8 @@ public class Event {
      */
 	public Event(String name, boolean oneTimeOnly) {
 		this.id = UUID.randomUUID();
-		this.params = new EventParams();
-		this.customParams = new EventParams();
+		this.params = new Params();
+		this.customParams = new Params();
 		this.oneTimeOnly = oneTimeOnly;
 		this.name = name;
 	}
@@ -126,18 +171,6 @@ public class Event {
 
 	/**
 	 * Set a custom parameter for this event.
-	 *
-	 * @deprecated As of release 2.10.0, replaced by {@link #setCustomParameter(String, String)}
-	 * @param key
-	 * @param value
-     */
-	@Deprecated
-	public void addPair(String key, Object value) {
-		setCustomParameter(key, value.toString());
-	}
-
-	/**
-	 * Set a custom parameter for this event.
 	 * @param key	parameter key
 	 * @param value	parameter value
      */
@@ -154,7 +187,7 @@ public class Event {
 	}
 
 	/**
-	 * Gets the name for this event. This corresponds to the Event slug that you can interact with
+	 * Gets the name for this event. This corresponds to the TimelineEvent slug that you can interact with
 	 * via the Tapstream dashboard API.
 	 * @return
      */
@@ -178,19 +211,16 @@ public class Event {
 		if (isTransaction){
 			setNameForPurchase(appName);
 		}
-
-		preparedAt = System.currentTimeMillis();
-		params.put("created-ms", preparedAt);
 	}
 
-	RequestBody buildPostBody(final EventParams commonParams, final Map<String, Object> globalCustomParams){
+	<T> RequestBody buildPostBody(final Params commonParams, final Map<String, T> globalCustomParams){
 		final FormPostBody body = new FormPostBody();
 
 		body.add(commonParams.toMap());
 		body.add(params.toMap());
 
 		if (globalCustomParams != null){
-			for(Map.Entry<String, Object> entry : globalCustomParams.entrySet()) {
+			for(Map.Entry<String, T> entry : globalCustomParams.entrySet()) {
 				body.add("custom-" + entry.getKey(), entry.getValue().toString());
 			}
 		}
@@ -201,7 +231,8 @@ public class Event {
 			}
 		}
 
+		body.add("created-ms", Long.toString(System.currentTimeMillis()));
+
 		return body;
 	}
-
 };

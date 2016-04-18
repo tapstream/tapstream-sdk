@@ -1,63 +1,78 @@
 package com.tapstream.sdk;
 
+import com.tapstream.sdk.http.HttpClient;
 import com.tapstream.sdk.http.HttpRequest;
 import com.tapstream.sdk.http.HttpResponse;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import com.tapstream.sdk.http.RequestBuilders;
+import com.tapstream.sdk.http.StdLibHttpClient;
+import com.tapstream.sdk.timeline.TimelineApiResponse;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-class Core implements ExecutorProvider {
-	public static final String VERSION = "2.10.0";
+class HttpApiClient implements ApiClient {
+	public static final String VERSION = "3.0.0";
 
 	private final Platform platform;
-	private final ActivityEventSource activityEventSource;
 	private final Config config;
-	private final String accountName;
-	private final String secret;
 	private final ScheduledExecutorService executor;
-	private final Set<String> firingEvents;
-	private final Set<String> firedEvents;
-	private AtomicBoolean retainEvents = new AtomicBoolean(true);
-	private List<Event> retainedEvents = new ArrayList<Event>();
-	private EventParams commonEventParams;
+	private final AtomicBoolean started = new AtomicBoolean(false);
+	private final HttpClient client;
+	private final OneTimeOnlyEventTracker oneTimeEventTracker;
+
+	private boolean queueEvents = true;
+	private List<Event> queuedEvents = new ArrayList<Event>();
+
+	private Event.Params commonEventParams;
 	private final String appName;
 
-	Core(Platform platform, ActivityEventSource activityEventSource, String accountName, String developerSecret, Config config) {
+
+	HttpApiClient(Platform platform, Config config){
+		this(platform, config, new StdLibHttpClient(), Executors.newSingleThreadScheduledExecutor(new DeamonThreadFactory()));
+	}
+
+	HttpApiClient(Platform platform, Config config, HttpClient client, ScheduledExecutorService executor) {
 		this.platform = platform;
-		this.activityEventSource = activityEventSource;
 		this.config = config;
-		this.accountName = accountName;
-		this.secret = developerSecret;
-		this.firingEvents = new HashSet<String>();
-		this.firedEvents = platform.loadFiredEvents();
-		this.executor = Executors.newSingleThreadScheduledExecutor(new DeamonThreadFactory());
+		this.client = client;
+		this.executor = executor;
 
 		String appName = platform.getAppName();
 		if (appName == null) {
 			appName = "";
 		}
 		this.appName = appName;
+		this.oneTimeEventTracker = new OneTimeOnlyEventTracker(platform);
 	}
 
+
+	@Override
+	public void close() throws IOException {
+		Utils.closeQuietly(client);
+
+		executor.shutdownNow();
+		try{
+			executor.awaitTermination(1, TimeUnit.SECONDS);
+		} catch (Exception e){
+			Logging.log(Logging.WARN, "Failed to shutdown executor");
+		}
+	}
+
+
 	public void start() {
-		// Automatically fire run event
+		if (!started.compareAndSet(false, true))
+			return;
+
 		if(config.getFireAutomaticInstallEvent()) {
 			String installEventName = config.getInstallEventName();
 			if(installEventName != null) {
@@ -77,7 +92,7 @@ class Core implements ExecutorProvider {
 		}
 
 		if (config.getFireAutomaticOpenEvent()){
-			activityEventSource.setListener(new ActivityEventSource.ActivityListener() {
+			platform.getActivityEventSource().setListener(new ActivityEventSource.ActivityListener() {
 				@Override
 				public void onOpen() {
 					String openEventName = config.getOpenEventName();
@@ -94,19 +109,22 @@ class Core implements ExecutorProvider {
 			@Override
 			public void run() {
 				commonEventParams = buildCommonEventParams();
-				dispatchRetainedEvents();
+				dispatchQueuedEvents();
 			}
 		});
 	}
 
-	private EventParams buildCommonEventParams(){
-		EventParams params = new EventParams();
-		params.put("secret", secret);
+	/**
+	 * Builds the event parameters that will be included with all events sent from this device.
+	 * This method must not be called in the main thread.
+	 * @return the event params.
+     */
+	Event.Params buildCommonEventParams(){
+		Event.Params params = new Event.Params();
+		params.put("secret", config.getDeveloperSecret());
 		params.put("sdkversion", VERSION);
-		params.put("hardware", config.getHardware());
 		params.put("hardware-odin1", config.getOdin1());
 		params.put("hardware-open-udid", config.getOpenUdid());
-		params.put("hardware", config.getHardware());
 		params.put("hardware-wifi-mac", config.getWifiMac());
 		params.put("hardware-android-device-id", config.getDeviceId());
 		params.put("hardware-android-android-id", config.getAndroidId());
@@ -125,9 +143,9 @@ class Core implements ExecutorProvider {
 		params.put("gmtoffset", Integer.toString(offsetFromUtc));
 
 		Callable<AdvertisingID> adIdFetcher = platform.getAdIdFetcher();
-		AdvertisingID advertisingIdInfo = null;
 
 		if (adIdFetcher != null && config.getCollectAdvertisingId()){
+			AdvertisingID advertisingIdInfo = null;
 			try{
 				advertisingIdInfo = adIdFetcher.call();
 			} catch (Exception e){
@@ -150,78 +168,60 @@ class Core implements ExecutorProvider {
 		return params;
 	}
 
-	private synchronized void dispatchRetainedEvents(){
-		retainEvents.set(false);
+	private synchronized void dispatchQueuedEvents(){
+		queueEvents = false;
 
-		for(Event e: retainedEvents) {
+		for(Event e: queuedEvents) {
 			fireEvent(e);
 		}
 
-		retainedEvents = null;
+		queuedEvents = null;
 	}
 
 
-	public synchronized void fireEvent(final Event e) {
-		// If we are retaining events, add them to a list to be sent later
-		if(retainEvents.get()) {
-			retainedEvents.add(e);
+	@Override
+	public synchronized void fireEvent(final Event event) {
+		if (queueEvents) {
+			queuedEvents.add(event);
 			return;
 		}
 
-		e.prepare(appName);
+		event.prepare(appName);
 
-		if (e.isOneTimeOnly()) {
-			if (firedEvents.contains(e.getName())) {
+		if (event.isOneTimeOnly()) {
+			if (oneTimeEventTracker.hasBeenAlreadySent(event)) {
 				Logging.log(Logging.INFO, "Tapstream ignoring event named \"%s\" because it is a " +
-						"one-time-only event that has already been fired", e.getName());
-				return;
-			} else if (firingEvents.contains(e.getName())) {
-				Logging.log(Logging.INFO, "Tapstream ignoring event named \"%s\" because it is a " +
-						"one-time-only event that is already in progress", e.getName());
+						"one-time-only event that has already been fired", event.getName());
 				return;
 			}
-
-			firingEvents.add(e.getName());
+			oneTimeEventTracker.inProgress(event);
 		}
 
-		final Core self = this;
-
-		final HttpRequest eventRequest;
+		final Retry.Retryable<HttpRequest> eventRequest;
 
 		try{
 			eventRequest = RequestBuilders
-					.eventRequestBuilder(accountName, e.getName())
-					.postBody(e.buildPostBody(commonEventParams, config.globalEventParams))
-					.build();
+					.eventRequestBuilder(config.getAccountName(), event.getName())
+					.postBody(event.buildPostBody(commonEventParams, config.getGlobalEventParams()))
+					.build()
+					.makeRetryable(config.getEventRetryStrategy());
 		} catch (MalformedURLException error){
 			// log the error
 			Logging.log(Logging.ERROR, "Tapstream failed to build the request URL: " + error.getMessage());
 			return;
 		}
 
-		fireEvent(e, eventRequest.makeRetryable(config.getEventRetryStrategy()));
+		fireEvent(event, eventRequest);
 	}
 
 	private void fireEvent(final Event event, final Retry.Retryable<HttpRequest> retryableRequest){
-		final Core self = this;
-
 		Runnable task = new Runnable() {
 			public void innerRun() throws IOException {
-				HttpResponse response = platform.sendRequest(retryableRequest.get());
-
-				if (event.isOneTimeOnly()) {
-					synchronized (self) {
-						firingEvents.remove(event.getName());
-
-						if (response.succeeded()){
-							firedEvents.add(event.getName());
-							platform.saveFiredEvents(self.firedEvents);
-						}
-					}
-				}
+				HttpResponse response = client.sendRequest(retryableRequest.get());
 
 				if (response.succeeded()){
 					Logging.log(Logging.INFO, "Tapstream fired event named \"%s\"", event.getName());
+					oneTimeEventTracker.sent(event);
 				} else {
 					if (response.status == 404) {
 						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d\n" +
@@ -231,18 +231,19 @@ class Core implements ExecutorProvider {
 						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d\n" +
 								"Are your account name and application secret correct?  This event " +
 								"will not be retried.", response.status);
+					} else if (response.shouldRetry() && retryableRequest.shouldRetry()) {
+						retryableRequest.incrementAttempt();
+						fireEvent(event, retryableRequest);
 					} else {
+						// Give up
 						String retryMsg = "";
 						if (!response.shouldRetry()) {
 							retryMsg = "  This event will not be retried.";
 						}
 						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d.%s",
 								response.status, retryMsg);
-					}
 
-					if (response.shouldRetry() && retryableRequest.shouldRetry()) {
-						retryableRequest.incrementAttempt();
-						fireEvent(event, retryableRequest);
+						oneTimeEventTracker.failed(event);
 					}
 				}
 			}
@@ -251,18 +252,21 @@ class Core implements ExecutorProvider {
 					innerRun();
 				} catch(Exception ex) {
 					Logging.log(Logging.ERROR, "Tapstream Error: Unhandled exception while firing event: " + ex.getMessage());
+					oneTimeEventTracker.failed(event);
 				}
 			}
 		};
 
-		executor.schedule(task, retryableRequest.getDelay(), TimeUnit.MILLISECONDS);
+		executor.schedule(task, retryableRequest.getDelayMs(), TimeUnit.MILLISECONDS);
 	}
 
-	public void getConversionData(final Callback<JSONObject> callback)
+	@Override
+	public void lookupTimeline(final Callback<TimelineApiResponse> callback)
 	{
 		final Retry.Retryable<HttpRequest> retryable;
 		try {
-			retryable = RequestBuilders.timelineLookupRequestBuilder(secret, platform.loadUuid())
+			retryable = RequestBuilders
+					.timelineLookupRequestBuilder(config.getDeveloperSecret(), platform.loadUuid())
 					.build()
 					.makeRetryable(config.getTimelineLookupRetryStrategy());
 		} catch (MalformedURLException e) {
@@ -272,33 +276,22 @@ class Core implements ExecutorProvider {
 
 		Runnable task = new Runnable() {
 			public void checkedRun() throws IOException{
-				HttpResponse res = platform.sendRequest(retryable.get());
-				if(res.status >= 200 && res.status < 300) {
+				HttpResponse httpResponse = client.sendRequest(retryable.get());
+				if(httpResponse.succeeded()) {
 
 					// Check for the legacy "timeline not found" pattern
-					String responseBody = res.getBodyAsString();
-					Object jsonRoot = new JSONTokener(responseBody).nextValue();
+					TimelineApiResponse apiResponse = new TimelineApiResponse(httpResponse.getBodyAsString());
 
-					if (jsonRoot instanceof JSONArray){
-						// The legacy empty timeline object is an empty array
-						JSONArray jsonRootArray = (JSONArray)jsonRoot;
-
-						if (jsonRootArray.length() == 0){
-							// We found the empty array. Poll again if the retry strategy allows it.
-							if (retryable.shouldRetry()){
-								retryable.incrementAttempt();
-								executor.schedule(this, retryable.getDelay(), TimeUnit.MILLISECONDS);
-							} else {
-								callback.error(new TimelineLookupFailed("Lookup attempts exhausted"));
-							}
+					if (apiResponse.isEmpty()){
+						// We found the empty array. Poll again if the retry strategy allows it.
+						if (retryable.shouldRetry()){
+							retryable.incrementAttempt();
+							executor.schedule(this, retryable.getDelayMs(), TimeUnit.MILLISECONDS);
 						} else {
-							callback.error(new TimelineLookupFailed("Unknown response structure"));
+							callback.error(new com.tapstream.sdk.timeline.TimelineLookupFailed("Lookup attempts exhausted"));
 						}
-
-					} else if (jsonRoot instanceof JSONObject){
-						callback.success((JSONObject)jsonRoot);
 					} else {
-						callback.error(new TimelineLookupFailed("Unknown response structure"));
+						callback.success(apiResponse);
 					}
 				}
 			}
@@ -315,12 +308,9 @@ class Core implements ExecutorProvider {
 		};
 
 		executor.submit(task);
-
-
 	}
 
-	@Override
-	public <T> Future<T> submit(Callable<T> task, int time, TimeUnit unit) {
-		return executor.schedule(task, time, unit);
+	ScheduledExecutorService getExecutor(){
+		return executor;
 	}
 }

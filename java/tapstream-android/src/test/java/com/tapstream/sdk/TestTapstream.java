@@ -1,7 +1,6 @@
 package com.tapstream.sdk;
 
 import android.app.Application;
-import android.content.Context;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
@@ -16,7 +15,7 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
 import java.io.IOException;
@@ -28,7 +27,8 @@ import java.util.Map;
  * Date: 15-05-09
  * Time: 10:49 AM
  */
-@RunWith(RobolectricTestRunner.class)
+@RunWith(RobolectricGradleTestRunner.class)
+@org.robolectric.annotation.Config(constants = BuildConfig.class, sdk=21)
 public class TestTapstream extends TestCase {
 
     Tapstream ts;
@@ -49,8 +49,8 @@ public class TestTapstream extends TestCase {
     class PlatformWithMockApi extends AndroidPlatform {
         Map<String, HttpResponse> responses = new HashMap<String, HttpResponse>();
 
-        public PlatformWithMockApi(Context context) {
-            super(context);
+        public PlatformWithMockApi(Application app) {
+            super(app);
         }
 
         public void registerResponse(HttpResponse response, String method, String url){
@@ -65,32 +65,14 @@ public class TestTapstream extends TestCase {
         }
     }
 
-    static class DelegateImpl implements Delegate{
-
-        @Override
-        public void init(Core core) {  }
-
-        @Override
-        public int getDelay() { return 0; }
-
-        @Override
-        public void setDelay(int delay) {  }
-
-        @Override
-        public boolean isRetryAllowed() { return false; }
-    }
-
     @Before
     public void setUp(){
         Application app = RuntimeEnvironment.application;
         app.getApplicationInfo().name = "TapstreamTest";
         platform = new PlatformWithMockApi(app);
         ts = new Tapstream(
-            new DelegateImpl(),
             platform,
-            new DefaultCoreListener(),
             new ActivityEventSource(),
-            new AdvertisingIdFetcher(app),
             "sdktest", SDKTEST_SECRET, new Config());
     }
 
@@ -107,7 +89,7 @@ public class TestTapstream extends TestCase {
     }
 
     @Test
-    public void testAndroid() throws Exception{
+    public void testWordOfMouth() throws Exception{
         platform.registerResponse(jsonResponse("order.json"), "GET", getOfferUrl("wom", platform.getPackageName()));
         platform.registerResponse(jsonResponse("rewards.json"), "GET", getRewardUrl(platform.loadUuid()));
 

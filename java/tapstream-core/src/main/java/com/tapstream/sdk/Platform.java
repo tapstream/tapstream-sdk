@@ -1,10 +1,7 @@
 package com.tapstream.sdk;
 
-import com.tapstream.sdk.http.HttpRequest;
-import com.tapstream.sdk.http.HttpResponse;
 import com.tapstream.sdk.wordofmouth.Reward;
 
-import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -30,8 +27,6 @@ public interface Platform {
 	String getAppVersion();
 
 	String getPackageName();
-
-	HttpResponse sendRequest(HttpRequest request) throws IOException;
 	
 	String getReferrer();
 
@@ -40,4 +35,6 @@ public interface Platform {
 	void consumeReward(Reward reward);
 
 	Callable<AdvertisingID> getAdIdFetcher();
+
+	ActivityEventSource getActivityEventSource();
 }

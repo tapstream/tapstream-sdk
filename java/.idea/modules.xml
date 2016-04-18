@@ -6,7 +6,6 @@
       <module fileurl="file://$PROJECT_DIR$/tapstream-android/tapstream-android.iml" filepath="$PROJECT_DIR$/tapstream-android/tapstream-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/tapstream-core/tapstream-core.iml" filepath="$PROJECT_DIR$/tapstream-core/tapstream-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/tapstream-example/tapstream-example.iml" filepath="$PROJECT_DIR$/tapstream-example/tapstream-example.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tapstream-test-bridge/tapstream-test-bridge.iml" filepath="$PROJECT_DIR$/tapstream-test-bridge/tapstream-test-bridge.iml" />
     </modules>
   </component>
 </project>
