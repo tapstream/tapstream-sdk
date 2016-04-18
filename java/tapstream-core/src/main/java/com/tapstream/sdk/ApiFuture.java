@@ -93,13 +93,13 @@ public class ApiFuture<T> implements Future<T> {
                 this.callback = callback;
                 break;
             case STATE_ERROR:
-                callback.error(this.error);
+                safeCallbackError(callback, error);
                 break;
             case STATE_DONE:
-                callback.success(obj);
+                safeCallbackSuccess(callback, obj);
                 break;
             case STATE_CANCELLED:
-                callback.error(new CancellationException());
+                safeCallbackError(callback, new CancellationException());
                 break;
         }
     }
@@ -122,6 +122,9 @@ public class ApiFuture<T> implements Future<T> {
 
     @Override
     synchronized public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        long start = System.currentTimeMillis();
+        long timeoutMillis = unit.toMillis(timeout);
+
         while (true) {
             switch (state) {
                 case STATE_DONE:
@@ -131,7 +134,13 @@ public class ApiFuture<T> implements Future<T> {
                 case STATE_CANCELLED:
                     throw new CancellationException();
                 default:
-                    this.wait(unit.toMillis(timeout));
+                    long timeDelta = System.currentTimeMillis() - start;
+                    long timeRemaining = timeoutMillis - timeDelta;
+                    if (timeRemaining > 0){
+                        this.wait(timeRemaining);
+                    } else {
+                        throw new TimeoutException();
+                    }
             }
 
         }
