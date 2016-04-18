@@ -4,13 +4,22 @@ import com.tapstream.sdk.errors.ApiException;
 import com.tapstream.sdk.errors.EventAlreadyFiredException;
 import com.tapstream.sdk.errors.TimelineLookupFailed;
 import com.tapstream.sdk.http.HttpClient;
+import com.tapstream.sdk.http.HttpMethod;
 import com.tapstream.sdk.http.HttpRequest;
 import com.tapstream.sdk.http.HttpResponse;
 import com.tapstream.sdk.http.RequestBuilders;
 import com.tapstream.sdk.http.StdLibHttpClient;
 
+import com.tapstream.sdk.wordofmouth.Offer;
+import com.tapstream.sdk.wordofmouth.Reward;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -330,7 +339,116 @@ class HttpApiClient implements ApiClient {
 		return responseFuture;
 	}
 
+	@Override
+	public  ApiFuture<Offer> getWordOfMouthOffer(final String insertionPoint) {
+		final Retry.Retryable<HttpRequest> retryable;
+		final ApiFuture<Offer> responseFuture = new ApiFuture<Offer>();
+
+		final String bundle = platform.getPackageName();
+		try {
+			retryable = RequestBuilders
+					.wordOfMouthOfferRequestBuilder(config.getDeveloperSecret(), insertionPoint, bundle)
+					.build()
+					.makeRetryable(config.getTimelineLookupRetryStrategy());
+		} catch (MalformedURLException e) {
+			responseFuture.setException(new ApiException(e));
+			return responseFuture;
+		}
+		Runnable task = new Runnable() {
+			public void checkedRun() throws IOException{
+				HttpResponse httpResponse = client.sendRequest(retryable.get());
+				if(httpResponse.succeeded()) {
+					JSONObject responseObject = new JSONObject(httpResponse.getBodyAsString());
+					Offer offer = Offer.fromApiResponse(responseObject);
+					responseFuture.set(offer);
+				}else if((httpResponse.status >= 400 && httpResponse.status <= 499)){
+					responseFuture.setException(new com.tapstream.sdk.wordofmouth.Offer.LookupFailed(
+							"Error in offer lookup: " + httpResponse.getBodyAsString()
+					));
+				}else if(retryable.shouldRetry()) {
+					retryable.incrementAttempt();
+					executor.schedule(this, retryable.getDelayMs(), TimeUnit.MILLISECONDS);
+				}else {
+					responseFuture.setException(new com.tapstream.sdk.wordofmouth.Offer.LookupFailed(
+							"Lookup attempts exhausted"));
+				}
+			}
+
+			@Override
+			public void run() {
+				try {
+					checkedRun();
+				} catch (Exception e){
+					Logging.log(Logging.ERROR, "Unhandled exception during timeline lookup");
+					responseFuture.setException(e);
+				}
+			}
+		};
+
+		executor.submit(task);
+		return responseFuture;
+	}
+
+	private boolean isConsumed(Reward reward){
+		int rewardCount = reward.getInstallCount() / reward.getMinimumInstalls();
+		int consumed = platform.getCountForReward(reward);
+		return consumed >= rewardCount;
+	}
+	@Override
+	public ApiFuture<List<Reward>> getWordOfMouthRewardList() {
+		final Retry.Retryable<HttpRequest> retryable;
+		final ApiFuture<List<Reward>> responseFuture = new ApiFuture<List<Reward>>();
+		try {
+			retryable = RequestBuilders
+					.wordOfMouthRewardRequestBuilder(config.getDeveloperSecret(), platform.loadUuid())
+					.build()
+					.makeRetryable(config.getTimelineLookupRetryStrategy());
+		} catch (MalformedURLException e) {
+			responseFuture.setException(new ApiException(e));
+			Logging.log(Logging.ERROR, "Tapstream Error: Failed to build offer lookup URL");
+			return responseFuture;
+		}
+		Runnable task = new Runnable() {
+			public void checkedRun() throws IOException {
+
+				HttpResponse httpResponse = client.sendRequest(retryable.get());
+				if (httpResponse.succeeded()) {
+					JSONArray responseObject = new JSONArray(httpResponse.getBodyAsString());
+					List<Reward> result = new ArrayList<Reward>(responseObject.length());
+
+					for (int ii = 0; ii < responseObject.length(); ii++) {
+						Reward reward = Reward.fromApiResponse(responseObject.getJSONObject(ii));
+						if (!isConsumed(reward)) {
+							result.add(reward);
+						}
+					}
+					responseFuture.set(result);
+				}else if((httpResponse.status >= 400 && httpResponse.status <= 499)){
+					responseFuture.setException(new com.tapstream.sdk.wordofmouth.Reward.LookupFailed(
+							"Error in reward lookup: " + httpResponse.getBodyAsString()));
+				}else if(retryable.shouldRetry()) {
+					retryable.incrementAttempt();
+					executor.schedule(this, retryable.getDelayMs(), TimeUnit.MILLISECONDS);
+				}else {
+					responseFuture.setException(new com.tapstream.sdk.wordofmouth.Reward.LookupFailed(
+							"Lookup attempts exhausted"));
+				}
+			}
+			public void run(){
+				try {
+					checkedRun();
+				}catch(Exception e){
+					Logging.log(Logging.WARN, e.getMessage());
+					responseFuture.setException(e);
+				}
+			}
+		};
+		executor.submit(task);
+		return responseFuture;
+	}
+
+
 	ScheduledExecutorService getExecutor(){
 		return executor;
-	}
+ 	}
 }

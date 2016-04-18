@@ -2,27 +2,30 @@ package com.tapstream.sdk;
 
 import android.app.Application;
 
+import com.tapstream.sdk.wordofmouth.Offer;
+import com.tapstream.sdk.wordofmouth.Reward;
+
 import com.tapstream.sdk.wordofmouth.WordOfMouth;
+import com.tapstream.sdk.wordofmouth.WordOfMouthImpl;
 
 import java.io.IOException;
+import java.util.List;
 
 public class Tapstream implements AndroidApiClient {
 	private static Tapstream instance;
 	private WordOfMouth wom;
-	private Platform platform;
 	private ApiClient client;
 
 	public interface ClientBuilder {
-		ApiClient build(Application app, Config config);
+		ApiClient build(Platform platform, Config config);
 	}
 
 	private static ClientBuilder clientBuilder;
 
 	public static class DefaultClientBuilder implements ClientBuilder {
-
 		@Override
-		public ApiClient build(Application app, Config config) {
-			HttpApiClient client = new HttpApiClient(new AndroidPlatform(app), config);
+		public ApiClient build(Platform platform, Config config) {
+			HttpApiClient client = new HttpApiClient(platform, config);
 			client.start();
 			return client;
 		}
@@ -35,7 +38,12 @@ public class Tapstream implements AndroidApiClient {
 	synchronized public static void create(Application app, Config config) {
 		if (instance == null) {
 			ClientBuilder builder = clientBuilder == null ? new DefaultClientBuilder() : clientBuilder;
-			instance = new Tapstream(builder.build(app, config));
+			final Platform platform = new AndroidPlatform(app);
+			if(config.getUseWordOfMouth()) {
+				instance = new Tapstream(builder.build(platform, config));
+			}else{
+				instance = new Tapstream(builder.build(platform, config), WordOfMouthImpl.getInstance(platform));
+			}
 		} else {
 			Logging.log(Logging.WARN, "Tapstream Warning: Tapstream already instantiated, it cannot be re-created.");
 		}
@@ -50,6 +58,12 @@ public class Tapstream implements AndroidApiClient {
 
 	Tapstream(ApiClient client){
 		this.client = client;
+		this.wom = null;
+	}
+
+	Tapstream(ApiClient client, WordOfMouth wom){
+		this.client = client;
+		this.wom = wom;
 	}
 
 	@Override
@@ -68,12 +82,17 @@ public class Tapstream implements AndroidApiClient {
 	}
 
 	@Override
-	synchronized public WordOfMouth getWordOfMouth(){
-//		if(wom == null) {
-//			wom = WordOfMouthImpl.getInstance(client.getExecutor(), platform, secret, platform.getPackageName());
-//		}
-//		return wom;
+	public ApiFuture<Offer> getWordOfMouthOffer(String insertionPoint) {
+		return client.getWordOfMouthOffer(insertionPoint);
+	}
 
-		return null;
+	@Override
+	public ApiFuture<List<Reward>> getWordOfMouthRewardList() {
+		return client.getWordOfMouthRewardList();
+	}
+
+	@Override
+	public WordOfMouth getWordOfMouth(){
+		return wom;
 	}
 }

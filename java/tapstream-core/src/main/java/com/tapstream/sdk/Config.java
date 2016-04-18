@@ -33,6 +33,9 @@ public class Config {
 
 	// Unset this if you want to disable automatic collection of Android Advertising Id
 	private boolean collectAdvertisingId = true;
+
+	// Unset this to save a little memory by not using the WordOfMouth feature.
+	private boolean useWordOfMouth = false;
 	
 	// These parameters will be automatically attached to all events fired by the sdk.
 	private final Map<String, String> globalEventParams = new HashMap<String, String>();
@@ -88,4 +91,8 @@ public class Config {
 
 	public Retry.Strategy getTimelineLookupRetryStrategy() {return timelineLookupRetryStrategy;}
 	public void setTimelineLookupRetryStrategy(Retry.Strategy timelineLookupRetryStrategy) { this.timelineLookupRetryStrategy = timelineLookupRetryStrategy; }
+
+	public boolean getUseWordOfMouth(){return useWordOfMouth;}
+	public void setUseWordOfMouth(boolean v){ useWordOfMouth = v;}
+
 }
