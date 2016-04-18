@@ -4,7 +4,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 
-public class DeamonThreadFactory implements ThreadFactory {
+public class DaemonThreadFactory implements ThreadFactory {
 
     private final ThreadFactory defaultThreadFactory = Executors.defaultThreadFactory();
 

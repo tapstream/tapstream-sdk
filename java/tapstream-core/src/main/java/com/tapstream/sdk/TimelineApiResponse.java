@@ -1,20 +1,29 @@
-package com.tapstream.sdk.timeline;
+package com.tapstream.sdk;
+
+import com.tapstream.sdk.http.HttpResponse;
 
 import org.json.JSONObject;
 
 import java.util.regex.Pattern;
 
 
-public class TimelineApiResponse {
+public class TimelineApiResponse implements ApiResponse{
 
     private static final Pattern legacyEmptyTimelinePattern = Pattern.compile("^\\s*\\[\\s*\\]\\s*$");
 
+    private final HttpResponse httpResponse;
     private final String rawResponse;
     private final boolean isEmpty;
 
-    public TimelineApiResponse(String rawResponse){
-        this.rawResponse = rawResponse;
+    public TimelineApiResponse(HttpResponse httpResponse){
+        this.httpResponse = httpResponse;
+        this.rawResponse = httpResponse.getBodyAsString();
         this.isEmpty = legacyEmptyTimelinePattern.matcher(rawResponse).matches();
+    }
+
+    @Override
+    public HttpResponse getHttpResponse(){
+        return httpResponse;
     }
 
     /**

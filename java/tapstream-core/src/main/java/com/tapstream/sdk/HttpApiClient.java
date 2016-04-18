@@ -1,11 +1,13 @@
 package com.tapstream.sdk;
 
+import com.tapstream.sdk.errors.ApiException;
+import com.tapstream.sdk.errors.EventAlreadyFiredException;
+import com.tapstream.sdk.errors.TimelineLookupFailed;
 import com.tapstream.sdk.http.HttpClient;
 import com.tapstream.sdk.http.HttpRequest;
 import com.tapstream.sdk.http.HttpResponse;
 import com.tapstream.sdk.http.RequestBuilders;
 import com.tapstream.sdk.http.StdLibHttpClient;
-import com.tapstream.sdk.timeline.TimelineApiResponse;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -31,14 +33,14 @@ class HttpApiClient implements ApiClient {
 	private final OneTimeOnlyEventTracker oneTimeEventTracker;
 
 	private boolean queueEvents = true;
-	private List<Event> queuedEvents = new ArrayList<Event>();
+	private List<QueuedEvent> queuedEvents = new ArrayList<QueuedEvent>();
 
 	private Event.Params commonEventParams;
 	private final String appName;
 
 
 	HttpApiClient(Platform platform, Config config){
-		this(platform, config, new StdLibHttpClient(), Executors.newSingleThreadScheduledExecutor(new DeamonThreadFactory()));
+		this(platform, config, new StdLibHttpClient(), Executors.newSingleThreadScheduledExecutor(new DaemonThreadFactory()));
 	}
 
 	HttpApiClient(Platform platform, Config config, HttpClient client, ScheduledExecutorService executor) {
@@ -70,8 +72,10 @@ class HttpApiClient implements ApiClient {
 
 
 	public void start() {
-		if (!started.compareAndSet(false, true))
+		if (!started.compareAndSet(false, true)) {
+			Logging.log(Logging.WARN, "Client has already been started");
 			return;
+		}
 
 		if(config.getFireAutomaticInstallEvent()) {
 			String installEventName = config.getInstallEventName();
@@ -92,17 +96,20 @@ class HttpApiClient implements ApiClient {
 		}
 
 		if (config.getFireAutomaticOpenEvent()){
-			platform.getActivityEventSource().setListener(new ActivityEventSource.ActivityListener() {
-				@Override
-				public void onOpen() {
-					String openEventName = config.getOpenEventName();
-					if(openEventName != null) {
-						fireEvent(new Event(openEventName, false));
-					} else {
-						fireEvent(new Event(String.format(Locale.US, "android-%s-open", appName), false));
+			ActivityEventSource eventSource = platform.getActivityEventSource();
+			if (eventSource != null){
+				eventSource.setListener(new ActivityEventSource.ActivityListener() {
+					@Override
+					public void onOpen() {
+						String openEventName = config.getOpenEventName();
+						if(openEventName != null) {
+							fireEvent(new Event(openEventName, false));
+						} else {
+							fireEvent(new Event(String.format(Locale.US, "android-%s-open", appName), false));
+						}
 					}
-				}
-			});
+				});
+			}
 		}
 
 		executor.submit(new Runnable() {
@@ -171,8 +178,8 @@ class HttpApiClient implements ApiClient {
 	private synchronized void dispatchQueuedEvents(){
 		queueEvents = false;
 
-		for(Event e: queuedEvents) {
-			fireEvent(e);
+		for(QueuedEvent e: queuedEvents) {
+			prepareAndSendEvent(e.getEvent(), e.getResponseFuture());
 		}
 
 		queuedEvents = null;
@@ -180,9 +187,15 @@ class HttpApiClient implements ApiClient {
 
 
 	@Override
-	public synchronized void fireEvent(final Event event) {
+	public ApiFuture<EventApiResponse> fireEvent(final Event event) {
+		ApiFuture<EventApiResponse> responseFuture = new ApiFuture<EventApiResponse>();
+		prepareAndSendEvent(event, responseFuture);
+		return responseFuture;
+	}
+
+	synchronized private void prepareAndSendEvent(final Event event, final ApiFuture<EventApiResponse> responseFuture){
 		if (queueEvents) {
-			queuedEvents.add(event);
+			queuedEvents.add(new QueuedEvent(event, responseFuture));
 			return;
 		}
 
@@ -192,6 +205,7 @@ class HttpApiClient implements ApiClient {
 			if (oneTimeEventTracker.hasBeenAlreadySent(event)) {
 				Logging.log(Logging.INFO, "Tapstream ignoring event named \"%s\" because it is a " +
 						"one-time-only event that has already been fired", event.getName());
+				responseFuture.setException(new EventAlreadyFiredException());
 				return;
 			}
 			oneTimeEventTracker.inProgress(event);
@@ -206,15 +220,15 @@ class HttpApiClient implements ApiClient {
 					.build()
 					.makeRetryable(config.getEventRetryStrategy());
 		} catch (MalformedURLException error){
-			// log the error
-			Logging.log(Logging.ERROR, "Tapstream failed to build the request URL: " + error.getMessage());
+			responseFuture.setException(new ApiException(error));
 			return;
 		}
 
-		fireEvent(event, eventRequest);
+		sendEventRequest(event, responseFuture, eventRequest);
+
 	}
 
-	private void fireEvent(final Event event, final Retry.Retryable<HttpRequest> retryableRequest){
+	private void sendEventRequest(final Event event, final ApiFuture<EventApiResponse> responseFuture, final Retry.Retryable<HttpRequest> retryableRequest){
 		Runnable task = new Runnable() {
 			public void innerRun() throws IOException {
 				HttpResponse response = client.sendRequest(retryableRequest.get());
@@ -222,6 +236,7 @@ class HttpApiClient implements ApiClient {
 				if (response.succeeded()){
 					Logging.log(Logging.INFO, "Tapstream fired event named \"%s\"", event.getName());
 					oneTimeEventTracker.sent(event);
+					responseFuture.set(new EventApiResponse(response));
 				} else {
 					if (response.status == 404) {
 						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d\n" +
@@ -233,7 +248,7 @@ class HttpApiClient implements ApiClient {
 								"will not be retried.", response.status);
 					} else if (response.shouldRetry() && retryableRequest.shouldRetry()) {
 						retryableRequest.incrementAttempt();
-						fireEvent(event, retryableRequest);
+						sendEventRequest(event, responseFuture, retryableRequest);
 					} else {
 						// Give up
 						String retryMsg = "";
@@ -244,6 +259,7 @@ class HttpApiClient implements ApiClient {
 								response.status, retryMsg);
 
 						oneTimeEventTracker.failed(event);
+						responseFuture.setException(new ApiException("Failed to fire event"));
 					}
 				}
 			}
@@ -253,6 +269,7 @@ class HttpApiClient implements ApiClient {
 				} catch(Exception ex) {
 					Logging.log(Logging.ERROR, "Tapstream Error: Unhandled exception while firing event: " + ex.getMessage());
 					oneTimeEventTracker.failed(event);
+					responseFuture.setException(new ApiException(ex));
 				}
 			}
 		};
@@ -261,8 +278,10 @@ class HttpApiClient implements ApiClient {
 	}
 
 	@Override
-	public void lookupTimeline(final Callback<TimelineApiResponse> callback)
+	public ApiFuture<TimelineApiResponse> lookupTimeline()
 	{
+		final ApiFuture<TimelineApiResponse> responseFuture = new ApiFuture<TimelineApiResponse>();
+
 		final Retry.Retryable<HttpRequest> retryable;
 		try {
 			retryable = RequestBuilders
@@ -270,8 +289,8 @@ class HttpApiClient implements ApiClient {
 					.build()
 					.makeRetryable(config.getTimelineLookupRetryStrategy());
 		} catch (MalformedURLException e) {
-			Logging.log(Logging.ERROR, "Tapstream Error: Failed to build timeline lookup URL");
-			return;
+			responseFuture.setException(new ApiException(e));
+			return responseFuture;
 		}
 
 		Runnable task = new Runnable() {
@@ -280,7 +299,7 @@ class HttpApiClient implements ApiClient {
 				if(httpResponse.succeeded()) {
 
 					// Check for the legacy "timeline not found" pattern
-					TimelineApiResponse apiResponse = new TimelineApiResponse(httpResponse.getBodyAsString());
+					TimelineApiResponse apiResponse = new TimelineApiResponse(httpResponse);
 
 					if (apiResponse.isEmpty()){
 						// We found the empty array. Poll again if the retry strategy allows it.
@@ -288,10 +307,10 @@ class HttpApiClient implements ApiClient {
 							retryable.incrementAttempt();
 							executor.schedule(this, retryable.getDelayMs(), TimeUnit.MILLISECONDS);
 						} else {
-							callback.error(new com.tapstream.sdk.timeline.TimelineLookupFailed("Lookup attempts exhausted"));
+							responseFuture.setException(new TimelineLookupFailed("Lookup attempts exhausted"));
 						}
 					} else {
-						callback.success(apiResponse);
+						responseFuture.set(apiResponse);
 					}
 				}
 			}
@@ -302,12 +321,13 @@ class HttpApiClient implements ApiClient {
 					checkedRun();
 				} catch (Exception e){
 					Logging.log(Logging.ERROR, "Unhandled exception during timeline lookup");
-					callback.error(e);
+					responseFuture.setException(e);
 				}
 			}
 		};
 
 		executor.submit(task);
+		return responseFuture;
 	}
 
 	ScheduledExecutorService getExecutor(){

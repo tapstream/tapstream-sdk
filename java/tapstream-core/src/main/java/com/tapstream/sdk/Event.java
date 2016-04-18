@@ -213,21 +213,21 @@ public class Event {
 		}
 	}
 
-	<T> RequestBody buildPostBody(final Params commonParams, final Map<String, T> globalCustomParams){
+	RequestBody buildPostBody(final Params commonParams, final Map<String, String> globalCustomParams){
 		final FormPostBody body = new FormPostBody();
 
 		body.add(commonParams.toMap());
 		body.add(params.toMap());
 
 		if (globalCustomParams != null){
-			for(Map.Entry<String, T> entry : globalCustomParams.entrySet()) {
-				body.add("custom-" + entry.getKey(), entry.getValue().toString());
+			for(Map.Entry<String, String> entry : globalCustomParams.entrySet()) {
+				body.add("custom-" + entry.getKey(), entry.getValue());
 			}
 		}
 
 		if (customParams != null){
 			for (Map.Entry<String, String> entry: customParams.toMap().entrySet()){
-				body.add("custom-" + entry.getKey(), entry.getValue().toString());
+				body.add("custom-" + entry.getKey(), entry.getValue());
 			}
 		}
 

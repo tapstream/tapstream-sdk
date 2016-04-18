@@ -1,7 +1,7 @@
-package com.tapstream.sdk.timeline;
+package com.tapstream.sdk.errors;
 
 
-public class TimelineLookupFailed extends Exception {
+public class TimelineLookupFailed extends ApiException {
 
     public TimelineLookupFailed() {
     }

@@ -2,7 +2,6 @@ package com.tapstream.sdk;
 
 import android.app.Application;
 
-import com.tapstream.sdk.timeline.TimelineApiResponse;
 import com.tapstream.sdk.wordofmouth.WordOfMouth;
 
 import java.io.IOException;
@@ -59,13 +58,13 @@ public class Tapstream implements AndroidApiClient {
 	}
 
 	@Override
-	public void fireEvent(Event e) {
-		client.fireEvent(e);
+	public ApiFuture<EventApiResponse> fireEvent(Event e) {
+		return client.fireEvent(e);
 	}
 
 	@Override
-	public void lookupTimeline(Callback<TimelineApiResponse> completion) {
-		client.lookupTimeline(completion);
+	public ApiFuture<TimelineApiResponse> lookupTimeline() {
+		return client.lookupTimeline();
 	}
 
 	@Override
