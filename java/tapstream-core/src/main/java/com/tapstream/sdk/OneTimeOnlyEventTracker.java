@@ -18,7 +18,7 @@ public class OneTimeOnlyEventTracker {
     synchronized public boolean hasBeenAlreadySent(Event event){
         if (!event.isOneTimeOnly())
             return false;
-        return eventsAlreadyFired.contains(event) || eventsInProgress.contains(event);
+        return eventsAlreadyFired.contains(event.getName()) || eventsInProgress.contains(event.getName());
     }
 
     synchronized public void sent(Event event){

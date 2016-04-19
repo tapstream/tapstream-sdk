@@ -7,6 +7,10 @@ public class HttpResponse {
 	final public String message;
 	final public byte[] body;
 
+	public HttpResponse(int status, String message){
+		this(status, message, new byte[0]);
+	}
+
 	public HttpResponse(int status, String message, byte[] body) {
 		this.status = status;
 		this.message = message;

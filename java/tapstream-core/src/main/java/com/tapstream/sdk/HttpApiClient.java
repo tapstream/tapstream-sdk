@@ -4,22 +4,18 @@ import com.tapstream.sdk.errors.ApiException;
 import com.tapstream.sdk.errors.EventAlreadyFiredException;
 import com.tapstream.sdk.errors.TimelineLookupFailed;
 import com.tapstream.sdk.http.HttpClient;
-import com.tapstream.sdk.http.HttpMethod;
 import com.tapstream.sdk.http.HttpRequest;
 import com.tapstream.sdk.http.HttpResponse;
 import com.tapstream.sdk.http.RequestBuilders;
 import com.tapstream.sdk.http.StdLibHttpClient;
-
 import com.tapstream.sdk.wordofmouth.Offer;
 import com.tapstream.sdk.wordofmouth.Reward;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -45,8 +41,6 @@ class HttpApiClient implements ApiClient {
 	private List<QueuedEvent> queuedEvents = new ArrayList<QueuedEvent>();
 
 	private Event.Params commonEventParams;
-	private final String appName;
-
 
 	HttpApiClient(Platform platform, Config config){
 		this(platform, config, new StdLibHttpClient(), Executors.newSingleThreadScheduledExecutor(new DaemonThreadFactory()));
@@ -57,12 +51,6 @@ class HttpApiClient implements ApiClient {
 		this.config = config;
 		this.client = client;
 		this.executor = executor;
-
-		String appName = platform.getAppName();
-		if (appName == null) {
-			appName = "";
-		}
-		this.appName = appName;
 		this.oneTimeEventTracker = new OneTimeOnlyEventTracker(platform);
 	}
 
@@ -85,6 +73,8 @@ class HttpApiClient implements ApiClient {
 			Logging.log(Logging.WARN, "Client has already been started");
 			return;
 		}
+
+		final String appName = Utils.getOrDefault(platform.getAppName(), "");
 
 		if(config.getFireAutomaticInstallEvent()) {
 			String installEventName = config.getInstallEventName();
@@ -208,7 +198,7 @@ class HttpApiClient implements ApiClient {
 			return;
 		}
 
-		event.prepare(appName);
+		event.prepare(Utils.getOrDefault(platform.getAppName(), ""));
 
 		if (event.isOneTimeOnly()) {
 			if (oneTimeEventTracker.hasBeenAlreadySent(event)) {
@@ -307,9 +297,7 @@ class HttpApiClient implements ApiClient {
 				HttpResponse httpResponse = client.sendRequest(retryable.get());
 				if(httpResponse.succeeded()) {
 
-					// Check for the legacy "timeline not found" pattern
 					TimelineApiResponse apiResponse = new TimelineApiResponse(httpResponse);
-
 					if (apiResponse.isEmpty()){
 						// We found the empty array. Poll again if the retry strategy allows it.
 						if (retryable.shouldRetry()){
@@ -362,14 +350,14 @@ class HttpApiClient implements ApiClient {
 					Offer offer = Offer.fromApiResponse(responseObject);
 					responseFuture.set(offer);
 				}else if((httpResponse.status >= 400 && httpResponse.status <= 499)){
-					responseFuture.setException(new com.tapstream.sdk.wordofmouth.Offer.LookupFailed(
+					responseFuture.setException(new Offer.LookupFailed(
 							"Error in offer lookup: " + httpResponse.getBodyAsString()
 					));
 				}else if(retryable.shouldRetry()) {
 					retryable.incrementAttempt();
 					executor.schedule(this, retryable.getDelayMs(), TimeUnit.MILLISECONDS);
 				}else {
-					responseFuture.setException(new com.tapstream.sdk.wordofmouth.Offer.LookupFailed(
+					responseFuture.setException(new Offer.LookupFailed(
 							"Lookup attempts exhausted"));
 				}
 			}
@@ -424,13 +412,13 @@ class HttpApiClient implements ApiClient {
 					}
 					responseFuture.set(result);
 				}else if((httpResponse.status >= 400 && httpResponse.status <= 499)){
-					responseFuture.setException(new com.tapstream.sdk.wordofmouth.Reward.LookupFailed(
+					responseFuture.setException(new Reward.LookupFailed(
 							"Error in reward lookup: " + httpResponse.getBodyAsString()));
 				}else if(retryable.shouldRetry()) {
 					retryable.incrementAttempt();
 					executor.schedule(this, retryable.getDelayMs(), TimeUnit.MILLISECONDS);
 				}else {
-					responseFuture.setException(new com.tapstream.sdk.wordofmouth.Reward.LookupFailed(
+					responseFuture.setException(new Reward.LookupFailed(
 							"Lookup attempts exhausted"));
 				}
 			}
@@ -447,8 +435,4 @@ class HttpApiClient implements ApiClient {
 		return responseFuture;
 	}
 
-
-	ScheduledExecutorService getExecutor(){
-		return executor;
- 	}
 }

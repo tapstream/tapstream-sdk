@@ -30,4 +30,10 @@ public class Utils {
         }
     }
 
+    public static <T> T getOrDefault(T value, T defaultValue){
+        if (value != null)
+            return value;
+        return defaultValue;
+    }
+
 }
