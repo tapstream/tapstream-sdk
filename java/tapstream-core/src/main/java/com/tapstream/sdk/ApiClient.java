@@ -10,5 +10,10 @@ public interface ApiClient extends Closeable {
 	ApiFuture<EventApiResponse> fireEvent(Event e);
 	ApiFuture<TimelineApiResponse> lookupTimeline();
 	ApiFuture<Offer> getWordOfMouthOffer(final String insertionPoint);
+
+	/**
+	 * TODO
+	 * @return
+	 */
 	ApiFuture<List<Reward>> getWordOfMouthRewardList();
 }

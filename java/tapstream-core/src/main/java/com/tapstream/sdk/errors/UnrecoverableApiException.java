@@ -3,30 +3,30 @@ package com.tapstream.sdk.errors;
 
 import com.tapstream.sdk.http.HttpResponse;
 
-public class UnrecoverableHttpException extends ApiException {
+public class UnrecoverableApiException extends ApiException {
 
     final private HttpResponse response;
 
-    public UnrecoverableHttpException(HttpResponse response) {
+    public UnrecoverableApiException(HttpResponse response) {
         this.response = response;
     }
 
-    public UnrecoverableHttpException(HttpResponse response, String message) {
+    public UnrecoverableApiException(HttpResponse response, String message) {
         super(message);
         this.response = response;
     }
 
-    public UnrecoverableHttpException(HttpResponse response, String message, Throwable cause) {
+    public UnrecoverableApiException(HttpResponse response, String message, Throwable cause) {
         super(message, cause);
         this.response = response;
     }
 
-    public UnrecoverableHttpException(HttpResponse response, Throwable cause) {
+    public UnrecoverableApiException(HttpResponse response, Throwable cause) {
         super(cause);
         this.response = response;
     }
 
-    public UnrecoverableHttpException(HttpResponse response, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public UnrecoverableApiException(HttpResponse response, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
         this.response = response;
     }

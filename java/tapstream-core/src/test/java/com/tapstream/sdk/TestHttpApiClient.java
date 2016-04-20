@@ -3,7 +3,7 @@ package com.tapstream.sdk;
 import com.google.common.io.Resources;
 import com.tapstream.sdk.errors.EventAlreadyFiredException;
 import com.tapstream.sdk.errors.RetriesExhaustedException;
-import com.tapstream.sdk.errors.UnrecoverableHttpException;
+import com.tapstream.sdk.errors.UnrecoverableApiException;
 import com.tapstream.sdk.http.HttpClient;
 import com.tapstream.sdk.http.HttpRequest;
 import com.tapstream.sdk.http.HttpResponse;
@@ -140,7 +140,7 @@ public class TestHttpApiClient {
             assertThat(firstResponse.get().getHttpResponse().getStatus(), is(200));
             fail("Expected retries exhausted exception");
         } catch (ExecutionException e){
-            assertThat(e.getCause(), is(instanceOf(UnrecoverableHttpException.class)));
+            assertThat(e.getCause(), is(instanceOf(UnrecoverableApiException.class)));
         }
 
         verify(httpClient, times(1)).sendRequest((HttpRequest) anyObject());

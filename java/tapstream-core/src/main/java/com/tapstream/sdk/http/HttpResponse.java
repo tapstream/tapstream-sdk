@@ -1,5 +1,9 @@
 package com.tapstream.sdk.http;
 
+import com.tapstream.sdk.errors.ApiException;
+import com.tapstream.sdk.errors.RecoverableApiException;
+import com.tapstream.sdk.errors.UnrecoverableApiException;
+
 import java.io.UnsupportedEncodingException;
 
 public class HttpResponse {
@@ -47,6 +51,18 @@ public class HttpResponse {
 	}
 
 	public boolean shouldRetry(){
+
 		return status >= 500 && status < 600;
+	}
+
+	public void throwOnError() throws ApiException{
+		if(this.succeeded()){
+			return;
+		}
+
+		if(this.shouldRetry()) {
+			throw new RecoverableApiException(this);
+		}
+        throw new UnrecoverableApiException(this, "Word of Mouth reward lookup failed.");
 	}
 };
