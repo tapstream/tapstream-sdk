@@ -80,7 +80,7 @@ public class Retry {
         private final T obj;
         private final Retry.Strategy retryStrategy;
 
-        private int attempt = 0;
+        private int attempt = 1;
         private final long firstSent = System.currentTimeMillis();
 
         public Retryable(T obj, Retry.Strategy retryStrategy) {

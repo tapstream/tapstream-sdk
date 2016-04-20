@@ -2,10 +2,11 @@ package com.tapstream.sdk;
 
 import com.google.common.io.Resources;
 import com.tapstream.sdk.errors.EventAlreadyFiredException;
+import com.tapstream.sdk.errors.RetriesExhaustedException;
+import com.tapstream.sdk.errors.UnrecoverableHttpException;
 import com.tapstream.sdk.http.HttpClient;
 import com.tapstream.sdk.http.HttpRequest;
 import com.tapstream.sdk.http.HttpResponse;
-
 import com.tapstream.sdk.http.RequestBuilders;
 import com.tapstream.sdk.wordofmouth.Offer;
 import com.tapstream.sdk.wordofmouth.Reward;
@@ -13,33 +14,35 @@ import com.tapstream.sdk.wordofmouth.Reward;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import org.mockito.Mock;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static com.tapstream.sdk.matchers.RequestURLMatcher.urlEq;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class TestHttpApiClient {
@@ -62,6 +65,8 @@ public class TestHttpApiClient {
         when(platform.loadFiredEvents()).thenReturn(alreadyFired);
         httpClient = mock(HttpClient.class);
         config = new Config("accountName", "theSecret");
+        config.setFireAutomaticInstallEvent(false);
+        config.setFireAutomaticOpenEvent(false);
         executor = Executors.newSingleThreadScheduledExecutor(new DaemonThreadFactory());
         apiClient = new HttpApiClient(platform, config, httpClient, executor);
     }
@@ -74,14 +79,73 @@ public class TestHttpApiClient {
 
     @Test
     public void testFireEvent() throws Exception {
-        apiClient.start();
         when(httpClient.sendRequest(any(HttpRequest.class))).thenReturn(new HttpResponse(200, "OK"));
+        apiClient.start();
         Event event = new Event("eventName", false);
         ApiFuture<EventApiResponse> firstResponse = apiClient.fireEvent(event);
         ApiFuture<EventApiResponse> secondResponse = apiClient.fireEvent(event);
         assertThat(firstResponse.get().getHttpResponse().getStatus(), is(200));
         assertThat(secondResponse.get().getHttpResponse().getStatus(), is(200));
     }
+
+    @Test(timeout=1000)
+    public void testFireEventWithRetries() throws Exception{
+        apiClient.start();
+        config.setEventRetryStrategy(new Retry.FixedDelay(100, 5));
+        when(httpClient.sendRequest(any(HttpRequest.class)))
+                .thenReturn(new HttpResponse(500, "ERROR"))
+                .thenReturn(new HttpResponse(500, "ERROR"))
+                .thenReturn(new HttpResponse(200, "OK"));
+        Event event = new Event("eventName", false);
+        ApiFuture<EventApiResponse> firstResponse = apiClient.fireEvent(event);
+        assertThat(firstResponse.get().getHttpResponse().getStatus(), is(200));
+        verify(httpClient, times(3)).sendRequest((HttpRequest) anyObject());
+    }
+
+    @Test(timeout=1000)
+    public void testFireEventWithRetriesExhausted() throws Exception{
+        apiClient.start();
+
+        config.setEventRetryStrategy(new Retry.FixedDelay(100, 1));
+        when(httpClient.sendRequest(any(HttpRequest.class)))
+                .thenReturn(new HttpResponse(500, "ERROR"));
+
+        Event event = new Event("eventName", false);
+        ApiFuture<EventApiResponse> firstResponse = apiClient.fireEvent(event);
+
+        try {
+            assertThat(firstResponse.get().getHttpResponse().getStatus(), is(200));
+            fail("Expected retries exhausted exception");
+        } catch (ExecutionException e){
+            assertThat(e.getCause(), is(instanceOf(RetriesExhaustedException.class)));
+        }
+
+        verify(httpClient, times(1)).sendRequest((HttpRequest) anyObject());
+    }
+
+
+    @Test
+    public void testFireEventWithHardFail() throws Exception{
+        apiClient.start();
+
+        config.setEventRetryStrategy(new Retry.FixedDelay(100, 5));
+        when(httpClient.sendRequest(any(HttpRequest.class)))
+                .thenReturn(new HttpResponse(404, "ERROR"))
+                .thenReturn(new HttpResponse(200, "OK"));
+
+        Event event = new Event("eventName", false);
+        ApiFuture<EventApiResponse> firstResponse = apiClient.fireEvent(event);
+
+        try {
+            assertThat(firstResponse.get().getHttpResponse().getStatus(), is(200));
+            fail("Expected retries exhausted exception");
+        } catch (ExecutionException e){
+            assertThat(e.getCause(), is(instanceOf(UnrecoverableHttpException.class)));
+        }
+
+        verify(httpClient, times(1)).sendRequest((HttpRequest) anyObject());
+    }
+
 
 
     @Test(expected = EventAlreadyFiredException.class)

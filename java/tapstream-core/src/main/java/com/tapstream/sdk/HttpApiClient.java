@@ -2,7 +2,8 @@ package com.tapstream.sdk;
 
 import com.tapstream.sdk.errors.ApiException;
 import com.tapstream.sdk.errors.EventAlreadyFiredException;
-import com.tapstream.sdk.errors.TimelineLookupFailed;
+import com.tapstream.sdk.errors.RetriesExhaustedException;
+import com.tapstream.sdk.errors.UnrecoverableHttpException;
 import com.tapstream.sdk.http.HttpClient;
 import com.tapstream.sdk.http.HttpRequest;
 import com.tapstream.sdk.http.HttpResponse;
@@ -42,6 +43,7 @@ class HttpApiClient implements ApiClient {
 
 	private Event.Params commonEventParams;
 
+
 	HttpApiClient(Platform platform, Config config){
 		this(platform, config, new StdLibHttpClient(), Executors.newSingleThreadScheduledExecutor(new DaemonThreadFactory()));
 	}
@@ -69,8 +71,8 @@ class HttpApiClient implements ApiClient {
 
 
 	public void start() {
+
 		if (!started.compareAndSet(false, true)) {
-			Logging.log(Logging.WARN, "Client has already been started");
 			return;
 		}
 
@@ -86,15 +88,6 @@ class HttpApiClient implements ApiClient {
 		}
 
 		if(config.getFireAutomaticOpenEvent()) {
-			String openEventName = config.getOpenEventName();
-			if(openEventName != null) {
-				fireEvent(new Event(openEventName, false));
-			} else {
-				fireEvent(new Event(String.format(Locale.US, "android-%s-open", appName), false));
-			}
-		}
-
-		if (config.getFireAutomaticOpenEvent()){
 			ActivityEventSource eventSource = platform.getActivityEventSource();
 			if (eventSource != null){
 				eventSource.setListener(new ActivityEventSource.ActivityListener() {
@@ -188,43 +181,51 @@ class HttpApiClient implements ApiClient {
 	@Override
 	public ApiFuture<EventApiResponse> fireEvent(final Event event) {
 		ApiFuture<EventApiResponse> responseFuture = new ApiFuture<EventApiResponse>();
-		prepareAndSendEvent(event, responseFuture);
+		try {
+			prepareAndSendEvent(event, responseFuture);
+		} catch (Exception e){
+			responseFuture.setException(e);
+		}
 		return responseFuture;
 	}
 
 	synchronized private void prepareAndSendEvent(final Event event, final ApiFuture<EventApiResponse> responseFuture){
-		if (queueEvents) {
-			queuedEvents.add(new QueuedEvent(event, responseFuture));
-			return;
-		}
-
-		event.prepare(Utils.getOrDefault(platform.getAppName(), ""));
-
-		if (event.isOneTimeOnly()) {
-			if (oneTimeEventTracker.hasBeenAlreadySent(event)) {
-				Logging.log(Logging.INFO, "Tapstream ignoring event named \"%s\" because it is a " +
-						"one-time-only event that has already been fired", event.getName());
-				responseFuture.setException(new EventAlreadyFiredException());
+		try {
+			if (queueEvents) {
+				queuedEvents.add(new QueuedEvent(event, responseFuture));
 				return;
 			}
-			oneTimeEventTracker.inProgress(event);
+
+			event.prepare(Utils.getOrDefault(platform.getAppName(), ""));
+
+			if (event.isOneTimeOnly()) {
+				if (oneTimeEventTracker.hasBeenAlreadySent(event)) {
+					Logging.log(Logging.INFO, "Tapstream ignoring event named \"%s\" because it is a " +
+							"one-time-only event that has already been fired", event.getName());
+					responseFuture.setException(new EventAlreadyFiredException());
+					return;
+				}
+				oneTimeEventTracker.inProgress(event);
+			}
+
+			final Retry.Retryable<HttpRequest> eventRequest;
+
+			try{
+				eventRequest = RequestBuilders
+						.eventRequestBuilder(config.getAccountName(), event.getName())
+						.postBody(event.buildPostBody(commonEventParams, config.getGlobalEventParams()))
+						.build()
+						.makeRetryable(config.getEventRetryStrategy());
+			} catch (MalformedURLException error){
+				responseFuture.setException(new ApiException(error));
+				return;
+			}
+
+			sendEventRequest(event, responseFuture, eventRequest);
+
+		} catch (Exception e){
+			responseFuture.setException(e);
 		}
-
-		final Retry.Retryable<HttpRequest> eventRequest;
-
-		try{
-			eventRequest = RequestBuilders
-					.eventRequestBuilder(config.getAccountName(), event.getName())
-					.postBody(event.buildPostBody(commonEventParams, config.getGlobalEventParams()))
-					.build()
-					.makeRetryable(config.getEventRetryStrategy());
-		} catch (MalformedURLException error){
-			responseFuture.setException(new ApiException(error));
-			return;
-		}
-
-		sendEventRequest(event, responseFuture, eventRequest);
-
 	}
 
 	private void sendEventRequest(final Event event, final ApiFuture<EventApiResponse> responseFuture, final Retry.Retryable<HttpRequest> retryableRequest){
@@ -237,28 +238,20 @@ class HttpApiClient implements ApiClient {
 					oneTimeEventTracker.sent(event);
 					responseFuture.set(new EventApiResponse(response));
 				} else {
-					if (response.status == 404) {
-						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d\n" +
-								"Does your event name contain characters that are not url safe? This " +
-								"event will not be retried.", response.status);
-					} else if (response.status == 403) {
-						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d\n" +
-								"Are your account name and application secret correct?  This event " +
-								"will not be retried.", response.status);
-					} else if (response.shouldRetry() && retryableRequest.shouldRetry()) {
+					if (!response.shouldRetry()) {
+						Logging.log(Logging.ERROR, "Tapstream Error: Hard failure while firing event, " +
+								"http code %d.", response.status);
+						oneTimeEventTracker.failed(event);
+						responseFuture.setException(new UnrecoverableHttpException(response, "Failed to fire event"));
+					} else if (!retryableRequest.shouldRetry()) {
+						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d. " +
+								"Retry attempts exhausted", response.status);
+						oneTimeEventTracker.failed(event);
+						responseFuture.setException(new RetriesExhaustedException());
+					} else {
+						System.out.println("Retrying");
 						retryableRequest.incrementAttempt();
 						sendEventRequest(event, responseFuture, retryableRequest);
-					} else {
-						// Give up
-						String retryMsg = "";
-						if (!response.shouldRetry()) {
-							retryMsg = "  This event will not be retried.";
-						}
-						Logging.log(Logging.ERROR, "Tapstream Error: Failed to fire event, http code %d.%s",
-								response.status, retryMsg);
-
-						oneTimeEventTracker.failed(event);
-						responseFuture.setException(new ApiException("Failed to fire event"));
 					}
 				}
 			}
@@ -268,12 +261,17 @@ class HttpApiClient implements ApiClient {
 				} catch(Exception ex) {
 					Logging.log(Logging.ERROR, "Tapstream Error: Unhandled exception while firing event: " + ex.getMessage());
 					oneTimeEventTracker.failed(event);
-					responseFuture.setException(new ApiException(ex));
+					responseFuture.setException(ex);
 				}
 			}
 		};
 
-		executor.schedule(task, retryableRequest.getDelayMs(), TimeUnit.MILLISECONDS);
+		try {
+			executor.schedule(task, retryableRequest.getDelayMs(), TimeUnit.MILLISECONDS);
+		} catch (Exception e){
+			responseFuture.setException(e);
+		}
+
 	}
 
 	@Override
@@ -281,153 +279,171 @@ class HttpApiClient implements ApiClient {
 	{
 		final ApiFuture<TimelineApiResponse> responseFuture = new ApiFuture<TimelineApiResponse>();
 
-		final Retry.Retryable<HttpRequest> retryable;
 		try {
-			retryable = RequestBuilders
+			final Retry.Retryable<HttpRequest> retryable = RequestBuilders
 					.timelineLookupRequestBuilder(config.getDeveloperSecret(), platform.loadUuid())
 					.build()
 					.makeRetryable(config.getTimelineLookupRetryStrategy());
-		} catch (MalformedURLException e) {
-			responseFuture.setException(new ApiException(e));
-			return responseFuture;
-		}
 
-		Runnable task = new Runnable() {
-			public void checkedRun() throws IOException{
-				HttpResponse httpResponse = client.sendRequest(retryable.get());
-				if(httpResponse.succeeded()) {
+			Runnable task = new Runnable() {
+				public void checkedRun() throws IOException{
+					HttpResponse httpResponse = client.sendRequest(retryable.get());
+					if(httpResponse.succeeded()) {
 
-					TimelineApiResponse apiResponse = new TimelineApiResponse(httpResponse);
-					if (apiResponse.isEmpty()){
-						// We found the empty array. Poll again if the retry strategy allows it.
-						if (retryable.shouldRetry()){
-							retryable.incrementAttempt();
-							executor.schedule(this, retryable.getDelayMs(), TimeUnit.MILLISECONDS);
+						TimelineApiResponse apiResponse = new TimelineApiResponse(httpResponse);
+
+						if (apiResponse.isEmpty()){
+							// We found the empty array. Poll again if the retry strategy allows it.
+							if (retryable.shouldRetry()){
+								retryable.incrementAttempt();
+								executor.schedule(this, retryable.getDelayMs(), TimeUnit.MILLISECONDS);
+							} else {
+								responseFuture.setException(new RetriesExhaustedException("Lookup attempts exhausted"));
+							}
 						} else {
-							responseFuture.setException(new TimelineLookupFailed("Lookup attempts exhausted"));
+							// Found a non-empty timeline response
+							responseFuture.set(apiResponse);
 						}
 					} else {
-						responseFuture.set(apiResponse);
+						// Request failed
+						if (!httpResponse.shouldRetry()){
+							responseFuture.setException(new UnrecoverableHttpException(httpResponse));
+						} else if (!retryable.shouldRetry()){
+							responseFuture.setException(new RetriesExhaustedException());
+						} else {
+							retryable.incrementAttempt();
+							executor.schedule(this, retryable.getDelayMs(), TimeUnit.MILLISECONDS);
+						}
+
 					}
 				}
-			}
 
-			@Override
-			public void run() {
-				try {
-					checkedRun();
-				} catch (Exception e){
-					Logging.log(Logging.ERROR, "Unhandled exception during timeline lookup");
-					responseFuture.setException(e);
+				@Override
+				public void run() {
+					try {
+						checkedRun();
+					} catch (Exception e){
+						Logging.log(Logging.ERROR, "Unhandled exception during timeline lookup");
+						responseFuture.setException(e);
+					}
 				}
-			}
-		};
+			};
 
-		executor.submit(task);
+			executor.submit(task);
+
+		} catch (Exception e){
+			responseFuture.setException(e);
+		}
+
 		return responseFuture;
 	}
 
 	@Override
 	public  ApiFuture<Offer> getWordOfMouthOffer(final String insertionPoint) {
-		final Retry.Retryable<HttpRequest> retryable;
 		final ApiFuture<Offer> responseFuture = new ApiFuture<Offer>();
 
-		final String bundle = platform.getPackageName();
-		try {
-			retryable = RequestBuilders
+		try{
+			final String bundle = platform.getPackageName();
+
+			final Retry.Retryable<HttpRequest> retryable = RequestBuilders
 					.wordOfMouthOfferRequestBuilder(config.getDeveloperSecret(), insertionPoint, bundle)
 					.build()
 					.makeRetryable(config.getTimelineLookupRetryStrategy());
-		} catch (MalformedURLException e) {
-			responseFuture.setException(new ApiException(e));
-			return responseFuture;
+
+
+			Runnable task = new Runnable() {
+				public void checkedRun() throws IOException{
+					HttpResponse httpResponse = client.sendRequest(retryable.get());
+					if(httpResponse.succeeded()) {
+						JSONObject responseObject = new JSONObject(httpResponse.getBodyAsString());
+						Offer offer = Offer.fromApiResponse(responseObject);
+						responseFuture.set(offer);
+					}else if((httpResponse.status >= 400 && httpResponse.status <= 499)){
+						responseFuture.setException(new Offer.LookupFailed(
+								"Error in offer lookup: " + httpResponse.getBodyAsString()
+						));
+					}else if(retryable.shouldRetry()) {
+						retryable.incrementAttempt();
+						executor.schedule(this, retryable.getDelayMs(), TimeUnit.MILLISECONDS);
+					}else {
+						responseFuture.setException(new Offer.LookupFailed(
+								"Lookup attempts exhausted"));
+					}
+				}
+
+				@Override
+				public void run() {
+					try {
+						checkedRun();
+					} catch (Exception e){
+						Logging.log(Logging.ERROR, "Unhandled exception during timeline lookup");
+						responseFuture.setException(e);
+					}
+				}
+			};
+
+			executor.submit(task);
+
+		} catch (Exception e){
+			responseFuture.setException(e);
 		}
-		Runnable task = new Runnable() {
-			public void checkedRun() throws IOException{
-				HttpResponse httpResponse = client.sendRequest(retryable.get());
-				if(httpResponse.succeeded()) {
-					JSONObject responseObject = new JSONObject(httpResponse.getBodyAsString());
-					Offer offer = Offer.fromApiResponse(responseObject);
-					responseFuture.set(offer);
-				}else if((httpResponse.status >= 400 && httpResponse.status <= 499)){
-					responseFuture.setException(new Offer.LookupFailed(
-							"Error in offer lookup: " + httpResponse.getBodyAsString()
-					));
-				}else if(retryable.shouldRetry()) {
-					retryable.incrementAttempt();
-					executor.schedule(this, retryable.getDelayMs(), TimeUnit.MILLISECONDS);
-				}else {
-					responseFuture.setException(new Offer.LookupFailed(
-							"Lookup attempts exhausted"));
-				}
-			}
 
-			@Override
-			public void run() {
-				try {
-					checkedRun();
-				} catch (Exception e){
-					Logging.log(Logging.ERROR, "Unhandled exception during timeline lookup");
-					responseFuture.setException(e);
-				}
-			}
-		};
-
-		executor.submit(task);
 		return responseFuture;
+
 	}
 
 	@Override
 	public ApiFuture<List<Reward>> getWordOfMouthRewardList() {
-		final Retry.Retryable<HttpRequest> retryable;
 		final ApiFuture<List<Reward>> responseFuture = new ApiFuture<List<Reward>>();
+
 		try {
-			retryable = RequestBuilders
+			final Retry.Retryable<HttpRequest> retryable = RequestBuilders
 					.wordOfMouthRewardRequestBuilder(config.getDeveloperSecret(), platform.loadUuid())
 					.build()
 					.makeRetryable(config.getTimelineLookupRetryStrategy());
-		} catch (MalformedURLException e) {
-			responseFuture.setException(new ApiException(e));
-			Logging.log(Logging.ERROR, "Tapstream Error: Failed to build offer lookup URL");
-			return responseFuture;
-		}
-		Runnable task = new Runnable() {
-			public void checkedRun() throws IOException {
 
-				HttpResponse httpResponse = client.sendRequest(retryable.get());
-				if (httpResponse.succeeded()) {
-					JSONArray responseObject = new JSONArray(httpResponse.getBodyAsString());
-					List<Reward> result = new ArrayList<Reward>(responseObject.length());
+			Runnable task = new Runnable() {
+				public void checkedRun() throws IOException {
 
-					for (int ii = 0; ii < responseObject.length(); ii++) {
-						Reward reward = Reward.fromApiResponse(responseObject.getJSONObject(ii));
-						if (!reward.isConsumed(platform)) {
-							result.add(reward);
+					HttpResponse httpResponse = client.sendRequest(retryable.get());
+					if (httpResponse.succeeded()) {
+						JSONArray responseObject = new JSONArray(httpResponse.getBodyAsString());
+						List<Reward> result = new ArrayList<Reward>(responseObject.length());
+
+						for (int ii = 0; ii < responseObject.length(); ii++) {
+							Reward reward = Reward.fromApiResponse(responseObject.getJSONObject(ii));
+							if (!reward.isConsumed(platform)) {
+								result.add(reward);
+							}
 						}
+						responseFuture.set(result);
+					}else if((httpResponse.status >= 400 && httpResponse.status <= 499)){
+						responseFuture.setException(new Reward.LookupFailed(
+								"Error in reward lookup: " + httpResponse.getBodyAsString()));
+					}else if(retryable.shouldRetry()) {
+						retryable.incrementAttempt();
+						executor.schedule(this, retryable.getDelayMs(), TimeUnit.MILLISECONDS);
+					}else {
+						responseFuture.setException(new Reward.LookupFailed(
+								"Lookup attempts exhausted"));
 					}
-					responseFuture.set(result);
-				}else if((httpResponse.status >= 400 && httpResponse.status <= 499)){
-					responseFuture.setException(new Reward.LookupFailed(
-							"Error in reward lookup: " + httpResponse.getBodyAsString()));
-				}else if(retryable.shouldRetry()) {
-					retryable.incrementAttempt();
-					executor.schedule(this, retryable.getDelayMs(), TimeUnit.MILLISECONDS);
-				}else {
-					responseFuture.setException(new Reward.LookupFailed(
-							"Lookup attempts exhausted"));
 				}
-			}
-			public void run(){
-				try {
-					checkedRun();
-				}catch(Exception e){
-					Logging.log(Logging.WARN, e.getMessage());
-					responseFuture.setException(e);
+				public void run(){
+					try {
+						checkedRun();
+					}catch(Exception e){
+						Logging.log(Logging.WARN, e.getMessage());
+						responseFuture.setException(e);
+					}
 				}
-			}
-		};
-		executor.submit(task);
+			};
+			executor.submit(task);
+		} catch (Exception e){
+			responseFuture.setException(e);
+		}
+
 		return responseFuture;
+
 	}
 
 }

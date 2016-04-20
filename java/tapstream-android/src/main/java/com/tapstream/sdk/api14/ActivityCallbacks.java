@@ -12,18 +12,8 @@ import com.tapstream.sdk.ActivityEventSource;
 public class ActivityCallbacks extends ActivityEventSource implements ActivityLifecycleCallbacks {
 
 	private final Application app;
-	
-	// For Android, the Tapstream SDK is initialized in the main activity's onCreate method, which
-	// is called before the activity is shown, so it will be followed by a call to onStart.
-	//
-	// For iOS, the Tapstream SDK is initialized in the didFinishLaunchingWithOptions method, which
-	// is not followed by a call to applicationWillEnterForeground.
-	//
-	// In order to maintain consistency with the iOS SDK, and to ensure proper behaviour on pre-API-14
-	// versions of Android, we need to ignore the first onActivityStarted call that we get (since the
-	// SDK invariably fires an open event when it is initialized).  We'll do this by setting the 
-	// startedActivities counter to negative one.
-	private int startedActivities = -1;
+
+	private int startedActivities = 0;
 	
 	public ActivityCallbacks(Application app) {
 		super();
