@@ -37,9 +37,7 @@ public class WordOfMouthImpl implements WordOfMouth{
 
     @Override
     public boolean isConsumed(Reward reward){
-        int rewardCount = reward.getInstallCount() / reward.getMinimumInstalls();
-        int consumed = platform.getCountForReward(reward);
-        return consumed >= rewardCount;
+        return reward.isConsumed(platform);
     }
 
     public void showOffer(final Activity mainActivity, View parent, final Offer o){

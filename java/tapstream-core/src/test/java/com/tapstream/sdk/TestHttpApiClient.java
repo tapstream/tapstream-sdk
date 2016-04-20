@@ -1,9 +1,14 @@
 package com.tapstream.sdk;
 
+import com.google.common.io.Resources;
 import com.tapstream.sdk.errors.EventAlreadyFiredException;
 import com.tapstream.sdk.http.HttpClient;
 import com.tapstream.sdk.http.HttpRequest;
 import com.tapstream.sdk.http.HttpResponse;
+
+import com.tapstream.sdk.http.RequestBuilders;
+import com.tapstream.sdk.wordofmouth.Offer;
+import com.tapstream.sdk.wordofmouth.Reward;
 
 import org.junit.After;
 import org.junit.Before;
@@ -17,6 +22,11 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import org.mockito.Mock;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -26,18 +36,27 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static com.tapstream.sdk.matchers.RequestURLMatcher.urlEq;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 public class TestHttpApiClient {
 
-    Platform platform;
+    @Mock Platform platform;
     Config config;
-    HttpClient httpClient;
+    @Mock HttpClient httpClient;
     HttpApiClient apiClient;
     ScheduledExecutorService executor;
 
+    static HttpResponse jsonResponse(String jsonResourcePath) throws IOException {
+        return new HttpResponse(200, "", Resources.toByteArray(Resources.getResource(jsonResourcePath)));
+    }
+
     @Before
     public void setup() throws Exception {
-        platform = mock(Platform.class);
+        initMocks(this);
         Set<String> alreadyFired = new HashSet<String>();
         alreadyFired.add("alreadyFired");
         when(platform.loadFiredEvents()).thenReturn(alreadyFired);
@@ -48,7 +67,7 @@ public class TestHttpApiClient {
     }
 
     @After
-    public void teardown() throws Exception {
+    public void tearDown() throws Exception {
         executor.shutdownNow();
         executor.awaitTermination(1, TimeUnit.SECONDS);
     }
@@ -112,7 +131,6 @@ public class TestHttpApiClient {
                 return expectedAdvertisingId;
             }
         });
-
         String expectedSessionId = UUID.randomUUID().toString();
         when(platform.loadUuid()).thenReturn(expectedSessionId);
 
@@ -172,6 +190,64 @@ public class TestHttpApiClient {
         assertThat(commonParams.remove("android-limit-ad-tracking"), is(Boolean.toString(expectedLimitAdTracking)));
         assertThat(commonParams.remove("android-referrer"), is(expectedReferrer));
         assertThat(commonParams.isEmpty(), is(true));
+    }
+
+
+    @Test
+    public void testGetWordOfMouthOffer() throws Exception {
+        String bundle = platform.getPackageName();
+        URL expectedURL = RequestBuilders
+                .wordOfMouthOfferRequestBuilder(config.getDeveloperSecret(), "wom", bundle)
+                .build().getURL();
+
+        when(httpClient.sendRequest(urlEq(expectedURL))).thenReturn(jsonResponse("offer.json"));
+
+
+        apiClient.start();
+        ApiFuture<Offer> futureOffer = apiClient.getWordOfMouthOffer("wom");
+        Offer offer = futureOffer.get();
+        verify(httpClient, times(1)).sendRequest(urlEq(expectedURL));
+
+        assertThat(offer, notNullValue());
+        assertThat(offer.getMessage(), is("This is the message"));
+    }
+
+    @Test
+    public void testGetWordOfMouthRewardList() throws Exception{
+        when(platform.loadUuid()).thenReturn("my-uuid");
+        URL expectedURL = RequestBuilders
+                .wordOfMouthRewardRequestBuilder(config.getDeveloperSecret(), "my-uuid")
+                .build().getURL();
+        when(httpClient.sendRequest(urlEq(expectedURL))).thenReturn(jsonResponse("rewards.json"));
+
+        apiClient.start();
+        final ApiFuture<List<Reward>> futureRewards = apiClient.getWordOfMouthRewardList();
+
+        List<Reward> rewards = futureRewards.get();
+        verify(httpClient, times(1)).sendRequest(urlEq(expectedURL));
+        assertThat(rewards, notNullValue());
+        assertThat(rewards.size(), is(1));
+        assertThat(rewards.get(0).getRewardSku(), is("my reward sku"));
+    }
+
+
+    @Test
+    public void testRewardAutoConsumption() throws Exception{
+
+        String session = platform.loadUuid();
+        URL expectedURL = RequestBuilders
+                .wordOfMouthRewardRequestBuilder(config.getDeveloperSecret(), session)
+                .build().getURL();
+
+        when(httpClient.sendRequest(urlEq(expectedURL))).thenReturn(jsonResponse("rewards.json"));
+
+        List<Reward> rewards = apiClient.getWordOfMouthRewardList().get();
+        assertThat(rewards.size(), is(1));
+
+        when(platform.getCountForReward((Reward) any())).thenReturn(1);
+
+        rewards = apiClient.getWordOfMouthRewardList().get();
+        assertThat(rewards.size(), is(0));
     }
 
 }

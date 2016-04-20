@@ -2,31 +2,32 @@ package com.tapstream.sdk;
 
 import android.app.Application;
 
-import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 
+import com.tapstream.sdk.http.HttpClient;
 import com.tapstream.sdk.http.HttpRequest;
 import com.tapstream.sdk.http.HttpResponse;
-import com.tapstream.sdk.http.StdLibHttpClient;
-import com.tapstream.sdk.wordofmouth.Offer;
 import com.tapstream.sdk.wordofmouth.Reward;
 import com.tapstream.sdk.wordofmouth.WordOfMouth;
 import com.tapstream.sdk.wordofmouth.WordOfMouthImpl;
 
-import junit.framework.TestCase;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 /**
  * Date: 15-05-09
@@ -34,47 +35,28 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @org.robolectric.annotation.Config(constants = BuildConfig.class, sdk=21)
-public class TestTapstream extends TestCase {
+public class TestTapstream {
 
-    static class HttpClientWithMockApi extends StdLibHttpClient {
-        Map<String, HttpResponse> responses = new HashMap<String, HttpResponse>();
-
-        public void registerResponse(HttpResponse response, String method, String url){
-            responses.put(method + "|" + url, response);
-        }
-        public HttpResponse sendRequest(HttpRequest request) throws IOException {
-            HttpResponse resp = responses.get(request.getMethod() + "|" + request.getURL());
-            if(resp == null){
-                fail("No response for " + request.getMethod() + "|" + request.getURL());
-            }
-            return resp;
-        }
-    }
-
-    Tapstream ts;
-    HttpClientWithMockApi httpClient;
+    @Mock HttpClient httpClient;
     Platform platform;
+    Tapstream ts;
+    Config config;
+
     final String OFFER_ENDPOINT = "https://app.tapstream.com/api/v1/word-of-mouth/offers/";
     final String REWARD_ENDPOINT = "https://app.tapstream.com/api/v1/word-of-mouth/rewards/";
     final String ACCOUNT_NAME = "sdktest";
     final String SDKTEST_SECRET = "YGP2pezGTI6ec48uti4o1w";
-
-    private String readResource(String resourceName){
-        try {
-            return Resources.toString(Resources.getResource(resourceName), Charsets.UTF_8);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
+    static HttpResponse jsonResponse(String jsonResourcePath) throws IOException {
+        return new HttpResponse(200, "", Resources.toByteArray(Resources.getResource(jsonResourcePath)));
     }
 
     @Before
     public void setUp(){
+        initMocks(this);
         Application app = RuntimeEnvironment.application;
         app.getApplicationInfo().name = "TapstreamTest";
         platform = new AndroidPlatform(app);
-        httpClient = new HttpClientWithMockApi();
-        Config config = new Config(ACCOUNT_NAME, SDKTEST_SECRET);
+        config = new Config(ACCOUNT_NAME, SDKTEST_SECRET);
         WordOfMouth wom = WordOfMouthImpl.getInstance(platform);
         ScheduledExecutorService ex = Executors.newSingleThreadScheduledExecutor(new DaemonThreadFactory());
         HttpApiClient client = new HttpApiClient(platform, config, httpClient, ex);
@@ -82,53 +64,25 @@ public class TestTapstream extends TestCase {
         ts = new Tapstream(client, wom);
     }
 
-    private HttpResponse jsonResponse(String jsonResourcePath){
-        return new HttpResponse(200, "", readResource(jsonResourcePath).getBytes());
-    }
-
-    private String getOfferUrl(String insertionPoint, String bundle){
-        return OFFER_ENDPOINT + "?secret=" + SDKTEST_SECRET + "&insertion_point=" + insertionPoint + "&bundle=" + bundle;
-    }
-
-    private String getRewardUrl(String eventSession) {
-        return REWARD_ENDPOINT + "?secret=" + SDKTEST_SECRET + "&event_session=" + eventSession;
-    }
-
-    @Test
-    public void testWordOfMouth() throws Exception{
-        httpClient.registerResponse(jsonResponse("order.json"), "GET", getOfferUrl("wom", platform.getPackageName()));
-        httpClient.registerResponse(jsonResponse("rewards.json"), "GET", getRewardUrl(platform.loadUuid()));
-        
-        ApiFuture<Offer> futureOffer = ts.getWordOfMouthOffer("wom");
-        Offer offer = futureOffer.get();
-        assertNotNull(offer);
-        assertEquals(offer.getMessage(), "This is the message");
-
-        final ApiFuture<List<Reward>> futureRewards = ts.getWordOfMouthRewardList();
-
-        List<Reward> rewards = futureRewards.get();
-        assertNotNull(rewards);
-        assertEquals(rewards.size(), 1);
-        assertEquals(rewards.get(0).getRewardSku(), "my reward sku");
-    }
-
     @Test
     public void testRewardConsumption() throws Exception{
-        httpClient.registerResponse(jsonResponse("rewards.json"), "GET", getRewardUrl(platform.loadUuid()));
+        when(httpClient.sendRequest((HttpRequest) any())).thenReturn(jsonResponse("rewards.json"));
 
         ApiFuture<List<Reward>> futureRewards = ts.getWordOfMouthRewardList();
         List<Reward> rewards = futureRewards.get();
-        assertEquals(rewards.size(), 1);
+        assertThat(rewards.size(), is(1));
 
         WordOfMouth wm = ts.getWordOfMouth();
 
-        assertFalse(wm.isConsumed(rewards.get(0)));
+        assertThat(wm.isConsumed(rewards.get(0)), is(false));
         wm.consumeReward(rewards.get(0));
-        assertTrue(wm.isConsumed(rewards.get(0)));
+        assertThat(wm.isConsumed(rewards.get(0)), is(true));
 
         // Get it again
         futureRewards = ts.getWordOfMouthRewardList();
         rewards = futureRewards.get();
-        assertEquals(rewards.size(), 0);
+        assertThat(rewards.size(), is(0));
     }
+
+
 }

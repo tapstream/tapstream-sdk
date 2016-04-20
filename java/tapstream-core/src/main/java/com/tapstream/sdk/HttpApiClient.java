@@ -377,11 +377,6 @@ class HttpApiClient implements ApiClient {
 		return responseFuture;
 	}
 
-	private boolean isConsumed(Reward reward){
-		int rewardCount = reward.getInstallCount() / reward.getMinimumInstalls();
-		int consumed = platform.getCountForReward(reward);
-		return consumed >= rewardCount;
-	}
 	@Override
 	public ApiFuture<List<Reward>> getWordOfMouthRewardList() {
 		final Retry.Retryable<HttpRequest> retryable;
@@ -406,7 +401,7 @@ class HttpApiClient implements ApiClient {
 
 					for (int ii = 0; ii < responseObject.length(); ii++) {
 						Reward reward = Reward.fromApiResponse(responseObject.getJSONObject(ii));
-						if (!isConsumed(reward)) {
+						if (!reward.isConsumed(platform)) {
 							result.add(reward);
 						}
 					}

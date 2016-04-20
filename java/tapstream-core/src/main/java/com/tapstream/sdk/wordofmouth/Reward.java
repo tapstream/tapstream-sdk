@@ -1,5 +1,7 @@
 package com.tapstream.sdk.wordofmouth;
 
+import com.tapstream.sdk.Platform;
+
 import org.json.JSONObject;
 
 public class Reward extends DelegatedJSONObject {
@@ -25,5 +27,14 @@ public class Reward extends DelegatedJSONObject {
 
     public String toString(){
         return "Reward('" + getRewardSku() + "', " + getInstallCount() + "/" + getMinimumInstalls() + " installs)";
+    }
+
+    public void consume(Platform platform){
+        platform.consumeReward(this);
+    }
+    public boolean isConsumed(Platform platform){
+        int rewardCount = this.getInstallCount() / this.getMinimumInstalls();
+        int consumed = platform.getCountForReward(this);
+        return consumed >= rewardCount;
     }
 }
