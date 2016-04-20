@@ -13,7 +13,7 @@ public class Retry {
          * @param attempt   the current attempt number starting at 0.
          * @return          the delay in milliseconds for the next attempt.
          */
-        int getDelay(int attempt);
+        int getDelayMs(int attempt);
 
 
         /**
@@ -39,7 +39,7 @@ public class Retry {
         }
 
         @Override
-        public int getDelay(int attempt) {
+        public int getDelayMs(int attempt) {
             if (attempt == 0)
                 return 0;
 
@@ -66,7 +66,7 @@ public class Retry {
         }
 
         @Override
-        public int getDelay(int attempt) {
+        public int getDelayMs(int attempt) {
             return delay;
         }
 
@@ -105,7 +105,7 @@ public class Retry {
         }
 
         public int getDelayMs(){
-            return retryStrategy.getDelay(attempt);
+            return retryStrategy.getDelayMs(attempt);
         }
 
         public boolean shouldRetry(){

@@ -147,7 +147,6 @@ public class TestHttpApiClient {
     }
 
 
-
     @Test(expected = EventAlreadyFiredException.class)
     public void testOneTimeOnlyEvents() throws Throwable {
         apiClient.start();
@@ -163,6 +162,7 @@ public class TestHttpApiClient {
             throw e.getCause();
         }
     }
+
 
     @Test(expected = EventAlreadyFiredException.class)
     public void testPersistedOneTimeOnlyEvents() throws Throwable{

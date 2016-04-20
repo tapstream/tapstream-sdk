@@ -9,10 +9,6 @@ import java.net.URL;
 
 import static org.mockito.Matchers.argThat;
 
-/**
- * Created by adam on 2016-04-19.
- */
-
 
 public class RequestURLMatcher extends TypeSafeMatcher<HttpRequest> {
     URL url;

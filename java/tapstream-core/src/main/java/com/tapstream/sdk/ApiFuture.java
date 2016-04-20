@@ -11,6 +11,8 @@ public class ApiFuture<T> implements Future<T> {
     T obj;
     Throwable error;
     Callback<T> callback;
+    Future<?> propagateCancellationTo;
+
     int state = STATE_INITIAL;
 
     private static final int STATE_INITIAL = 0;
@@ -24,6 +26,10 @@ public class ApiFuture<T> implements Future<T> {
             return false;
 
         state = STATE_CANCELLED;
+
+        if (propagateCancellationTo != null)
+            propagateCancellationTo.cancel(mayInterruptIfRunning);
+
         this.notifyAll();
         return true;
     }
@@ -64,7 +70,10 @@ public class ApiFuture<T> implements Future<T> {
         this.notifyAll();
         safeCallbackError(callback, t);
         return true;
+    }
 
+    synchronized public void propagateCancellationTo(Future<?> future){
+        this.propagateCancellationTo = future;
     }
 
      private static <T> void safeCallbackSuccess(Callback<T> callback, T obj){

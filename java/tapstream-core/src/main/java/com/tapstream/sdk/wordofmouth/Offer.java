@@ -6,12 +6,6 @@ import org.json.JSONObject;
  * Represents an Offer retrieved from Tapstream's word-of-mouth API.
  */
 public class Offer extends DelegatedJSONObject{
-    public static class LookupFailed extends Exception{
-        public LookupFailed(String message){
-            super(message);
-        }
-    };
-
     public static Offer fromApiResponse(JSONObject delegate){
         return new Offer(delegate);
     }

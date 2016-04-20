@@ -229,7 +229,7 @@ class HttpApiClient implements ApiClient {
 
 	private void sendEventRequest(final Event event, ApiFuture<EventApiResponse> responseFuture, Retry.Retryable<HttpRequest> retryableRequest){
 
-		CheckedApiRunnable<EventApiResponse> task = new CheckedApiRunnable<EventApiResponse>() {
+		ApiRequest.Handler<EventApiResponse> responseHandler = new ApiRequest.Handler<EventApiResponse>() {
 			@Override
 			public void onFailure() {
 				oneTimeEventTracker.failed(event);
@@ -242,7 +242,7 @@ class HttpApiClient implements ApiClient {
 				return new EventApiResponse(response);
 			}
 		};
-        ApiRunnable.createAndStart(responseFuture, retryableRequest, task, executor, client);
+        ApiRequest.submit(executor, client, responseFuture, retryableRequest, responseHandler);
 	}
 
 	@Override
@@ -257,7 +257,7 @@ class HttpApiClient implements ApiClient {
 					.makeRetryable(config.getTimelineLookupRetryStrategy());
 
 
-            CheckedApiRunnable<TimelineApiResponse> task = new CheckedApiRunnable<TimelineApiResponse>() {
+            ApiRequest.Handler<TimelineApiResponse> responseHandler = new ApiRequest.Handler<TimelineApiResponse>() {
                 @Override
                 public TimelineApiResponse checkedRun(HttpResponse resp) throws IOException, ApiException {
                     TimelineApiResponse apiResponse = new TimelineApiResponse(resp);
@@ -269,7 +269,7 @@ class HttpApiClient implements ApiClient {
                 }
             };
 
-            ApiRunnable.createAndStart(responseFuture, retryable, task, executor, client);
+            ApiRequest.submit(executor, client, responseFuture, retryable, responseHandler);
 
 		} catch (Exception e){
 			responseFuture.setException(e);
@@ -290,7 +290,7 @@ class HttpApiClient implements ApiClient {
 					.build()
 					.makeRetryable(config.getTimelineLookupRetryStrategy());
 
-			CheckedApiRunnable<Offer> offerRequest = new CheckedApiRunnable<Offer>() {
+			ApiRequest.Handler<Offer> offerRequest = new ApiRequest.Handler<Offer>() {
 				@Override
 				public Offer checkedRun(HttpResponse resp) throws IOException, ApiException {
 					JSONObject responseObject = new JSONObject(resp.getBodyAsString());
@@ -299,7 +299,7 @@ class HttpApiClient implements ApiClient {
 				}
 			};
 
-			ApiRunnable.createAndStart(responseFuture, retryable, offerRequest, executor, client);
+			ApiRequest.submit(executor, client, responseFuture, retryable, offerRequest);
 
 		} catch (Exception e){
 			responseFuture.setException(e);
@@ -321,7 +321,8 @@ class HttpApiClient implements ApiClient {
 					.makeRetryable(config.getTimelineLookupRetryStrategy());
 
 
-			CheckedApiRunnable<List<Reward>> getRewards = new CheckedApiRunnable<List<Reward>>() {
+			ApiRequest.Handler<List<Reward>> getRewards = new ApiRequest.Handler<List<Reward>>() {
+				@Override
 				public List<Reward> checkedRun(HttpResponse resp) throws IOException, ApiException {
                     JSONArray responseObject = new JSONArray(resp.getBodyAsString());
                     List<Reward> result = new ArrayList<Reward>(responseObject.length());
@@ -336,7 +337,7 @@ class HttpApiClient implements ApiClient {
 				}
 			};
 
-			ApiRunnable.createAndStart(responseFuture, retryable, getRewards, executor, client);
+			ApiRequest.submit(executor, client, responseFuture, retryable, getRewards);
 		} catch (Exception e){
 			responseFuture.setException(e);
 		}

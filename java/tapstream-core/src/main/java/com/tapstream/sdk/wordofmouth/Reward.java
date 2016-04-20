@@ -5,12 +5,6 @@ import com.tapstream.sdk.Platform;
 import org.json.JSONObject;
 
 public class Reward extends DelegatedJSONObject {
-    public static class LookupFailed extends Exception{
-        public LookupFailed(String message){
-            super(message);
-        }
-    };
-
     public static Reward fromApiResponse(JSONObject resp){
         return new Reward(resp);
     }
