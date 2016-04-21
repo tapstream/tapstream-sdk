@@ -9,7 +9,9 @@ import com.tapstream.sdk.http.HttpRequest;
 import com.tapstream.sdk.http.HttpResponse;
 import com.tapstream.sdk.http.RequestBuilders;
 import com.tapstream.sdk.wordofmouth.Offer;
+import com.tapstream.sdk.wordofmouth.OfferApiResponse;
 import com.tapstream.sdk.wordofmouth.Reward;
+import com.tapstream.sdk.wordofmouth.RewardApiResponse;
 
 import org.junit.After;
 import org.junit.Before;
@@ -268,8 +270,8 @@ public class TestHttpApiClient {
 
 
         apiClient.start();
-        ApiFuture<Offer> futureOffer = apiClient.getWordOfMouthOffer("wom");
-        Offer offer = futureOffer.get();
+        ApiFuture<OfferApiResponse> futureOffer = apiClient.getWordOfMouthOffer("wom");
+        Offer offer = futureOffer.get().getOffer();
         verify(httpClient, times(1)).sendRequest(urlEq(expectedURL));
 
         assertThat(offer, notNullValue());
@@ -285,9 +287,9 @@ public class TestHttpApiClient {
         when(httpClient.sendRequest(urlEq(expectedURL))).thenReturn(jsonResponse("rewards.json"));
 
         apiClient.start();
-        final ApiFuture<List<Reward>> futureRewards = apiClient.getWordOfMouthRewardList();
+        final ApiFuture<RewardApiResponse> futureRewards = apiClient.getWordOfMouthRewardList();
 
-        List<Reward> rewards = futureRewards.get();
+        List<Reward> rewards = futureRewards.get().getRewards();
         verify(httpClient, times(1)).sendRequest(urlEq(expectedURL));
         assertThat(rewards, notNullValue());
         assertThat(rewards.size(), is(1));
@@ -305,12 +307,12 @@ public class TestHttpApiClient {
 
         when(httpClient.sendRequest(urlEq(expectedURL))).thenReturn(jsonResponse("rewards.json"));
 
-        List<Reward> rewards = apiClient.getWordOfMouthRewardList().get();
+        List<Reward> rewards = apiClient.getWordOfMouthRewardList().get().getRewards();
         assertThat(rewards.size(), is(1));
 
         when(platform.getCountForReward((Reward) any())).thenReturn(1);
 
-        rewards = apiClient.getWordOfMouthRewardList().get();
+        rewards = apiClient.getWordOfMouthRewardList().get().getRewards();
         assertThat(rewards.size(), is(0));
     }
 

@@ -9,7 +9,9 @@ import com.tapstream.sdk.http.HttpResponse;
 import com.tapstream.sdk.http.RequestBuilders;
 import com.tapstream.sdk.http.StdLibHttpClient;
 import com.tapstream.sdk.wordofmouth.Offer;
+import com.tapstream.sdk.wordofmouth.OfferApiResponse;
 import com.tapstream.sdk.wordofmouth.Reward;
+import com.tapstream.sdk.wordofmouth.RewardApiResponse;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -279,8 +281,8 @@ class HttpApiClient implements ApiClient {
 	}
 
 	@Override
-	public  ApiFuture<Offer> getWordOfMouthOffer(final String insertionPoint) {
-		final ApiFuture<Offer> responseFuture = new ApiFuture<Offer>();
+	public ApiFuture<OfferApiResponse> getWordOfMouthOffer(final String insertionPoint) {
+		final ApiFuture<OfferApiResponse> responseFuture = new ApiFuture<OfferApiResponse>();
 
 		try{
 			final String bundle = platform.getPackageName();
@@ -290,12 +292,12 @@ class HttpApiClient implements ApiClient {
 					.build()
 					.makeRetryable(config.getTimelineLookupRetryStrategy());
 
-			ApiRequest.Handler<Offer> offerRequest = new ApiRequest.Handler<Offer>() {
+			ApiRequest.Handler<OfferApiResponse> offerRequest = new ApiRequest.Handler<OfferApiResponse>() {
 				@Override
-				public Offer checkedRun(HttpResponse resp) throws IOException, ApiException {
+				public OfferApiResponse checkedRun(HttpResponse resp) throws IOException, ApiException {
 					JSONObject responseObject = new JSONObject(resp.getBodyAsString());
 					Offer offer = Offer.fromApiResponse(responseObject);
-					return offer;
+					return new OfferApiResponse(resp, offer);
 				}
 			};
 
@@ -311,8 +313,8 @@ class HttpApiClient implements ApiClient {
 
 
 	@Override
-	public ApiFuture<List<Reward>> getWordOfMouthRewardList() {
-		final ApiFuture<List<Reward>> responseFuture = new ApiFuture<List<Reward>>();
+	public ApiFuture<RewardApiResponse> getWordOfMouthRewardList() {
+		final ApiFuture<RewardApiResponse> responseFuture = new ApiFuture<RewardApiResponse>();
 
 		try {
 			final Retry.Retryable<HttpRequest> retryable = RequestBuilders
@@ -321,23 +323,25 @@ class HttpApiClient implements ApiClient {
 					.makeRetryable(config.getTimelineLookupRetryStrategy());
 
 
-			ApiRequest.Handler<List<Reward>> getRewards = new ApiRequest.Handler<List<Reward>>() {
+			ApiRequest.Handler<RewardApiResponse> getRewardApiResponses = new ApiRequest.Handler<RewardApiResponse>() {
 				@Override
-				public List<Reward> checkedRun(HttpResponse resp) throws IOException, ApiException {
-                    JSONArray responseObject = new JSONArray(resp.getBodyAsString());
-                    List<Reward> result = new ArrayList<Reward>(responseObject.length());
+				public RewardApiResponse checkedRun(HttpResponse resp) throws IOException, ApiException {
 
-                    for (int ii = 0; ii < responseObject.length(); ii++) {
-                        Reward reward = Reward.fromApiResponse(responseObject.getJSONObject(ii));
-                        if (!reward.isConsumed(platform)) {
-                            result.add(reward);
-                        }
-                    }
-                    return result;
+					JSONArray responseObject = new JSONArray(resp.getBodyAsString());
+					List<Reward> rewards = new ArrayList<Reward>(responseObject.length());
+
+					for (int ii = 0; ii < responseObject.length(); ii++) {
+						Reward reward = Reward.fromApiResponse(responseObject.getJSONObject(ii));
+						if (!reward.isConsumed(platform)) {
+							rewards.add(reward);
+						}
+					}
+					return new RewardApiResponse(resp, rewards);
 				}
 			};
 
-			ApiRequest.submit(executor, client, responseFuture, retryable, getRewards);
+
+			ApiRequest.submit(executor, client, responseFuture, retryable, getRewardApiResponses);
 		} catch (Exception e){
 			responseFuture.setException(e);
 		}

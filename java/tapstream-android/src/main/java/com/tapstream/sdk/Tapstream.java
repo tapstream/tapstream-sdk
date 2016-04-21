@@ -2,9 +2,10 @@ package com.tapstream.sdk;
 
 import android.app.Application;
 
-import com.tapstream.sdk.wordofmouth.Offer;
+import com.tapstream.sdk.wordofmouth.OfferApiResponse;
 import com.tapstream.sdk.wordofmouth.Reward;
 
+import com.tapstream.sdk.wordofmouth.RewardApiResponse;
 import com.tapstream.sdk.wordofmouth.WordOfMouth;
 import com.tapstream.sdk.wordofmouth.WordOfMouthImpl;
 
@@ -82,12 +83,12 @@ public class Tapstream implements AndroidApiClient {
 	}
 
 	@Override
-	public ApiFuture<Offer> getWordOfMouthOffer(String insertionPoint) {
+	public ApiFuture<OfferApiResponse> getWordOfMouthOffer(String insertionPoint) {
 		return client.getWordOfMouthOffer(insertionPoint);
 	}
 
 	@Override
-	public ApiFuture<List<Reward>> getWordOfMouthRewardList() {
+	public ApiFuture<RewardApiResponse> getWordOfMouthRewardList() {
 		return client.getWordOfMouthRewardList();
 	}
 
