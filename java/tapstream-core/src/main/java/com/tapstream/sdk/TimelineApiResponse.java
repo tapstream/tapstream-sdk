@@ -18,13 +18,17 @@ public class TimelineApiResponse implements ApiResponse{
     public TimelineApiResponse(HttpResponse httpResponse){
         this.httpResponse = httpResponse;
         this.rawResponse = httpResponse.getBodyAsString();
-        this.isEmpty = legacyEmptyTimelinePattern.matcher(rawResponse).matches();
+        this.isEmpty = rawResponse == null
+                || rawResponse.isEmpty()
+                || legacyEmptyTimelinePattern.matcher(rawResponse).matches();
     }
 
     @Override
     public HttpResponse getHttpResponse(){
         return httpResponse;
     }
+
+
 
     /**
      * @return true if the timeline response is empty

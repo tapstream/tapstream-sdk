@@ -16,6 +16,7 @@ import com.tapstream.sdk.wordofmouth.RewardApiResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 
 import java.io.IOException;
@@ -41,7 +42,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,8 +52,9 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class TestHttpApiClient {
 
     @Mock Platform platform;
-    Config config;
     @Mock HttpClient httpClient;
+
+    Config config;
     HttpApiClient apiClient;
     ScheduledExecutorService executor;
 
@@ -65,7 +68,6 @@ public class TestHttpApiClient {
         Set<String> alreadyFired = new HashSet<String>();
         alreadyFired.add("alreadyFired");
         when(platform.loadFiredEvents()).thenReturn(alreadyFired);
-        httpClient = mock(HttpClient.class);
         config = new Config("accountName", "theSecret");
         config.setFireAutomaticInstallEvent(false);
         config.setFireAutomaticOpenEvent(false);
@@ -80,7 +82,58 @@ public class TestHttpApiClient {
     }
 
     @Test
-    public void testFireEvent() throws Exception {
+    public void testTimelineLookup() throws Exception {
+        String session = UUID.randomUUID().toString();
+        when(platform.loadSessionId()).thenReturn(session);
+        apiClient.start();
+        HttpRequest request = RequestBuilders.timelineLookupRequestBuilder("theSecret", session).build();
+        when(httpClient.sendRequest(request)).thenReturn(new HttpResponse(200, "OK"));
+        TimelineApiResponse response = apiClient.lookupTimeline().get();
+        assertThat(response.getHttpResponse().getStatus(), is(200));
+        assertThat(response.isEmpty(), is(true));
+    }
+
+    @Test
+    public void testAutoOpenEvent() throws Exception {
+        when(httpClient.sendRequest(any(HttpRequest.class))).thenReturn(new HttpResponse(200, "OK"));
+        when(platform.getAppName()).thenReturn("testapp");
+        config.setFireAutomaticOpenEvent(true);
+
+        apiClient.start();
+
+        ArgumentCaptor<HttpRequest> requestCaptor = ArgumentCaptor.forClass(HttpRequest.class);
+        verify(httpClient, timeout(1000)).sendRequest(requestCaptor.capture());
+        assertThat(requestCaptor.getValue().getURL(), is(new URL("https://api.tapstream.com/accountName/event/android-testapp-open")));
+    }
+
+    @Test
+    public void testAutoInstallEvent() throws Exception {
+        when(httpClient.sendRequest(any(HttpRequest.class))).thenReturn(new HttpResponse(200, "OK"));
+        when(platform.getAppName()).thenReturn("testapp");
+        config.setFireAutomaticInstallEvent(true);
+
+        apiClient.start();
+
+        ArgumentCaptor<HttpRequest> requestCaptor = ArgumentCaptor.forClass(HttpRequest.class);
+        verify(httpClient, timeout(1000)).sendRequest(requestCaptor.capture());
+        assertThat(requestCaptor.getValue().getURL(), is(new URL("https://api.tapstream.com/accountName/event/android-testapp-install")));
+    }
+
+    @Test
+    public void testEventInteractionWithClient() throws Exception {
+        String appName = "appName";
+        when(platform.getAppName()).thenReturn(appName);
+        when(httpClient.sendRequest(any(HttpRequest.class))).thenReturn(new HttpResponse(200, "OK"));
+        apiClient.start();
+        Event event = spy(new Event("eventName", false));
+        apiClient.fireEvent(event).get();
+        verify(event).prepare(appName);
+        verify(event).buildPostBody(apiClient.getCommonEventParams(), config.getGlobalEventParams());
+        verify(httpClient).sendRequest(any(HttpRequest.class));
+    }
+
+    @Test
+    public void testFireEventMultipleTimes() throws Exception {
         when(httpClient.sendRequest(any(HttpRequest.class))).thenReturn(new HttpResponse(200, "OK"));
         apiClient.start();
         Event event = new Event("eventName", false);
@@ -88,12 +141,13 @@ public class TestHttpApiClient {
         ApiFuture<EventApiResponse> secondResponse = apiClient.fireEvent(event);
         assertThat(firstResponse.get().getHttpResponse().getStatus(), is(200));
         assertThat(secondResponse.get().getHttpResponse().getStatus(), is(200));
+        verify(httpClient, times(2)).sendRequest(any(HttpRequest.class));
     }
 
     @Test(timeout=1000)
     public void testFireEventWithRetries() throws Exception{
         apiClient.start();
-        config.setEventRetryStrategy(new Retry.FixedDelay(100, 5));
+        config.setDataCollectionRetryStrategy(new Retry.FixedDelay(100, 5));
         when(httpClient.sendRequest(any(HttpRequest.class)))
                 .thenReturn(new HttpResponse(500, "ERROR"))
                 .thenReturn(new HttpResponse(500, "ERROR"))
@@ -108,7 +162,7 @@ public class TestHttpApiClient {
     public void testFireEventWithRetriesExhausted() throws Exception{
         apiClient.start();
 
-        config.setEventRetryStrategy(new Retry.FixedDelay(100, 1));
+        config.setDataCollectionRetryStrategy(new Retry.FixedDelay(100, 1));
         when(httpClient.sendRequest(any(HttpRequest.class)))
                 .thenReturn(new HttpResponse(500, "ERROR"));
 
@@ -130,7 +184,7 @@ public class TestHttpApiClient {
     public void testFireEventWithHardFail() throws Exception{
         apiClient.start();
 
-        config.setEventRetryStrategy(new Retry.FixedDelay(100, 5));
+        config.setDataCollectionRetryStrategy(new Retry.FixedDelay(100, 5));
         when(httpClient.sendRequest(any(HttpRequest.class)))
                 .thenReturn(new HttpResponse(404, "ERROR"))
                 .thenReturn(new HttpResponse(200, "OK"));
@@ -198,7 +252,7 @@ public class TestHttpApiClient {
             }
         });
         String expectedSessionId = UUID.randomUUID().toString();
-        when(platform.loadUuid()).thenReturn(expectedSessionId);
+        when(platform.loadSessionId()).thenReturn(expectedSessionId);
 
         String expectedVendor = "vendorValue";
         when(platform.getManufacturer()).thenReturn(expectedVendor);
@@ -280,7 +334,7 @@ public class TestHttpApiClient {
 
     @Test
     public void testGetWordOfMouthRewardList() throws Exception{
-        when(platform.loadUuid()).thenReturn("my-uuid");
+        when(platform.loadSessionId()).thenReturn("my-uuid");
         URL expectedURL = RequestBuilders
                 .wordOfMouthRewardRequestBuilder(config.getDeveloperSecret(), "my-uuid")
                 .build().getURL();
@@ -300,7 +354,7 @@ public class TestHttpApiClient {
     @Test
     public void testRewardAutoConsumption() throws Exception{
 
-        String session = platform.loadUuid();
+        String session = platform.loadSessionId();
         URL expectedURL = RequestBuilders
                 .wordOfMouthRewardRequestBuilder(config.getDeveloperSecret(), session)
                 .build().getURL();

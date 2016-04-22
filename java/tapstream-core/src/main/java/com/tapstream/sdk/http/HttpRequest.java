@@ -35,6 +35,36 @@ public class HttpRequest {
         return new Retry.Retryable<HttpRequest>(this, strategy);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        HttpRequest that = (HttpRequest) o;
+
+        if (url != null ? !url.equals(that.url) : that.url != null) return false;
+        if (method != that.method) return false;
+        return body != null ? body.equals(that.body) : that.body == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = url != null ? url.hashCode() : 0;
+        result = 31 * result + (method != null ? method.hashCode() : 0);
+        result = 31 * result + (body != null ? body.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "HttpRequest{" +
+                "url=" + url +
+                ", method=" + method +
+                ", body=" + body +
+                '}';
+    }
+
     public static class Builder {
         private HttpMethod method;
         private String scheme;
@@ -101,12 +131,12 @@ public class HttpRequest {
                 urlBuilder.append(path);
             }
 
-            if (qs != null){
+            if (qs != null && !qs.isEmpty()){
                 urlBuilder.append("?");
                 urlBuilder.append(URLEncoding.buildQueryString(qs));
             }
 
-            if (fragment != null){
+            if (fragment != null && !fragment.isEmpty()){
                 urlBuilder.append("#");
                 urlBuilder.append(fragment);
             }

@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 public interface Platform {
-	String loadUuid();
+	String loadSessionId();
 
 	Set<String> loadFiredEvents();
 

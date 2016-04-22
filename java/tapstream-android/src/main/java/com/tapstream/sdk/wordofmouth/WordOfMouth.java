@@ -2,10 +2,6 @@ package com.tapstream.sdk.wordofmouth;
 
 import android.app.Activity;
 import android.view.View;
-import com.tapstream.sdk.Maybe;
-
-import java.util.List;
-import java.util.concurrent.Future;
 
 /**
  * Date: 15-05-01

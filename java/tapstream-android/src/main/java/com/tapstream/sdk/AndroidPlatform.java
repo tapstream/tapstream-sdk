@@ -34,7 +34,7 @@ class AndroidPlatform implements Platform {
 	}
 
 	@Override
-	public String loadUuid() {
+	public String loadSessionId() {
 		SharedPreferences prefs = app.getApplicationContext().getSharedPreferences(UUID_KEY, 0);
 		String uuid = prefs.getString("uuid", null);
 		if (uuid == null) {

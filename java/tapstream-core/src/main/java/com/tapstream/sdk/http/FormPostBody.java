@@ -13,10 +13,6 @@ public class FormPostBody implements RequestBody {
         this.params = new LinkedHashMap<String, String>();
     }
 
-    public FormPostBody(Map<String, String> params){
-        this.params = params;
-    }
-
     public FormPostBody add(String name, String value){
         params.put(name, value);
         return this;
@@ -39,5 +35,28 @@ public class FormPostBody implements RequestBody {
         } catch (UnsupportedEncodingException e){
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "FormPostBody{" +
+                "params=" + params +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FormPostBody that = (FormPostBody) o;
+
+        return params != null ? params.equals(that.params) : that.params == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return params != null ? params.hashCode() : 0;
     }
 }

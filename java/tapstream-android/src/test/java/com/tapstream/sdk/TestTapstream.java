@@ -8,9 +8,11 @@ import com.tapstream.sdk.http.HttpClient;
 import com.tapstream.sdk.http.HttpRequest;
 import com.tapstream.sdk.http.HttpResponse;
 import com.tapstream.sdk.wordofmouth.Reward;
+import com.tapstream.sdk.wordofmouth.RewardApiResponse;
 import com.tapstream.sdk.wordofmouth.WordOfMouth;
 import com.tapstream.sdk.wordofmouth.WordOfMouthImpl;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,10 +44,9 @@ public class TestTapstream {
     Tapstream ts;
     Config config;
 
-    final String OFFER_ENDPOINT = "https://app.tapstream.com/api/v1/word-of-mouth/offers/";
-    final String REWARD_ENDPOINT = "https://app.tapstream.com/api/v1/word-of-mouth/rewards/";
     final String ACCOUNT_NAME = "sdktest";
     final String SDKTEST_SECRET = "YGP2pezGTI6ec48uti4o1w";
+
     static HttpResponse jsonResponse(String jsonResourcePath) throws IOException {
         return new HttpResponse(200, "", Resources.toByteArray(Resources.getResource(jsonResourcePath)));
     }
@@ -60,16 +61,20 @@ public class TestTapstream {
         WordOfMouth wom = WordOfMouthImpl.getInstance(platform);
         ScheduledExecutorService ex = Executors.newSingleThreadScheduledExecutor(new DaemonThreadFactory());
         HttpApiClient client = new HttpApiClient(platform, config, httpClient, ex);
-
         ts = new Tapstream(client, wom);
+    }
+
+    @After
+    public void testdown() throws Exception {
+        httpClient.close();
     }
 
     @Test
     public void testRewardConsumption() throws Exception{
         when(httpClient.sendRequest((HttpRequest) any())).thenReturn(jsonResponse("rewards.json"));
 
-        ApiFuture<List<Reward>> futureRewards = ts.getWordOfMouthRewardList();
-        List<Reward> rewards = futureRewards.get();
+        ApiFuture<RewardApiResponse> futureRewards = ts.getWordOfMouthRewardList();
+        List<Reward> rewards = futureRewards.get().getRewards();
         assertThat(rewards.size(), is(1));
 
         WordOfMouth wm = ts.getWordOfMouth();
@@ -80,7 +85,7 @@ public class TestTapstream {
 
         // Get it again
         futureRewards = ts.getWordOfMouthRewardList();
-        rewards = futureRewards.get();
+        rewards = futureRewards.get().getRewards();
         assertThat(rewards.size(), is(0));
     }
 

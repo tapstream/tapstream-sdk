@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 
 public class Event {
 
@@ -39,13 +38,13 @@ public class Event {
 			}
 
 			if (key.length() > 255) {
-				Logging.log(Logging.WARN, "Tapstream Warning: key exceeds 255 characters, " +
+				Logging.log(Logging.WARN, "key exceeds 255 characters, " +
 						"this field will not be included in the post (key=%s)", key);
 				return;
 			}
 
 			if (limitValueLength && value.length() > 255) {
-				Logging.log(Logging.WARN, "Tapstream Warning: value exceeds 255 characters, " +
+				Logging.log(Logging.WARN, "value exceeds 255 characters, " +
 						"this field will not be included in the post (value=%s)", value);
 				return;
 			}
@@ -68,7 +67,6 @@ public class Event {
 	public static final String PURCHASE_CURRENCY = "purchase-currency";
 	public static final String RECEIPT_POST_BODY = "receipt-postBody";
 
-	private final UUID id;
 	private final Params params;
 	private final Params customParams;
 
@@ -84,7 +82,6 @@ public class Event {
 	 * @param oneTimeOnly	true if this device should only fire an event with {@code name}.
      */
 	public Event(String name, boolean oneTimeOnly) {
-		this.id = UUID.randomUUID();
 		this.params = new Params();
 		this.customParams = new Params();
 		this.oneTimeOnly = oneTimeOnly;
@@ -176,14 +173,6 @@ public class Event {
      */
 	public void setCustomParameter(String key, String value){
 		this.customParams.put(key, value);
-	}
-
-	/**
-	 * Gets the unique ID for this event.
-	 * @return	this event's ID.
-     */
-	public UUID getId(){
-		return id;
 	}
 
 	/**

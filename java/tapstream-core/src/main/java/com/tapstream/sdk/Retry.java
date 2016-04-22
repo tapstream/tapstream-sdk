@@ -3,8 +3,9 @@ package com.tapstream.sdk;
 
 public class Retry {
 
-    public static final Strategy DEFAULT_EVENT_STRATEGY = new Exponential(1000, 2, 10);
-    public static final Strategy DEFAULT_TIMELINE_LOOKUP_STRATEGY = new FixedDelay(500, 6);
+    public static final Strategy DEFAULT_DATA_COLLECTION_STRATEGY = new Exponential(1000, 2, 10);
+    public static final Strategy DEFAULT_USER_FACING_RETRY_STRATEGY = new FixedDelay(500, 3);
+    public static final Strategy NEVER_RETRY = new Never();
 
     public interface Strategy {
         /**
@@ -26,6 +27,19 @@ public class Retry {
         boolean shouldRetry(int attempt);
     }
 
+    static public class Never implements Strategy {
+
+        @Override
+        public int getDelayMs(int attempt) {
+            return 0;
+        }
+
+        @Override
+        public boolean shouldRetry(int attempt) {
+            return false;
+        }
+    }
+
     static public class Exponential implements Strategy {
 
         private final int scale;
@@ -40,12 +54,12 @@ public class Retry {
 
         @Override
         public int getDelayMs(int attempt) {
-            if (attempt == 0)
+            if (attempt == 1)
                 return 0;
 
-            double delay = scale * Math.pow(exponent, attempt);
-            delay = Math.max(delay, 60);
-            delay = Math.min(delay, 0);
+            double delay = scale * Math.pow(exponent, attempt - 2);
+            delay = Math.min(delay, 60000);
+            delay = Math.max(delay, 0);
             return (int)delay;
         }
 
@@ -97,7 +111,7 @@ public class Retry {
         }
 
         public int incrementAttempt(){
-            return attempt++;
+            return ++attempt;
         }
 
         public long getFirstSent(){

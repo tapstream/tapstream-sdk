@@ -23,8 +23,15 @@ public class Logging {
 	}
 
 	synchronized public static void log(int logLevel, String format, Object... args) {
-		if (logger != null) {
-			logger.log(logLevel, String.format(format, args));
+		if (logger != null && format != null) {
+			try {
+				String msg = format == null ? null : String.format(format, args);
+				logger.log(logLevel, msg);
+			} catch (Exception e){
+				logger.log(ERROR, "Unhandled exception in the logging system. " +
+						"This should never happen.");
+			}
+
 		}
 	}
 

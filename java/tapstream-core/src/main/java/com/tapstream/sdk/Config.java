@@ -13,8 +13,8 @@ public class Config {
 		this.developerSecret = developerSecret;
 	}
 
-	private Retry.Strategy eventRetryStrategy = Retry.DEFAULT_EVENT_STRATEGY;
-	private Retry.Strategy timelineLookupRetryStrategy = Retry.DEFAULT_TIMELINE_LOOKUP_STRATEGY;
+	private Retry.Strategy dataCollectionRetryStrategy = Retry.DEFAULT_DATA_COLLECTION_STRATEGY;
+	private Retry.Strategy userFacingRequestRetryStrategy = Retry.DEFAULT_USER_FACING_RETRY_STRATEGY;
 
 	// Optional hardware identifiers that can be provided by the caller
 	private String odin1 = null;
@@ -86,13 +86,22 @@ public class Config {
 	public boolean getCollectAdvertisingId() { return collectAdvertisingId; }
 	public void setCollectAdvertisingId(boolean collect) { collectAdvertisingId = collect; }
 
-	public Retry.Strategy getEventRetryStrategy() { return eventRetryStrategy; }
-	public void setEventRetryStrategy(Retry.Strategy eventRetryStrategy) {this.eventRetryStrategy = eventRetryStrategy;}
-
-	public Retry.Strategy getTimelineLookupRetryStrategy() {return timelineLookupRetryStrategy;}
-	public void setTimelineLookupRetryStrategy(Retry.Strategy timelineLookupRetryStrategy) { this.timelineLookupRetryStrategy = timelineLookupRetryStrategy; }
-
 	public boolean getUseWordOfMouth(){return useWordOfMouth;}
 	public void setUseWordOfMouth(boolean v){ useWordOfMouth = v;}
 
+	public Retry.Strategy getDataCollectionRetryStrategy() {
+		return dataCollectionRetryStrategy;
+	}
+
+	public void setDataCollectionRetryStrategy(Retry.Strategy dataCollectionRetryStrategy) {
+		this.dataCollectionRetryStrategy = dataCollectionRetryStrategy;
+	}
+
+	public Retry.Strategy getUserFacingRequestRetryStrategy() {
+		return userFacingRequestRetryStrategy;
+	}
+
+	public void setUserFacingRequestRetryStrategy(Retry.Strategy userFacingRequestRetryStrategy) {
+		this.userFacingRequestRetryStrategy = userFacingRequestRetryStrategy;
+	}
 }

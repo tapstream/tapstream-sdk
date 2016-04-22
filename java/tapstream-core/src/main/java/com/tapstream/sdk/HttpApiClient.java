@@ -2,7 +2,8 @@ package com.tapstream.sdk;
 
 import com.tapstream.sdk.errors.ApiException;
 import com.tapstream.sdk.errors.EventAlreadyFiredException;
-import com.tapstream.sdk.errors.RecoverableApiException;
+import com.tapstream.sdk.http.AsyncHttpClient;
+import com.tapstream.sdk.http.AsyncHttpRequest;
 import com.tapstream.sdk.http.HttpClient;
 import com.tapstream.sdk.http.HttpRequest;
 import com.tapstream.sdk.http.HttpResponse;
@@ -17,7 +18,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,38 +29,46 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-class HttpApiClient implements ApiClient {
+public class HttpApiClient implements ApiClient {
 	public static final String VERSION = "3.0.0";
 
 	private final Platform platform;
 	private final Config config;
 	private final ScheduledExecutorService executor;
 	private final AtomicBoolean started = new AtomicBoolean(false);
-	private final HttpClient client;
+	private final AsyncHttpClient asyncClient;
 	private final OneTimeOnlyEventTracker oneTimeEventTracker;
 
-	private boolean queueEvents = true;
-	private List<QueuedEvent> queuedEvents = new ArrayList<QueuedEvent>();
-
+	private boolean queueRequests = true;
+	private List<Runnable> queuedRequests = new ArrayList<Runnable>();
 	private Event.Params commonEventParams;
 
 
-	HttpApiClient(Platform platform, Config config){
+	public HttpApiClient(Platform platform, Config config){
 		this(platform, config, new StdLibHttpClient(), Executors.newSingleThreadScheduledExecutor(new DaemonThreadFactory()));
 	}
 
-	HttpApiClient(Platform platform, Config config, HttpClient client, ScheduledExecutorService executor) {
+	public HttpApiClient(Platform platform, Config config, HttpClient client, ScheduledExecutorService executor) {
 		this.platform = platform;
 		this.config = config;
-		this.client = client;
 		this.executor = executor;
+		this.asyncClient = new AsyncHttpClient(client, executor);
 		this.oneTimeEventTracker = new OneTimeOnlyEventTracker(platform);
+	}
+
+
+	/**
+	 * Visible for testing only.
+	 * @return the common event params.
+     */
+	Event.Params getCommonEventParams(){
+		return commonEventParams;
 	}
 
 
 	@Override
 	public void close() throws IOException {
-		Utils.closeQuietly(client);
+		Utils.closeQuietly(asyncClient);
 
 		executor.shutdownNow();
 		try{
@@ -80,26 +88,26 @@ class HttpApiClient implements ApiClient {
 		final String appName = Utils.getOrDefault(platform.getAppName(), "");
 
 		if(config.getFireAutomaticInstallEvent()) {
-			String installEventName = config.getInstallEventName();
-			if(installEventName != null) {
-				fireEvent(new Event(installEventName, true));
-			} else {
-				fireEvent(new Event(String.format(Locale.US, "android-%s-install", appName), true));
-			}
+			String installEventName = config.getInstallEventName() == null
+					? String.format(Locale.US, "android-%s-install", appName)
+					: config.getInstallEventName();
+
+			fireEvent(new Event(installEventName, true));
 		}
 
 		if(config.getFireAutomaticOpenEvent()) {
+			final String openEventName = config.getOpenEventName() == null
+					? String.format(Locale.US, "android-%s-open", appName)
+					: config.getOpenEventName();
+
 			ActivityEventSource eventSource = platform.getActivityEventSource();
-			if (eventSource != null){
+			if (eventSource == null) {
+				fireEvent(new Event(openEventName, false));
+			} else {
 				eventSource.setListener(new ActivityEventSource.ActivityListener() {
 					@Override
 					public void onOpen() {
-						String openEventName = config.getOpenEventName();
-						if(openEventName != null) {
-							fireEvent(new Event(openEventName, false));
-						} else {
-							fireEvent(new Event(String.format(Locale.US, "android-%s-open", appName), false));
-						}
+						fireEvent(new Event(openEventName, false));
 					}
 				});
 			}
@@ -128,7 +136,7 @@ class HttpApiClient implements ApiClient {
 		params.put("hardware-wifi-mac", config.getWifiMac());
 		params.put("hardware-android-device-id", config.getDeviceId());
 		params.put("hardware-android-android-id", config.getAndroidId());
-		params.put("uuid", platform.loadUuid());
+		params.put("uuid", platform.loadSessionId());
 		params.put("platform", "Android");
 		params.put("vendor", platform.getManufacturer());
 		params.put("model", platform.getModel());
@@ -149,7 +157,7 @@ class HttpApiClient implements ApiClient {
 			try{
 				advertisingIdInfo = adIdFetcher.call();
 			} catch (Exception e){
-				Logging.log(Logging.WARN, "Exception while getting the Advertising ID: " + e.getMessage());
+				Logging.log(Logging.WARN, "Exception while getting the Advertising ID: " + e.toString());
 			}
 
 			if (advertisingIdInfo != null && advertisingIdInfo.isValid()){
@@ -169,39 +177,47 @@ class HttpApiClient implements ApiClient {
 	}
 
 	private synchronized void dispatchQueuedEvents(){
-		queueEvents = false;
+		queueRequests = false;
 
-		for(QueuedEvent e: queuedEvents) {
-			prepareAndSendEvent(e.getEvent(), e.getResponseFuture());
+		for(Runnable r: queuedRequests) {
+			executor.submit(r);
 		}
 
-		queuedEvents = null;
+		queuedRequests = null;
 	}
 
 
 	@Override
 	public ApiFuture<EventApiResponse> fireEvent(final Event event) {
-		ApiFuture<EventApiResponse> responseFuture = new ApiFuture<EventApiResponse>();
+		SettableApiFuture<EventApiResponse> responseFuture = new SettableApiFuture<EventApiResponse>();
 		try {
-			prepareAndSendEvent(event, responseFuture);
+			fireEvent(event, responseFuture);
 		} catch (Exception e){
 			responseFuture.setException(e);
 		}
 		return responseFuture;
 	}
 
-	synchronized private void prepareAndSendEvent(final Event event, final ApiFuture<EventApiResponse> responseFuture){
+	private void fireEvent(final Event event, final SettableApiFuture<EventApiResponse> responseFuture){
 		try {
-			if (queueEvents) {
-				queuedEvents.add(new QueuedEvent(event, responseFuture));
-				return;
+			synchronized (this){
+				if (queueRequests) {
+					queuedRequests.add(new Runnable() {
+
+						@Override
+						public void run() {
+							fireEvent(event, responseFuture);
+						}
+					});
+					return;
+				}
 			}
 
 			event.prepare(Utils.getOrDefault(platform.getAppName(), ""));
 
 			if (event.isOneTimeOnly()) {
 				if (oneTimeEventTracker.hasBeenAlreadySent(event)) {
-					Logging.log(Logging.INFO, "Tapstream ignoring event named \"%s\" because it is a " +
+					Logging.log(Logging.INFO, "Ignoring event named \"%s\" because it is a " +
 							"one-time-only event that has already been fired", event.getName());
 					responseFuture.setException(new EventAlreadyFiredException());
 					return;
@@ -209,90 +225,92 @@ class HttpApiClient implements ApiClient {
 				oneTimeEventTracker.inProgress(event);
 			}
 
-			final Retry.Retryable<HttpRequest> eventRequest;
+			final HttpRequest eventRequest = RequestBuilders
+					.eventRequestBuilder(config.getAccountName(), event.getName())
+					.postBody(event.buildPostBody(commonEventParams, config.getGlobalEventParams()))
+					.build();
 
-			try{
-				eventRequest = RequestBuilders
-						.eventRequestBuilder(config.getAccountName(), event.getName())
-						.postBody(event.buildPostBody(commonEventParams, config.getGlobalEventParams()))
-						.build()
-						.makeRetryable(config.getEventRetryStrategy());
-			} catch (MalformedURLException error){
-				responseFuture.setException(new ApiException(error));
-				return;
-			}
 
-			sendEventRequest(event, responseFuture, eventRequest);
+			AsyncHttpRequest.Handler<EventApiResponse> responseHandler = new AsyncHttpRequest.Handler<EventApiResponse>() {
+				@Override
+				public void onFailure() {
+					oneTimeEventTracker.failed(event);
+				}
+
+				@Override
+				public EventApiResponse checkedRun(HttpResponse response) throws IOException, ApiException {
+					Logging.log(Logging.INFO, "Fired event named \"%s\"", event.getName());
+					oneTimeEventTracker.sent(event);
+					return new EventApiResponse(response);
+				}
+			};
+
+			asyncClient.sendRequest(eventRequest, config.getDataCollectionRetryStrategy(), responseHandler, responseFuture);
+
 
 		} catch (Exception e){
 			responseFuture.setException(e);
 		}
-	}
-
-	private void sendEventRequest(final Event event, ApiFuture<EventApiResponse> responseFuture, Retry.Retryable<HttpRequest> retryableRequest){
-
-		ApiRequest.Handler<EventApiResponse> responseHandler = new ApiRequest.Handler<EventApiResponse>() {
-			@Override
-			public void onFailure() {
-				oneTimeEventTracker.failed(event);
-			}
-
-			@Override
-			public EventApiResponse checkedRun(HttpResponse response) throws IOException, ApiException {
-				Logging.log(Logging.INFO, "Fired event named \"%s\"", event.getName());
-				oneTimeEventTracker.sent(event);
-				return new EventApiResponse(response);
-			}
-		};
-        ApiRequest.submit(executor, client, responseFuture, retryableRequest, responseHandler);
 	}
 
 	@Override
-	public ApiFuture<TimelineApiResponse> lookupTimeline()
-	{
-		final ApiFuture<TimelineApiResponse> responseFuture = new ApiFuture<TimelineApiResponse>();
-
+	public ApiFuture<TimelineApiResponse> lookupTimeline() {
+		final SettableApiFuture<TimelineApiResponse> responseFuture = new SettableApiFuture<TimelineApiResponse>();
 		try {
-			final Retry.Retryable<HttpRequest> retryable = RequestBuilders
-					.timelineLookupRequestBuilder(config.getDeveloperSecret(), platform.loadUuid())
-					.build()
-					.makeRetryable(config.getTimelineLookupRetryStrategy());
-
-
-            ApiRequest.Handler<TimelineApiResponse> responseHandler = new ApiRequest.Handler<TimelineApiResponse>() {
-                @Override
-                public TimelineApiResponse checkedRun(HttpResponse resp) throws IOException, ApiException {
-                    TimelineApiResponse apiResponse = new TimelineApiResponse(resp);
-                    if (apiResponse.isEmpty()){
-                        throw new RecoverableApiException(resp);
-                    }
-
-                    return apiResponse;
-                }
-            };
-
-            ApiRequest.submit(executor, client, responseFuture, retryable, responseHandler);
-
+			lookupTimeline(responseFuture);
 		} catch (Exception e){
 			responseFuture.setException(e);
 		}
-
 		return responseFuture;
+	}
+
+	private void lookupTimeline(final SettableApiFuture<TimelineApiResponse> responseFuture) {
+		try {
+			synchronized (this){
+				if (queueRequests) {
+					queuedRequests.add(new Runnable() {
+
+						@Override
+						public void run() {
+							lookupTimeline(responseFuture);
+						}
+					});
+					return;
+				}
+			}
+
+			final HttpRequest request = RequestBuilders
+					.timelineLookupRequestBuilder(config.getDeveloperSecret(), platform.loadSessionId())
+					.build();
+
+			AsyncHttpRequest.Handler<TimelineApiResponse> responseHandler = new AsyncHttpRequest.Handler<TimelineApiResponse>() {
+				@Override
+				public TimelineApiResponse checkedRun(HttpResponse resp) throws IOException, ApiException {
+					return new TimelineApiResponse(resp);
+				}
+			};
+
+			asyncClient.sendRequest(request, config.getUserFacingRequestRetryStrategy(), responseHandler, responseFuture);
+
+		} catch (Exception e) {
+			responseFuture.setException(e);
+			return;
+		}
+
 	}
 
 	@Override
 	public ApiFuture<OfferApiResponse> getWordOfMouthOffer(final String insertionPoint) {
-		final ApiFuture<OfferApiResponse> responseFuture = new ApiFuture<OfferApiResponse>();
+		final SettableApiFuture<OfferApiResponse> responseFuture = new SettableApiFuture<OfferApiResponse>();
 
 		try{
 			final String bundle = platform.getPackageName();
 
-			final Retry.Retryable<HttpRequest> retryable = RequestBuilders
+			final HttpRequest request = RequestBuilders
 					.wordOfMouthOfferRequestBuilder(config.getDeveloperSecret(), insertionPoint, bundle)
-					.build()
-					.makeRetryable(config.getTimelineLookupRetryStrategy());
+					.build();
 
-			ApiRequest.Handler<OfferApiResponse> offerRequest = new ApiRequest.Handler<OfferApiResponse>() {
+			AsyncHttpRequest.Handler<OfferApiResponse> handler = new AsyncHttpRequest.Handler<OfferApiResponse>() {
 				@Override
 				public OfferApiResponse checkedRun(HttpResponse resp) throws IOException, ApiException {
 					JSONObject responseObject = new JSONObject(resp.getBodyAsString());
@@ -301,7 +319,7 @@ class HttpApiClient implements ApiClient {
 				}
 			};
 
-			ApiRequest.submit(executor, client, responseFuture, retryable, offerRequest);
+			asyncClient.sendRequest(request, config.getUserFacingRequestRetryStrategy(), handler, responseFuture);
 
 		} catch (Exception e){
 			responseFuture.setException(e);
@@ -314,16 +332,14 @@ class HttpApiClient implements ApiClient {
 
 	@Override
 	public ApiFuture<RewardApiResponse> getWordOfMouthRewardList() {
-		final ApiFuture<RewardApiResponse> responseFuture = new ApiFuture<RewardApiResponse>();
+		final SettableApiFuture<RewardApiResponse> responseFuture = new SettableApiFuture<RewardApiResponse>();
 
 		try {
-			final Retry.Retryable<HttpRequest> retryable = RequestBuilders
-					.wordOfMouthRewardRequestBuilder(config.getDeveloperSecret(), platform.loadUuid())
-					.build()
-					.makeRetryable(config.getTimelineLookupRetryStrategy());
+			final HttpRequest request = RequestBuilders
+					.wordOfMouthRewardRequestBuilder(config.getDeveloperSecret(), platform.loadSessionId())
+					.build();
 
-
-			ApiRequest.Handler<RewardApiResponse> getRewardApiResponses = new ApiRequest.Handler<RewardApiResponse>() {
+			AsyncHttpRequest.Handler<RewardApiResponse> handler = new AsyncHttpRequest.Handler<RewardApiResponse>() {
 				@Override
 				public RewardApiResponse checkedRun(HttpResponse resp) throws IOException, ApiException {
 
@@ -340,8 +356,8 @@ class HttpApiClient implements ApiClient {
 				}
 			};
 
+			asyncClient.sendRequest(request, config.getUserFacingRequestRetryStrategy(), handler, responseFuture);
 
-			ApiRequest.submit(executor, client, responseFuture, retryable, getRewardApiResponses);
 		} catch (Exception e){
 			responseFuture.setException(e);
 		}

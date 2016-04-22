@@ -61,7 +61,7 @@ public class WordOfMouthImpl implements WordOfMouth{
 
         wv.loadDataWithBaseURL("https://tapstream.com/", o.getMarkup(), "text/html", null, "https://tapstream.com/");
         wv.setBackgroundColor(Color.TRANSPARENT);
-        final String uuid = platform.loadUuid();
+        final String uuid = platform.loadSessionId();
 
         wv.setWebViewClient(new WebViewClient(){
             @Override

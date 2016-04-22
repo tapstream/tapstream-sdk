@@ -21,23 +21,6 @@ public class RequestBuilders {
                 .scheme(DEFAULT_SCHEME)
                 .host(API_TAPSTREAM_COM)
                 .path(path);
-
-    }
-
-    public static HttpRequest.Builder hitRequestBuilder(String accountName, String hitName){
-
-        final String path =
-                "/"
-                + URLEncoding.QUERY_STRING_ENCODER.encode(accountName)
-                + "/hit/"
-                + URLEncoding.QUERY_STRING_ENCODER.encode(hitName)
-                + ".gif";
-
-        return new HttpRequest.Builder()
-                .method(HttpMethod.GET)
-                .scheme(DEFAULT_SCHEME)
-                .host(API_TAPSTREAM_COM)
-                .path(path);
     }
 
     public static HttpRequest.Builder timelineLookupRequestBuilder(String secret, String eventSession){
@@ -48,7 +31,8 @@ public class RequestBuilders {
                 .host(REPORTING_TAPSTREAM_COM)
                 .path("/v1/timelines/lookup")
                 .addQueryParameter("secret", secret)
-                .addQueryParameter("event_session", eventSession);
+                .addQueryParameter("event_session", eventSession)
+                .addQueryParameter("blocking", "true");
     }
 
     public static HttpRequest.Builder wordOfMouthOfferRequestBuilder(String secret, String insertionPoint, String bundle) {

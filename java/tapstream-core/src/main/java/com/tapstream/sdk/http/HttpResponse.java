@@ -34,6 +34,9 @@ public class HttpResponse {
 	}
 
 	public String getBodyAsString() {
+		if (body == null)
+			return null;
+
 		try{
 			return new String(body, "UTF-8");
 		} catch (UnsupportedEncodingException e){

@@ -1,12 +1,13 @@
-package com.tapstream.sdk;
+package com.tapstream.sdk.http;
 
+import com.tapstream.sdk.ApiResponse;
+import com.tapstream.sdk.Logging;
+import com.tapstream.sdk.Retry;
+import com.tapstream.sdk.SettableApiFuture;
 import com.tapstream.sdk.errors.ApiException;
 import com.tapstream.sdk.errors.RecoverableApiException;
 import com.tapstream.sdk.errors.RetriesExhaustedException;
 import com.tapstream.sdk.errors.UnrecoverableApiException;
-import com.tapstream.sdk.http.HttpClient;
-import com.tapstream.sdk.http.HttpRequest;
-import com.tapstream.sdk.http.HttpResponse;
 
 import java.io.IOException;
 import java.util.concurrent.Future;
@@ -14,36 +15,21 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 
-public class ApiRequest<T> implements Runnable {
+public class AsyncHttpRequest<T extends ApiResponse> implements Runnable {
 
     public abstract static class Handler<T> {
-        abstract T checkedRun(HttpResponse resp) throws IOException, ApiException;
-        void onFailure(){};
-        void onRetry(){};
+        protected abstract T checkedRun(HttpResponse resp) throws IOException, ApiException;
+        protected void onFailure(){};
+        protected void onRetry(){};
     }
 
     final HttpClient client;
-    final ApiFuture<T> responseFuture;
+    final SettableApiFuture<T> responseFuture;
     final Retry.Retryable<HttpRequest> retryable;
     final Handler<T> handler;
     final ScheduledExecutorService executor;
 
-	public static <T> void submit(ScheduledExecutorService executor,
-                                  HttpClient client,
-                                  ApiFuture<T> responseFuture,
-                                  Retry.Retryable<HttpRequest> retryable,
-                                  Handler<T> handler) {
-
-        try {
-            Future<?> requestFuture = executor.submit(new ApiRequest<T>(responseFuture, retryable, handler, executor, client));
-            responseFuture.propagateCancellationTo(requestFuture);
-        } catch (RuntimeException e){
-            responseFuture.setException(e);
-            handler.onFailure();
-        }
-    }
-
-    public ApiRequest(ApiFuture<T> responseFuture, Retry.Retryable<HttpRequest> retryable, Handler<T> handler, ScheduledExecutorService executor, HttpClient client) {
+    public AsyncHttpRequest(SettableApiFuture<T> responseFuture, Retry.Retryable<HttpRequest> retryable, Handler<T> handler, ScheduledExecutorService executor, HttpClient client) {
         this.responseFuture = responseFuture;
         this.retryable = retryable;
         this.handler = handler;
@@ -62,7 +48,9 @@ public class ApiRequest<T> implements Runnable {
             response.throwOnError();
             responseFuture.set(handler.checkedRun(response));
         } catch (RecoverableApiException e) {
-            if (retryable.shouldRetry()) {
+            if (responseFuture.isCancelled()){
+                Logging.log(Logging.INFO, "API request cancelled");
+            } else if (retryable.shouldRetry()) {
                 Logging.log(Logging.WARN, "Failure during request, retrying (http code %d).", e.getHttpResponse().status);
                 retryable.incrementAttempt();
                 handler.onRetry();
@@ -79,7 +67,7 @@ public class ApiRequest<T> implements Runnable {
             Logging.log(Logging.ERROR, "IO Error during API call");
             fail(e);
         } catch (Exception e) {
-            Logging.log(Logging.ERROR, e.getMessage());
+            Logging.log(Logging.ERROR, e.toString());
             fail(e);
         }
     }
