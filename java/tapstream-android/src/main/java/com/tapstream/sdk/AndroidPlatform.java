@@ -23,9 +23,9 @@ import java.util.concurrent.Callable;
 
 
 class AndroidPlatform implements Platform {
-	private static final String FIRED_EVENTS_KEY = "TapstreamSDKFiredEvents";
-	private static final String UUID_KEY = "TapstreamSDKUUID";
-	private static final String WOM_REWARDS_KEY = "TapstreamWOMRewards";
+	public static final String FIRED_EVENTS_KEY = "TapstreamSDKFiredEvents";
+	public static final String UUID_KEY = "TapstreamSDKUUID";
+	public static final String WOM_REWARDS_KEY = "TapstreamWOMRewards";
 
 	private final Application app;
 

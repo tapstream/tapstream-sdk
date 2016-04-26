@@ -117,7 +117,7 @@ public class HttpApiClient implements ApiClient {
 			@Override
 			public void run() {
 				commonEventParams = buildCommonEventParams();
-				dispatchQueuedEvents();
+				dispatchQueuedRequests();
 			}
 		});
 	}
@@ -157,7 +157,7 @@ public class HttpApiClient implements ApiClient {
 			try{
 				advertisingIdInfo = adIdFetcher.call();
 			} catch (Exception e){
-				Logging.log(Logging.WARN, "Exception while getting the Advertising ID: " + e.toString());
+				Logging.log(Logging.WARN, "Advertising ID could not be collected. Is Google Play Services installed?");
 			}
 
 			if (advertisingIdInfo != null && advertisingIdInfo.isValid()){
@@ -176,7 +176,7 @@ public class HttpApiClient implements ApiClient {
 		return params;
 	}
 
-	private synchronized void dispatchQueuedEvents(){
+	private synchronized void dispatchQueuedRequests(){
 		queueRequests = false;
 
 		for(Runnable r: queuedRequests) {

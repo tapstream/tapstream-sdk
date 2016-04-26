@@ -23,7 +23,7 @@ public class Logging {
 	}
 
 	synchronized public static void log(int logLevel, String format, Object... args) {
-		if (logger != null && format != null) {
+		if (logger != null) {
 			try {
 				String msg = format == null ? null : String.format(format, args);
 				logger.log(logLevel, msg);

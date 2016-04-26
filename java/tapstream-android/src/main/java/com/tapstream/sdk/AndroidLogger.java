@@ -3,10 +3,6 @@ package com.tapstream.sdk;
 
 public class AndroidLogger implements Logging.Logger{
 
-    static {
-        Logging.setLogger(new AndroidLogger());
-    }
-
     private static final String TAG = "Tapstream";
 
     @Override

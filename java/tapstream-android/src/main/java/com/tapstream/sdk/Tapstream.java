@@ -14,6 +14,10 @@ public class Tapstream implements AndroidApiClient {
 	private WordOfMouth wom;
 	private ApiClient client;
 
+	static {
+		Logging.setLogger(new AndroidLogger());
+	}
+
 	public interface ClientBuilder {
 		ApiClient build(Platform platform, Config config);
 	}
