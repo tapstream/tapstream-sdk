@@ -23,6 +23,10 @@ public class FormPostBody implements RequestBody {
         return this;
     }
 
+    public Map<String, String> getParams(){
+        return params;
+    }
+
     @Override
     public String contentType(){
         return "application/x-www-form-urlencoded; charset=utf-8";

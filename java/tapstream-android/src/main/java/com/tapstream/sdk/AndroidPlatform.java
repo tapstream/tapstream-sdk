@@ -34,34 +34,34 @@ class AndroidPlatform implements Platform {
 	}
 
 	@Override
-	public String loadSessionId() {
+	synchronized public String loadSessionId() {
 		SharedPreferences prefs = app.getApplicationContext().getSharedPreferences(UUID_KEY, 0);
 		String uuid = prefs.getString("uuid", null);
 		if (uuid == null) {
 			uuid = UUID.randomUUID().toString();
 			SharedPreferences.Editor editor = prefs.edit();
 			editor.putString("uuid", uuid);
-			editor.commit();
+			editor.apply();
 		}
 		return uuid;
 	}
 
 	@Override
-	public Set<String> loadFiredEvents() {
+	synchronized public Set<String> loadFiredEvents() {
 		SharedPreferences settings = app.getApplicationContext().getSharedPreferences(FIRED_EVENTS_KEY, 0);
 		Map<String, ?> fired = settings.getAll();
 		return new HashSet<String>(fired.keySet());
 	}
 
 	@Override
-	public void saveFiredEvents(Set<String> firedEvents) {
+	synchronized public void saveFiredEvents(Set<String> firedEvents) {
 		SharedPreferences settings = app.getApplicationContext().getSharedPreferences(FIRED_EVENTS_KEY, 0);
 		SharedPreferences.Editor editor = settings.edit();
 		editor.clear();
 		for (String name : firedEvents) {
 			editor.putString(name, "");
 		}
-		editor.commit();
+		editor.apply();
 	}
 
 	@Override
@@ -135,23 +135,19 @@ class AndroidPlatform implements Platform {
 
 
 	@Override
-	public Integer getCountForReward(Reward reward){
-		synchronized (this) {
-			SharedPreferences prefs = app.getApplicationContext().getSharedPreferences(WOM_REWARDS_KEY, Context.MODE_PRIVATE);
-			return prefs.getInt(Integer.toString(reward.getOfferId()), 0);
-		}
+	synchronized public Integer getCountForReward(Reward reward){
+		SharedPreferences prefs = app.getApplicationContext().getSharedPreferences(WOM_REWARDS_KEY, Context.MODE_PRIVATE);
+		return prefs.getInt(Integer.toString(reward.getOfferId()), 0);
 	}
 
 	@Override
-	public void consumeReward(Reward reward){
+	synchronized public void consumeReward(Reward reward){
 		String key = String.format("%d", reward.getOfferId());
-		synchronized (this) {
-			SharedPreferences prefs = app.getApplicationContext().getSharedPreferences(WOM_REWARDS_KEY, Context.MODE_PRIVATE);
+		SharedPreferences prefs = app.getApplicationContext().getSharedPreferences(WOM_REWARDS_KEY, Context.MODE_PRIVATE);
+		prefs.edit()
+			.putInt(key, prefs.getInt(key, 0) + 1)
+			.apply();
 
-			prefs.edit()
-				.putInt(key, prefs.getInt(key, 0) + 1)
-				.apply();
-		}
 	}
 
 	@Override

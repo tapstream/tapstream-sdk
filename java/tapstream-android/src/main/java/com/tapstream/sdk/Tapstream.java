@@ -3,14 +3,11 @@ package com.tapstream.sdk;
 import android.app.Application;
 
 import com.tapstream.sdk.wordofmouth.OfferApiResponse;
-import com.tapstream.sdk.wordofmouth.Reward;
-
 import com.tapstream.sdk.wordofmouth.RewardApiResponse;
 import com.tapstream.sdk.wordofmouth.WordOfMouth;
 import com.tapstream.sdk.wordofmouth.WordOfMouthImpl;
 
 import java.io.IOException;
-import java.util.List;
 
 public class Tapstream implements AndroidApiClient {
 	private static Tapstream instance;

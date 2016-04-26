@@ -28,6 +28,7 @@ public class AsyncHttpClient implements Closeable {
                     new Retry.Retryable<HttpRequest>(request, retryStrategy),
                     handler,
                     executor,
+
                     httpClient);
 
             Future<?> requestFuture = executor.submit(asyncRequest);
@@ -38,7 +39,6 @@ public class AsyncHttpClient implements Closeable {
         }
 
         return responseFuture;
-
     }
 
     @Override

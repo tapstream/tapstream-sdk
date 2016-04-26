@@ -1,7 +1,6 @@
 package com.tapstream.sdk;
 
 import com.tapstream.sdk.http.FormPostBody;
-import com.tapstream.sdk.http.RequestBody;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,14 +64,14 @@ public class Event {
 	public static final String PURCHASE_QUANTITY = "purchase-quantity";
 	public static final String PURCHASE_PRICE = "purchase-price";
 	public static final String PURCHASE_CURRENCY = "purchase-currency";
-	public static final String RECEIPT_POST_BODY = "receipt-postBody";
+	public static final String RECEIPT_BODY = "receipt-body";
 
-	private final Params params;
-	private final Params customParams;
+	private final Params params = new Params();
+	private final Params customParams = new Params();
 
 	private String name;
-	private boolean oneTimeOnly;
-	private boolean isTransaction = false;
+	private final boolean oneTimeOnly;
+	private final boolean isTransaction;
 	private String productSku;
 
 	/**
@@ -82,10 +81,9 @@ public class Event {
 	 * @param oneTimeOnly	true if this device should only fire an event with {@code name}.
      */
 	public Event(String name, boolean oneTimeOnly) {
-		this.params = new Params();
-		this.customParams = new Params();
-		this.oneTimeOnly = oneTimeOnly;
 		this.name = name;
+		this.oneTimeOnly = oneTimeOnly;
+		this.isTransaction = false;
 	}
 
 	/**
@@ -96,7 +94,8 @@ public class Event {
 	 * @param quantity
      */
 	public Event(String orderId, String productSku, int quantity) {
-		this("", false);
+		this.name = "";
+		this.oneTimeOnly = false;
 		this.isTransaction = true;
 		this.productSku = productSku;
 		params.put(PURCHASE_TRANSACTION_ID, orderId);
@@ -114,7 +113,8 @@ public class Event {
      * @param currencyCode
      */
 	public Event(String orderId, String productSku, int quantity, int priceInCents, String currencyCode) {
-		this("", false);
+		this.name = "";
+		this.oneTimeOnly = false;
 		this.isTransaction = true;
 		this.productSku = productSku;
 		params.put(PURCHASE_TRANSACTION_ID, orderId);
@@ -125,7 +125,7 @@ public class Event {
 	}
 
 	/**
-	 * Only to be used for creating IAB purchase events.
+	 * Only to be used for creating IAB purchase events from PlayStore JSON.
 	 *
 	 * @param purchaseDataJson
 	 * @param skuDetailsJson
@@ -133,37 +133,36 @@ public class Event {
 	 * @throws JSONException
      */
 	public Event(String purchaseDataJson, String skuDetailsJson, String signature) throws JSONException {
-		this("", false);
-		isTransaction = true;
-		
+		this.name = "";
+		this.oneTimeOnly = false;
+		this.isTransaction = true;
+
 		JSONObject skuDetails = new JSONObject(skuDetailsJson);
 		JSONObject purchase = new JSONObject(purchaseDataJson);
 		
 		productSku = purchase.getString("productId");
 		String orderId = purchase.getString("orderId");
 
-		try {
+		if (skuDetails.has("price_currency_code") && skuDetails.has("price_amount_micros")){
 			String currencyCode = skuDetails.getString("price_currency_code");
 			int priceMicros = skuDetails.getInt("price_amount_micros");
-			int priceCentis = (int)Math.round(priceMicros / 10000.0);
-
+			int priceInCents = (int)Math.round(priceMicros / 10000.0);
 			params.put(PURCHASE_TRANSACTION_ID, orderId);
 			params.put(PURCHASE_PRODUCT_ID, productSku);
 			params.put(PURCHASE_QUANTITY, 1);
-			params.put(PURCHASE_PRICE, priceCentis);
+			params.put(PURCHASE_PRICE, priceInCents);
 			params.put(PURCHASE_CURRENCY, currencyCode);
-			
-		} catch (JSONException e) {
+		} else {
 			// Older versions of the Google Play Store app don't send the currency and amount separately
 			params.put(PURCHASE_TRANSACTION_ID, orderId);
 			params.put(PURCHASE_PRODUCT_ID, productSku);
 			params.put(PURCHASE_QUANTITY, 1);
 		}
-		
+
 		JSONObject receipt = new JSONObject();
 		receipt.put("purchase_data", purchaseDataJson);
 		receipt.put("signature", signature);
-		params.putWithoutTruncation(RECEIPT_POST_BODY, receipt.toString());
+		params.putWithoutTruncation(RECEIPT_BODY, receipt.toString());
 	}
 
 	/**
@@ -202,14 +201,14 @@ public class Event {
 		}
 	}
 
-	RequestBody buildPostBody(final Params commonParams, final Map<String, String> globalCustomParams){
+	FormPostBody buildPostBody(final Params commonParams, final Params globalCustomParams){
 		final FormPostBody body = new FormPostBody();
 
 		body.add(commonParams.toMap());
 		body.add(params.toMap());
 
 		if (globalCustomParams != null){
-			for(Map.Entry<String, String> entry : globalCustomParams.entrySet()) {
+			for(Map.Entry<String, String> entry : globalCustomParams.toMap().entrySet()) {
 				body.add("custom-" + entry.getKey(), entry.getValue());
 			}
 		}
@@ -223,5 +222,21 @@ public class Event {
 		body.add("created-ms", Long.toString(System.currentTimeMillis()));
 
 		return body;
+	}
+
+	Params getParams(){
+		return params;
+	}
+
+	Params getCustomParams(){
+		return customParams;
+	}
+
+	boolean isTransaction(){
+		return isTransaction;
+	}
+
+	String getProductSku(){
+		return productSku;
 	}
 };

@@ -1,8 +1,5 @@
 package com.tapstream.sdk;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Config {
 
 	private final String accountName;
@@ -38,7 +35,7 @@ public class Config {
 	private boolean useWordOfMouth = false;
 	
 	// These parameters will be automatically attached to all events fired by the sdk.
-	private final Map<String, String> globalEventParams = new HashMap<String, String>();
+	private final Event.Params globalEventParams = new Event.Params();
 
 	public String getAccountName(){
 		return accountName;
@@ -52,7 +49,7 @@ public class Config {
 		globalEventParams.put(name, value);
 	}
 
-	public Map<String, String> getGlobalEventParams(){
+	public Event.Params getGlobalEventParams(){
 		return globalEventParams;
 	}
 
