@@ -5,8 +5,10 @@ import android.os.Build;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.tapstream.sdk.api14.ActivityCallbacks;
+import com.tapstream.sdk.wordofmouth.Reward;
 
 import org.hamcrest.Matchers;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,12 +75,24 @@ public class TestAndroidPlatform extends BaseAndroidTest {
 
     @Test
     public void testGetCountForReward() throws Exception {
-        /* TODO: Add implementation */
+        JSONObject rewardDelegate = new JSONObject("{\"offer_id\": 2}");
+        Reward r = Reward.fromApiResponse(rewardDelegate);
+        platform.consumeReward(r);
+        assertThat(platform.getCountForReward(r), is(1));
     }
 
     @Test
     public void testConsumeReward() throws Exception {
-        /* TODO: Add implementation */
+        JSONObject rewardDelegate = new JSONObject("{\"offer_id\": 1}");
+        Reward r = Reward.fromApiResponse(rewardDelegate);
+
+        assertThat(platform.getCountForReward(r), is(0));
+
+        r.consume(platform);
+        r.consume(platform);
+        r.consume(platform);
+
+        assertThat(platform.getCountForReward(r), is(3));
     }
 
     @Test
