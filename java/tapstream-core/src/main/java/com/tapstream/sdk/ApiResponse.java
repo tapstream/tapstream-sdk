@@ -7,6 +7,7 @@ public interface ApiResponse {
 
     /**
      * Returns the {@link HttpResponse} this instance was created from.
+     *
      * @return the associated http response.
      */
     HttpResponse getHttpResponse();
