@@ -1,7 +1,5 @@
 package com.tapstream.sdk;
 
-import android.app.Application;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.tapstream.sdk.http.HttpClient;
@@ -27,9 +25,8 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith(AndroidJUnit4.class)
-public class TestTapstream {
+public class TestTapstream extends BaseAndroidTest {
 
-    Application app;
     HttpClient httpClient;
     AndroidPlatform platform;
     Tapstream ts;
@@ -40,10 +37,7 @@ public class TestTapstream {
 
     @Before
     public void setUp() throws Exception{
-        app = (Application)InstrumentationRegistry.getTargetContext().getApplicationContext();
-
         app.getApplicationInfo().name = "TapstreamTest";
-        TestUtils.clearState(app);
 
         httpClient = mock(HttpClient.class);
         platform = new AndroidPlatform(app);
@@ -59,7 +53,7 @@ public class TestTapstream {
     @Test
     public void testRewardConsumption() throws Exception{
         when(httpClient.sendRequest((HttpRequest) any()))
-                .thenReturn(TestUtils.jsonResponse(app, com.tapstream.sdk.test.R.raw.rewards));
+                .thenReturn(jsonResponse(com.tapstream.sdk.test.R.raw.rewards));
 
         ApiFuture<RewardApiResponse> futureRewards = ts.getWordOfMouthRewardList();
         List<Reward> rewards = futureRewards.get().getRewards();

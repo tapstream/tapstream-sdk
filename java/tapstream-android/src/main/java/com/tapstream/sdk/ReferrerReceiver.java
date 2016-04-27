@@ -9,7 +9,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
 public class ReferrerReceiver extends BroadcastReceiver {
-	private static final String UUID_KEY = "TapstreamSDKUUID";
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -24,7 +23,7 @@ public class ReferrerReceiver extends BroadcastReceiver {
 			}
 
 			if(decoded.length() > 0) {
-				SharedPreferences prefs = context.getApplicationContext().getSharedPreferences(UUID_KEY, 0);
+				SharedPreferences prefs = context.getApplicationContext().getSharedPreferences(AndroidPlatform.UUID_KEY, 0);
 				SharedPreferences.Editor editor = prefs.edit();
 				editor.putString("referrer", decoded);
 				editor.commit();

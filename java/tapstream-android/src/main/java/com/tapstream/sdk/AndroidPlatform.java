@@ -160,13 +160,13 @@ class AndroidPlatform implements Platform {
 
 		// Using reflection, try to instantiate the ActivityCallbacks class.  ActivityCallbacks
 		// is derived from a class only available in api 14, so we expect this to fail for any
-		// android version prior to 4.  For older android versions, a dummy implementation is used.
+		// android version prior to 14.  For older android versions, a dummy implementation is used.
 		ActivityEventSource aes;
 		try {
 			Class<?> cls = Class.forName("com.tapstream.sdk.api14.ActivityCallbacks");
 			Constructor<?> constructor = cls.getConstructor(Application.class);
 			return (ActivityEventSource)constructor.newInstance(app);
-		} catch(Exception e) {
+		} catch(Throwable e) {
 			return new ActivityEventSource();
 		}
 	}
