@@ -1,6 +1,10 @@
 package com.tapstream.sdk;
 
+import org.junit.runner.RunWith;
+
 import android.os.Build;
+import android.app.Application;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.Assume;

@@ -3,6 +3,10 @@ package com.tapstream.sdk;
 import com.google.common.collect.ImmutableMap;
 import com.tapstream.sdk.http.FormPostBody;
 
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.json.JSONObject;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -12,6 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -102,8 +107,53 @@ public class TestEvent {
         expectedParams.put(Event.PURCHASE_QUANTITY, Integer.toString(qty));
         expectedParams.put(Event.PURCHASE_PRICE, Integer.toString(priceInCents));
         expectedParams.put(Event.PURCHASE_CURRENCY, currency);
-        expectedParams.put(Event.RECEIPT_BODY, "{\"signature\":\"theSignature\",\"purchase_data\":\"{\\\"orderId\\\": \\\"order123abc\\\", \\\"productId\\\": \\\"com.product.sku\\\"}\"}");
-        assertThat(event.getParams().toMap(), is(expectedParams));
+
+        String expectedBody = "{\"signature\":\"theSignature\",\"purchase_data\":\"{\\\"orderId\\\": \\\"order123abc\\\", \\\"productId\\\": \\\"com.product.sku\\\"}\"}";
+
+        Map<String, String> actual = event.getParams().toMap();
+        String actualBody = actual.remove(Event.RECEIPT_BODY);
+
+        assertThat(actual, is(expectedParams));
+        assertThat(actualBody, matchesJSONObject(expectedBody));
+    }
+
+    static Matcher<String> matchesJSONObject(String jsonString){
+        return new JSONObjectMatcher(jsonString);
+    }
+
+    static class JSONObjectMatcher extends BaseMatcher<String> {
+        String expected;
+        JSONObjectMatcher(String expected){
+            this.expected = expected;
+        }
+
+        @Override
+        public boolean matches(Object actual) {
+            if(!(actual instanceof String)){
+                return false;
+            }
+            if(actual.equals(expected)){
+                return true;
+            }
+            JSONObject expectedJSON = new JSONObject(expected);
+            JSONObject actualJSON = new JSONObject((String) actual);
+            if(expectedJSON.keySet().size() != actualJSON.keySet().size()){
+                return false;
+            }
+
+            for(Object k: expectedJSON.keySet()){
+                if(!actualJSON.get((String) k).equals(expectedJSON.get((String) k))){
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        @Override
+        public void describeTo(Description description) {
+            description.appendText("JSONMatcher(\"" + expected + "\")");
+        }
     }
 
     @Test
@@ -144,11 +194,13 @@ public class TestEvent {
 
         Event event = spy(new Event("name", false));
         event.prepare(appName);
-        verify(event, never()).setNameForPurchase(appName);
+        //verify(event, never()).setNameForPurchase(appName);
+        assertThat(event.getName(), not("android-appName-purchase-sku"));
 
         Event purchase = spy(new Event("orderId", "sku", 1));
         purchase.prepare(appName);
-        verify(purchase).setNameForPurchase(appName);
+        //verify(purchase).setNameForPurchase(appName);
+        assertThat(purchase.getName(), is("android-appName-purchase-sku"));
     }
 
     @Test

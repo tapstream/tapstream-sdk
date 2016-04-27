@@ -1,5 +1,6 @@
 package com.tapstream.sdk;
 
+import com.google.common.collect.Lists;
 import com.tapstream.sdk.http.HttpResponse;
 
 import org.json.JSONObject;
@@ -38,7 +39,7 @@ public class TestTimelineApiResponse {
         assertThat(nullBodyResponse.parse(), is(nullValue()));
         JSONObject json = validResponse.parse();
         assertThat(json, is(not(nullValue())));
-        assertThat((Collection<String>)json.keySet(), containsInAnyOrder("hits", "events"));
+        assertThat((Collection<String>) Lists.newArrayList(json.keys()), containsInAnyOrder("hits", "events"));
     }
 
 }

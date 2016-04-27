@@ -20,6 +20,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -27,19 +28,19 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class TestAsyncHttpClient {
 
     ScheduledExecutorService executor;
-    @Mock HttpClient syncClient;
+    HttpClient syncClient;
     AsyncHttpClient asyncClient;
 
     @Before
     public void setup() throws Exception {
-        initMocks(this);
+        syncClient = mock(HttpClient.class);
         executor = Executors.newSingleThreadScheduledExecutor();
         asyncClient = new AsyncHttpClient(syncClient, executor);
     }
 
     @After
     public void teardown() throws Exception {
-        executor.shutdownNow();
+        //executor.shutdownNow();
     }
 
     class SimpleApiResponse implements ApiResponse {

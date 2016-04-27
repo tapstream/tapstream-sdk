@@ -1,5 +1,7 @@
 package com.tapstream.sdk;
 
+import org.junit.Before;
+
 import android.support.test.runner.AndroidJUnit4;
 
 import com.tapstream.sdk.http.HttpClient;

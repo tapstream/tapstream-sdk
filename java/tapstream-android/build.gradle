@@ -43,4 +43,8 @@ dependencies {
     compile(project(path: ':tapstream-core')) {
         exclude group: 'org.json', module: 'json'
     }
+
+    androidTestCompile(project(path: ':tapstream-core', configuration: 'testArchives')) {
+        exclude group: 'org.json', module: 'json'
+    }
 }

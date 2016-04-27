@@ -2,6 +2,8 @@ plugins {
     id 'java' // or 'groovy' Must be explicitly applied
 }
 
+apply plugin: 'com.github.hauner.jarTest'
+
 dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'

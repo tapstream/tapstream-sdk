@@ -11,6 +11,7 @@ import java.net.URL;
 import fi.iki.elonen.NanoHTTPD;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 
@@ -81,7 +82,7 @@ public class TestStdLibHttpClient {
         HttpRequest req = new HttpRequest(new URL("http://localhost:8080/get/200"), HttpMethod.GET, null);
         HttpResponse resp = client.sendRequest(req);
         assertThat(resp.getStatus(), is(200));
-        assertThat(resp.getMessage(), is("OK"));
+        assertThat(resp.getMessage(), startsWith("OK"));
         assertThat(resp.getBody(), is(OK_BODY.getBytes()));
         assertThat(resp.getBodyAsString(), is(OK_BODY));
     }
@@ -91,7 +92,7 @@ public class TestStdLibHttpClient {
         HttpRequest req = new HttpRequest(new URL("http://localhost:8080/get/500"), HttpMethod.GET, null);
         HttpResponse resp = client.sendRequest(req);
         assertThat(resp.getStatus(), is(500));
-        assertThat(resp.getMessage(), is("Internal Server Error"));
+        assertThat(resp.getMessage(), startsWith("Internal Server Error"));
         assertThat(resp.getBody(), is(ERROR_BODY.getBytes()));
         assertThat(resp.getBodyAsString(), is(ERROR_BODY));
     }
@@ -102,7 +103,7 @@ public class TestStdLibHttpClient {
         HttpRequest req = new HttpRequest(new URL("http://localhost:8080/post/200"), HttpMethod.POST, new ByteArrayRequestBody(body.getBytes()));
         HttpResponse resp = client.sendRequest(req);
         assertThat(resp.getStatus(), is(200));
-        assertThat(resp.getMessage(), is("OK"));
+        assertThat(resp.getMessage(), startsWith("OK"));
         assertThat(resp.getBody(), is(body.getBytes()));
         assertThat(resp.getBodyAsString(), is(body));
     }
@@ -113,7 +114,7 @@ public class TestStdLibHttpClient {
         HttpRequest req = new HttpRequest(new URL("http://localhost:8080/post/500"), HttpMethod.POST, new ByteArrayRequestBody(body.getBytes()));
         HttpResponse resp = client.sendRequest(req);
         assertThat(resp.getStatus(), is(500));
-        assertThat(resp.getMessage(), is("Internal Server Error"));
+        assertThat(resp.getMessage(), startsWith("Internal Server Error"));
         assertThat(resp.getBody(), is(ERROR_BODY.getBytes()));
         assertThat(resp.getBodyAsString(), is(ERROR_BODY));
     }
