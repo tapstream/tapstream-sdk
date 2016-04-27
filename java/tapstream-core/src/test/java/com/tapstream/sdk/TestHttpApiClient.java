@@ -82,8 +82,8 @@ public class TestHttpApiClient {
 
     @After
     public void tearDown() throws Exception {
-        //executor.shutdownNow();
-        //executor.awaitTermination(1, TimeUnit.SECONDS);
+        executor.shutdownNow();
+        executor.awaitTermination(1, TimeUnit.SECONDS);
     }
 
     @Test

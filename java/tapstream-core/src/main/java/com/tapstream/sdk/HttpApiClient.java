@@ -231,7 +231,6 @@ public class HttpApiClient implements ApiClient {
 					.build();
 
 
-			System.out.println("\n\nSubmitting event...\n\n");
 			AsyncHttpRequest.Handler<EventApiResponse> responseHandler = new AsyncHttpRequest.Handler<EventApiResponse>() {
 				@Override
 				public void onFailure() {
@@ -240,7 +239,6 @@ public class HttpApiClient implements ApiClient {
 
 				@Override
 				public EventApiResponse checkedRun(HttpResponse response) throws IOException, ApiException {
-                    System.out.println("\n\nEvent fired, handling...\n\n");
 					Logging.log(Logging.INFO, "Fired event named \"%s\"", event.getName());
 					oneTimeEventTracker.sent(event);
 					return new EventApiResponse(response);

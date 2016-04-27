@@ -40,7 +40,7 @@ public class TestAsyncHttpClient {
 
     @After
     public void teardown() throws Exception {
-        //executor.shutdownNow();
+        executor.shutdownNow();
     }
 
     class SimpleApiResponse implements ApiResponse {
