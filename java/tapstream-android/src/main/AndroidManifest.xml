@@ -3,8 +3,8 @@
     package="com.tapstream.sdk">
 
     <application
-        android:allowBackup="true"
         android:label="@string/app_name"
-        android:supportsRtl="true"></application>
+        android:supportsRtl="true">
+    </application>
 
 </manifest>

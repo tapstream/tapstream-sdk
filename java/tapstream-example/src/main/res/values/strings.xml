@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">sdk-example</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="main_header">Tapstream Example App</string>
 </resources>

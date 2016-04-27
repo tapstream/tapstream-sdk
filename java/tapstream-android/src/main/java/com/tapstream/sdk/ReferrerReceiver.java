@@ -26,7 +26,7 @@ public class ReferrerReceiver extends BroadcastReceiver {
 				SharedPreferences prefs = context.getApplicationContext().getSharedPreferences(AndroidPlatform.UUID_KEY, 0);
 				SharedPreferences.Editor editor = prefs.edit();
 				editor.putString("referrer", decoded);
-				editor.commit();
+				editor.apply();
 			}
 		}
 	}

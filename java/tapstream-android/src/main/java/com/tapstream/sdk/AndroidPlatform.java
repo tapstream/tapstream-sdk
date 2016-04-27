@@ -142,7 +142,7 @@ class AndroidPlatform implements Platform {
 
 	@Override
 	synchronized public void consumeReward(Reward reward){
-		String key = String.format("%d", reward.getOfferId());
+		String key = Integer.toString(reward.getOfferId());
 		SharedPreferences prefs = app.getApplicationContext().getSharedPreferences(WOM_REWARDS_KEY, Context.MODE_PRIVATE);
 		prefs.edit()
 			.putInt(key, prefs.getInt(key, 0) + 1)

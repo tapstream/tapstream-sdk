@@ -39,7 +39,6 @@ dependencies {
     androidTestCompile 'com.crittercism.dexmaker:dexmaker-mockito:1.4'
     androidTestCompile 'com.google.android.gms:play-services-ads:8.4.0'
 
-    compile 'com.android.support:appcompat-v7:23.3.0'
     compile(project(path: ':tapstream-core')) {
         exclude group: 'org.json', module: 'json'
     }
