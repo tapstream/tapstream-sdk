@@ -28,8 +28,6 @@ public class TimelineApiResponse implements ApiResponse{
         return httpResponse;
     }
 
-
-
     /**
      * @return true if the timeline response is empty
      */

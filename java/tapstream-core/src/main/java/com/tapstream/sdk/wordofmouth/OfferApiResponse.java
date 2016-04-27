@@ -17,6 +17,9 @@ public class OfferApiResponse implements ApiResponse {
         this.offer = offer;
     }
 
+    /**
+     * @return The Offer returned by the server.
+     */
     public Offer getOffer(){
         return offer;
     }

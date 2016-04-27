@@ -21,6 +21,9 @@ public class RewardApiResponse implements ApiResponse{
         this.rewards = rewards;
     }
 
+    /**
+     * @return The list of Reward objects returned by the server.
+     */
     public List<Reward> getRewards(){
         return rewards;
     }
