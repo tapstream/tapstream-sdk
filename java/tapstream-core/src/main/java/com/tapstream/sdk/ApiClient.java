@@ -1,12 +1,9 @@
 package com.tapstream.sdk;
 
-import com.tapstream.sdk.wordofmouth.Offer;
 import com.tapstream.sdk.wordofmouth.OfferApiResponse;
-import com.tapstream.sdk.wordofmouth.Reward;
 import com.tapstream.sdk.wordofmouth.RewardApiResponse;
 
 import java.io.Closeable;
-import java.util.List;
 
 public interface ApiClient extends Closeable {
 
@@ -17,7 +14,7 @@ public interface ApiClient extends Closeable {
 	 * @return An ApiFuture wrapping an EventApiResponse, from which the
 	 *         HttpResponse can be obtained if necessary.
      */
-	ApiFuture<EventApiResponse> fireEvent(Event e);
+    ApiFuture<EventApiResponse> fireEvent(Event e);
 
 	/**
 	 * Queries Tapstream's timeline lookup API to get a list of historic hits
@@ -28,7 +25,7 @@ public interface ApiClient extends Closeable {
 	 *
 	 * @returns An ApiFuture wrapping a TimelineApiResponse, from which a JSONObject can be parsed.
      */
-	ApiFuture<TimelineApiResponse> lookupTimeline();
+    ApiFuture<TimelineApiResponse> lookupTimeline();
 
 	/**
 	 * Queries the Word of Mouth API to retrieve an offer to be displayed to
@@ -45,7 +42,7 @@ public interface ApiClient extends Closeable {
 	 *         .getOffer();
 	 * </pre></code>
      */
-	ApiFuture<OfferApiResponse> getWordOfMouthOffer(final String insertionPoint);
+    ApiFuture<OfferApiResponse> getWordOfMouthOffer(final String insertionPoint);
 
 	/**
 	 * Queries the Word of Mouth API to retrieve a list of rewards associated

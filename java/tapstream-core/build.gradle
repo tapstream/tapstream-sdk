@@ -2,7 +2,18 @@ plugins {
     id 'java' // or 'groovy' Must be explicitly applied
 }
 
-apply plugin: 'com.github.hauner.jarTest'
+configurations {
+    testArtifacts.extendsFrom testRuntime
+}
+
+task testJar (type: Jar) {
+    classifier "test"
+    from sourceSets.test.output
+}
+
+artifacts {
+    testArtifacts testJar
+}
 
 dependencies {
     testCompile 'junit:junit:4.12'
