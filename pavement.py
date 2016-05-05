@@ -39,7 +39,6 @@ pip install markdown django
 PLATFORMS = {
 	'ios': 'iOS',
 	'mac': 'Mac',
-	'android': 'Android',
 	'win8': 'Windows 8',
 	'winphone': 'Windows Phone',
 }
@@ -62,71 +61,6 @@ def debug():
 	global DEBUG, CONFIGURATION
 	DEBUG = True
 	CONFIGURATION = 'Debug'
-
-# Java sdk for Android
-def _make_java(path):
-	with pushd(path):
-		sh('mvn -pl Core clean install')
-		sh('mvn -pl Tapstream clean package')
-		sh('mvn -pl TapstreamTest clean package')
-
-def _gen_java_whitelabel():
-	path('java-whitelabel').rmtree()
-	path.copytree(path('java'), path('java-whitelabel'))
-	for d in ('Core', 'Tapstream', 'TapstreamTest'):
-		path.move(path('java-whitelabel/%s/src/main/java/com/tapstream' % d), path('java-whitelabel/%s/src/main/java/com/conversiontracker' % d))
-	path.move(path('java-whitelabel/Tapstream/src/test/java/com/tapstream'), path('java-whitelabel/Tapstream/src/test/java/com/conversiontracker'))
-	path.move(path('java-whitelabel/Tapstream/src/main/java/com/conversiontracker/sdk/Tapstream.java'), path('java-whitelabel/Tapstream/src/main/java/com/conversiontracker/sdk/ConversionTracker.java'))
-
-	package_name = re.compile(r'com\.tapstream\.sdk')
-	class_name = re.compile(r'([\s("])Tapstream([\s(.])')
-        def clean_file(file_path):
-		with open(file_path, 'rb+') as f:
-			data = f.read()
-			data = package_name.sub('com.conversiontracker.sdk', data)
-			data = class_name.sub(r'\1ConversionTracker\2', data)
-			f.seek(0)
-			f.write(data)
-			f.truncate()
-	for file_path in path('java-whitelabel').walkfiles('*.java'):
-		clean_file(file_path)
-	for file_path in path('java-whitelabel').walkfiles('pom.xml'):
-		clean_file(file_path)
-
-def _package_java():
-	path('builds/android').rmtree()
-	path('builds/android').makedirs()
-	path.copy(path('./java/Tapstream/target/Tapstream-%s.jar' % VERSION), path('./builds/android/'))
-	path.copy(path('./java/Tapstream/target/Tapstream-%s.jar' % VERSION), path('./examples/Android/Example/libs/'))
-	path('builds/tapstream-%s-android.zip' % VERSION).remove()
-	with pushd('builds/android'):
-		_zip("../tapstream-%s-android.zip" % VERSION, 'Tapstream-%s.jar' % VERSION)
-
-def _package_java_whitelabel():
-	path('builds/android-whitelabel').rmtree()
-	path('builds/android-whitelabel').makedirs()
-	path.copy(path('./java-whitelabel/Tapstream/target/Tapstream-%s.jar' % VERSION), path('./builds/android-whitelabel/ConversionTracker.jar'))
-	path('builds/tapstream-%s-android-whitelabel.zip' % VERSION).remove()
-	with pushd('builds/android-whitelabel'):
-		_zip("../tapstream-%s-android-whitelabel.zip" % VERSION, 'ConversionTracker.jar')
-	path('java-whitelabel').rmtree()
-
-@task
-def make_java():
-	_make_java('java')
-	
-@task
-def test_java():
-	sh('java -jar ./java/TapstreamTest/target/sdk-test-%s.jar tests.js' % VERSION)
-
-@task
-def package_java():
-	_make_java('java')
-	_gen_java_whitelabel()
-	_make_java('java-whitelabel')
-	_package_java()
-	_package_java_whitelabel()
-
 
 
 # C# sdk for Windows 8 and Windows Phone
@@ -414,38 +348,6 @@ def package_xamarin():
 		_zip('tapstream-%s-xamarin.zip' % VERSION, 'tapstream-%s-xamarin' % VERSION)
 		sh('rm -rf tapstream-%s-xamarin' % VERSION)
 	sh('echo "Make sure you built the project in Xamarin before running this"')
-
-
-
-
-@needs('make_java')
-@task
-def make_unity():
-	path('builds/unity').rmtree()
-	path('builds/unity').makedirs()
-	path('builds/unity/Plugins/iOS').makedirs()
-	path('builds/unity/Plugins/Android').makedirs()
-	with pushd('unity/java/'):
-		sh('ant release')
-	sh('cp unity/java/build/jar/Tapstream.jar builds/unity/Plugins/Android')
-	sh('cp objc/Core/*.m builds/unity/Plugins/iOS')
-	sh('cp objc/Core/*.h builds/unity/Plugins/iOS')
-	sh('cp objc/Tapstream/*.m builds/unity/Plugins/iOS')
-	sh('cp objc/Tapstream/*.h builds/unity/Plugins/iOS')
-	sh('cp unity/TapstreamObjcInterface.m builds/unity/Plugins/iOS')
-	sh('cp unity/Tapstream.cs builds/unity')
-	# Update Example project
-	sh('cp -r builds/unity/* examples/Unity/Assets/')
-
-@needs('make_unity')
-@task
-def package_unity():
-	path('builds/tapstream-%s-unity.zip' % VERSION).remove()
-	with pushd('builds'):
-		sh('cp -r unity tapstream-%s-unity' % VERSION)
-		_zip('tapstream-%s-unity.zip' % VERSION, 'tapstream-%s-unity' % VERSION)
-		sh('rm -rf tapstream-%s-unity' % VERSION)
-
 
 
 
