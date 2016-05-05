@@ -3,10 +3,10 @@ plugins {
 }
 
 configurations {
-    testArtifacts.extendsFrom testRuntime
+    testArtifacts.extendsFrom testCompile
 }
 
-task testJar (type: Jar) {
+task testJar (type: Jar, dependsOn: testClasses) {
     classifier "test"
     from sourceSets.test.output
 }
@@ -33,4 +33,3 @@ task copyTestResources(type: Copy) {
     from sourceSets.test.resources
     into sourceSets.test.output.classesDir
 }
-
