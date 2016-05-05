@@ -1,7 +1,0 @@
-Core/target
-Tapstream/target
-TapstreamTest/target
-target
-*.iml
-.idea
-dependency-reduced-pom.xml
