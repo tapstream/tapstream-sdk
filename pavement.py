@@ -16,10 +16,10 @@ need to adjust the path to vcvarsall.bat in the vcpaver.cmd script)
 
 ObjC tasks require clang.  To build the test application, you also need v8.
 Version 3.9.24 is required. To install:
-	
+
         First, go to the homebrew base directory
         $ cd $( brew --prefix )
-        
+
         Then, check for homebrew versions for v8
         $ brew versions v8
 
@@ -93,7 +93,7 @@ def package_cs():
 	path('builds/win8').rmtree()
 	path('builds/win8').makedirs()
 	path.copy(path('./cs/Tapstream/bin/%s/TapstreamMetrics.winmd' % CONFIGURATION), path('./builds/win8/'))
-	
+
 	path('builds/winphone').rmtree()
 	path('builds/winphone').makedirs()
 	path.copy(path('./cs/TapstreamWinPhone/Bin/%s/TapstreamMetrics.dll' % CONFIGURATION), path('./builds/winphone/'))
@@ -144,7 +144,7 @@ def make_objc():
 		sh('%s -isysroot %s -miphoneos-version-min=4.3 -arch armv7 -fobjc-arc -shared %s %s -o ./TapstreamTest/bin/Tapstream.so -framework Foundation -framework UIKit -framework SafariServices -framework CoreGraphics' % (
 			clang, sdk_root, include_dirs, tapstream_sources
 		))
-		
+
 		# Mac With and without ARC
 		sh('clang -fno-objc-arc -shared %s %s -o ./TapstreamTest/bin/Tapstream.so -framework Foundation -framework AppKit -framework IOKit' % (
 			include_dirs, tapstream_sources
@@ -161,7 +161,7 @@ def make_objc():
 		sh('clang++ -fobjc-arc %s %s -o ./TapstreamTest/bin/TapstreamTestMac -DTEST_PLATFORM=mac -lv8 -framework Foundation -framework IOKit' % (
 			include_dirs, tapstream_test_sources
 		))
-		
+
 
 @task
 def test_objc_mac():
@@ -220,40 +220,6 @@ def package_objc():
 			sh('zip -r ../tapstream-%s-%s-whitelabel.zip %s' % (VERSION, sdk, folders))
 
 
-@needs('make_java', 'make_objc')
-@task
-def make_phonegap():
-	path('builds/phonegap').rmtree()
-	path('builds/phonegap').makedirs()
-	sh('cp -r phonegap builds')
-	sh('cp -r builds/ios/Tapstream builds/phonegap/src/ios')
-	sh('cp builds/android/Tapstream-%s.jar builds/phonegap/src/android/Tapstream.jar' % VERSION)
-
-	# Generate plugin xml elements that will copy each ios source file to the right place
-	# Format these elements into the plugin file
-	sources = path('builds/phonegap/src/ios/Tapstream').walkfiles('*.m')
-	headers = path('builds/phonegap/src/ios/Tapstream').walkfiles('*.h')
-	base = path('builds/phonegap')
-	elements = ['        <source-file src="%s" />' % base.relpathto(s) for s in sources]
-	elements += ['        <header-file src="%s" />' % base.relpathto(h) for h in headers]
-	elements = '\n'.join(elements)
-
-	with open('builds/phonegap/plugin.xml') as file:
-		data = file.read()
-	data = re.sub(r'{{\s*ios_sources\s*}}', elements, data)
-	with open('builds/phonegap/plugin.xml', 'w') as file:
-		file.write(data)
-
-@needs('make_phonegap')
-@task
-def package_phonegap():
-	path('builds/tapstream-%s-phonegap.zip' % VERSION).remove()
-	with pushd('builds'):
-		sh('cp -r phonegap tapstream-%s-phonegap' % VERSION)
-		_zip('tapstream-%s-phonegap.zip' % VERSION, 'tapstream-%s-phonegap' % VERSION)
-		sh('rm -rf tapstream-%s-phonegap' % VERSION)
-
-
 
 @needs('make_java', 'make_objc')
 @task
@@ -278,7 +244,7 @@ def make_titanium():
 @task
 def package_titanium():
 	path('builds/tapstream-%s-titanium.zip' % VERSION).remove()
-	with pushd('builds/titanium'):		
+	with pushd('builds/titanium'):
 		_zip('../tapstream-%s-titanium.zip' % VERSION, 'modules')
 
 
