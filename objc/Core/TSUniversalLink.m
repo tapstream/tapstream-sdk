@@ -15,14 +15,17 @@
 {
 	TSUniversalLinkStatus status = kTSULUnknown;
 
+	if (response.status != 200 || response.data == nil){
+		return [self universalLinkWithStatus:kTSULUnknown];
+	}
+
 	NSData *jsonData = response.data;
 	NSError* error = nil;
 	NSDictionary *jsonDict  = [NSJSONSerialization JSONObjectWithData:jsonData
 															  options:kNilOptions
 																error:&error];
 
-
-	if (error != nil || response.status != 200){
+	if (error != nil){
 		return [self universalLinkWithStatus:kTSULUnknown];
 	}
 
