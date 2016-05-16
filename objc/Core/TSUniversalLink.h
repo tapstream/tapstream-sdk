@@ -16,6 +16,7 @@ typedef enum _TSUniversalLinkStatus
 @property(nonatomic, STRONG_OR_RETAIN, readonly) NSURL* deeplinkURL;
 @property(nonatomic, STRONG_OR_RETAIN, readonly) NSURL* fallbackURL;
 @property(nonatomic, readonly) TSUniversalLinkStatus status;
+@property(nonatomic, STRONG_OR_RETAIN, readonly) NSError* error;
 
 + (instancetype)universalLinkWithDeeplinkQueryResponse:(TSResponse*)response;
 + (instancetype)universalLinkWithStatus:(TSUniversalLinkStatus)status;

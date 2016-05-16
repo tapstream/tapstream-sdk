@@ -34,6 +34,7 @@
 		12FFCF0A183FE5B300D54F4E /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12FFCF09183FE5B300D54F4E /* StoreKit.framework */; };
 		662003871BC7432900ACED07 /* TSSafariViewControllerDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 662003861BC7432900ACED07 /* TSSafariViewControllerDelegate.m */; };
 		662003901BC7758400ACED07 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6620038F1BC7758400ACED07 /* SafariServices.framework */; };
+		668FF8A51CEA38FA009A8C44 /* TSError.m in Sources */ = {isa = PBXBuildFile; fileRef = 668FF8A41CEA38FA009A8C44 /* TSError.m */; };
 		66D258E51C2083E600667982 /* TSLander.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D258DE1C2083E600667982 /* TSLander.m */; };
 		66D258E61C2083E600667982 /* TSLanderController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D258E01C2083E600667982 /* TSLanderController.m */; };
 		66D258E71C2083E600667982 /* TSLanderDelegateWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D258E31C2083E600667982 /* TSLanderDelegateWrapper.m */; };
@@ -95,6 +96,8 @@
 		662003851BC7432900ACED07 /* TSSafariViewControllerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSSafariViewControllerDelegate.h; sourceTree = "<group>"; };
 		662003861BC7432900ACED07 /* TSSafariViewControllerDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSSafariViewControllerDelegate.m; sourceTree = "<group>"; };
 		6620038F1BC7758400ACED07 /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = System/Library/Frameworks/SafariServices.framework; sourceTree = SDKROOT; };
+		668FF8A31CEA35BE009A8C44 /* TSError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TSError.h; sourceTree = "<group>"; };
+		668FF8A41CEA38FA009A8C44 /* TSError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSError.m; sourceTree = "<group>"; };
 		66D258DD1C2083E600667982 /* TSLander.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSLander.h; sourceTree = "<group>"; };
 		66D258DE1C2083E600667982 /* TSLander.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSLander.m; sourceTree = "<group>"; };
 		66D258DF1C2083E600667982 /* TSLanderController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSLanderController.h; sourceTree = "<group>"; };
@@ -215,6 +218,8 @@
 				12A98521185A67A500D388CD /* TSUtils.m */,
 				66D258E91C22C7A300667982 /* TSUniversalLink.h */,
 				66D258EA1C2950C500667982 /* TSUniversalLink.m */,
+				668FF8A31CEA35BE009A8C44 /* TSError.h */,
+				668FF8A41CEA38FA009A8C44 /* TSError.m */,
 			);
 			name = Core;
 			path = ../../objc/Core;
@@ -336,6 +341,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				12A98532185A67A500D388CD /* TSUtils.m in Sources */,
+				668FF8A51CEA38FA009A8C44 /* TSError.m in Sources */,
 				12042FF6167D456200F509B7 /* main.m in Sources */,
 				66D258E71C2083E600667982 /* TSLanderDelegateWrapper.m in Sources */,
 				12A98534185A67A500D388CD /* TSCoreListenerImpl.m in Sources */,

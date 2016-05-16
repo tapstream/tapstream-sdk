@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "TSTapstream.h"
 #import "TSUniversalLink.h"
+#import "TSError.h"
 
 @implementation AppDelegate
 
@@ -133,14 +134,41 @@
  restorationHandler:(void (^)(NSArray *restorableObjects))restorationHandler
 {
 	TSUniversalLink* result = [[TSTapstream instance] handleUniversalLink:userActivity];
-	if(result.status == kTSULValid && result.fallbackURL != nil)
+	switch(result.status)
 	{
-		// Do deeplink things
-		NSLog(@"Universal Link Handled: %@, %@", result.deeplinkURL, result.fallbackURL);
-		return YES;
-	}else if([userActivity.activityType isEqualToString:NSUserActivityTypeBrowsingWeb]){
-		// Fall back to openURL if link not handled.
-		[[UIApplication sharedApplication] openURL:userActivity.webpageURL];
+		case kTSULValid:
+			NSLog(@"Universal Link Handled (dest: %@)", result.deeplinkURL);
+			// Handle UL...
+			break;
+		case kTSULDisabled:
+			NSLog(@"Universal Link Disabled (dest: %@)", result.fallbackURL);
+			// Fall back to fallbackURL in browser
+			[[UIApplication sharedApplication] openURL:result.fallbackURL];
+			break;
+		case kTSULUnknown:
+			NSLog(@"Something didn't quite work right");
+			if(result.error != nil)
+			{
+				// An error occurred, better check it out
+				switch(result.error.code)
+				{
+					case kTSIOError:
+						NSLog(@"IO Error");
+						break;
+					case kTSInvalidResponse:
+						NSLog(@"Invalid response body");
+						break;
+					default:
+						NSLog(@"Some unexpected error occurred");
+						// For debugging, check the userInfo attached to the error
+				}
+			}
+			else
+			{
+				// No error; URL was not handled by tapstream
+				// Fall back to openURL on the original URL
+				[[UIApplication sharedApplication] openURL:userActivity.webpageURL];
+			}
 	}
 	return NO;
 }
