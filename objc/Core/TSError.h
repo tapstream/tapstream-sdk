@@ -6,8 +6,8 @@
 #define kTSErrorDomain @"Tapstream"
 
 typedef enum _TSErrorCode {
-	kTSError = 0,
-	kTSInvalidResponse,
+	kTSIOError = 0,
+	kTSInvalidResponse
 } TSErrorCode;
 
 

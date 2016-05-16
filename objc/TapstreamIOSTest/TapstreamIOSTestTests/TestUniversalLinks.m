@@ -32,14 +32,14 @@
 
 	XCTAssertEqual(ul.status, kTSULUnknown);
 	XCTAssert(ul.error != nil);
-	XCTAssertEqual(ul.error.code, kTSInvalidResponse);
+	XCTAssertEqual(ul.error.code, kTSIOError);
 
 	r = [[TSResponse alloc] initWithStatus:200 message:nil data:nil];
 	ul = [TSUniversalLink universalLinkWithDeeplinkQueryResponse:r];
 
 	XCTAssertEqual(ul.status, kTSULUnknown);
 	XCTAssert(ul.error != nil);
-	XCTAssertEqual(ul.error.code, kTSInvalidResponse);
+	XCTAssertEqual(ul.error.code, kTSIOError);
 }
 
 - (void)testInvalidJSON {

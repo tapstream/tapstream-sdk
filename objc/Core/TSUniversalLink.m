@@ -18,7 +18,7 @@
 	TSUniversalLinkStatus status = kTSULUnknown;
 
 	if (response.status != 200 || response.data == nil){
-		NSError* error = [TSError errorWithCode:kTSInvalidResponse
+		NSError* error = [TSError errorWithCode:kTSIOError
 										message:[NSString stringWithFormat:@"Invalid response (status code %d)", response.status]];
 		return [self universalLinkWithError:error];
 	}

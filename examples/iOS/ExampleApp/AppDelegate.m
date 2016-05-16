@@ -152,8 +152,11 @@
 				// An error occurred, better check it out
 				switch(result.error.code)
 				{
+					case kTSIOError:
+						NSLog(@"IO Error");
+						break;
 					case kTSInvalidResponse:
-						NSLog(@"Invalid response from Tapstream server");
+						NSLog(@"Invalid response body");
 						break;
 					default:
 						NSLog(@"Some unexpected error occurred");
