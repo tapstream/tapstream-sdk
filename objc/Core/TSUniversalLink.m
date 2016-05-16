@@ -1,10 +1,12 @@
 #import <Foundation/Foundation.h>
 #import "TSUniversalLink.h"
+#import "TSError.h"
 
 @interface TSUniversalLink()
 @property(nonatomic, STRONG_OR_RETAIN, readwrite) NSURL* deeplinkURL;
 @property(nonatomic, STRONG_OR_RETAIN, readwrite) NSURL* fallbackURL;
 @property(nonatomic, readwrite) TSUniversalLinkStatus status;
+@property(nonatomic, STRONG_OR_RETAIN, readwrite) NSError* error;
 @end
 
 @implementation TSUniversalLink
@@ -16,7 +18,9 @@
 	TSUniversalLinkStatus status = kTSULUnknown;
 
 	if (response.status != 200 || response.data == nil){
-		return [self universalLinkWithStatus:kTSULUnknown];
+		NSError* error = [TSError errorWithCode:kTSInvalidResponse
+										message:[NSString stringWithFormat:@"Invalid response (status code %d)", response.status]];
+		return [self universalLinkWithError:error];
 	}
 
 	NSData *jsonData = response.data;
@@ -26,7 +30,10 @@
 																error:&error];
 
 	if (error != nil){
-		return [self universalLinkWithStatus:kTSULUnknown];
+		NSError* tsError = [TSError errorWithCode:kTSInvalidResponse
+										message:@"Invalid JSON response"
+										   info:[NSDictionary dictionaryWithObjectsAndKeys:error, @"cause", nil]];
+		return [self universalLinkWithError:tsError];
 	}
 
 	id regUrlStr = [jsonDict objectForKey:@"registered_url"];
@@ -68,12 +75,29 @@
 	return [[self alloc] initWithStatus:status];
 }
 
++ (instancetype)universalLinkWithError:(NSError*)error
+{
+	return [[self alloc] initWithError:error];
+}
+
 - (id)initWithStatus:(TSUniversalLinkStatus)status
 {
 	if([self init] != nil){
 		self.deeplinkURL = nil;
 		self.fallbackURL = nil;
 		self.status = status;
+		self.error = nil;
+	}
+	return self;
+}
+
+- (id)initWithError:(NSError*)error
+{
+	if([self init] != nil){
+		self.deeplinkURL = nil;
+		self.fallbackURL = nil;
+		self.status = kTSULUnknown;
+		self.error = error;
 	}
 	return self;
 }
@@ -84,6 +108,7 @@
 		self.deeplinkURL = deeplinkURL;
 		self.fallbackURL = fallbackURL;
 		self.status = status;
+		self.error = nil;
 	}
 	return self;
 }

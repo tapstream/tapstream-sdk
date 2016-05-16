@@ -18,6 +18,7 @@
 		66D915211BD254DE00782905 /* libTapstream.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D9151F1BD254DE00782905 /* libTapstream.a */; };
 		66D915221BD254DE00782905 /* libTapstreamWOM.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D915201BD254DE00782905 /* libTapstreamWOM.a */; };
 		66D915241BD254F400782905 /* libPods-TapstreamIOSTestTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D915231BD254F400782905 /* libPods-TapstreamIOSTestTests.a */; };
+		66DB63BC1CEA434700A4E072 /* TestUniversalLinks.m in Sources */ = {isa = PBXBuildFile; fileRef = 66DB63BB1CEA434700A4E072 /* TestUniversalLinks.m */; };
 		E8E5439F6FD04F59A40ABA10 /* libPods-TapstreamIOSTestTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5065BB279B27859413C55EE2 /* libPods-TapstreamIOSTestTests.a */; };
 /* End PBXBuildFile section */
 
@@ -60,6 +61,7 @@
 		66D9151F1BD254DE00782905 /* libTapstream.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libTapstream.a; path = "Pods/../build/Debug-iphoneos/libTapstream.a"; sourceTree = "<group>"; };
 		66D915201BD254DE00782905 /* libTapstreamWOM.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libTapstreamWOM.a; path = "Pods/../build/Debug-iphoneos/libTapstreamWOM.a"; sourceTree = "<group>"; };
 		66D915231BD254F400782905 /* libPods-TapstreamIOSTestTests.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libPods-TapstreamIOSTestTests.a"; path = "Pods/../build/Debug-iphoneos/libPods-TapstreamIOSTestTests.a"; sourceTree = "<group>"; };
+		66DB63BB1CEA434700A4E072 /* TestUniversalLinks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUniversalLinks.m; sourceTree = "<group>"; };
 		7F557048FBFBB0EF9A9B2220 /* Pods-TapstreamIOSTestTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TapstreamIOSTestTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-TapstreamIOSTestTests/Pods-TapstreamIOSTestTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -143,6 +145,7 @@
 			children = (
 				661FAFAF1BD24B1A00CCBD1C /* TapstreamIOSTestTests.m */,
 				661FAFB11BD24B1A00CCBD1C /* Info.plist */,
+				66DB63BB1CEA434700A4E072 /* TestUniversalLinks.m */,
 			);
 			path = TapstreamIOSTestTests;
 			sourceTree = "<group>";
@@ -371,6 +374,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				661FAFB01BD24B1A00CCBD1C /* TapstreamIOSTestTests.m in Sources */,
+				66DB63BC1CEA434700A4E072 /* TestUniversalLinks.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
