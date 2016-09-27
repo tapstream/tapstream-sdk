@@ -4,7 +4,7 @@
 #import "TSUtils.h"
 #import "TSUniversalLink.h"
 
-#define kTSVersion @"2.11.3"
+#define kTSVersion @"2.11.4"
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
 #define kTSCookieMatchUrlTemplate @"https://api.taps.io/%@/event/%@/?cookiematch=true&%@"
 #define kTSHitUrlTemplate @"https://api.tapstream.com/%@/hit/%@.gif"
@@ -647,17 +647,20 @@
 	if (ul.status != kTSULUnknown){
 		NSURL* simulatedClickUrl = [self urlWithQueryItems:url,
 									@"__tsredirect", @"0",
-									@"__tsul", @"1",
+									@"__tsul", [platform loadUuid],
+									@"__tshardware-ios-idfa", config.idfa,
 									nil];
 
-		[platform fireCookieMatch:simulatedClickUrl
-					   completion:^(TSResponse* response){
-			if (response.status >= 200 && response.status < 300){
+		TSResponse* simulatedClickResponse = [platform request:[simulatedClickUrl absoluteString]
+					 data:nil
+				   method:@"GET"
+			   timeout_ms:kTSDefaultTimeout];
+
+		if (simulatedClickResponse.status >= 200 && simulatedClickResponse.status < 300){
 				[TSLogging logAtLevel:kTSLoggingInfo format:@"Universal link simulated click succeeded for url %@", url];
-			}else{
-				[TSLogging logAtLevel:kTSLoggingWarn format:@"Universal link simulated click failed for url %@", url];
-			}
-		}];
+		}else{
+			[TSLogging logAtLevel:kTSLoggingWarn format:@"Universal link simulated click failed for url %@", url];
+		}
 	}
 
 	return ul;
