@@ -32,7 +32,6 @@
 		12A98535185A67A500D388CD /* TSPlatformImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A98529185A67A500D388CD /* TSPlatformImpl.m */; };
 		12A98536185A67A500D388CD /* TSTapstream.m in Sources */ = {isa = PBXBuildFile; fileRef = 12A9852B185A67A500D388CD /* TSTapstream.m */; };
 		12FFCF0A183FE5B300D54F4E /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12FFCF09183FE5B300D54F4E /* StoreKit.framework */; };
-		662003871BC7432900ACED07 /* TSSafariViewControllerDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 662003861BC7432900ACED07 /* TSSafariViewControllerDelegate.m */; };
 		662003901BC7758400ACED07 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6620038F1BC7758400ACED07 /* SafariServices.framework */; };
 		668FF8A51CEA38FA009A8C44 /* TSError.m in Sources */ = {isa = PBXBuildFile; fileRef = 668FF8A41CEA38FA009A8C44 /* TSError.m */; };
 		66D258E51C2083E600667982 /* TSLander.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D258DE1C2083E600667982 /* TSLander.m */; };
@@ -93,8 +92,6 @@
 		12A9852A185A67A500D388CD /* TSTapstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSTapstream.h; sourceTree = "<group>"; };
 		12A9852B185A67A500D388CD /* TSTapstream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSTapstream.m; sourceTree = "<group>"; };
 		12FFCF09183FE5B300D54F4E /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		662003851BC7432900ACED07 /* TSSafariViewControllerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSSafariViewControllerDelegate.h; sourceTree = "<group>"; };
-		662003861BC7432900ACED07 /* TSSafariViewControllerDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSSafariViewControllerDelegate.m; sourceTree = "<group>"; };
 		6620038F1BC7758400ACED07 /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = System/Library/Frameworks/SafariServices.framework; sourceTree = SDKROOT; };
 		668FF8A31CEA35BE009A8C44 /* TSError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TSError.h; sourceTree = "<group>"; };
 		668FF8A41CEA38FA009A8C44 /* TSError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSError.m; sourceTree = "<group>"; };
@@ -236,8 +233,6 @@
 				66D258E21C2083E600667982 /* TSLanderDelegateWrapper.h */,
 				66D258E31C2083E600667982 /* TSLanderDelegateWrapper.m */,
 				66D258E41C2083E600667982 /* TSLanderView.xib */,
-				662003851BC7432900ACED07 /* TSSafariViewControllerDelegate.h */,
-				662003861BC7432900ACED07 /* TSSafariViewControllerDelegate.m */,
 				12A98523185A67A500D388CD /* bin */,
 				12A98524185A67A500D388CD /* TSAppEventSourceImpl.h */,
 				12A98525185A67A500D388CD /* TSAppEventSourceImpl.m */,
@@ -290,6 +285,7 @@
 				TargetAttributes = {
 					12042FE4167D456200F509B7 = {
 						DevelopmentTeam = ZDKMGAVQQS;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.Keychain = {
 								enabled = 0;
@@ -346,7 +342,6 @@
 				66D258E71C2083E600667982 /* TSLanderDelegateWrapper.m in Sources */,
 				12A98534185A67A500D388CD /* TSCoreListenerImpl.m in Sources */,
 				12A98533185A67A500D388CD /* TSAppEventSourceImpl.m in Sources */,
-				662003871BC7432900ACED07 /* TSSafariViewControllerDelegate.m in Sources */,
 				12042FFA167D456200F509B7 /* AppDelegate.m in Sources */,
 				66D258E61C2083E600667982 /* TSLanderController.m in Sources */,
 				66D258E51C2083E600667982 /* TSLander.m in Sources */,

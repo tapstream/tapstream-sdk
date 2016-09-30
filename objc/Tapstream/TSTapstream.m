@@ -1,5 +1,4 @@
 
-#import "TSSafariViewControllerDelegate.h"
 #import "TSTapstream.h"
 #import "TSHelpers.h"
 #import "TSPlatformImpl.h"

@@ -26,8 +26,5 @@
 - (NSString *)getBundleShortVersion;
 - (BOOL)landerShown:(NSUInteger)landerId;
 - (void)setLanderShown:(NSUInteger)landerId;
-- (BOOL) shouldCookieMatch;
-- (void)setCookieMatchFired:(NSTimeInterval)t;
-- (BOOL)fireCookieMatch:(NSURL*)url completion:(void(^)(TSResponse*))completion;
 
 @end

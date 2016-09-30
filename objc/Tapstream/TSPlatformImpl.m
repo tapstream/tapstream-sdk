@@ -1,5 +1,4 @@
 #import "TSPlatformImpl.h"
-#import "TSSafariViewControllerDelegate.h"
 #import <sys/types.h>
 #import <sys/sysctl.h>
 #import <sys/socket.h>
@@ -19,7 +18,7 @@
 #define kTSFiredEventsKey @"__tapstream_fired_events"
 #define kTSUUIDKey @"__tapstream_uuid"
 #define kTSHasRunKey @"__tapstream_has_run"
-#define kTSLastCookieMatchTimestampKey @"__tapstream_cookie_match_timestamp"
+
 #define kTSLandersShownKey @"__tapstream_landers_shown"
 #define SECONDS_PER_DAY 86400
 
@@ -371,28 +370,6 @@
 	[[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-- (NSTimeInterval) getCookieMatchFired
-{
-	return [[NSUserDefaults standardUserDefaults] doubleForKey:kTSLastCookieMatchTimestampKey];
-}
-- (void) setCookieMatchFired:(NSTimeInterval)t
-{
-	[[NSUserDefaults standardUserDefaults] setDouble:t forKey:kTSLastCookieMatchTimestampKey];
-}
-- (BOOL) shouldCookieMatch
-{
-	NSTimeInterval lastCookieMatch = [self getCookieMatchFired];
-	NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
-	return (now - lastCookieMatch) >= SECONDS_PER_DAY;
-}
-
-- (BOOL)fireCookieMatch:(NSURL*)url completion:(void(^)(TSResponse*))completion
-{
-	return [TSSafariViewControllerDelegate
-	 presentSafariViewControllerWithURLAndCompletion:url
-	 completion:completion];
-
-}
 
 
 @end

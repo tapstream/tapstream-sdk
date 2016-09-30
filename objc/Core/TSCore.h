@@ -30,7 +30,6 @@
 	NSString *failingEventId;
 	NSString *appName;
 	int delay;
-	dispatch_semaphore_t cookieMatchFired;
 }
 
 
@@ -41,13 +40,10 @@
 - (void)start;
 - (void)fireEvent:(TSEvent *)event;
 - (void)fireHit:(TSHit *)hit completion:(void(^)(TSResponse *))completion;
-- (void)firedCookieMatch;
 - (void)getConversionData:(void(^)(NSData *))completion;
 - (NSData*)getConversionDataBlocking:(int)timeout_ms;
 - (int)getDelay;
 - (NSURL*)makeLanderURL;
-- (NSURL*)makeCookieMatchURL;
-- (NSURL*)makeCookieMatchURL:(NSString*)eventName data:(NSString*)data;
 - (NSMutableString *)postData;
 - (void)dispatchOnQueue:(void(^)())completion;
 
