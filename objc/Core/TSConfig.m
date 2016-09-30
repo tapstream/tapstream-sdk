@@ -23,6 +23,8 @@
 @synthesize fireAutomaticInstallEvent = fireAutomaticInstallEvent;
 @synthesize fireAutomaticOpenEvent = fireAutomaticOpenEvent;
 @synthesize fireAutomaticIAPEvents = fireAutomaticIAPEvents;
+
+// DEPRECATED
 @synthesize attemptCookieMatch = attemptCookieMatch;
 
 @synthesize collectTasteData = collectTasteData;

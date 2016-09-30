@@ -4,9 +4,8 @@
 #import "TSUtils.h"
 #import "TSUniversalLink.h"
 
-#define kTSVersion @"2.11.3"
+#define kTSVersion @"2.11.4"
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
-#define kTSCookieMatchUrlTemplate @"https://api.taps.io/%@/event/%@/?cookiematch=true&%@"
 #define kTSHitUrlTemplate @"https://api.tapstream.com/%@/hit/%@.gif"
 #define kTSDeeplinkQueryUrlTemplate @"https://api.tapstream.com/%@/deeplink_query/"
 #define kTSLanderUrlTemplate @"https://reporting.tapstream.com/v1/in_app_landers/display/?secret=%@&event_session=%@"
@@ -39,8 +38,6 @@
 @property(nonatomic, STRONG_OR_RETAIN) NSString *appName;
 @property(nonatomic, STRONG_OR_RETAIN) NSString *platformName;
 @property(nonatomic) dispatch_queue_t queue;
-@property(nonatomic) dispatch_semaphore_t cookieMatchFired;
-@property(nonatomic) BOOL cookieMatchInProgress;
 
 - (NSString *)clean:(NSString *)s;
 - (void)increaseDelay;
@@ -50,7 +47,7 @@
 
 @implementation TSCore
 
-@synthesize del, platform, listener, appEventSource, config, accountName, secret, encodedAppName, postData, firingEvents, firedEvents, failingEventId, appName, platformName, queue, cookieMatchFired;
+@synthesize del, platform, listener, appEventSource, config, accountName, secret, encodedAppName, postData, firingEvents, firedEvents, failingEventId, appName, platformName, queue;
 
 - (id)initWithDelegate:(id<TSDelegate>)delegateVal
 	platform:(id<TSPlatform>)platformVal
@@ -84,7 +81,6 @@
         firingEvents = [[NSMutableSet alloc] initWithCapacity:32];
 		self.firedEvents = [platform loadFiredEvents];
 		self.queue = RETAIN(dispatch_queue_create("Tapstream Internal Queue", DISPATCH_QUEUE_CONCURRENT));
-		self.cookieMatchFired = RETAIN(dispatch_semaphore_create(0));
 
 	}
 	return self;
@@ -105,7 +101,6 @@
 	RELEASE(appName);
 	RELEASE(platformName);
 	RELEASE(queue);
-	RELEASE(cookieMatchFired);
 	SUPER_DEALLOC;
 }
 
@@ -153,28 +148,7 @@
 
 	if([platform isFirstRun])
 	{
-		BOOL firingCookieMatch = false;
-		if(config.attemptCookieMatch) // cookie match replaces initial install and open events
-		{
-			NSURL* url = [self makeCookieMatchURL];
-			__unsafe_unretained TSCore* me = self;
-			void (^completion)(TSResponse*) = ^(TSResponse* response){
-				[me firedCookieMatch];
-			};
-			firingCookieMatch = [platform fireCookieMatch:url completion:completion];
-			if(firingCookieMatch){
-				// Block queue until cookie match fired or for 10 seconds
-				dispatch_barrier_async(self.queue, ^{
-					dispatch_semaphore_wait(self.cookieMatchFired,
-											dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 10));
-					[platform registerFirstRun];
-					NSLog(@"Tapstream: Cookie Match Complete");
-				});
-			}
-
-		}
-
-		if(!firingCookieMatch && config.fireAutomaticInstallEvent)
+		if(config.fireAutomaticInstallEvent)
 		{
 			if(config.installEventName != nil)
 			{
@@ -231,12 +205,6 @@
 	}
 }
 
-- (void)firedCookieMatch
-{
-	[platform setCookieMatchFired:[[NSDate date] timeIntervalSince1970]];
-	dispatch_semaphore_signal(self.cookieMatchFired);
-}
-
 - (BOOL)shouldFireEvent:(TSEvent *)e
 {
 
@@ -265,40 +233,11 @@
 - (void)sendEventRequest:(TSEvent*)e completion:(void(^)(TSResponse*))completion{
 
 	NSString *data = [postData stringByAppendingString:e.postData];
-	void (^fireEvent)() = ^{
+
+	dispatch_async(self.queue, ^{
 		NSString *url = [NSString stringWithFormat:kTSEventUrlTemplate, accountName, e.encodedName];
 		completion([platform request:url data:data method:@"POST" timeout_ms:kTSDefaultTimeout]);
-	};
-
-	if(config.attemptCookieMatch && [platform shouldCookieMatch] && !self.cookieMatchInProgress)
-	{
-		self.cookieMatchInProgress = true;
-		NSURL* url = [self makeCookieMatchURL:e.name data:data];
-		__unsafe_unretained TSCore* me = self;
-
-		// SFSafariViewController must run on main thread
-		dispatch_async(dispatch_get_main_queue(), ^{
-			BOOL firingCookieMatch = [platform fireCookieMatch:url completion:^(TSResponse* response){
-				if(me != nil){
-					me.cookieMatchInProgress = false;
-					if (response == nil){
-						completion([[TSResponse alloc] initWithStatus:-1 message:@"Request incomplete" data:nil]);
-					}else{
-						[me cookieMatchFired];
-						dispatch_async(me.queue, ^{
-							completion(response);
-						});
-					}
-				}
-			}];
-
-			if (!firingCookieMatch){
-				dispatch_async(self.queue, fireEvent);
-			}
-		});
-	}else{
-		dispatch_async(self.queue, fireEvent);
-	}
+	});
 }
 
 - (void)handleEventRequestResponse:(TSEvent*)e response:(TSResponse*)response
@@ -553,34 +492,6 @@
 	return [[NSURL alloc] initWithString:[NSString stringWithFormat:kTSLanderUrlTemplate, secret, eventSession]];
 }
 
-- (NSURL*)makeCookieMatchURL
-{
-	return [self makeCookieMatchURL:nil data:postData];
-}
-
-- (NSURL*)makeCookieMatchURL:(NSString*)eventName data:(NSString*)data
-{
-
-	if(eventName == nil)
-	{
-		eventName = [NSString stringWithFormat:@"%@-%@-install", platformName, self.appName];
-	}
-
-	NSMutableString* urlString = [NSMutableString stringWithFormat:kTSCookieMatchUrlTemplate,
-								  accountName, eventName, data];
-
-	for(NSString *key in config.globalEventParams)
-	{
-		[urlString appendString:@"&"];
-
-		NSString* value = [config.globalEventParams valueForKey:key];
-		[urlString appendString:[TSUtils encodeEventPairWithPrefix:@"custom-"
-															   key:key
-															 value:value
-												  limitValueLength:NO]];
-	}
-	return [NSURL URLWithString:urlString];
-}
 
 - (NSString *)clean:(NSString *)s
 {
@@ -647,17 +558,20 @@
 	if (ul.status != kTSULUnknown){
 		NSURL* simulatedClickUrl = [self urlWithQueryItems:url,
 									@"__tsredirect", @"0",
-									@"__tsul", @"1",
+									@"__tsul", [platform loadUuid],
+									@"__tshardware-ios-idfa", config.idfa,
 									nil];
 
-		[platform fireCookieMatch:simulatedClickUrl
-					   completion:^(TSResponse* response){
-			if (response.status >= 200 && response.status < 300){
-				[TSLogging logAtLevel:kTSLoggingInfo format:@"Universal link simulated click succeeded for url %@", url];
-			}else{
-				[TSLogging logAtLevel:kTSLoggingWarn format:@"Universal link simulated click failed for url %@", url];
-			}
-		}];
+		TSResponse* response = [platform request:[simulatedClickUrl absoluteString]
+					 data:nil
+				   method:@"GET"
+			   timeout_ms:kTSDefaultTimeout];
+
+		if (response.status >= 200 && response.status < 300){
+			[TSLogging logAtLevel:kTSLoggingInfo format:@"Universal link simulated click succeeded for url %@", url];
+		}else{
+			[TSLogging logAtLevel:kTSLoggingWarn format:@"Universal link simulated click failed for url %@", url];
+		}
 	}
 
 	return ul;
