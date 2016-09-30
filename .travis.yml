@@ -1,6 +1,6 @@
 language: objective-c
 before_install:
-  - cd /usr/local && brew update && git checkout bb7fcab && sed -i bak 's/111bf871bda84e72fdf93f2877d97591b918db2a/d1f9166ae0c7ef01ea16f950fbdfb195b587c857/' Library/Formula/v8.rb && brew install -f v8 && cd $TRAVIS_BUILD_DIR
+  - cd `brew --repository` && brew update && git checkout bb7fcab && sed -i bak 's/111bf871bda84e72fdf93f2877d97591b918db2a/d1f9166ae0c7ef01ea16f950fbdfb195b587c857/' Library/Formula/v8.rb && brew install -f v8 && cd $TRAVIS_BUILD_DIR
   - sudo pip install paver
   - paver package_objc
 script:
