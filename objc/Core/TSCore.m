@@ -4,7 +4,7 @@
 #import "TSUtils.h"
 #import "TSUniversalLink.h"
 
-#define kTSVersion @"2.11.4"
+#define kTSVersion @"2.12.0"
 #define kTSEventUrlTemplate @"https://api.tapstream.com/%@/event/%@/"
 #define kTSHitUrlTemplate @"https://api.tapstream.com/%@/hit/%@.gif"
 #define kTSDeeplinkQueryUrlTemplate @"https://api.tapstream.com/%@/deeplink_query/"

@@ -1,11 +1,11 @@
 Pod::Spec.new do |s|
   s.name         = 'Tapstream'
-  s.version      = '2.11.4'
+  s.version      = '2.12.0'
   s.summary      = 'Tapstream marketing analytics.'
   s.homepage     = 'https://tapstream.com/'
   s.license      = 'MIT'
   s.author       = { 'Benjamin Fox' => 'support@tapstream.com' }
-  s.source       = { :git => 'https://github.com/tapstream/tapstream-sdk.git', :tag => 'v2.11.4-objc' }
+  s.source       = { :git => 'https://github.com/tapstream/tapstream-sdk.git', :tag => 'v2.12.0-objc' }
   s.ios.deployment_target = '4.3'
   s.osx.deployment_target = '10.6'
   s.source_files = 'objc/Tapstream', 'objc/Core'
