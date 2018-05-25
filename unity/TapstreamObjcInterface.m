@@ -13,7 +13,7 @@ void Config_Delete(void *conf)
 
 void _Config_Set(void *conf, const char *key, NSObject *value)
 {
-	TSConfig *c = (BRIDGE_TRANSFER TSConfig *)conf;
+	TSConfig *c = (BRIDGE TSConfig *)conf;
 	NSString *k = [NSString stringWithUTF8String:key];
 	if([c respondsToSelector:NSSelectorFromString(k)])
 	{
@@ -56,39 +56,39 @@ void Event_AddPairString(void *event, const char *key, const char *value)
 {
 	NSString *k = [NSString stringWithUTF8String:key];
 	NSString *v = [NSString stringWithUTF8String:value];
-	[(BRIDGE_TRANSFER TSEvent *)event addValue:v forKey:k];
+	[(BRIDGE TSEvent *)event addValue:v forKey:k];
 }
 void Event_AddPairBool(void *event, const char *key, bool value)
 {
 	NSString *k = [NSString stringWithUTF8String:key];
-	[(BRIDGE_TRANSFER TSEvent *)event addBooleanValue:(int)value forKey:k];
+	[(BRIDGE TSEvent *)event addBooleanValue:(int)value forKey:k];
 }
 void Event_AddPairInt(void *event, const char *key, int value)
 {
 	NSString *k = [NSString stringWithUTF8String:key];
-	[(BRIDGE_TRANSFER TSEvent *)event addIntegerValue:value forKey:k];
+	[(BRIDGE TSEvent *)event addIntegerValue:value forKey:k];
 }
 void Event_AddPairUInt(void *event, const char *key, unsigned int value)
 {
 	NSString *k = [NSString stringWithUTF8String:key];
-	[(BRIDGE_TRANSFER TSEvent *)event addUnsignedIntegerValue:value forKey:k];
+	[(BRIDGE TSEvent *)event addUnsignedIntegerValue:value forKey:k];
 }
 void Event_AddPairDouble(void *event, const char *key, double value)
 {
 	NSString *k = [NSString stringWithUTF8String:key];
-	[(BRIDGE_TRANSFER TSEvent *)event addDoubleValue:value forKey:k];
+	[(BRIDGE TSEvent *)event addDoubleValue:value forKey:k];
 }
 
 void Tapstream_Create(const char *accountName, const char *developerSecret, void *conf)
 {
-	TSConfig *c = (BRIDGE_TRANSFER TSConfig *)conf;
+	TSConfig *c = (BRIDGE TSConfig *)conf;
 	NSString *name = [NSString stringWithUTF8String:accountName];
 	NSString *secret = [NSString stringWithUTF8String:developerSecret];
 	[TSTapstream createWithAccountName:name developerSecret:secret config:c];
 }
 void Tapstream_FireEvent(void *event)
 {
-	TSEvent *e = (BRIDGE_TRANSFER TSEvent *)event;
+	TSEvent *e = (BRIDGE TSEvent *)event;
 	[[TSTapstream instance] fireEvent:e];
 }
 
